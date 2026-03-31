@@ -1,96 +1,121 @@
 /**
- * Advanced AI Chat Module
+ * 🤖 Advanced AI Chat — Public API
  *
- * Provides a comprehensive advanced chat system with:
- *  - Conversation branching & forking
- *  - Message pinning & tagging
- *  - Smart context-window management
- *  - Full-text, regex, and fuzzy search with relevance scoring
- *  - Rich conversation analytics (tokens, cost, tool frequency)
- *  - Export to Markdown, JSON, and plain text
+ * Everything is in ONE file: AiChat.ts
+ * Import anything you need from here.
  *
  * @example
  * ```ts
- * import { AdvancedChat } from './chat/index.js'
+ * import { AdvancedChat, AiBrain } from './chat/index.js'
  *
- * const chat = new AdvancedChat({ title: 'My Session' })
- *
- * // Add messages
- * chat.addUserMessage('Explain the repository structure')
- * chat.addAssistantMessage('This repo contains...', {
+ * // Create a smart AI that can chat, write code, and analyze images
+ * const ai = new AdvancedChat({
+ *   title: 'My AI Session',
+ *   apiKey: 'sk-ant-...',          // or set ANTHROPIC_API_KEY env var
  *   model: 'claude-sonnet-4-20250514',
- *   tokenUsage: { inputTokens: 500, outputTokens: 1200 },
- *   apiDurationMs: 3400,
  * })
  *
- * // Pin important messages
- * const msgs = chat.getMessages()
- * chat.togglePin(msgs[0].id)
+ * // 💬 Chat with the AI
+ * const reply = await ai.sendMessage('Explain how React hooks work')
  *
- * // Fork a branch
- * chat.forkBranch(msgs[0].id, 'Alternative approach')
- * chat.addUserMessage('Try a different approach...')
+ * // 💻 Write code (AI generates production-quality code)
+ * const { result } = await ai.writeCode({
+ *   description: 'REST API with authentication',
+ *   language: 'typescript',
+ *   style: 'production',
+ * })
+ * console.log(result.code)
  *
- * // Search
- * const results = chat.search({ query: 'repository', mode: 'fuzzy' })
+ * // 🔍 Review code for bugs and security issues
+ * const { result: review } = await ai.reviewCode({
+ *   code: 'function add(a, b) { return a + b }',
+ *   language: 'javascript',
+ *   focus: ['bugs', 'security', 'style'],
+ * })
+ * console.log(`Score: ${review.score}/100`)
  *
- * // Analytics
- * const analytics = chat.getAnalytics()
- * console.log(`Turns: ${analytics.turnCount}, Cost: $${analytics.estimatedCostUsd}`)
+ * // 🖼 Analyze images (like Claude Opus vision)
+ * const { result: analysis } = await ai.analyzeImage({
+ *   imageData: base64ImageString,
+ *   mediaType: 'image/png',
+ *   question: 'What is in this image?',
+ * })
+ * console.log(analysis.description)
  *
- * // Export
- * const md = chat.exportMarkdown()
- * const json = chat.exportJSON()
+ * // 🌿 Branch conversations
+ * const msgs = ai.getMessages()
+ * ai.forkBranch(msgs[0].id, 'Try different approach')
  *
- * // Context window
- * const ctx = chat.buildContextWindow()
- * console.log(`${ctx.messages.length} messages fit (${ctx.totalTokens} tokens)`)
+ * // 📌 Pin important messages
+ * ai.togglePin(msgs[0].id)
  *
- * // Persistence
- * const serialized = chat.serialize()
- * const restored = AdvancedChat.deserialize(serialized)
+ * // 🔍 Search through history
+ * const results = ai.search({ query: 'authentication', mode: 'fuzzy' })
+ *
+ * // 📊 Get analytics
+ * const stats = ai.getAnalytics()
+ * console.log(`Cost: $${stats.estimatedCostUsd}, Code: ${stats.codeStats.totalSnippets} snippets`)
+ *
+ * // 📤 Export conversation
+ * const markdown = ai.exportMarkdown()
+ * const json = ai.exportJSON()
+ *
+ * // 💾 Save and restore
+ * const saved = ai.serialize()
+ * const restored = AdvancedChat.deserialize(saved)
  * ```
  */
 
-// Core
-export { AdvancedChat } from './AdvancedChat.js'
+// ── Main Classes ──
+export { AdvancedChat, AiBrain } from './AiChat.js'
 
-// Search
-export { searchMessages, searchByTool, getPinnedMessages } from './ChatSearch.js'
+// ── Search Functions ──
+export { searchMessages, searchByTool, getPinnedMessages } from './AiChat.js'
 
-// Analytics
-export { computeAnalytics, getTopTools, getTurnBreakdown } from './ChatAnalytics.js'
+// ── Analytics Functions ──
+export { computeAnalytics, getTopTools, getTurnBreakdown } from './AiChat.js'
 
-// Export
-export { exportConversation } from './ChatExport.js'
+// ── Export Functions ──
+export { exportConversation } from './AiChat.js'
 
-// Types
+// ── Code Writer Functions ──
+export {
+  detectLanguage,
+  countLinesOfCode,
+  estimateComplexity,
+  getCodeTemplate,
+  getLanguageInfo,
+  formatCode,
+} from './AiChat.js'
+
+// ── Image Analyzer Functions ──
+export {
+  isSupportedImageType,
+  validateImageData,
+  estimateImageSize,
+  buildImageContentBlock,
+  createImageBlock,
+  parseImageAnalysis,
+} from './AiChat.js'
+
+// ── All Types ──
 export type {
   // Messages
-  ChatMessageId,
-  ChatMessage,
-  ChatRole,
-  ContentBlock,
-  ContentBlockType,
-  TokenUsage,
-  // Conversation & Branching
-  Branch,
-  BranchId,
-  Conversation,
-  ConversationMetadata,
+  ChatMessageId, ChatMessage, ChatRole, ContentBlock, ContentBlockType, TokenUsage,
+  // Conversation
+  Branch, BranchId, Conversation, ConversationMetadata,
   // Search
-  SearchMode,
-  ChatSearchOptions,
-  ChatSearchResult,
-  SearchHighlight,
+  SearchMode, ChatSearchOptions, ChatSearchResult, SearchHighlight,
   // Analytics
-  ConversationAnalytics,
-  ModelUsageBreakdown,
+  ConversationAnalytics, ModelUsageBreakdown, CodeStats, ImageStats,
   // Export
-  ExportFormat,
-  ExportOptions,
+  ExportFormat, ExportOptions,
   // Context Window
-  MessagePriority,
-  ContextWindowConfig,
-  ContextWindowResult,
-} from './types.js'
+  MessagePriority, ContextWindowConfig, ContextWindowResult,
+  // Code Writer
+  ProgrammingLanguage, CodeRequest, CodeResult, CodeReviewRequest, CodeReviewResult, CodeIssue,
+  // Image Analyzer
+  ImageAnalysisRequest, ImageAnalysisResult,
+  // AI Brain
+  AiBrainConfig, ApiMessage, ApiContentBlock,
+} from './AiChat.js'

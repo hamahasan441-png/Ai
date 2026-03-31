@@ -1,69 +1,93 @@
-# Ai
+# 🤖 Ai — Advanced AI System
 Smart
 
-## Advanced AI Chat Module
+## What Is This?
 
-The `src/chat/` module provides a full-featured advanced chat system built on top of the core AI assistant. Import it from `src/chat/index.ts`.
+A **complete AI system** in a single TypeScript file (`src/chat/AiChat.ts`) that can:
 
-### Features
+| Capability | Description |
+| --- | --- |
+| 💬 **Chat** | Intelligent conversation powered by Claude API |
+| 💻 **Write Code** | Generate production-quality code in 24 languages |
+| 🔍 **Review Code** | Find bugs, security issues, and style problems |
+| 🖼 **Analyze Images** | Describe and understand photos (vision AI) |
+| 🌿 **Branch** | Fork conversations to explore different approaches |
+| 📌 **Pin & Tag** | Bookmark important messages with custom labels |
+| 🔎 **Search** | Fuzzy, exact, and regex search with relevance scoring |
+| 📊 **Analytics** | Token usage, cost, tool frequency, code & image stats |
+| 📤 **Export** | Conversations to Markdown, JSON, or plain text |
+| 🧠 **Context Window** | Smart management of what fits in the LLM |
+| 💾 **Persistence** | Save and restore complete sessions |
 
-- **Conversation Branching** — Fork conversations at any point and switch between branches to explore different approaches.
-- **Message Pinning & Tagging** — Bookmark important messages and add custom tags for easy filtering.
-- **Smart Context Window** — Automatically manage which messages fit within the model's context window using configurable strategies (`truncate_oldest`, `summarize`, `drop_low_priority`).
-- **Advanced Search** — Full-text, exact, regex, and fuzzy search with relevance scoring and highlighted snippets.
-- **Rich Analytics** — Token usage tracking, cost estimation, tool frequency analysis, per-model breakdowns, and per-turn metrics.
-- **Multi-Format Export** — Export conversations to Markdown, JSON, or plain text with configurable options.
-- **Persistence** — Serialize and deserialize entire conversations for storage and resumption.
+## How the File Is Organized
 
-### Quick Start
+Everything lives in **one file** (`src/chat/AiChat.ts`), divided into 8 clear sections:
+
+```
+§1  TYPES           — Every data shape the AI uses
+§2  SEARCH ENGINE   — Find any message instantly
+§3  ANALYTICS       — Token, cost & tool tracking
+§4  EXPORT          — Markdown / JSON / Text output
+§5  CODE WRITER     — Generate, review & fix code in 24 languages
+§6  IMAGE ANALYZER  — Describe & understand photos (like Claude Opus)
+§7  AI BRAIN        — Core intelligence (Claude API connection)
+§8  ADVANCED CHAT   — Main class tying it ALL together
+```
+
+## Quick Start
 
 ```ts
 import { AdvancedChat } from './chat/index.js'
 
-const chat = new AdvancedChat({ title: 'My Session' })
-
-// Add messages
-chat.addUserMessage('Explain the repository structure')
-chat.addAssistantMessage('This repo contains...', {
+// Create the AI (set ANTHROPIC_API_KEY env var or pass apiKey)
+const ai = new AdvancedChat({
+  title: 'My Session',
   model: 'claude-sonnet-4-20250514',
-  tokenUsage: { inputTokens: 500, outputTokens: 1200 },
-  apiDurationMs: 3400,
 })
 
-// Pin important messages
-const msgs = chat.getMessages()
-chat.togglePin(msgs[0].id)
+// 💬 Chat
+const reply = await ai.sendMessage('How do I build a REST API?')
 
-// Fork a branch to try a different approach
-chat.forkBranch(msgs[0].id, 'Alternative approach')
-chat.addUserMessage('Try a different approach...')
+// 💻 Write code
+const { result } = await ai.writeCode({
+  description: 'HTTP server with authentication',
+  language: 'typescript',
+  style: 'production',
+})
+console.log(result.code)
 
-// Search across all messages
-const results = chat.search({ query: 'repository', mode: 'fuzzy' })
+// 🔍 Review code
+const { result: review } = await ai.reviewCode({
+  code: myCode,
+  language: 'python',
+  focus: ['bugs', 'security'],
+})
+console.log(`Score: ${review.score}/100`)
 
-// Get analytics
-const analytics = chat.getAnalytics()
-console.log(`Turns: ${analytics.turnCount}, Cost: $${analytics.estimatedCostUsd}`)
+// 🖼 Analyze an image
+const { result: img } = await ai.analyzeImage({
+  imageData: base64String,
+  mediaType: 'image/png',
+  question: 'What do you see?',
+})
+console.log(img.description)
 
-// Export conversation
-const md = chat.exportMarkdown()
+// 📊 Get analytics
+const stats = ai.getAnalytics()
+console.log(`Cost: $${stats.estimatedCostUsd}`)
+console.log(`Code: ${stats.codeStats.totalSnippets} snippets`)
+console.log(`Images: ${stats.imageStats.totalImagesAnalyzed} analyzed`)
 
-// Context window management
-const ctx = chat.buildContextWindow()
-console.log(`${ctx.messages.length} messages fit (${ctx.totalTokens} tokens)`)
-
-// Persist and restore
-const serialized = chat.serialize()
-const restored = AdvancedChat.deserialize(serialized)
+// 📤 Export
+const markdown = ai.exportMarkdown()
 ```
 
-### Module Structure
+## Supported Languages (Code Writer)
 
-| File | Description |
-| --- | --- |
-| `types.ts` | Core type definitions (messages, branches, search, analytics, export) |
-| `AdvancedChat.ts` | Main orchestrator class with all features |
-| `ChatSearch.ts` | Search engine with fuzzy/exact/regex modes and relevance scoring |
-| `ChatAnalytics.ts` | Conversation analytics, token tracking, tool frequency |
-| `ChatExport.ts` | Multi-format export (Markdown, JSON, plain text) |
-| `index.ts` | Public API — all exports in one place |
+TypeScript, JavaScript, Python, Rust, Go, Java, C, C++, C#, Swift,
+Kotlin, Ruby, PHP, HTML, CSS, SQL, Bash, PowerShell, R, Dart,
+Scala, Lua, Haskell, Elixir
+
+## Supported Image Formats (Vision AI)
+
+PNG, JPEG, GIF, WebP
