@@ -5,7 +5,7 @@
  * ║                                                                             ║
  * ║   A single-file, advanced AI that can:                                      ║
  * ║     ✦ Chat intelligently with users                                         ║
- * ║     ✦ Write code in 20+ languages (like a senior developer)                 ║
+ * ║     ✦ Write code in 24 languages (like a senior developer)                 ║
  * ║     ✦ Analyze & describe photos/images (vision AI)                          ║
  * ║     ✦ Review and fix code                                                   ║
  * ║     ✦ Search conversations with fuzzy/regex matching                        ║
@@ -446,6 +446,11 @@ export function getPinnedMessages(messages: ChatMessage[], branchId?: string): C
 // ║                                                                             ║
 // ╚═══════════════════════════════════════════════════════════════════════════════╝
 
+/**
+ * Approximate cost per 1 000 tokens for popular models.
+ * These are rough estimates — real pricing depends on the provider.
+ * Last verified: 2025. See https://www.anthropic.com/pricing for current rates.
+ */
 const MODEL_COST_PER_1K: Record<string, { input: number; output: number }> = {
   'claude-opus-4-20250514': { input: 0.015, output: 0.075 },
   'claude-sonnet-4-20250514': { input: 0.003, output: 0.015 },
@@ -904,7 +909,7 @@ export function isSupportedImageType(mediaType: string): boolean {
 /** Validate base64 image data. Returns true if the data looks like valid base64. */
 export function validateImageData(data: string): boolean {
   if (!data || data.length === 0) return false
-  if (data.length > 20_000_000) return false // ~15MB limit
+  if (data.length > 20_000_000) return false // ~15MB decoded (20M base64 chars ≈ 15MB raw bytes)
   return /^[A-Za-z0-9+/]+=*$/.test(data.replace(/\s/g, ''))
 }
 
@@ -1197,7 +1202,13 @@ function parseCodeReview(text: string): CodeReviewResult {
   }
 
   const scoreMatch = text.match(/(?:score|rating)[\s:]*(\d+)/i)
-  const score = scoreMatch ? Math.min(100, Math.max(0, parseInt(scoreMatch[1]!))) : (issues.filter(i => i.severity === 'error').length === 0 ? 80 : 50)
+  let score: number
+  if (scoreMatch) {
+    score = Math.min(100, Math.max(0, parseInt(scoreMatch[1]!)))
+  } else {
+    const hasErrors = issues.some(i => i.severity === 'error')
+    score = hasErrors ? 50 : 80
+  }
 
   const summaryMatch = text.match(/(?:summary|overall)[\s:]+(.+?)(?:\n|$)/i)
   const summary = summaryMatch?.[1]?.trim() ?? `Found ${issues.length} issue(s). Score: ${score}/100`
