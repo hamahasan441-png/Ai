@@ -75,7 +75,10 @@ function estimateMessageTokens(msg: ChatMessage): number {
   }
   // Rough heuristic: ~4 chars per token
   const textLength = msg.content.reduce((sum, b) => {
-    return sum + (b.text?.length ?? 0) + (b.toolResult?.length ?? 0) + (b.toolInput ? JSON.stringify(b.toolInput).length : 0)
+    const text = b.text?.length ?? 0
+    const result = b.toolResult?.length ?? 0
+    const input = b.toolInput ? JSON.stringify(b.toolInput).length : 0
+    return sum + text + result + input
   }, 0)
   return Math.ceil(textLength / 4)
 }
