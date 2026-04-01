@@ -44,6 +44,10 @@ import {
   parseImageAnalysis,
 } from './AiChat'
 
+import { TfIdfScorer } from './TfIdfScorer'
+import * as fs from 'fs'
+import * as path from 'path'
+
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §1  TYPES — All types for the local brain                                  ║
 // ╚═══════════════════════════════════════════════════════════════════════════════╝
@@ -62,6 +66,19 @@ export interface LocalBrainConfig {
   learningEnabled: boolean
   /** Maximum number of learned patterns to store. */
   maxLearnedPatterns: number
+
+  // ── Self-Learning v2 ──
+
+  /** Path for auto-save brain state (default: from paths.ts). Set to '' to disable. */
+  autoSavePath: string
+  /** Auto-save after every N learnings (default: 5). */
+  autoSaveInterval: number
+  /** Confidence decay rate per day (default: 0.01). Unused patterns lose confidence over time. */
+  decayRate: number
+  /** Minimum confidence threshold — patterns below this are auto-pruned (default: 0.1). */
+  minConfidence: number
+  /** Enable TF-IDF scoring for pattern matching (default: true). */
+  useTfIdf: boolean
 }
 
 /** A single entry in the knowledge base. */
@@ -98,6 +115,24 @@ export interface LearnedPattern {
   lastUsed: string
   /** Confidence score (0-1). Higher = more reliable. */
   confidence: number
+  /** Learning source priority: 'cloud-learned' > 'user-corrected' > 'reinforced' > 'learned'. */
+  priority: LearnedPatternPriority
+}
+
+/** Priority levels for learned patterns (higher value = higher priority). */
+export type LearnedPatternPriority = 'learned' | 'reinforced' | 'user-corrected' | 'cloud-learned'
+
+const PRIORITY_WEIGHTS: Record<LearnedPatternPriority, number> = {
+  'learned': 1,
+  'reinforced': 2,
+  'user-corrected': 3,
+  'cloud-learned': 4,
+}
+
+/** Conflict information for ambiguous patterns. */
+export interface PatternConflict {
+  query: string
+  patterns: Array<{ pattern: LearnedPattern; score: number }>
 }
 
 /** Result of a knowledge search. */
@@ -1002,22 +1037,35 @@ export class LocalBrain {
   private knowledgeBase: KnowledgeEntry[]
   private learnedPatterns: LearnedPattern[] = []
   private stats: LocalBrainStats
+  private tfidfScorer: TfIdfScorer
+  private learningsSinceLastSave = 0
 
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
-      model: config?.model ?? 'local-brain-v1',
+      model: config?.model ?? 'local-brain-v2',
       maxResponseLength: config?.maxResponseLength ?? 4096,
       creativity: config?.creativity ?? 0.3,
       systemPrompt: config?.systemPrompt ?? 'You are LocalBrain, a standalone AI assistant that works offline.',
       learningEnabled: config?.learningEnabled ?? true,
       maxLearnedPatterns: config?.maxLearnedPatterns ?? 1000,
+      autoSavePath: config?.autoSavePath ?? '',
+      autoSaveInterval: config?.autoSaveInterval ?? 5,
+      decayRate: config?.decayRate ?? 0.01,
+      minConfidence: config?.minConfidence ?? 0.1,
+      useTfIdf: config?.useTfIdf ?? true,
     }
     this.knowledgeBase = buildKnowledgeBase()
+    this.tfidfScorer = new TfIdfScorer()
     const now = new Date().toISOString()
     this.stats = {
       totalChats: 0, totalCodeGenerations: 0, totalCodeReviews: 0,
       totalImageAnalyses: 0, totalLearnings: 0, patternsLearned: 0,
       knowledgeEntriesAdded: 0, createdAt: now, lastUsedAt: now,
+    }
+
+    // Auto-load persisted brain state if path configured and file exists
+    if (this.config.autoSavePath) {
+      this.autoLoad()
     }
   }
 
@@ -1028,6 +1076,9 @@ export class LocalBrain {
     const start = Date.now()
     this.conversationHistory.push({ role: 'user', content: userMessage })
 
+    // Apply confidence decay to unused patterns
+    this.applyConfidenceDecay()
+
     // Detect intent and extract keywords
     const intent = detectIntent(userMessage)
     const keywords = extractKeywords(userMessage)
@@ -1035,12 +1086,14 @@ export class LocalBrain {
     // Search knowledge base
     const knowledgeResults = searchKnowledge(this.knowledgeBase, keywords)
 
-    // Generate response
-    const text = buildResponse(
-      intent, userMessage, knowledgeResults,
-      this.learnedPatterns, this.conversationHistory,
-      this.config.creativity,
-    )
+    // Generate response (uses TF-IDF if enabled)
+    const text = this.config.useTfIdf
+      ? this.buildResponseWithTfIdf(intent, userMessage, knowledgeResults)
+      : buildResponse(
+          intent, userMessage, knowledgeResults,
+          this.learnedPatterns, this.conversationHistory,
+          this.config.creativity,
+        )
 
     // Update knowledge use counts
     for (const result of knowledgeResults) {
@@ -1062,6 +1115,109 @@ export class LocalBrain {
       usage: { inputTokens, outputTokens, cacheReadTokens: 0, cacheCreationTokens: 0 },
       durationMs,
     }
+  }
+
+  /** Build response using TF-IDF scoring for better pattern matching. */
+  private buildResponseWithTfIdf(
+    intent: string,
+    userMessage: string,
+    knowledgeResults: KnowledgeSearchResult[],
+  ): string {
+    // Score learned patterns using TF-IDF
+    if (this.learnedPatterns.length > 0) {
+      // Rebuild TF-IDF index
+      this.rebuildTfIdfIndex()
+
+      const tfidfResults = this.tfidfScorer.score(userMessage, 5, 0.05)
+
+      if (tfidfResults.length > 0) {
+        // Check for conflicts (multiple patterns with similar scores)
+        const topScore = tfidfResults[0]!.score
+        const closeMatches = tfidfResults.filter(r => r.score >= topScore * 0.9)
+
+        if (closeMatches.length > 1) {
+          // Conflict resolution: prefer higher priority, then reinforcements, then recency
+          const resolved = this.resolveConflict(closeMatches.map(r => {
+            const pattern = this.learnedPatterns.find(p => `pattern-${p.inputPattern}` === r.id)
+            return { pattern: pattern!, score: r.score }
+          }).filter(r => r.pattern))
+
+          if (resolved) {
+            resolved.lastUsed = new Date().toISOString()
+            return resolved.response
+          }
+        }
+
+        // Use top match
+        const topMatch = tfidfResults[0]!
+        const pattern = this.learnedPatterns.find(p => `pattern-${p.inputPattern}` === topMatch.id)
+        if (pattern && pattern.confidence >= this.config.minConfidence) {
+          pattern.lastUsed = new Date().toISOString()
+          return pattern.response
+        }
+      }
+    }
+
+    // Fall back to standard response building
+    return buildResponse(
+      intent, userMessage, knowledgeResults,
+      this.learnedPatterns, this.conversationHistory,
+      this.config.creativity,
+    )
+  }
+
+  /** Rebuild the TF-IDF index from learned patterns. */
+  private rebuildTfIdfIndex(): void {
+    this.tfidfScorer.clear()
+    for (const pattern of this.learnedPatterns) {
+      this.tfidfScorer.addDocument({
+        id: `pattern-${pattern.inputPattern}`,
+        text: pattern.inputPattern,
+      })
+    }
+  }
+
+  /** Resolve conflicts between patterns with similar scores. */
+  private resolveConflict(
+    candidates: Array<{ pattern: LearnedPattern; score: number }>,
+  ): LearnedPattern | null {
+    if (candidates.length === 0) return null
+    if (candidates.length === 1) return candidates[0]!.pattern
+
+    // Sort by: priority (desc) → reinforcements (desc) → recency (desc)
+    candidates.sort((a, b) => {
+      const priorityDiff = (PRIORITY_WEIGHTS[b.pattern.priority] ?? 1) - (PRIORITY_WEIGHTS[a.pattern.priority] ?? 1)
+      if (priorityDiff !== 0) return priorityDiff
+
+      const reinforceDiff = b.pattern.reinforcements - a.pattern.reinforcements
+      if (reinforceDiff !== 0) return reinforceDiff
+
+      return new Date(b.pattern.lastUsed).getTime() - new Date(a.pattern.lastUsed).getTime()
+    })
+
+    return candidates[0]!.pattern
+  }
+
+  /** Apply confidence decay to unused patterns. Prune below minConfidence. */
+  private applyConfidenceDecay(): void {
+    if (this.config.decayRate <= 0) return
+
+    const now = Date.now()
+    const dayMs = 24 * 60 * 60 * 1000
+
+    this.learnedPatterns = this.learnedPatterns.filter(pattern => {
+      const daysSinceUse = (now - new Date(pattern.lastUsed).getTime()) / dayMs
+      if (daysSinceUse < 1) return true  // Skip decay for recently used patterns
+
+      // Decay: confidence *= (1 - decayRate * daysSinceLastUse)
+      // Reinforcement count slows decay
+      const effectiveDecay = this.config.decayRate / (1 + pattern.reinforcements * 0.1)
+      pattern.confidence *= (1 - effectiveDecay * daysSinceUse)
+      pattern.confidence = Math.max(0, pattern.confidence)
+
+      // Prune below minimum confidence
+      return pattern.confidence >= this.config.minConfidence
+    })
   }
 
   // ── Code Writing (same interface as AiBrain.writeCode) ──
@@ -1119,6 +1275,9 @@ export class LocalBrain {
 
     const keywords = extractKeywords(input)
 
+    // Map category to priority
+    const priority = this.categoryToPriority(category)
+
     // Check if we already have a similar pattern
     const existing = this.learnedPatterns.find(p =>
       p.keywords.length > 0 && keywords.length > 0 &&
@@ -1132,6 +1291,10 @@ export class LocalBrain {
       existing.response = correctResponse
       existing.confidence = Math.min(1, existing.confidence + 0.1)
       existing.lastUsed = new Date().toISOString()
+      // Upgrade priority if higher
+      if ((PRIORITY_WEIGHTS[priority] ?? 1) > (PRIORITY_WEIGHTS[existing.priority] ?? 1)) {
+        existing.priority = priority
+      }
     } else {
       // Create new pattern
       if (this.learnedPatterns.length >= this.config.maxLearnedPatterns) {
@@ -1148,11 +1311,30 @@ export class LocalBrain {
         reinforcements: 1,
         lastUsed: new Date().toISOString(),
         confidence: 0.5,
+        priority,
       })
       this.stats.patternsLearned++
     }
 
     this.stats.totalLearnings++
+    this.learningsSinceLastSave++
+
+    // Auto-save periodically
+    if (this.config.autoSavePath &&
+        this.learningsSinceLastSave >= this.config.autoSaveInterval) {
+      this.autoSave()
+    }
+  }
+
+  /** Map a category string to a LearnedPatternPriority. */
+  private categoryToPriority(category: string): LearnedPatternPriority {
+    switch (category) {
+      case 'cloud-learned': return 'cloud-learned'
+      case 'user-corrected':
+      case 'corrected': return 'user-corrected'
+      case 'reinforced': return 'reinforced'
+      default: return 'learned'
+    }
   }
 
   /**
@@ -1197,9 +1379,72 @@ export class LocalBrain {
       // Reinforce this pattern
       this.learn(userInput, assistantResponse, 'reinforced')
     } else if (correction) {
-      // Learn the correction
-      this.learn(userInput, correction, 'corrected')
+      // Learn the correction with higher priority
+      this.learn(userInput, correction, 'user-corrected')
     }
+  }
+
+  /**
+   * Multi-turn feedback: provide feedback on a specific turn in conversation history.
+   * @param turnIndex Index into conversation history (0 = first message).
+   * @param correct Whether the response at that turn was correct.
+   * @param correction The correct response (if incorrect).
+   */
+  feedbackOnTurn(turnIndex: number, correct: boolean, correction?: string): void {
+    if (!this.config.learningEnabled) return
+
+    const history = this.conversationHistory
+    if (turnIndex < 0 || turnIndex >= history.length - 1) return
+
+    const userMsg = history[turnIndex]
+    const assistantMsg = history[turnIndex + 1]
+
+    if (!userMsg || !assistantMsg) return
+    if (userMsg.role !== 'user' || assistantMsg.role !== 'assistant') return
+
+    const userInput = typeof userMsg.content === 'string' ? userMsg.content : ''
+    const assistantResponse = typeof assistantMsg.content === 'string' ? assistantMsg.content : ''
+
+    if (correct) {
+      this.learn(userInput, assistantResponse, 'reinforced')
+    } else if (correction) {
+      this.learn(userInput, correction, 'user-corrected')
+    }
+  }
+
+  /**
+   * Get patterns that have conflicting responses for similar inputs.
+   * Useful for identifying ambiguous patterns for user review.
+   */
+  getConflicts(): PatternConflict[] {
+    const conflicts: PatternConflict[] = []
+    const checked = new Set<string>()
+
+    for (const pattern of this.learnedPatterns) {
+      if (checked.has(pattern.inputPattern)) continue
+
+      // Find similar patterns using keyword overlap
+      const similar = this.learnedPatterns.filter(other =>
+        other !== pattern &&
+        !checked.has(other.inputPattern) &&
+        other.keywords.some(k => pattern.keywords.includes(k)) &&
+        other.response !== pattern.response
+      )
+
+      if (similar.length > 0) {
+        conflicts.push({
+          query: pattern.inputPattern,
+          patterns: [
+            { pattern, score: pattern.confidence },
+            ...similar.map(s => ({ pattern: s, score: s.confidence })),
+          ],
+        })
+        checked.add(pattern.inputPattern)
+        for (const s of similar) checked.add(s.inputPattern)
+      }
+    }
+
+    return conflicts
   }
 
   // ── Knowledge Search ──
@@ -1239,10 +1484,14 @@ export class LocalBrain {
   /** Restore brain state from a serialized string. */
   static deserializeBrain(json: string): LocalBrain {
     const state = JSON.parse(json) as LocalBrainState
-    const brain = new LocalBrain(state.config)
-    brain.learnedPatterns = state.learnedPatterns
+    const brain = new LocalBrain({ ...state.config, autoSavePath: '' })  // Prevent double-load
+    brain.learnedPatterns = state.learnedPatterns.map(p => ({
+      ...p,
+      priority: p.priority ?? 'learned',  // Migrate old patterns without priority
+    }))
     brain.conversationHistory = state.conversationHistory
     brain.stats = state.stats
+    brain.config = { ...brain.config, ...state.config }
 
     // Restore learned knowledge entries
     for (const entry of state.knowledgeAdditions) {
@@ -1250,5 +1499,107 @@ export class LocalBrain {
     }
 
     return brain
+  }
+
+  // ── Auto-Save / Auto-Load (v2) ──
+
+  /** Auto-save brain state to configured path. Uses atomic write for safety. */
+  private autoSave(): void {
+    if (!this.config.autoSavePath) return
+
+    try {
+      const dir = path.dirname(this.config.autoSavePath)
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+      }
+
+      const json = this.serializeBrain()
+      const tempPath = this.config.autoSavePath + '.tmp'
+      fs.writeFileSync(tempPath, json, 'utf-8')
+      fs.renameSync(tempPath, this.config.autoSavePath)
+      this.learningsSinceLastSave = 0
+    } catch {
+      // Silently fail — auto-save is best-effort
+    }
+  }
+
+  /** Auto-load brain state from configured path. */
+  private autoLoad(): void {
+    if (!this.config.autoSavePath) return
+
+    try {
+      if (!fs.existsSync(this.config.autoSavePath)) return
+
+      const json = fs.readFileSync(this.config.autoSavePath, 'utf-8')
+      const state = JSON.parse(json) as LocalBrainState
+
+      this.learnedPatterns = state.learnedPatterns.map(p => ({
+        ...p,
+        priority: p.priority ?? 'learned',
+      }))
+      this.stats = { ...this.stats, ...state.stats }
+
+      // Restore learned knowledge entries
+      for (const entry of state.knowledgeAdditions) {
+        if (!this.knowledgeBase.some(e => e.id === entry.id)) {
+          this.knowledgeBase.push(entry)
+        }
+      }
+    } catch {
+      // Silently fail — auto-load is best-effort
+    }
+  }
+
+  /**
+   * Export brain state to a specific file path.
+   * Useful for backup, transfer, or sharing learned knowledge.
+   */
+  exportBrain(filePath: string): void {
+    const dir = path.dirname(filePath)
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+    fs.writeFileSync(filePath, this.serializeBrain(), 'utf-8')
+  }
+
+  /**
+   * Import brain state from a file path.
+   * Merges learned patterns and knowledge with existing state.
+   */
+  importBrain(filePath: string): void {
+    const json = fs.readFileSync(filePath, 'utf-8')
+    const state = JSON.parse(json) as LocalBrainState
+
+    // Merge learned patterns (avoid duplicates by input pattern)
+    for (const pattern of state.learnedPatterns) {
+      const existing = this.learnedPatterns.find(
+        p => p.inputPattern.toLowerCase() === pattern.inputPattern.toLowerCase()
+      )
+      if (existing) {
+        // Merge: keep higher confidence/reinforcements
+        if (pattern.confidence > existing.confidence) {
+          existing.confidence = pattern.confidence
+          existing.response = pattern.response
+        }
+        existing.reinforcements += pattern.reinforcements
+      } else {
+        this.learnedPatterns.push({
+          ...pattern,
+          priority: pattern.priority ?? 'learned',
+        })
+      }
+    }
+
+    // Merge knowledge additions
+    for (const entry of state.knowledgeAdditions) {
+      if (!this.knowledgeBase.some(e => e.id === entry.id)) {
+        this.knowledgeBase.push(entry)
+      }
+    }
+  }
+
+  /** Force save current state (for manual persistence). */
+  save(): void {
+    this.autoSave()
   }
 }
