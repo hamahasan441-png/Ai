@@ -2082,7 +2082,13 @@ async function* queryModel(
             } else {
               switch (delta.type) {
                 case 'citations_delta':
-                  // TODO: handle citations
+                  // Accumulate citation deltas on the content block for downstream consumers.
+                  // Full citation rendering is handled by the UI layer.
+                  if ('citations' in contentBlock && Array.isArray(contentBlock.citations)) {
+                    contentBlock.citations.push(delta)
+                  } else {
+                    ;(contentBlock as any).citations = [delta]
+                  }
                   break
                 case 'input_json_delta':
                   if (

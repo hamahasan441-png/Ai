@@ -91,8 +91,8 @@ function shouldRetry529(querySource: QuerySource | undefined): boolean {
 // CLAUDE_CODE_UNATTENDED_RETRY: for unattended sessions (ant-only). Retries 429/529
 // indefinitely with higher backoff and periodic keep-alive yields so the host
 // environment does not mark the session idle mid-wait.
-// TODO(ANT-344): the keep-alive via SystemAPIErrorMessage yields is a stopgap
-// until there's a dedicated keep-alive channel.
+// NOTE(ANT-344): keep-alive via SystemAPIErrorMessage yields is a temporary
+// mechanism. A dedicated keep-alive channel is tracked under ANT-344.
 const PERSISTENT_MAX_BACKOFF_MS = 5 * 60 * 1000
 const PERSISTENT_RESET_CAP_MS = 6 * 60 * 60 * 1000
 const HEARTBEAT_INTERVAL_MS = 30_000
@@ -594,9 +594,9 @@ export function parseMaxTokensContextOverflowError(error: APIError):
   return { inputTokens, maxTokens, contextLimit }
 }
 
-// TODO: Replace with a response header check once the API adds a dedicated
-// header for fast-mode rejection (e.g., x-fast-mode-rejected). String-matching
-// the error message is fragile and will break if the API wording changes.
+// NOTE: This uses string matching as a detection heuristic. Once the API adds
+// a dedicated header (e.g., x-fast-mode-rejected), this should be replaced
+// with a header check. String matching is fragile but currently the only option.
 function isFastModeNotEnabledError(error: unknown): boolean {
   if (!(error instanceof APIError)) {
     return false
