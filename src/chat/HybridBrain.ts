@@ -110,6 +110,16 @@ export interface HybridBrainState {
   stats: HybridBrainStats
 }
 
+// ── Constants for auto-learning storage limits ───────────────────────────────
+/** Maximum length (chars) of a cloud response stored as offline knowledge. */
+const MAX_STORED_RESPONSE_LENGTH = 2000
+/** Maximum length (chars) of generated code stored as offline knowledge. */
+const MAX_STORED_CODE_LENGTH = 1500
+/** Minimum word length to be considered a meaningful keyword. */
+const MIN_KEYWORD_LENGTH = 3
+/** Maximum keywords extracted from a code request description. */
+const MAX_CODE_DESCRIPTION_KEYWORDS = 5
+
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §2  SYSTEM PROMPTS — Claude Opus 4.6 level thinking                         ║
 // ╚═══════════════════════════════════════════════════════════════════════════════╝
@@ -726,8 +736,8 @@ export class HybridBrain implements BrainInterface {
     const keywords = this.extractKeyTopics(userMessage)
     if (keywords.length > 0 && cloudResponse.length > 50) {
       // Store a condensed version as knowledge
-      const condensed = cloudResponse.length > 2000
-        ? cloudResponse.substring(0, 2000) + '...'
+      const condensed = cloudResponse.length > MAX_STORED_RESPONSE_LENGTH
+        ? cloudResponse.substring(0, MAX_STORED_RESPONSE_LENGTH) + '...'
         : cloudResponse
       this.localBrain.addKnowledge('cloud-learned', keywords, condensed)
     }
@@ -741,12 +751,12 @@ export class HybridBrain implements BrainInterface {
   private learnCodePattern(request: CodeRequest, result: CodeResult): void {
     const keywords = [
       request.language,
-      ...(request.description.split(/\s+/).filter(w => w.length > 3).slice(0, 5)),
+      ...(request.description.split(/\s+/).filter(w => w.length > MIN_KEYWORD_LENGTH).slice(0, MAX_CODE_DESCRIPTION_KEYWORDS)),
     ]
     this.localBrain.addKnowledge(
       'code-pattern',
       keywords,
-      `${request.language} code for "${request.description}":\n\`\`\`${request.language}\n${result.code.substring(0, 1500)}\n\`\`\``,
+      `${request.language} code for "${request.description}":\n\`\`\`${request.language}\n${result.code.substring(0, MAX_STORED_CODE_LENGTH)}\n\`\`\``,
     )
     this.stats.autoLearnCount++
   }
