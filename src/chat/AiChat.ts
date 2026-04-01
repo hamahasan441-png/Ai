@@ -286,6 +286,7 @@ export interface ImageAnalysisResult {
 /** Configuration for the AI Brain. */
 export interface AiBrainConfig {
   apiKey?: string
+  apiBaseUrl?: string
   model: string
   maxTokens: number
   temperature: number
@@ -1023,6 +1024,11 @@ const CODE_REVIEW_SYSTEM_PROMPT = `You are a senior code reviewer. Review code f
 Format your review as a list of issues, each with severity (error/warning/info), the line number if applicable, the problem, and a suggested fix.
 End with an overall score from 0-100 and a brief summary.`
 
+// Cloud provider environment variable names
+const ENV_USE_BEDROCK = 'CLAUDE_CODE_USE_BEDROCK'
+const ENV_USE_VERTEX = 'CLAUDE_CODE_USE_VERTEX'
+const ENV_USE_FOUNDRY = 'CLAUDE_CODE_USE_FOUNDRY'
+
 /**
  * The AI Brain — connects to Claude API for intelligence.
  *
@@ -1043,6 +1049,7 @@ export class AiBrain {
       temperature: config?.temperature ?? 0.7,
       systemPrompt: config?.systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
       apiKey: config?.apiKey,
+      apiBaseUrl: config?.apiBaseUrl,
     }
   }
 
@@ -1054,6 +1061,39 @@ export class AiBrain {
 
   /** Clear conversation history (start fresh). */
   clearHistory(): void { this.conversationHistory = [] }
+
+  /**
+   * Check whether the AI is configured with valid API access.
+   * Call this early (e.g. at startup) to get a clear error before the first API call.
+   * Returns an object with `ok: true` if ready, or `ok: false` with a `message` explaining what's missing.
+   */
+  validateConfig(): { ok: true } | { ok: false; message: string } {
+    const apiKey = this.config.apiKey ?? this.getApiKeyFromEnv()
+    if (apiKey) {
+      return { ok: true }
+    }
+    const env = this.getEnv()
+    if (env?.[ENV_USE_BEDROCK] || env?.[ENV_USE_VERTEX] || env?.[ENV_USE_FOUNDRY]) {
+      return { ok: true }
+    }
+    return {
+      ok: false,
+      message:
+        'No API key or cloud provider configured. Set up one of the following:\n\n' +
+        '  Option 1 — Direct Anthropic key:\n' +
+        '    export ANTHROPIC_API_KEY="your-key"\n' +
+        '    Get a key at: https://console.anthropic.com/settings/keys\n\n' +
+        '  Option 2 — AWS Bedrock (no Anthropic key needed):\n' +
+        '    export CLAUDE_CODE_USE_BEDROCK=1\n\n' +
+        '  Option 3 — Google Vertex AI (no Anthropic key needed):\n' +
+        '    export CLAUDE_CODE_USE_VERTEX=1\n' +
+        '    export ANTHROPIC_VERTEX_PROJECT_ID="your-gcp-project"\n\n' +
+        '  Option 4 — Azure AI Foundry (no Anthropic key needed):\n' +
+        '    export CLAUDE_CODE_USE_FOUNDRY=1\n' +
+        '    export ANTHROPIC_FOUNDRY_RESOURCE="your-resource"\n\n' +
+        '  Or pass apiKey directly in AiBrainConfig.',
+    }
+  }
 
   /**
    * Send a chat message to the AI and get a response.
@@ -1122,11 +1162,18 @@ export class AiBrain {
   ): Promise<{ text: string; usage: TokenUsage }> {
     const apiKey = this.config.apiKey ?? this.getApiKeyFromEnv()
     if (!apiKey) {
+      const check = this.validateConfig()
+      if (!check.ok) {
+        throw new Error(check.message)
+      }
+      // A cloud provider is configured but no direct API key — inform the user
       throw new Error(
-        'No API key provided. Set ANTHROPIC_API_KEY environment variable or pass apiKey in config.\n' +
-        'Get your key at: https://console.anthropic.com/settings/keys'
+        'A cloud provider (Bedrock/Vertex/Foundry) is configured, but AiBrain only supports direct API calls.\n' +
+        'Use IntegratedAI instead, or set ANTHROPIC_API_KEY for direct access.'
       )
     }
+
+    const baseUrl = this.config.apiBaseUrl ?? 'https://api.anthropic.com'
 
     const body = JSON.stringify({
       model: this.config.model,
@@ -1136,7 +1183,7 @@ export class AiBrain {
       messages,
     })
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(`${baseUrl}/v1/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1174,11 +1221,16 @@ export class AiBrain {
 
   /** Try to get API key from environment. */
   private getApiKeyFromEnv(): string | undefined {
+    const env = this.getEnv()
+    return env?.['ANTHROPIC_API_KEY'] ?? undefined
+  }
+
+  /** Read process.env safely (works in Node, Bun, and browsers). */
+  private getEnv(): Record<string, string | undefined> | undefined {
     try {
-      // Access process.env dynamically to avoid compile-time dependency on @types/node
       const g = globalThis as Record<string, unknown>
       const proc = g['process'] as { env?: Record<string, string | undefined> } | undefined
-      return proc?.env?.['ANTHROPIC_API_KEY']
+      return proc?.env
     } catch {
       return undefined
     }
