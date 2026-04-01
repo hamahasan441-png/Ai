@@ -16,7 +16,11 @@ An AI system that **uses every file in the repository**. Three files work togeth
 
 - **[Bun](https://bun.sh/)** v1.0 or later — this project uses Bun as its JavaScript/TypeScript runtime
 - **Git** — for version control and project context features
-- An **Anthropic API key** — required for Claude AI integration
+- **Access to Claude** — via one of these providers:
+  - [Anthropic API key](https://console.anthropic.com/settings/keys) (direct)
+  - [AWS Bedrock](https://aws.amazon.com/bedrock/) (use Claude through your AWS account)
+  - [Google Cloud Vertex AI](https://cloud.google.com/vertex-ai) (use Claude through GCP)
+  - [Azure AI Foundry](https://azure.microsoft.com/en-us/products/ai-foundry) (use Claude through Microsoft Azure)
 
 ### Install Bun
 
@@ -44,14 +48,60 @@ bun install
 
 ## Configuration
 
-Set the required environment variable for the Anthropic Claude API:
+You need **one** of the following authentication methods to access Claude.
+
+### Option 1: Anthropic API Key (Direct)
 
 ```bash
-# Set your Anthropic API key (required)
 export ANTHROPIC_API_KEY="your-api-key-here"
 ```
 
 Get your API key from the [Anthropic Console](https://console.anthropic.com/settings/keys).
+
+### Option 2: AWS Bedrock (No Anthropic Key Needed)
+
+Use Claude through your AWS account — no separate Anthropic API key required.
+
+```bash
+export CLAUDE_CODE_USE_BEDROCK=1
+
+# AWS region (defaults to us-east-1)
+export AWS_REGION="us-east-1"
+```
+
+Authentication uses your standard AWS credentials (environment variables, `~/.aws/credentials`, or IAM roles). Make sure your AWS account has [access to Claude models on Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
+
+### Option 3: Google Cloud Vertex AI (No Anthropic Key Needed)
+
+Use Claude through Google Cloud — no separate Anthropic API key required.
+
+```bash
+export CLAUDE_CODE_USE_VERTEX=1
+export ANTHROPIC_VERTEX_PROJECT_ID="your-gcp-project-id"
+
+# Region (optional, defaults vary by model)
+export CLOUD_ML_REGION="us-east5"
+```
+
+Authentication uses your standard GCP credentials (`gcloud auth application-default login` or service account). Your GCP project must have the [Claude models enabled on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude).
+
+### Option 4: Azure AI Foundry (No Anthropic Key Needed)
+
+Use Claude through Microsoft Azure — no separate Anthropic API key required.
+
+```bash
+export CLAUDE_CODE_USE_FOUNDRY=1
+
+# Provide one of:
+export ANTHROPIC_FOUNDRY_RESOURCE="your-azure-resource-name"
+# or
+export ANTHROPIC_FOUNDRY_BASE_URL="https://your-resource.azure.com"
+
+# Optional: API key (otherwise uses Azure Default Credentials)
+export ANTHROPIC_FOUNDRY_API_KEY="your-foundry-api-key"
+```
+
+Authentication uses an Azure API key or [Azure Default Credentials](https://learn.microsoft.com/en-us/python/api/azure-identity/azure.identity.defaultazurecredential) (environment variables, managed identity, or Azure CLI).
 
 ### Optional Environment Variables
 
