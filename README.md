@@ -75,15 +75,33 @@ Authentication uses your standard AWS credentials (environment variables, `~/.aw
 
 Use Claude through Google Cloud — no separate Anthropic API key required.
 
-```bash
-export CLAUDE_CODE_USE_VERTEX=1
-export ANTHROPIC_VERTEX_PROJECT_ID="your-gcp-project-id"
+**Step-by-step setup:**
 
-# Region (optional, defaults vary by model)
-export CLOUD_ML_REGION="us-east5"
-```
+1. **Create a Google Cloud account** — sign up at [cloud.google.com](https://cloud.google.com/) (free tier available with $300 credits)
 
-Authentication uses your standard GCP credentials (`gcloud auth application-default login` or service account). Your GCP project must have the [Claude models enabled on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude).
+2. **Create a GCP project** — in the [GCP Console](https://console.cloud.google.com/), create a new project (or use an existing one) and note the **project ID**
+
+3. **Enable the Vertex AI API** — go to [Vertex AI API](https://console.cloud.google.com/apis/library/aiplatform.googleapis.com) and click **Enable** for your project
+
+4. **Enable Claude models** — in the [Vertex AI Model Garden](https://console.cloud.google.com/vertex-ai/model-garden), find Claude models and enable access ([full instructions](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude))
+
+5. **Install the Google Cloud CLI** — follow the [gcloud CLI install guide](https://cloud.google.com/sdk/docs/install)
+
+6. **Authenticate locally:**
+   ```bash
+   gcloud auth application-default login
+   ```
+
+7. **Set environment variables:**
+   ```bash
+   export CLAUDE_CODE_USE_VERTEX=1
+   export ANTHROPIC_VERTEX_PROJECT_ID="your-gcp-project-id"
+
+   # Region (optional, defaults to us-east5)
+   export CLOUD_ML_REGION="us-east5"
+   ```
+
+> **Note:** Vertex AI does not use a traditional API key. Authentication is handled through your Google Cloud credentials (gcloud CLI login, service account JSON file via `GOOGLE_APPLICATION_CREDENTIALS`, or managed identity on GCP).
 
 ### Option 4: Azure AI Foundry (No Anthropic Key Needed)
 
@@ -373,3 +391,37 @@ Scala, Lua, Haskell, Elixir
 ## Image Analysis (Vision AI)
 
 Supported formats: PNG, JPEG, GIF, WebP
+
+## Troubleshooting
+
+### "No API key" or authentication errors
+
+This project **requires** access to Claude through one of four providers. It will not work without any authentication configured.
+
+| Error | Cause | Fix |
+| --- | --- | --- |
+| `No API key or cloud provider configured` | No `ANTHROPIC_API_KEY` and no cloud provider env var set | Set up any of the 4 options in [Configuration](#configuration) |
+| `Invalid API key` | `ANTHROPIC_API_KEY` is set but incorrect or expired | Get a new key from [console.anthropic.com](https://console.anthropic.com/settings/keys) |
+| `Authentication failed` on Vertex AI | GCP credentials expired or not set up | Run `gcloud auth application-default login` |
+| `Authentication failed` on Bedrock | AWS credentials missing or expired | Check `~/.aws/credentials` or run `aws configure` |
+
+### Quick check: is auth configured?
+
+```ts
+import { AiBrain } from './src/chat/index.js'
+
+const brain = new AiBrain()
+const check = brain.validateConfig()
+if (!check.ok) {
+  console.error(check.message) // Shows all 4 auth options with exact commands
+}
+```
+
+### Which option should I choose?
+
+| Option | Best For | Cost |
+| --- | --- | --- |
+| **Anthropic API Key** | Quickest to start, personal projects | Pay-per-use via Anthropic |
+| **AWS Bedrock** | Teams already on AWS, enterprise | Via your AWS bill |
+| **Google Vertex AI** | Teams already on GCP, $300 free credits | Via your GCP bill |
+| **Azure AI Foundry** | Teams already on Azure, enterprise | Via your Azure bill |
