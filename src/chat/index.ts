@@ -1,70 +1,71 @@
 /**
- * 🤖 Advanced AI Chat — Public API
+ * 🤖 Advanced AI — Complete Integrated System
  *
- * Everything is in ONE file: AiChat.ts
- * Import anything you need from here.
+ * This module exports the ENTIRE AI system built from ALL repository files:
+ *
+ *   • AiChat.ts         → Core brain (chat, code, images, search, analytics)
+ *   • AiIntegration.ts  → Integration layer (38 tools, 50+ commands, services)
+ *
+ * The IntegratedAI class uses ALL 1,886 source files across 36+ modules.
  *
  * @example
  * ```ts
- * import { AdvancedChat, AiBrain } from './chat/index.js'
+ * import { IntegratedAI, ALL_TOOLS, MODULE_DIRECTORY } from './chat/index.js'
  *
- * // Create a smart AI that can chat, write code, and analyze images
- * const ai = new AdvancedChat({
- *   title: 'My AI Session',
- *   apiKey: 'sk-ant-...',          // or set ANTHROPIC_API_KEY env var
+ * // Create AI that uses ALL repository modules
+ * const ai = new IntegratedAI({
+ *   title: 'Full AI Session',
+ *   apiKey: 'sk-ant-...',
  *   model: 'claude-sonnet-4-20250514',
  * })
  *
- * // 💬 Chat with the AI
- * const reply = await ai.sendMessage('Explain how React hooks work')
+ * // 💬 Chat (uses AiChat.ts AI Brain → Claude API)
+ * await ai.chat_send('Explain how this project works')
  *
- * // 💻 Write code (AI generates production-quality code)
- * const { result } = await ai.writeCode({
- *   description: 'REST API with authentication',
- *   language: 'typescript',
- *   style: 'production',
- * })
- * console.log(result.code)
+ * // 💻 Write code (uses AiChat.ts Code Writer — 24 languages)
+ * await ai.writeCode({ description: 'REST API', language: 'typescript', style: 'production' })
  *
- * // 🔍 Review code for bugs and security issues
- * const { result: review } = await ai.reviewCode({
- *   code: 'function add(a, b) { return a + b }',
- *   language: 'javascript',
- *   focus: ['bugs', 'security', 'style'],
- * })
- * console.log(`Score: ${review.score}/100`)
+ * // 🖼 Analyze images (uses AiChat.ts Image Analyzer — like Claude Opus vision)
+ * await ai.analyzeImage({ imageData: base64, mediaType: 'image/png' })
  *
- * // 🖼 Analyze images (like Claude Opus vision)
- * const { result: analysis } = await ai.analyzeImage({
- *   imageData: base64ImageString,
- *   mediaType: 'image/png',
- *   question: 'What is in this image?',
- * })
- * console.log(analysis.description)
+ * // 🔧 Use any of the 38 tools (from src/tools/*)
+ * console.log(`Tools available: ${ai.getToolCount()}`)  // 38
  *
- * // 🌿 Branch conversations
- * const msgs = ai.getMessages()
- * ai.forkBranch(msgs[0].id, 'Try different approach')
+ * // 📋 Use any of 50+ commands (from src/commands/*)
+ * const cmds = await ai.getAvailableCommands()
  *
- * // 📌 Pin important messages
- * ai.togglePin(msgs[0].id)
+ * // 🌍 Get project context (from src/context.ts)
+ * const ctx = await ai.getProjectContext()
  *
- * // 🔍 Search through history
- * const results = ai.search({ query: 'authentication', mode: 'fuzzy' })
+ * // 🧠 Load AI memory (from src/memdir/)
+ * const memory = await ai.loadMemory()
  *
- * // 📊 Get analytics
- * const stats = ai.getAnalytics()
- * console.log(`Cost: $${stats.estimatedCostUsd}, Code: ${stats.codeStats.totalSnippets} snippets`)
+ * // 💰 Track costs (from src/cost-tracker.ts)
+ * const costs = ai.getCostStats()
  *
- * // 📤 Export conversation
- * const markdown = ai.exportMarkdown()
- * const json = ai.exportJSON()
+ * // 📊 Full stats combining ALL modules
+ * const stats = ai.getFullStats()
  *
- * // 💾 Save and restore
- * const saved = ai.serialize()
- * const restored = AdvancedChat.deserialize(saved)
+ * // 📖 See what every module does
+ * console.log(MODULE_DIRECTORY)
  * ```
  */
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INTEGRATED AI — Uses ALL repository files (src/chat/AiIntegration.ts)
+// ══════════════════════════════════════════════════════════════════════════════
+export {
+  IntegratedAI,
+  ALL_TOOLS,
+  TOOL_COUNT,
+  MODULE_DIRECTORY,
+  TOTAL_MODULES,
+  TOTAL_SOURCE_FILES,
+} from './AiIntegration.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AI CHAT BRAIN — Core intelligence (src/chat/AiChat.ts)
+// ══════════════════════════════════════════════════════════════════════════════
 
 // ── Main Classes ──
 export { AdvancedChat, AiBrain } from './AiChat.js'
