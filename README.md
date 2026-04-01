@@ -12,6 +12,148 @@ An AI system that **uses every file in the repository**. Three files work togeth
 | `src/chat/AiIntegration.ts` | 1,001 | 🔗 **Integration Layer** — Imports from ALL 36+ modules, wires 38 tools, 50+ commands, services |
 | `src/chat/index.ts` | 135+ | 📦 **Public API** — Clean exports for everything |
 
+## Prerequisites
+
+- **[Bun](https://bun.sh/)** v1.0 or later — this project uses Bun as its JavaScript/TypeScript runtime
+- **Git** — for version control and project context features
+- An **Anthropic API key** — required for Claude AI integration
+
+### Install Bun
+
+```bash
+# macOS / Linux
+curl -fsSL https://bun.sh/install | bash
+
+# Windows (via PowerShell)
+powershell -c "irm bun.sh/install.ps1 | iex"
+
+# Verify installation
+bun --version
+```
+
+## Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/hamahasan441-png/Ai.git
+cd Ai
+
+# 2. Install dependencies
+bun install
+```
+
+## Configuration
+
+Set the required environment variable for the Anthropic Claude API:
+
+```bash
+# Set your Anthropic API key (required)
+export ANTHROPIC_API_KEY="your-api-key-here"
+```
+
+Get your API key from the [Anthropic Console](https://console.anthropic.com/settings/keys).
+
+### Optional Environment Variables
+
+| Variable | Description |
+| --- | --- |
+| `GITHUB_TOKEN` | GitHub authentication for git operations and PR features |
+
+## How to Run
+
+### Run the CLI (Interactive REPL)
+
+```bash
+# Start the interactive AI REPL
+bun run src/entrypoints/cli.tsx
+```
+
+This launches an interactive terminal session where you can chat with the AI, run commands, and use all 38 built-in tools.
+
+### Run with a Prompt (Non-Interactive)
+
+```bash
+# Send a single prompt and get a response
+bun run src/entrypoints/cli.tsx "Explain this project"
+```
+
+### Run as an MCP Server
+
+```bash
+# Start as a Model Context Protocol server
+bun run src/entrypoints/mcp.ts
+```
+
+### Use Programmatically (SDK)
+
+```ts
+import { IntegratedAI, MODULE_DIRECTORY } from './src/chat/index.js'
+
+const ai = new IntegratedAI({
+  title: 'My Session',
+  model: 'claude-sonnet-4-20250514',
+})
+
+// Send a chat message
+await ai.chat_send('Explain this project')
+
+// Write code in any of 24 supported languages
+await ai.writeCode({ description: 'REST API', language: 'typescript', style: 'production' })
+
+// Analyze an image
+await ai.analyzeImage({ imageData: base64, mediaType: 'image/png' })
+
+// Get available tools and commands
+console.log(`Tools: ${ai.getToolCount()}`)        // 38 tools
+const cmds = await ai.getAvailableCommands()       // 50+ commands
+```
+
+## Usage Guide
+
+### Interactive Commands
+
+Once in the REPL, use `/` commands to interact with the system:
+
+| Command | What It Does |
+| --- | --- |
+| `/help` | Show all available commands |
+| `/commit` | Create a git commit with AI-generated message |
+| `/diff` | Show current git diff |
+| `/review` | AI code review of changes |
+| `/config` | View or update configuration |
+| `/cost` | Show API usage and cost tracking |
+| `/memory` | Manage persistent AI memory |
+| `/doctor` | Diagnose and fix common issues |
+| `/model` | Switch the active AI model |
+| `/exit` | Exit the session |
+
+### Example Workflows
+
+**Chat and ask questions:**
+```
+> What does the src/tools/ directory contain?
+> Explain how the QueryEngine agentic loop works
+```
+
+**Write and edit code:**
+```
+> Write a REST API server in TypeScript with error handling
+> Edit src/utils/format.ts to add a new date formatter
+```
+
+**Work with git:**
+```
+> /diff
+> /commit
+> /review
+```
+
+**Search and explore:**
+```
+> Find all files that import from the services/ directory
+> Search for TODO comments in the codebase
+```
+
 ## Architecture — How ALL Files Connect
 
 ```
@@ -111,7 +253,7 @@ An AI system that **uses every file in the repository**. Three files work togeth
 | `src/types/` | 10+ | TypeScript type definitions |
 | `src/constants/` | 5+ | App-wide constants |
 
-## Quick Start
+## Programmatic API Reference
 
 ```ts
 import { IntegratedAI, MODULE_DIRECTORY } from './chat/index.js'
