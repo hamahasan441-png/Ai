@@ -260,7 +260,9 @@ export function Config({
     });
   }
 
-  // TODO: Add MCP servers
+  // MCP server management is handled via `mcp add/remove` CLI commands
+  // and the .claude/settings.json mcpServers configuration.
+  // A dedicated UI panel for MCP servers is planned for a future release.
   const settingsItems: Setting[] = [
   // Global settings
   {
