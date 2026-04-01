@@ -1,16 +1,23 @@
 {
   "name": "ai",
-  "version": "1.0.0",
-  "description": "**1,886 source files · 36+ modules · 38 tools · 50+ commands — ALL connected into one AI.**",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "**1,886+ source files · 36+ modules · 39 tools · 50+ commands — ALL connected into one AI.** Now with DatabaseTool, CachingLayer, and Self-Learning v2.",
+  "main": "src/chat/index.ts",
+  "bin": {
+    "ai": "./src/entrypoints/cli.tsx"
+  },
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "start": "npx tsx src/entrypoints/cli.tsx",
+    "dev": "npx tsx src/entrypoints/cli.tsx",
+    "postinstall": "node scripts/postinstall.js",
+    "prepublishOnly": "echo 'Note: This package requires tsx or a TypeScript runtime to execute the CLI entry point.'"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hamahasan441-png/Ai.git"
   },
-  "keywords": [],
+  "keywords": ["ai", "claude", "anthropic", "chat", "code", "tools", "brain", "offline", "database", "cache"],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -18,7 +25,15 @@
     "url": "https://github.com/hamahasan441-png/Ai/issues"
   },
   "homepage": "https://github.com/hamahasan441-png/Ai#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "vitest": "^4.1.2"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^11.0.0",
+    "pg": "^8.13.0",
+    "mysql2": "^3.11.0"
   }
 }

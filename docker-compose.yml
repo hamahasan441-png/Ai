@@ -1,0 +1,35 @@
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║  AI — Docker Compose Configuration                                           ║
+# ║                                                                              ║
+# ║  Usage:                                                                      ║
+# ║    docker compose run --rm ai                                                ║
+# ║    docker compose run --rm ai --help                                         ║
+# ║                                                                              ║
+# ║  Environment:                                                                ║
+# ║    Set ANTHROPIC_API_KEY in a .env file or export it in your shell.          ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+services:
+  ai:
+    build: .
+    stdin_open: true
+    tty: true
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - CLAUDE_CODE_USE_BEDROCK=${CLAUDE_CODE_USE_BEDROCK:-}
+      - CLAUDE_CODE_USE_VERTEX=${CLAUDE_CODE_USE_VERTEX:-}
+    volumes:
+      # Persist brain state across container restarts
+      - ai-data:/root/.local/share/ai
+      # Persist cache
+      - ai-cache:/root/.cache/ai
+      # Persist config
+      - ai-config:/root/.config/ai
+      # Mount current directory for file operations
+      - .:/workspace
+    working_dir: /workspace
+
+volumes:
+  ai-data:
+  ai-cache:
+  ai-config:
