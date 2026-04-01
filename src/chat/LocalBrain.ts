@@ -855,7 +855,10 @@ function reviewCodeLocally(request: CodeReviewRequest): CodeReviewResult {
     // == instead of === (JavaScript/TypeScript)
     if (['typescript', 'javascript'].includes(language)) {
       for (let i = 0; i < lines.length; i++) {
-        if (/[^=!]==[^=]/.test(lines[i]!) && !/===/.test(lines[i]!)) {
+        // Match == that is NOT preceded by ! or = and NOT followed by =
+        const line = lines[i]!
+        const eePattern = /(?<![=!])==(?!=)/
+        if (eePattern.test(line)) {
           issues.push({ severity: 'warning', line: i + 1, message: 'Use === instead of == for strict equality', suggestion: 'Replace == with === to avoid type coercion bugs' })
         }
       }
@@ -871,8 +874,8 @@ function reviewCodeLocally(request: CodeReviewRequest): CodeReviewResult {
 
   // ── Security Analysis ──
   if (checkAll || focus.includes('security')) {
-    // SQL injection risk
-    if (/\+\s*['"`].*(?:SELECT|INSERT|UPDATE|DELETE|DROP)/i.test(code) || /\$\{.*\}.*(?:SELECT|INSERT|UPDATE|DELETE|DROP)/i.test(code)) {
+    // SQL injection risk — detect string concatenation within query-building contexts
+    if (/(?:execute|query|prepare|exec)\s*\(.*\+/.test(code) || /(?:SELECT|INSERT|UPDATE|DELETE|DROP)\b[^;]*\$\{/i.test(code) || /(?:SELECT|INSERT|UPDATE|DELETE|DROP)\b[^;]*['"]?\s*\+\s*\w/i.test(code)) {
       issues.push({ severity: 'error', message: 'Potential SQL injection — string concatenation in SQL query', suggestion: 'Use parameterized queries or prepared statements' })
     }
 
@@ -896,16 +899,33 @@ function reviewCodeLocally(request: CodeReviewRequest): CodeReviewResult {
 
   // ── Performance ──
   if (checkAll || focus.includes('performance')) {
-    // Nested loops
-    const loopPattern = /\b(for|while)\b/g
-    let nestLevel = 0, maxNest = 0
+    // Nested loops — track brace depth to estimate loop nesting
+    let loopNestLevel = 0, maxLoopNest = 0, braceDepth = 0
+    const loopBraceStarts: number[] = []
     for (const line of lines) {
-      if (/\b(for|while)\b/.test(line)) nestLevel++
-      if (/^\s*\}/.test(line)) nestLevel = Math.max(0, nestLevel - 1)
-      maxNest = Math.max(maxNest, nestLevel)
+      const trimmed = line.trim()
+      const isLoop = /\b(for|while)\b/.test(trimmed)
+      const opens = (trimmed.match(/\{/g) ?? []).length
+      const closes = (trimmed.match(/\}/g) ?? []).length
+
+      if (isLoop) {
+        loopNestLevel++
+        // Track that this brace level started a loop
+        if (opens > 0) loopBraceStarts.push(braceDepth + opens)
+      }
+
+      braceDepth += opens - closes
+
+      // Check if we closed a loop's brace
+      while (loopBraceStarts.length > 0 && braceDepth < loopBraceStarts[loopBraceStarts.length - 1]!) {
+        loopBraceStarts.pop()
+        loopNestLevel = Math.max(0, loopNestLevel - 1)
+      }
+
+      maxLoopNest = Math.max(maxLoopNest, loopNestLevel)
     }
-    if (maxNest >= 3) {
-      issues.push({ severity: 'warning', message: `Deeply nested loops detected (${maxNest} levels) — possible O(n³) or worse complexity`, suggestion: 'Consider using hash maps or reducing loop nesting' })
+    if (maxLoopNest >= 3) {
+      issues.push({ severity: 'warning', message: `Deeply nested loops detected (${maxLoopNest} levels) — possible O(n³) or worse complexity`, suggestion: 'Consider using hash maps or reducing loop nesting' })
     }
 
     // Large function
@@ -927,7 +947,10 @@ function reviewCodeLocally(request: CodeReviewRequest): CodeReviewResult {
     // Missing return type (TypeScript)
     if (language === 'typescript') {
       for (let i = 0; i < lines.length; i++) {
-        if (/(?:function|=>)\s*\{/.test(lines[i]!) && !/:\s*\w+/.test(lines[i]!.split('{')[0]!)) {
+        const line = lines[i]!
+        const beforeBrace = line.split('{')[0] ?? ''
+        // Check for function declarations that have a closing paren but no type annotation after it
+        if (/(?:function\s+\w+|=>)\s*\{/.test(line) && /\)\s*\{/.test(line) && !/\)\s*:\s*\S/.test(beforeBrace)) {
           issues.push({ severity: 'info', line: i + 1, message: 'Function missing explicit return type', suggestion: 'Add return type annotation for better type safety' })
           break
         }
