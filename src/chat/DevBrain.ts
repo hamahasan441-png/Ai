@@ -58,16 +58,20 @@ import { LocalBrain } from './LocalBrain.js'
 // ║  §1  TYPES — Configuration, state, and interfaces for DevBrain               ║
 // ╚═══════════════════════════════════════════════════════════════════════════════╝
 
-/** Supported OpenAI models. */
+/**
+ * Supported OpenAI models.
+ * Vision-capable models (required for analyzeImage): gpt-4o, gpt-4o-mini, gpt-4-turbo.
+ * Text-only models: gpt-4, gpt-3.5-turbo, o1, o1-mini.
+ */
 export type OpenAIModel =
-  | 'gpt-4o'
-  | 'gpt-4o-mini'
-  | 'gpt-4-turbo'
-  | 'gpt-4'
-  | 'gpt-3.5-turbo'
-  | 'o1'
-  | 'o1-mini'
-  | string  // Allow any model string for forward-compatibility
+  | 'gpt-4o'          // Vision + text (recommended)
+  | 'gpt-4o-mini'     // Vision + text (lightweight)
+  | 'gpt-4-turbo'     // Vision + text
+  | 'gpt-4'           // Text only
+  | 'gpt-3.5-turbo'   // Text only
+  | 'o1'              // Text only (reasoning)
+  | 'o1-mini'         // Text only (reasoning, lightweight)
+  | string            // Allow any model string for forward-compatibility
 
 /** Configuration for the DevBrain. */
 export interface DevBrainConfig {
@@ -93,6 +97,10 @@ export interface DevBrainConfig {
   timeoutMs: number
   /** Enable offline fallback to LocalBrain when OpenAI is unavailable. Default: true. */
   offlineFallback: boolean
+  /** Max characters of OpenAI response stored as learned knowledge. Default: 3000. */
+  maxLearnedResponseLength: number
+  /** Max keywords extracted from messages for knowledge indexing. Default: 10. */
+  maxExtractedKeywords: number
   /** Configuration overrides for the local brain. */
   localBrainConfig?: {
     creativity?: number
@@ -177,10 +185,10 @@ Be brutally honest about issues. Don't sugarcoat problems.
 Format: List issues by severity (critical/error/warning/info) with line numbers and fixes.
 End with a score (0-100) and honest summary.`
 
-/** Max characters of OpenAI response to store as learned knowledge. */
-const MAX_LEARNED_RESPONSE_LENGTH = 3000
-/** Max keywords extracted from a message. */
-const MAX_EXTRACTED_KEYWORDS = 10
+/** Default max characters of OpenAI response to store as learned knowledge. */
+const DEFAULT_MAX_LEARNED_RESPONSE_LENGTH = 3000
+/** Default max keywords extracted from a message. */
+const DEFAULT_MAX_EXTRACTED_KEYWORDS = 10
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §3  DEV BRAIN — The main class                                              ║
@@ -235,6 +243,8 @@ export class DevBrain implements BrainInterface {
       debugMode: config?.debugMode ?? false,
       timeoutMs: config?.timeoutMs ?? 60000,
       offlineFallback: config?.offlineFallback ?? true,
+      maxLearnedResponseLength: config?.maxLearnedResponseLength ?? DEFAULT_MAX_LEARNED_RESPONSE_LENGTH,
+      maxExtractedKeywords: config?.maxExtractedKeywords ?? DEFAULT_MAX_EXTRACTED_KEYWORDS,
       localBrainConfig: config?.localBrainConfig,
     }
 
@@ -924,8 +934,9 @@ export class DevBrain implements BrainInterface {
     // Extract keywords and store as knowledge
     const keywords = this.extractKeyTopics(userMessage)
     if (keywords.length > 0 && openaiResponse.length > 50) {
-      const condensed = openaiResponse.length > MAX_LEARNED_RESPONSE_LENGTH
-        ? openaiResponse.substring(0, MAX_LEARNED_RESPONSE_LENGTH) + '...'
+      const maxLen = this.config.maxLearnedResponseLength
+      const condensed = openaiResponse.length > maxLen
+        ? openaiResponse.substring(0, maxLen) + '...'
         : openaiResponse
       this.localBrain.addKnowledge('openai-learned', keywords, condensed)
     }
@@ -939,8 +950,9 @@ export class DevBrain implements BrainInterface {
       request.language,
       ...request.description.split(/\s+/).filter(w => w.length > 3).slice(0, 5),
     ]
-    const condensedCode = code.length > MAX_LEARNED_RESPONSE_LENGTH
-      ? code.substring(0, MAX_LEARNED_RESPONSE_LENGTH) + '\n// ... (truncated)'
+    const maxLen = this.config.maxLearnedResponseLength
+    const condensedCode = code.length > maxLen
+      ? code.substring(0, maxLen) + '\n// ... (truncated)'
       : code
     this.localBrain.addKnowledge(
       'code-pattern',
@@ -971,7 +983,7 @@ export class DevBrain implements BrainInterface {
       .replace(/[^a-z0-9\s]/g, ' ')
       .split(/\s+/)
       .filter(w => w.length > 2 && !stopWords.has(w))
-      .slice(0, MAX_EXTRACTED_KEYWORDS)
+      .slice(0, this.config.maxExtractedKeywords)
   }
 
   /** Add a debug log entry. */
