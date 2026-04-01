@@ -6,6 +6,7 @@
  *   • AiChat.ts         → Core brain (chat, code, images, search, analytics)
  *   • AiIntegration.ts  → Integration layer (38 tools, 50+ commands, services)
  *   • LocalBrain.ts     → Standalone offline brain (self-learning, no API needed)
+ *   • HybridBrain.ts    → Cloud + Offline hybrid (auto-fallback, self-learning)
  *
  * The IntegratedAI class uses ALL 1,886 source files across 36+ modules.
  *
@@ -18,6 +19,13 @@
  *   title: 'Full AI Session',
  *   apiKey: 'sk-ant-...',
  *   model: 'claude-sonnet-4-20250514',
+ * })
+ *
+ * // 🌐🧠 Create HYBRID AI — cloud + offline with auto-learning
+ * const hybridAi = new IntegratedAI({
+ *   title: 'Hybrid AI Session',
+ *   apiKey: 'sk-ant-...',
+ *   mode: 'hybrid',  // Uses Claude Opus 4.6 + LocalBrain auto-fallback
  * })
  *
  * // 💬 Chat (uses AiChat.ts AI Brain → Claude API)
@@ -70,6 +78,34 @@
  * // Save brain state
  * const state = brain.serializeBrain()
  * const restored = LocalBrain.deserializeBrain(state)
+ * ```
+ *
+ * @example
+ * ```ts
+ * // 🌐🧠 Hybrid Brain — Cloud API + Offline (auto-fallback + self-learning)
+ * import { HybridBrain } from './chat/index.js'
+ *
+ * const brain = new HybridBrain({
+ *   apiKey: 'sk-ant-...',
+ *   deepThinking: true,  // Claude Opus 4.6 level reasoning
+ * })
+ *
+ * // Uses cloud when available, falls back to offline seamlessly
+ * const response = await brain.chat('Design a microservices architecture')
+ *
+ * // Cloud responses automatically train the offline brain
+ * // Over time, offline gets smarter from cloud interactions!
+ *
+ * // Check status
+ * console.log(brain.isCloudAvailable())  // true/false
+ * console.log(brain.getStats())          // { cloudRequests, offlineRequests, autoLearnCount, ... }
+ *
+ * // Manually teach the brain
+ * brain.teach('What is event sourcing?', 'Event sourcing stores state as a sequence of events...')
+ *
+ * // Persist hybrid state (preserves ALL learned knowledge)
+ * const state = brain.serializeState()
+ * const restored = HybridBrain.deserializeState(state)
  * ```
  */
 
@@ -134,6 +170,17 @@ export type {
   LocalBrainState,
   LocalBrainStats,
 } from './LocalBrain.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HYBRID BRAIN — Cloud + Offline intelligence (src/chat/HybridBrain.ts)
+// ══════════════════════════════════════════════════════════════════════════════
+export { HybridBrain } from './HybridBrain.js'
+
+export type {
+  HybridBrainConfig,
+  HybridBrainStats,
+  HybridBrainState,
+} from './HybridBrain.js'
 
 // ── All Types ──
 export type {
