@@ -1,6 +1,72 @@
 # 🤖 Ai — Complete Integrated AI System
 
-**1,886 source files · 36+ modules · 38 tools · 50+ commands — ALL connected into one AI.**
+**1,886+ source files · 36+ modules · 39 tools · 50+ commands — ALL connected into one AI.**
+
+## 🚀 Quick Installation
+
+### Linux (one-line)
+```bash
+curl -fsSL https://raw.githubusercontent.com/hamahasan441-png/Ai/main/scripts/install-linux.sh | bash
+```
+
+With optional features:
+```bash
+curl -fsSL https://raw.githubusercontent.com/hamahasan441-png/Ai/main/scripts/install-linux.sh | bash -s -- --with-voice --with-sqlite
+```
+
+### Windows (PowerShell, one-line)
+```powershell
+irm https://raw.githubusercontent.com/hamahasan441-png/Ai/main/scripts/install-windows.ps1 | iex
+```
+
+### Docker
+```bash
+docker build -t ai .
+docker run -it --rm -e ANTHROPIC_API_KEY=your-key ai
+```
+
+### From Source (Development)
+```bash
+git clone https://github.com/hamahasan441-png/Ai.git
+cd Ai
+npm install
+npm test
+```
+
+## ✨ What's New in v2
+
+### 🗄️ DatabaseTool (NEW)
+Query SQLite, PostgreSQL, and MySQL databases directly from the AI:
+```ts
+// List tables, run queries, explore schemas
+await ai.tools.database({ command: 'tables', connection_string: 'sqlite:///data.db' })
+await ai.tools.database({ command: 'query', connection_string: 'sqlite:///data.db', sql: 'SELECT * FROM users LIMIT 10' })
+```
+- **Read-only by default** for safety
+- **Lazy-loaded drivers** — no startup bloat
+- Supports: SQLite (embedded), PostgreSQL, MySQL
+
+### ⚡ Caching Service (NEW)
+Multi-tier caching for AI responses, knowledge, and tool results:
+```ts
+import { initCache, withCache, getCacheStats } from './services/cache/index.js'
+
+initCache({ enableDisk: true })
+const response = await withCache('chat:key', () => expensiveApiCall())
+console.log(getCacheStats())  // { memory: { hits: 5, misses: 1 }, disk: { ... } }
+```
+- **L1: Memory** — LRU in-memory (session-scoped, fast)
+- **L2: Disk** — Persistent JSON files (cross-session, TTL-based)
+
+### 🧠 LocalBrain Self-Learning v2 (ENHANCED)
+Major upgrades to the offline AI brain:
+- **TF-IDF Pattern Matching** — Semantic similarity instead of just keywords
+- **Confidence Decay** — Unused patterns fade, reinforced ones persist
+- **Cross-Session Persistence** — Auto-save/load brain state to disk
+- **Conflict Resolution** — Smart priority system when patterns clash
+- **Multi-Turn Feedback** — Give feedback on any conversation turn
+- **Learning Priorities** — `cloud-learned` > `user-corrected` > `reinforced` > `learned`
+- **Export/Import** — Share brain state between machines
 
 ## What Is This?
 
@@ -154,7 +220,7 @@ console.log(stats)
 console.log(MODULE_DIRECTORY)
 ```
 
-## The 38 Tools
+## The 39 Tools
 
 | Category | Tools | What They Do |
 | --- | --- | --- |
@@ -162,6 +228,7 @@ console.log(MODULE_DIRECTORY)
 | 📁 Files | `fileRead`, `fileWrite`, `fileEdit` | Read/write/edit any file |
 | 🔍 Search | `glob`, `grep`, `toolSearch` | Find files, search contents, discover tools |
 | 🌐 Web | `webFetch`, `webSearch` | Fetch URLs, search the internet |
+| 🗄 Database | `database` | Query SQLite, PostgreSQL, MySQL databases |
 | 📓 Notebooks | `notebookEdit` | Edit Jupyter notebooks |
 | 🤖 Agents | `agent`, `skill`, `sendMessage` | Spawn sub-agents, run skills |
 | 📋 Tasks | `taskCreate/Get/List/Output/Stop/Update` | Full task management |

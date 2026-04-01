@@ -169,7 +169,16 @@ export type {
   KnowledgeSearchResult,
   LocalBrainState,
   LocalBrainStats,
+  LearnedPatternPriority,
+  PatternConflict,
 } from './LocalBrain.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
+// ══════════════════════════════════════════════════════════════════════════════
+export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './TfIdfScorer.js'
+
+export type { TfIdfDocument, TfIdfResult } from './TfIdfScorer.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // HYBRID BRAIN — Cloud + Offline intelligence (src/chat/HybridBrain.ts)
