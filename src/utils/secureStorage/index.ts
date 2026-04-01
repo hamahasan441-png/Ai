@@ -1,4 +1,5 @@
 import { createFallbackStorage } from './fallbackStorage.js'
+import { linuxSecretStorage } from './linuxSecretStorage.js'
 import { macOsKeychainStorage } from './macOsKeychainStorage.js'
 import { plainTextStorage } from './plainTextStorage.js'
 import type { SecureStorage } from './types.js'
@@ -11,7 +12,10 @@ export function getSecureStorage(): SecureStorage {
     return createFallbackStorage(macOsKeychainStorage, plainTextStorage)
   }
 
-  // TODO: add libsecret support for Linux
+  if (process.platform === 'linux') {
+    // Use libsecret (GNOME Keyring / KDE Wallet) with plaintext fallback
+    return createFallbackStorage(linuxSecretStorage, plainTextStorage)
+  }
 
   return plainTextStorage
 }

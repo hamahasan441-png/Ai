@@ -59,9 +59,10 @@ export async function startMCPServer(
   server.setRequestHandler(
     ListToolsRequestSchema,
     async (): Promise<ListToolsResult> => {
-      // TODO: Also re-expose any MCP tools
       const toolPermissionContext = getEmptyToolPermissionContext()
       const tools = getTools(toolPermissionContext)
+      // Note: MCP tools from connected servers are not re-exposed here
+      // to avoid circular tool chains. Only native tools are listed.
       return {
         tools: await Promise.all(
           tools.map(async tool => {
@@ -100,7 +101,8 @@ export async function startMCPServer(
     CallToolRequestSchema,
     async ({ params: { name, arguments: args } }): Promise<CallToolResult> => {
       const toolPermissionContext = getEmptyToolPermissionContext()
-      // TODO: Also re-expose any MCP tools
+      // Note: MCP tools from connected servers are not re-exposed here
+      // to avoid circular tool chains. Only native tools are listed.
       const tools = getTools(toolPermissionContext)
       const tool = findToolByName(tools, name)
       if (!tool) {
@@ -133,13 +135,27 @@ export async function startMCPServer(
         updateAttributionState: () => {},
       }
 
-      // TODO: validate input types with zod
+      // Validate input types against the tool's Zod schema
+      const parseResult = tool.inputSchema.safeParse(args ?? {})
+      if (!parseResult.success) {
+        return {
+          isError: true,
+          content: [
+            {
+              type: 'text',
+              text: `Input validation failed for tool ${name}: ${parseResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
+            },
+          ],
+        }
+      }
+      const validatedArgs = parseResult.data
+
       try {
         if (!tool.isEnabled()) {
           throw new Error(`Tool ${name} is not enabled`)
         }
         const validationResult = await tool.validateInput?.(
-          (args as never) ?? {},
+          validatedArgs as never,
           toolUseContext,
         )
         if (validationResult && !validationResult.result) {
@@ -148,7 +164,7 @@ export async function startMCPServer(
           )
         }
         const finalResult = await tool.call(
-          (args ?? {}) as never,
+          validatedArgs as never,
           toolUseContext,
           hasPermissionsToUseTool,
           createAssistantMessage({

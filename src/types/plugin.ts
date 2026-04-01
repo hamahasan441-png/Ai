@@ -84,19 +84,26 @@ export type PluginComponent =
  * error handling that can't break when error messages change.
  *
  * IMPLEMENTATION STATUS:
- * Currently used in production (2 types):
- * - generic-error: Used for various plugin loading failures
- * - plugin-not-found: Used when plugin not found in marketplace
+ * Currently used in production:
+ * - generic-error: Catch-all for miscellaneous plugin loading failures
+ * - plugin-not-found: When plugin not found in marketplace
+ * - path-not-found: When plugin directory/path doesn't exist
+ * - network-error: When plugin download/caching fails
+ * - manifest-validation-error: When plugin manifests have conflicts
+ * - plugin-cache-miss: When cached plugin is missing from disk
+ * - marketplace-blocked-by-policy: When policy blocks marketplace access
+ * - mcp-config-invalid: When MCP server config in plugin is invalid
+ * - mcp-server-suppressed-duplicate: When duplicate MCP servers detected
+ * - hook-load-failed: When hook configuration fails to load
+ * - component-load-failed: When a plugin component fails to load
+ * - dependency-unsatisfied: When a plugin dependency is not satisfied
  *
- * Planned for future use (10 types - see TODOs in pluginLoader.ts):
- * - path-not-found, git-auth-failed, git-timeout, network-error
- * - manifest-parse-error, manifest-validation-error
- * - marketplace-not-found, marketplace-load-failed
- * - mcp-config-invalid, hook-load-failed, component-load-failed
- *
- * These unused types support UI formatting and provide a clear roadmap for
- * improving error specificity. They can be incrementally implemented as
- * error creation sites are refactored.
+ * Additional types (available for incremental adoption):
+ * - git-auth-failed, git-timeout: Git-specific failures
+ * - manifest-parse-error: When JSON parsing fails
+ * - marketplace-not-found, marketplace-load-failed: Marketplace issues
+ * - lsp-*: LSP server errors
+ * - mcpb-*: MCPB package errors
  */
 export type PluginError =
   | {

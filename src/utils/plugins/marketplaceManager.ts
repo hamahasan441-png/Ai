@@ -1616,8 +1616,53 @@ async function loadAndCacheMarketplace(
       }
 
       case 'npm': {
-        // TODO: Implement npm package support
-        throw new Error('NPM marketplace sources not yet implemented')
+        temporaryCachePath = join(cacheDir, tempName)
+        cleanupNeeded = true
+        // Download npm package to temp directory and extract marketplace manifest
+        const packageSpec = source.version
+          ? `${source.package}@${source.version}`
+          : source.package
+        onProgress?.(`Installing npm package: ${packageSpec}`)
+        const npmResult = await execFileNoThrow('npm', [
+          'pack',
+          packageSpec,
+          '--pack-destination',
+          temporaryCachePath,
+        ])
+        if (npmResult.exitCode !== 0) {
+          throw new Error(
+            `Failed to download npm package ${packageSpec}: ${npmResult.stderr}`,
+          )
+        }
+        // npm pack creates a .tgz file; extract it
+        const tgzFiles = (
+          await import('fs/promises').then(fs => fs.readdir(temporaryCachePath))
+        ).filter(f => f.endsWith('.tgz'))
+        if (tgzFiles.length === 0) {
+          throw new Error(
+            `No .tgz file found after npm pack ${packageSpec}`,
+          )
+        }
+        const tgzPath = join(temporaryCachePath, tgzFiles[0]!)
+        const extractDir = join(temporaryCachePath, 'extracted')
+        const tarResult = await execFileNoThrow('tar', [
+          'xzf',
+          tgzPath,
+          '-C',
+          temporaryCachePath,
+        ])
+        if (tarResult.exitCode !== 0) {
+          throw new Error(
+            `Failed to extract npm package ${packageSpec}: ${tarResult.stderr}`,
+          )
+        }
+        // npm pack extracts to a 'package/' subdirectory
+        const packageDir = join(temporaryCachePath, 'package')
+        marketplacePath = join(
+          packageDir,
+          source.path || '.claude-plugin/marketplace.json',
+        )
+        break
       }
 
       case 'file': {
