@@ -297,6 +297,7 @@ import {
   AdvancedChat,
   AiBrain,
   type AiBrainConfig,
+  type BrainInterface,
   type ChatMessage,
   type ContentBlock,
   type TokenUsage,
@@ -313,6 +314,11 @@ import {
   isSupportedImageType,
   validateImageData,
 } from './AiChat.js'
+
+// ── From HybridBrain — Cloud + Offline hybrid intelligence ───────────────────
+// WHY: HybridBrain combines cloud API (Claude Opus 4.6) with offline LocalBrain
+// for auto-fallback, self-learning from cloud responses, and continuous improvement.
+import { HybridBrain, type HybridBrainConfig } from './HybridBrain.js'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 //
@@ -460,8 +466,11 @@ export class IntegratedAI {
   /** The AI chat brain (from AiChat.ts) */
   public readonly chat: AdvancedChat
 
-  /** The AI brain for API calls */
-  public readonly brain: AiBrain
+  /** The AI brain for API calls (cloud, local, or hybrid) */
+  public readonly brain: BrainInterface
+
+  /** The hybrid brain (available when mode is 'hybrid') */
+  public readonly hybridBrain: HybridBrain | null
 
   /** All available tools */
   public readonly tools: typeof ALL_TOOLS
@@ -477,12 +486,43 @@ export class IntegratedAI {
     apiKey?: string
     model?: string
     cwd?: string
+    /**
+     * Brain mode:
+     *  - 'cloud' (default): Uses AiBrain with Claude API
+     *  - 'hybrid': Uses HybridBrain (cloud + offline auto-fallback + self-learning)
+     *  - 'custom': Uses a custom BrainInterface passed via the `brain` option
+     */
+    mode?: 'cloud' | 'hybrid' | 'custom'
+    /** Custom brain implementation (used when mode is 'custom'). */
+    brain?: BrainInterface
+    /** Configuration for hybrid mode. */
+    hybridConfig?: Partial<HybridBrainConfig>
   }) {
+    const mode = options?.mode ?? 'cloud'
+
+    // Determine which brain to use
+    let brain: BrainInterface | undefined
+    this.hybridBrain = null
+
+    if (mode === 'hybrid') {
+      // Create HybridBrain — cloud + offline with auto-learning
+      this.hybridBrain = new HybridBrain({
+        apiKey: options?.apiKey,
+        model: options?.model ?? 'claude-opus-4-20250514',
+        ...options?.hybridConfig,
+      })
+      brain = this.hybridBrain
+    } else if (mode === 'custom' && options?.brain) {
+      brain = options.brain
+    }
+    // mode === 'cloud' uses default AiBrain via AdvancedChat
+
     // Initialize the chat brain (from AiChat.ts §7-§8)
     this.chat = new AdvancedChat({
       title: options?.title ?? 'Integrated AI Session',
       apiKey: options?.apiKey,
       model: options?.model,
+      brain,
     })
     this.brain = this.chat.brain
 
