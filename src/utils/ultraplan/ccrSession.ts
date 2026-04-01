@@ -10,6 +10,7 @@ import type {
 } from '@anthropic-ai/sdk/resources'
 import type { SDKMessage } from '../../entrypoints/agentSdkTypes.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '../../tools/ExitPlanModeTool/constants.js'
+import { checkAndRefreshOAuthTokenIfNeeded } from '../auth.js'
 import { logForDebugging } from '../debug.js'
 import { sleep } from '../sleep.js'
 import { isTransientNetworkError } from '../teleport/api.js'
@@ -22,6 +23,9 @@ const POLL_INTERVAL_MS = 3000
 // pollRemoteSessionEvents doesn't retry. A 30min poll makes ~600 calls;
 // at any nonzero 5xx rate one blip would kill the run.
 const MAX_CONSECUTIVE_FAILURES = 5
+// Proactively refresh OAuth token every 10 minutes during long polls
+// to prevent staleness over the 30-min ultraplan window.
+const TOKEN_REFRESH_INTERVAL_MS = 10 * 60 * 1000
 
 export type PollFailReason =
   | 'terminated'
@@ -206,8 +210,21 @@ export async function pollForApprovedExitPlanMode(
   let cursor: string | null = null
   let failures = 0
   let lastPhase: UltraplanPhase = 'running'
+  let lastTokenRefresh = Date.now()
 
   while (Date.now() < deadline) {
+    // Proactively refresh OAuth token to prevent staleness during long polls
+    if (Date.now() - lastTokenRefresh >= TOKEN_REFRESH_INTERVAL_MS) {
+      try {
+        await checkAndRefreshOAuthTokenIfNeeded()
+        lastTokenRefresh = Date.now()
+        logForDebugging('[ultraplan] proactive OAuth token refresh completed')
+      } catch {
+        // Non-fatal: the next pollRemoteSessionEvents will fail with 401
+        // if the token is truly stale, which is handled by the retry logic.
+        logForDebugging('[ultraplan] proactive OAuth token refresh failed, continuing')
+      }
+    }
     if (shouldStop?.()) {
       throw new UltraplanPollError(
         'poll stopped by caller',

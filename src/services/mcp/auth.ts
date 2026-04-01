@@ -1740,13 +1740,9 @@ export class ClaudeAuthProvider implements OAuthClientProvider {
    * On exchange failure, clears the id_token cache so the next interactive
    * auth does a fresh IdP login (the cached id_token is likely stale/revoked).
    *
-   * TODO(xaa-ga): add cross-process lockfile before GA. `_refreshInProgress`
-   * only dedupes within one process — two CC instances with expiring tokens
-   * both fire the full 4-request XAA chain and race on storage.update().
-   * Unlike inc-4829 the id_token is not single-use so both access_tokens
-   * stay valid (wasted round-trips + keychain write race, not brickage),
-   * but this is the shape CLAUDE.md flags under "Token/auth caching across
-   * process boundaries". Mirror refreshAuthorization()'s lockfile pattern.
+   * Cross-process lockfile prevents multiple CC instances from racing on the
+   * XAA 4-request chain simultaneously. Mirrors refreshAuthorization()'s
+   * lockfile pattern.
    */
   private async xaaRefresh(): Promise<OAuthTokens | undefined> {
     const idp = getXaaIdpSettings()
@@ -1788,7 +1784,78 @@ export class ClaudeAuthProvider implements OAuthClientProvider {
       return undefined
     }
 
+    // Cross-process lockfile to prevent multiple CC instances from racing
+    // on the XAA 4-request chain and keychain writes.
+    const serverKey = getServerKey(this.serverName, this.serverConfig)
+    const claudeDir = getClaudeConfigHomeDir()
+    await mkdir(claudeDir, { recursive: true })
+    const sanitizedKey = serverKey.replace(/[^a-zA-Z0-9]/g, '_')
+    const lockfilePath = join(claudeDir, `mcp-xaa-refresh-${sanitizedKey}.lock`)
+
+    let release: (() => Promise<void>) | undefined
+    for (let retry = 0; retry < MAX_LOCK_RETRIES; retry++) {
+      try {
+        logMCPDebug(
+          this.serverName,
+          `XAA: acquiring refresh lock (attempt ${retry + 1})`,
+        )
+        release = await lockfile.lock(lockfilePath, {
+          realpath: false,
+          onCompromised: () => {
+            logMCPDebug(this.serverName, `XAA: refresh lock was compromised`)
+          },
+        })
+        logMCPDebug(this.serverName, `XAA: acquired refresh lock`)
+        break
+      } catch (e: unknown) {
+        const code = getErrnoCode(e)
+        if (code === 'ELOCKED') {
+          logMCPDebug(
+            this.serverName,
+            `XAA: refresh lock held by another process, waiting (attempt ${retry + 1}/${MAX_LOCK_RETRIES})`,
+          )
+          await sleep(1000 + Math.random() * 1000)
+          continue
+        }
+        logMCPDebug(
+          this.serverName,
+          `XAA: failed to acquire refresh lock: ${code}, proceeding without lock`,
+        )
+        break
+      }
+    }
+    if (!release) {
+      logMCPDebug(
+        this.serverName,
+        `XAA: could not acquire refresh lock after ${MAX_LOCK_RETRIES} retries, proceeding without lock`,
+      )
+    }
+
     try {
+      // Re-read tokens after acquiring lock — another process may have refreshed
+      if (release) {
+        clearKeychainCache()
+        const storage = getSecureStorage()
+        const data = storage.read()
+        const tokenData = data?.mcpOAuth?.[serverKey]
+        if (tokenData) {
+          const expiresIn = (tokenData.expiresAt - Date.now()) / 1000
+          if (expiresIn > 300) {
+            logMCPDebug(
+              this.serverName,
+              `XAA: another process already refreshed tokens (${Math.floor(expiresIn)}s remaining)`,
+            )
+            return {
+              access_token: tokenData.accessToken,
+              token_type: 'Bearer',
+              expires_in: Math.floor(expiresIn),
+              scope: tokenData.scope,
+              refresh_token: tokenData.refreshToken,
+            }
+          }
+        }
+      }
+
       const tokens = await performCrossAppAccess(
         this.serverConfig.url,
         {
@@ -1808,7 +1875,6 @@ export class ClaudeAuthProvider implements OAuthClientProvider {
       // and send a client_id-less RFC 7009 request that strict ASes reject.
       const storage = getSecureStorage()
       const existingData = storage.read() || {}
-      const serverKey = getServerKey(this.serverName, this.serverConfig)
       const prev = existingData.mcpOAuth?.[serverKey]
       storage.update({
         ...existingData,
@@ -1846,6 +1912,15 @@ export class ClaudeAuthProvider implements OAuthClientProvider {
         )
       }
       throw e
+    } finally {
+      if (release) {
+        try {
+          await release()
+          logMCPDebug(this.serverName, `XAA: released refresh lock`)
+        } catch {
+          logMCPDebug(this.serverName, `XAA: failed to release refresh lock`)
+        }
+      }
     }
   }
 
