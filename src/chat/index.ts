@@ -5,6 +5,7 @@
  *
  *   • AiChat.ts         → Core brain (chat, code, images, search, analytics)
  *   • AiIntegration.ts  → Integration layer (38 tools, 50+ commands, services)
+ *   • LocalBrain.ts     → Standalone offline brain (self-learning, no API needed)
  *
  * The IntegratedAI class uses ALL 1,886 source files across 36+ modules.
  *
@@ -48,6 +49,27 @@
  *
  * // 📖 See what every module does
  * console.log(MODULE_DIRECTORY)
+ * ```
+ *
+ * @example
+ * ```ts
+ * // 🧠 Standalone offline AI (no API key needed)
+ * import { LocalBrain } from './chat/index.js'
+ *
+ * const brain = new LocalBrain({ learningEnabled: true })
+ *
+ * // Chat offline
+ * const response = await brain.chat('How do I sort an array in Python?')
+ *
+ * // Write code offline
+ * const code = await brain.writeCode({ description: 'binary search', language: 'typescript' })
+ *
+ * // Teach the brain
+ * brain.learn('What is Redux?', 'Redux is a state management library for JavaScript apps.')
+ *
+ * // Save brain state
+ * const state = brain.serializeBrain()
+ * const restored = LocalBrain.deserializeBrain(state)
  * ```
  */
 
@@ -99,6 +121,20 @@ export {
   parseImageAnalysis,
 } from './AiChat.js'
 
+// ══════════════════════════════════════════════════════════════════════════════
+// LOCAL BRAIN — Standalone offline AI (src/chat/LocalBrain.ts)
+// ══════════════════════════════════════════════════════════════════════════════
+export { LocalBrain } from './LocalBrain.js'
+
+export type {
+  LocalBrainConfig,
+  KnowledgeEntry,
+  LearnedPattern,
+  KnowledgeSearchResult,
+  LocalBrainState,
+  LocalBrainStats,
+} from './LocalBrain.js'
+
 // ── All Types ──
 export type {
   // Messages
@@ -118,5 +154,5 @@ export type {
   // Image Analyzer
   ImageAnalysisRequest, ImageAnalysisResult,
   // AI Brain
-  AiBrainConfig, ApiMessage, ApiContentBlock,
+  AiBrainConfig, ApiMessage, ApiContentBlock, BrainInterface,
 } from './AiChat.js'

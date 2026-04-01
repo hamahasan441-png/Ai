@@ -298,6 +298,20 @@ export interface ApiMessage {
   content: string | ApiContentBlock[]
 }
 
+/**
+ * Common interface that any brain (AiBrain, LocalBrain, or custom) must implement.
+ * This allows AdvancedChat to work with any brain implementation.
+ */
+export interface BrainInterface {
+  chat(userMessage: string): Promise<{ text: string; usage: TokenUsage; durationMs: number }>
+  writeCode(request: CodeRequest): Promise<CodeResult>
+  reviewCode(request: CodeReviewRequest): Promise<CodeReviewResult>
+  analyzeImage(request: ImageAnalysisRequest): Promise<ImageAnalysisResult>
+  getModel(): string
+  setModel(model: string): void
+  clearHistory(): void
+}
+
 export interface ApiContentBlock {
   type: 'text' | 'image'
   text?: string
@@ -1275,7 +1289,7 @@ export class AdvancedChat {
   private conversation: Conversation
   private contextConfig: ContextWindowConfig
   private messagePriorities = new Map<ChatMessageId, MessagePriority>()
-  public readonly brain: AiBrain
+  public readonly brain: BrainInterface
 
   constructor(options?: {
     title?: string
@@ -1283,6 +1297,8 @@ export class AdvancedChat {
     metadata?: Partial<ConversationMetadata>
     apiKey?: string
     model?: string
+    /** Pass a custom brain (e.g. LocalBrain) to use instead of the default AiBrain. */
+    brain?: BrainInterface
   }) {
     const now = new Date().toISOString()
     this.conversation = {
@@ -1297,7 +1313,7 @@ export class AdvancedChat {
       metadata: { modelsUsed: [], totalToolCalls: 0, estimatedCostUsd: 0, ...options?.metadata },
     }
     this.contextConfig = { ...DEFAULT_CTX, ...options?.contextConfig }
-    this.brain = new AiBrain({ apiKey: options?.apiKey, model: options?.model })
+    this.brain = options?.brain ?? new AiBrain({ apiKey: options?.apiKey, model: options?.model })
   }
 
   // ── Conversation State ──
