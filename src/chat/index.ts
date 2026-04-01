@@ -7,6 +7,7 @@
  *   • AiIntegration.ts  → Integration layer (38 tools, 50+ commands, services)
  *   • LocalBrain.ts     → Standalone offline brain (self-learning, no API needed)
  *   • HybridBrain.ts    → Cloud + Offline hybrid (auto-fallback, self-learning)
+ *   • DevBrain.ts       → Private developer brain (LocalBrain + OpenAI, unrestricted)
  *
  * The IntegratedAI class uses ALL 1,886 source files across 36+ modules.
  *
@@ -107,6 +108,29 @@
  * const state = brain.serializeState()
  * const restored = HybridBrain.deserializeState(state)
  * ```
+ *
+ * @example
+ * ```ts
+ * // 🔓🧠 DevBrain — Private developer brain (LocalBrain + OpenAI, unrestricted)
+ * import { DevBrain } from './chat/index.js'
+ *
+ * const dev = new DevBrain({ openaiApiKey: 'sk-...' })
+ *
+ * // Chat — local brain thinks first, OpenAI enhances
+ * const response = await dev.chat('How do I reverse-engineer this binary?')
+ *
+ * // Raw prompt — bypass local thinking, direct to OpenAI
+ * const raw = await dev.rawPrompt('Explain V8 memory internals')
+ *
+ * // System override — custom persona for one request
+ * const custom = await dev.chatWithSystem('You are a kernel dev', 'Explain mmap')
+ *
+ * // Write code — no restrictions
+ * const code = await dev.writeCode({ description: 'TCP port scanner', language: 'python' })
+ *
+ * // Debug log — see what happened
+ * console.log(dev.getDebugLog())
+ * ```
  */
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -190,6 +214,19 @@ export type {
   HybridBrainStats,
   HybridBrainState,
 } from './HybridBrain.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DEV BRAIN — Private developer module (src/chat/DevBrain.ts)
+// ══════════════════════════════════════════════════════════════════════════════
+export { DevBrain } from './DevBrain.js'
+
+export type {
+  DevBrainConfig,
+  DevBrainStats,
+  DevBrainState,
+  DevBrainLogEntry,
+  OpenAIModel,
+} from './DevBrain.js'
 
 // ── All Types ──
 export type {
