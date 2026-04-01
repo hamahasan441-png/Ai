@@ -8,9 +8,10 @@
   },
   "scripts": {
     "test": "vitest run",
-    "start": "node src/entrypoints/cli.tsx",
+    "start": "npx tsx src/entrypoints/cli.tsx",
     "dev": "npx tsx src/entrypoints/cli.tsx",
-    "postinstall": "node scripts/postinstall.js"
+    "postinstall": "node scripts/postinstall.js",
+    "prepublishOnly": "echo 'Note: This package requires tsx or a TypeScript runtime to execute the CLI entry point.'"
   },
   "repository": {
     "type": "git",
