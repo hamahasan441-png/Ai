@@ -9,7 +9,7 @@ An AI system that **uses every file in the repository**. Three files work togeth
 | File | Lines | What It Does |
 | --- | --- | --- |
 | `src/chat/AiChat.ts` | 1,526 | 🧠 **AI Brain** — Chat, code writing (24 langs), image analysis, search, analytics, export |
-| `src/chat/AiIntegration.ts` | 700+ | 🔗 **Integration Layer** — Imports from ALL 36+ modules, wires 38 tools, 50+ commands, services |
+| `src/chat/AiIntegration.ts` | 1,001 | 🔗 **Integration Layer** — Imports from ALL 36+ modules, wires 38 tools, 50+ commands, services |
 | `src/chat/index.ts` | 135+ | 📦 **Public API** — Clean exports for everything |
 
 ## Architecture — How ALL Files Connect

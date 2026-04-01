@@ -869,7 +869,7 @@ export const MODULE_DIRECTORY = {
     sections: ['Types', 'Search Engine', 'Analytics', 'Export', 'Code Writer', 'Image Analyzer', 'AI Brain', 'AdvancedChat'],
   },
   'src/chat/AiIntegration.ts': {
-    lines: 'this file',
+    lines: 1001,
     purpose: 'Integration layer — connects AiChat to ALL other modules',
     sections: ['Tool imports', 'Service imports', 'IntegratedAI class'],
   },
