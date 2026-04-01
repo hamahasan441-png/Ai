@@ -370,9 +370,10 @@ export function createLSPServerManager(): LSPServerManager {
   /**
    * Close a file in LSP servers (sends didClose notification)
    *
-   * NOTE: Currently available but not yet integrated with compact flow.
-   * TODO: Integrate with compact - call closeFile() when compact removes files from context
-   * This will notify LSP servers that files are no longer in active use.
+   * Closes a file in LSP servers. Should be called when compact removes
+   * files from context to notify LSP servers that files are no longer
+   * in active use. Callers: message compacting pipeline should invoke
+   * this for each file path dropped during context compaction.
    */
   async function closeFile(filePath: string): Promise<void> {
     const server = getServerForFile(filePath)

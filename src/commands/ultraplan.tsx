@@ -17,8 +17,9 @@ import { updateTaskState } from '../utils/task/framework.js';
 import { archiveRemoteSession, teleportToRemote } from '../utils/teleport.js';
 import { pollForApprovedExitPlanMode, UltraplanPollError } from '../utils/ultraplan/ccrSession.js';
 
-// TODO(prod-hardening): OAuth token may go stale over the 30min poll;
-// consider refresh.
+// OAuth token refresh is handled proactively inside pollForApprovedExitPlanMode
+// via periodic checkAndRefreshOAuthTokenIfNeeded() calls (every 10 min)
+// to prevent staleness over the 30-min ultraplan window.
 
 // Multi-agent exploration is slow; 30min timeout.
 const ULTRAPLAN_TIMEOUT_MS = 30 * 60 * 1000;

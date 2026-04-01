@@ -87,7 +87,7 @@ import { getAddDirEnabledPlugins } from './addDirPluginSettings.js'
 import { verifyAndDemote } from './dependencyResolver.js'
 import { classifyFetchError, logPluginFetch } from './fetchTelemetry.js'
 import { checkGitAvailable } from './gitAvailability.js'
-import { getInMemoryInstalledPlugins } from './installedPluginsManager.js'
+import { clearInstalledPluginsCache, getInMemoryInstalledPlugins } from './installedPluginsManager.js'
 import { getManagedPluginNames } from './managedPlugins.js'
 import {
   formatSourceForDisplay,
@@ -2217,9 +2217,10 @@ async function loadPluginFromMarketplaceEntry(
       })
       logError(error)
       errorsOut.push({
-        type: 'generic-error',
+        type: 'path-not-found',
         source: pluginId,
-        error: `Plugin directory not found at path: ${sourcePluginPath}. Check that the marketplace entry has the correct path.`,
+        path: sourcePluginPath,
+        component: 'commands',
       })
       return null
     }
@@ -2371,9 +2372,11 @@ async function loadPluginFromMarketplaceEntry(
       })
       logError(toError(error))
       errorsOut.push({
-        type: 'generic-error',
+        type: 'network-error',
         source: pluginId,
-        error: `Failed to download/cache plugin ${entry.name}: ${errorMsg}`,
+        plugin: entry.name,
+        url: entry.source,
+        details: `Failed to download/cache plugin ${entry.name}: ${errorMsg}`,
       })
       return null
     }
@@ -2699,9 +2702,13 @@ async function finishLoadingPluginFromPath(
     )
     logError(error)
     errorsOut.push({
-      type: 'generic-error',
+      type: 'manifest-validation-error',
       source: pluginId,
-      error: `Plugin ${entry.name} has conflicting manifests: both plugin.json and marketplace entry specify components. Set strict: true in marketplace entry or remove component specs from one location.`,
+      plugin: entry.name,
+      manifestPath: join(pluginPath, '.claude-plugin', 'plugin.json'),
+      validationErrors: [
+        `Plugin ${entry.name} has conflicting manifests: both plugin.json and marketplace entry specify components. Set strict: true in marketplace entry or remove component specs from one location.`,
+      ],
     })
     return null
   } else if (hasManifest) {
@@ -3239,7 +3246,8 @@ export function clearPluginCache(reason?: string): void {
     resetSettingsCache()
   }
   clearPluginSettingsBase()
-  // TODO: Clear installed plugins cache when installedPluginsManager is implemented
+  // Clear installed plugins cache so stale plugin installation state is dropped
+  clearInstalledPluginsCache()
 }
 
 /**

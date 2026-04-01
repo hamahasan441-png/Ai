@@ -185,10 +185,9 @@ export function ExitPlanModePermissionRequest({
   const imageAttachments = Object.values(pastedContents).filter(c => c.type === 'image');
   const hasImages = imageAttachments.length > 0;
 
-  // TODO: Delete the branch after moving to V2
-  // Use tool name to detect V2 instead of checking input.plan, because PR #10394
-  // injects plan content into input.plan for hooks/SDK, which broke the old detection
-  // (see issue #10878)
+  // V1 compatibility branch — deprecated. Will be removed when all users
+  // migrate to V2 ExitPlanMode. Detection uses tool name instead of
+  // input.plan per PR #10394 (see issue #10878).
   const isV2 = toolUseConfirm.tool.name === EXIT_PLAN_MODE_V2_TOOL_NAME;
   const inputPlan = isV2 ? undefined : toolUseConfirm.input.plan as string | undefined;
   const planFilePath = isV2 ? getPlanFilePath() : undefined;

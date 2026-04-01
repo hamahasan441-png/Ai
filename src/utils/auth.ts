@@ -1051,7 +1051,15 @@ export function prefetchAwsCredentialsAndBedRockInfoIfSafe(): void {
 export const getApiKeyFromConfigOrMacOSKeychain = memoize(
   (): { key: string; source: ApiKeySource } | null => {
     if (isBareMode()) return null
-    // TODO: migrate to SecureStorage
+    // Use SecureStorage for cross-platform API key retrieval.
+    // On macOS this reads from Keychain (with prefetch optimization),
+    // on Linux from libsecret, and falls back to plaintext.
+    const secureStorage = getSecureStorage()
+    const storageData = secureStorage.read()
+    if (storageData?.apiKey) {
+      return { key: storageData.apiKey, source: '/login managed key' }
+    }
+    // Legacy macOS Keychain read path (for keys stored before SecureStorage migration)
     if (process.platform === 'darwin') {
       // keychainPrefetch.ts fires this read at main.tsx top-level in parallel
       // with module imports. If it completed, use that instead of spawning a
@@ -1101,38 +1109,60 @@ export async function saveApiKey(apiKey: string): Promise<void> {
   // Store as primary API key
   await maybeRemoveApiKeyFromMacOSKeychain()
   let savedToKeychain = false
-  if (process.platform === 'darwin') {
-    try {
-      // TODO: migrate to SecureStorage
-      const storageServiceName = getMacOsKeychainStorageServiceName()
-      const username = getUsername()
-
-      // Convert to hexadecimal to avoid any escaping issues
-      const hexValue = Buffer.from(apiKey, 'utf-8').toString('hex')
-
-      // Use security's interactive mode (-i) with -X (hexadecimal) option
-      // This ensures credentials never appear in process command-line arguments
-      // Process monitors only see "security -i", not the password
-      const command = `add-generic-password -U -a "${username}" -s "${storageServiceName}" -X "${hexValue}"\n`
-
-      await execa('security', ['-i'], {
-        input: command,
-        reject: false,
-      })
-
+  // Use SecureStorage for cross-platform API key persistence.
+  // This stores via Keychain on macOS, libsecret on Linux, or plaintext fallback.
+  try {
+    const secureStorage = getSecureStorage()
+    const existing = secureStorage.read() || {}
+    const updateResult = secureStorage.update({ ...existing, apiKey: apiKey })
+    if (updateResult.success) {
       logEvent('tengu_api_key_saved_to_keychain', {})
       savedToKeychain = true
-    } catch (e) {
-      logError(e)
-      logEvent('tengu_api_key_keychain_error', {
-        error: errorMessage(
-          e,
-        ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      })
+    } else if (updateResult.warning) {
+      logForDebugging(`SecureStorage warning: ${updateResult.warning}`)
+    }
+  } catch (e) {
+    logError(e)
+    logEvent('tengu_api_key_keychain_error', {
+      error: errorMessage(
+        e,
+      ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    })
+  }
+  if (!savedToKeychain) {
+    // Legacy macOS-specific Keychain path (fallback for pre-SecureStorage installs)
+    if (process.platform === 'darwin') {
+      try {
+        const storageServiceName = getMacOsKeychainStorageServiceName()
+        const username = getUsername()
+
+        // Convert to hexadecimal to avoid any escaping issues
+        const hexValue = Buffer.from(apiKey, 'utf-8').toString('hex')
+
+        // Use security's interactive mode (-i) with -X (hexadecimal) option
+        // This ensures credentials never appear in process command-line arguments
+        // Process monitors only see "security -i", not the password
+        const command = `add-generic-password -U -a "${username}" -s "${storageServiceName}" -X "${hexValue}"\n`
+
+        await execa('security', ['-i'], {
+          input: command,
+          reject: false,
+        })
+
+        logEvent('tengu_api_key_saved_to_keychain', {})
+        savedToKeychain = true
+      } catch (e) {
+        logError(e)
+        logEvent('tengu_api_key_keychain_error', {
+          error: errorMessage(
+            e,
+          ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        })
+      }
+    }
+    if (!savedToKeychain) {
       logEvent('tengu_api_key_saved_to_config', {})
     }
-  } else {
-    logEvent('tengu_api_key_saved_to_config', {})
   }
 
   const normalizedKey = normalizeApiKeyForConfig(apiKey)

@@ -2916,7 +2916,7 @@ function runHeadlessStreaming(
             void run()
           }
         } else if (message.request.subtype === 'set_permission_mode') {
-          const m = message.request // for typescript (TODO: use readonly types to avoid this)
+          const m = message.request as Readonly<typeof message.request>
           setAppState(prev => ({
             ...prev,
             toolPermissionContext: handleSetPermissionMode(
