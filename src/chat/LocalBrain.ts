@@ -53,11 +53,11 @@ import { LearningEngine } from './codemaster/LearningEngine.js'
 import type { CodeAnalysis, CodeReviewOutput, FixResult, TaskPlan, AnalysisLanguage } from './codemaster/types.js'
 
 // Intelligence modules
-import { SemanticEngine } from './SemanticEngine'
-import { IntentEngine } from './IntentEngine'
-import { ContextManager } from './ContextManager'
-import { ReasoningEngine } from './ReasoningEngine'
-import { MetaCognition } from './MetaCognition'
+import { SemanticEngine } from './SemanticEngine.js'
+import { IntentEngine } from './IntentEngine.js'
+import { ContextManager } from './ContextManager.js'
+import { ReasoningEngine } from './ReasoningEngine.js'
+import { MetaCognition } from './MetaCognition.js'
 import * as fs from 'fs'
 import * as path from 'path'
 
