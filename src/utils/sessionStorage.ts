@@ -285,8 +285,12 @@ export async function writeAgentMetadata(
   metadata: AgentMetadata,
 ): Promise<void> {
   const path = getAgentMetadataPath(agentId)
-  await mkdir(dirname(path), { recursive: true })
-  await writeFile(path, JSON.stringify(metadata))
+  try {
+    await mkdir(dirname(path), { recursive: true })
+    await writeFile(path, JSON.stringify(metadata))
+  } catch (e) {
+    logForDebugging(`Failed to write agent metadata for ${agentId}: ${e}`)
+  }
 }
 
 export async function readAgentMetadata(
@@ -339,8 +343,12 @@ export async function writeRemoteAgentMetadata(
   metadata: RemoteAgentMetadata,
 ): Promise<void> {
   const path = getRemoteAgentMetadataPath(taskId)
-  await mkdir(dirname(path), { recursive: true })
-  await writeFile(path, JSON.stringify(metadata))
+  try {
+    await mkdir(dirname(path), { recursive: true })
+    await writeFile(path, JSON.stringify(metadata))
+  } catch (e) {
+    logForDebugging(`Failed to write remote agent metadata for ${taskId}: ${e}`)
+  }
 }
 
 export async function readRemoteAgentMetadata(
@@ -637,8 +645,14 @@ class Project {
     } catch {
       // Directory may not exist — some NFS-like filesystems return
       // unexpected error codes, so don't discriminate on code.
-      await mkdir(dirname(filePath), { recursive: true, mode: 0o700 })
-      await fsAppendFile(filePath, data, { mode: 0o600 })
+      try {
+        await mkdir(dirname(filePath), { recursive: true, mode: 0o700 })
+        await fsAppendFile(filePath, data, { mode: 0o600 })
+      } catch (retryErr) {
+        logForDebugging(
+          `Failed to append to file ${filePath} after retry: ${retryErr}`,
+        )
+      }
     }
   }
 
@@ -2578,8 +2592,14 @@ function appendEntryToFile(
   try {
     fs.appendFileSync(fullPath, line, { mode: 0o600 })
   } catch {
-    fs.mkdirSync(dirname(fullPath), { mode: 0o700 })
-    fs.appendFileSync(fullPath, line, { mode: 0o600 })
+    try {
+      fs.mkdirSync(dirname(fullPath), { mode: 0o700 })
+      fs.appendFileSync(fullPath, line, { mode: 0o600 })
+    } catch (retryErr) {
+      logForDebugging(
+        `Failed to append entry to ${fullPath} after retry: ${retryErr}`,
+      )
+    }
   }
 }
 
