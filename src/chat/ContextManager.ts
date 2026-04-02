@@ -149,6 +149,26 @@ function tokenize(text: string): string[] {
     .filter(w => w.length >= 2)
 }
 
+// ── Tuning Constants ─────────────────────────────────────────────────────────
+
+/** Minimum decayed relevance for an entity to be considered "active". */
+const MIN_ENTITY_RELEVANCE = 0.05
+
+/** Time window (ms) in which a turn is considered "fresh" for scoring. */
+const FRESHNESS_WINDOW_MS = 60_000
+
+/** Bonus added to score for turns within the freshness window. */
+const FRESHNESS_BONUS = 0.05
+
+/**
+ * Factor applied to `topicChangeThreshold` when deciding whether a detected
+ * topic is strong enough to accept (vs. falling back to the current topic).
+ */
+const TOPIC_ACCEPTANCE_FACTOR = 0.1
+
+/** Maximum character length for a back-ticked code span to be treated as an entity. */
+const MAX_CODE_SPAN_LENGTH = 60
+
 // ── ContextManager Class ─────────────────────────────────────────────────────
 
 export class ContextManager {
@@ -228,9 +248,9 @@ export class ContextManager {
       const entityOverlap = entityTokens.filter(e => query.toLowerCase().includes(e)).length
       const entityBonus = entityOverlap * 0.15
 
-      // Time-based freshness bonus (within 60 s of latest turn)
+      // Time-based freshness bonus (within the freshness window)
       const timeDelta = latestTs - turn.timestamp
-      const freshnessBonus = timeDelta < 60_000 ? 0.05 : 0
+      const freshnessBonus = timeDelta < FRESHNESS_WINDOW_MS ? FRESHNESS_BONUS : 0
 
       const score = (baseScore + topicBonus + entityBonus + freshnessBonus) * recency
       return { turn, score }
@@ -266,7 +286,7 @@ export class ContextManager {
       const decayed = entity.mentions * Math.exp(-this.config.decayFactor * age)
       const updated: TrackedEntity = { ...entity, decayedRelevance: decayed }
 
-      if (decayed > 0.05) {
+      if (decayed > MIN_ENTITY_RELEVANCE) {
         active.push(updated)
       }
     }
@@ -375,7 +395,7 @@ export class ContextManager {
     }
 
     // Only accept a non-general topic when confidence exceeds threshold
-    if (bestTopic !== 'general' && bestScore < this.config.topicChangeThreshold * 0.1) {
+    if (bestTopic !== 'general' && bestScore < this.config.topicChangeThreshold * TOPIC_ACCEPTANCE_FACTOR) {
       bestTopic = this.currentTopicName ?? 'general'
     }
 
@@ -440,7 +460,7 @@ export class ContextManager {
     BACKTICK_PATTERN.lastIndex = 0
     while ((match = BACKTICK_PATTERN.exec(text)) !== null) {
       const inner = match[1].trim()
-      if (inner.length > 0 && inner.length < 60) found.add(inner)
+      if (inner.length > 0 && inner.length < MAX_CODE_SPAN_LENGTH) found.add(inner)
     }
 
     // 4. function() calls
