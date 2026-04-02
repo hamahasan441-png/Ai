@@ -22,7 +22,18 @@
     "type": "git",
     "url": "git+https://github.com/hamahasan441-png/Ai.git"
   },
-  "keywords": ["ai", "claude", "anthropic", "chat", "code", "tools", "brain", "offline", "database", "cache"],
+  "keywords": [
+    "ai",
+    "claude",
+    "anthropic",
+    "chat",
+    "code",
+    "tools",
+    "brain",
+    "offline",
+    "database",
+    "cache"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -42,7 +53,7 @@
   },
   "optionalDependencies": {
     "better-sqlite3": "^11.0.0",
-    "pg": "^8.13.0",
-    "mysql2": "^3.11.0"
+    "mysql2": "^3.11.0",
+    "pg": "^8.13.0"
   }
 }
