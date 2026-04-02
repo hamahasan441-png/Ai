@@ -248,7 +248,7 @@ function normalizeVector(vec: number[]): number[] {
   return vec
 }
 
-/** Cosine similarity between two dense vectors. Returns value in [0, 1]. */
+/** Cosine similarity between two dense vectors. Clamped to [0, 1] (negative similarities treated as 0). */
 function cosineSimilarity(a: number[], b: number[]): number {
   const len = Math.min(a.length, b.length)
   let dot = 0
@@ -293,7 +293,7 @@ function createContextVector(
     }
   }
 
-  // Add small noise so the vector is never all-zero
+  // Add small noise using a linear congruential generator (LCG) seeded by word content
   const seed = words.join('').length
   for (let i = 0; i < dimensions; i++) {
     const noise = ((seed * (i + 1) * 9301 + 49297) % 233280) / 233280 - 0.5
