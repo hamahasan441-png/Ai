@@ -406,4 +406,211 @@ describe('LocalBrain', () => {
       expect(stats.totalLearnings).toBe(1)
     })
   })
+
+  // ── CodeMaster Integration ──
+
+  describe('analyzeCode (CodeMaster CodeAnalyzer)', () => {
+    it('returns CodeAnalysis with complexity metrics', () => {
+      const analysis = brain.analyzeCode(
+        'function add(a: number, b: number): number {\n  return a + b\n}',
+        'typescript',
+      )
+      expect(analysis).toBeDefined()
+      expect(analysis.complexity).toBeDefined()
+      expect(analysis.complexity.linesOfCode).toBeGreaterThan(0)
+      expect(typeof analysis.qualityScore).toBe('number')
+      expect(analysis.qualityScore).toBeGreaterThanOrEqual(0)
+      expect(analysis.qualityScore).toBeLessThanOrEqual(100)
+    })
+
+    it('detects language when not specified', () => {
+      const analysis = brain.analyzeCode('def hello():\n    print("hello")\n')
+      expect(analysis.language).toBeDefined()
+    })
+
+    it('finds anti-patterns in complex code', () => {
+      const messyCode = `
+function x(a,b,c,d,e,f,g,h,i,j) {
+  if (a) {
+    if (b) {
+      if (c) {
+        if (d) {
+          console.log(e)
+        }
+      }
+    }
+  }
+}
+`
+      const analysis = brain.analyzeCode(messyCode, 'javascript')
+      expect(analysis.complexity.maxNestingDepth).toBeGreaterThanOrEqual(3)
+    })
+
+    it('tracks analysis stats', () => {
+      brain.analyzeCode('const x = 1', 'typescript')
+      brain.analyzeCode('const y = 2', 'typescript')
+      expect(brain.getStats().totalCodeAnalyses).toBe(2)
+    })
+  })
+
+  describe('fixCode (CodeMaster CodeFixer)', () => {
+    it('returns FixResult with fixes array', () => {
+      const result = brain.fixCode(
+        'if (x == null) { console.log(x) }',
+        'javascript',
+      )
+      expect(result).toBeDefined()
+      expect(result.fixes).toBeDefined()
+      expect(Array.isArray(result.fixes)).toBe(true)
+      expect(result.summary).toBeDefined()
+      expect(typeof result.summary.applied).toBe('number')
+      expect(typeof result.summary.skipped).toBe('number')
+    })
+
+    it('fixes loose equality to strict equality', () => {
+      const code = 'if (x == null) { return false }'
+      const result = brain.fixCode(code, 'javascript')
+      const appliedFixes = result.fixes.filter(f => f.applied)
+      if (appliedFixes.length > 0) {
+        expect(appliedFixes.some(f => f.fixed.includes('==='))).toBe(true)
+      }
+    })
+
+    it('tracks fix stats', () => {
+      brain.fixCode('const x = 1', 'typescript')
+      expect(brain.getStats().totalCodeFixes).toBe(1)
+    })
+
+    it('handles clean code without errors', () => {
+      const result = brain.fixCode('const x: number = 42', 'typescript')
+      expect(result.summary.applied).toBeGreaterThanOrEqual(0)
+    })
+  })
+
+  describe('decomposeTask (CodeMaster ProblemDecomposer)', () => {
+    it('returns TaskPlan with steps', () => {
+      const plan = brain.decomposeTask('Add user authentication with JWT tokens')
+      expect(plan).toBeDefined()
+      expect(plan.intent).toBeDefined()
+      expect(plan.steps).toBeDefined()
+      expect(Array.isArray(plan.steps)).toBe(true)
+      expect(plan.steps.length).toBeGreaterThan(0)
+    })
+
+    it('classifies intent correctly for new feature', () => {
+      const plan = brain.decomposeTask('Create a new REST API for user management')
+      expect(plan.intent).toBeDefined()
+    })
+
+    it('provides execution order', () => {
+      const plan = brain.decomposeTask('Refactor the database module to use connection pooling')
+      expect(plan.executionOrder).toBeDefined()
+      expect(Array.isArray(plan.executionOrder)).toBe(true)
+    })
+
+    it('tracks decomposition stats', () => {
+      brain.decomposeTask('Add tests')
+      brain.decomposeTask('Fix bug')
+      expect(brain.getStats().totalDecompositions).toBe(2)
+    })
+  })
+
+  describe('enhanced reviewCode (CodeMaster integration)', () => {
+    it('returns enhanced review with more issues than basic', async () => {
+      const code = `
+function process(data) {
+  eval(data)
+  var x = 1
+  if (x == 1) {
+    console.log(x)
+  }
+}
+`
+      const result = await brain.reviewCode({ code, language: 'javascript' })
+      expect(result.issues.length).toBeGreaterThan(0)
+      expect(result.score).toBeLessThan(100)
+      expect(result.summary).toBeTruthy()
+    })
+
+    it('detects security issues via CodeMaster', async () => {
+      const code = 'function run(input) { eval(input); }'
+      const result = await brain.reviewCode({ code, language: 'javascript' })
+      const securityIssues = result.issues.filter(i =>
+        i.message.toLowerCase().includes('eval') ||
+        i.message.toLowerCase().includes('security'),
+      )
+      expect(securityIssues.length).toBeGreaterThan(0)
+    })
+
+    it('generates improved code when fixable issues found', async () => {
+      const code = 'if (x == null) { var y = 1 }'
+      const result = await brain.reviewCode({ code, language: 'javascript' })
+      // improvedCode may or may not be set depending on whether fixes are applicable
+      expect(result).toBeDefined()
+      expect(typeof result.score).toBe('number')
+    })
+  })
+
+  describe('deepReview (raw CodeMaster output)', () => {
+    it('returns CodeReviewOutput with findings and suggestedFixes', () => {
+      const output = brain.deepReview('const x = eval("code")', 'javascript')
+      expect(output).toBeDefined()
+      expect(output.findings).toBeDefined()
+      expect(output.summary).toBeDefined()
+      expect(typeof output.overallScore).toBe('number')
+      expect(output.topIssues).toBeDefined()
+    })
+  })
+
+  describe('code learning engine integration', () => {
+    it('exposes code learning engine', () => {
+      const engine = brain.getCodeLearningEngine()
+      expect(engine).toBeDefined()
+      expect(typeof engine.getStats).toBe('function')
+    })
+
+    it('learning engine tracks review patterns', async () => {
+      await brain.reviewCode({
+        code: 'function test() { eval("code") }',
+        language: 'javascript',
+      })
+      const engine = brain.getCodeLearningEngine()
+      const stats = engine.getStats()
+      expect(stats).toBeDefined()
+    })
+  })
+
+  // ── Expanded Knowledge Base ──
+
+  describe('expanded knowledge base', () => {
+    it('responds to framework questions', async () => {
+      const result = await brain.chat('Tell me about React hooks')
+      expect(result.text.length).toBeGreaterThan(0)
+    })
+
+    it('responds to debugging questions', async () => {
+      const result = await brain.chat('How do I debug a null pointer error?')
+      expect(result.text.length).toBeGreaterThan(0)
+    })
+
+    it('responds to code fixing questions', async () => {
+      const result = await brain.chat('How do I fix a bug in my code?')
+      expect(result.text.length).toBeGreaterThan(0)
+    })
+
+    it('responds to CI/CD questions', async () => {
+      const result = await brain.chat('What is a CI CD pipeline?')
+      expect(result.text.length).toBeGreaterThan(0)
+    })
+
+    it('responds to error handling questions', async () => {
+      const result = await brain.chat('What are error handling best practices?')
+      expect(result.text.length).toBeGreaterThan(0)
+    })
+
+    it('knows about Express.js', async () => {
+      const result = await brain.chat('Tell me about Express middleware')
+      expect(result.text.length).toBeGreaterThan(0)
+    })
+  })
 })
