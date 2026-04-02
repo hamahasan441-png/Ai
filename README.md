@@ -68,6 +68,38 @@ Major upgrades to the offline AI brain:
 - **Learning Priorities** — `cloud-learned` > `user-corrected` > `reinforced` > `learned`
 - **Export/Import** — Share brain state between machines
 
+### 🧩 Intelligence Modules (NEW)
+Five cognitive modules that enhance LocalBrain with advanced capabilities:
+
+| Module | What It Does |
+| --- | --- |
+| `SemanticEngine` | Dense vector embeddings, cosine similarity, synonym expansion, disambiguation |
+| `IntentEngine` | Multi-intent classification (18 intent types), entity extraction (9 entity types) |
+| `ContextManager` | Sliding-window context tracking, topic detection, entity decay, pronoun resolution |
+| `ReasoningEngine` | Chain-of-thought reasoning: decompose → plan → solve → verify pipeline |
+| `MetaCognition` | Confidence calibration, knowledge gap detection, epistemic state tracking |
+
+```ts
+import { SemanticEngine, IntentEngine, ContextManager, ReasoningEngine, MetaCognition } from './chat/index.js'
+
+// Use individually
+const semantic = new SemanticEngine()
+const results = semantic.findSimilar('database query', documents)
+
+const intent = new IntentEngine()
+const classified = intent.classify('Write a React component')
+// → { primary: { label: 'code_write', confidence: 0.95 }, entities: [...] }
+
+const reasoning = new ReasoningEngine()
+const result = reasoning.reason('Compare REST vs GraphQL')
+// → { answer: '...', steps: [...], confidence: 0.85, alternatives: [...] }
+
+// Or use via LocalBrain (auto-integrated when enableIntelligence: true)
+const brain = new LocalBrain({ enableIntelligence: true })
+const stats = brain.getIntelligenceStats()
+// → { enabled: true, contextTurns: 5, contextTopicCount: 3, ... }
+```
+
 ## What Is This?
 
 An AI system that **uses every file in the repository**. Three files work together:
@@ -140,6 +172,15 @@ An AI system that **uses every file in the repository**. Three files work togeth
 | --- | --- | --- |
 | `src/chat/AiChat.ts` | 1 | 🧠 Core brain — chat, code (24 langs), images, search, analytics, export |
 | `src/chat/AiIntegration.ts` | 1 | 🔗 Integration layer — connects brain to all modules |
+| `src/chat/LocalBrain.ts` | 1 | 🧠 Standalone offline brain — self-learning, no API needed |
+| `src/chat/HybridBrain.ts` | 1 | 🌐🧠 Cloud + offline hybrid — auto-fallback, self-learning |
+| `src/chat/DevBrain.ts` | 1 | 🔓 Private dev brain — LocalBrain + OpenAI, unrestricted |
+| `src/chat/SemanticEngine.ts` | 1 | 📐 Semantic similarity — vector embeddings, cosine search, disambiguation |
+| `src/chat/IntentEngine.ts` | 1 | 🎯 Intent detection — 18 intents, entity extraction, compound parsing |
+| `src/chat/ContextManager.ts` | 1 | 📋 Context tracking — sliding window, topic detection, entity decay |
+| `src/chat/ReasoningEngine.ts` | 1 | 🔗 Chain-of-thought — decompose → plan → solve → verify pipeline |
+| `src/chat/MetaCognition.ts` | 1 | 🔮 Meta-cognition — confidence calibration, knowledge gap detection |
+| `src/chat/codemaster/` | 5 | 🔍 Code intelligence — analysis, review, auto-fix, decomposition, learning |
 | `src/tools/` | 38 dirs | 🔧 38 executable tools (bash, files, web, search, agents, MCP, tasks...) |
 | `src/tools.ts` | 1 | Tool registry — permission-filtered tool loading |
 | `src/Tool.ts` | 1 | Tool type system — `buildTool()` factory |

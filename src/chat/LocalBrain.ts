@@ -51,6 +51,13 @@ import { CodeFixer } from './codemaster/CodeFixer.js'
 import { ProblemDecomposer } from './codemaster/ProblemDecomposer.js'
 import { LearningEngine } from './codemaster/LearningEngine.js'
 import type { CodeAnalysis, CodeReviewOutput, FixResult, TaskPlan, AnalysisLanguage } from './codemaster/types.js'
+
+// Intelligence modules
+import { SemanticEngine } from './SemanticEngine.js'
+import { IntentEngine } from './IntentEngine.js'
+import { ContextManager } from './ContextManager.js'
+import { ReasoningEngine } from './ReasoningEngine.js'
+import { MetaCognition } from './MetaCognition.js'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -85,6 +92,8 @@ export interface LocalBrainConfig {
   minConfidence: number
   /** Enable TF-IDF scoring for pattern matching (default: true). */
   useTfIdf: boolean
+  /** Enable intelligence modules: SemanticEngine, IntentEngine, ContextManager, ReasoningEngine, MetaCognition (default: true). */
+  enableIntelligence: boolean
 }
 
 /** A single entry in the knowledge base. */
@@ -1580,6 +1589,13 @@ export class LocalBrain {
   private problemDecomposer: ProblemDecomposer
   private codeLearningEngine: LearningEngine
 
+  // ── Intelligence modules (cognitive layer) ──
+  private semanticEngine: SemanticEngine | null = null
+  private intentEngine: IntentEngine | null = null
+  private contextManager: ContextManager | null = null
+  private reasoningEngine: ReasoningEngine | null = null
+  private metaCognition: MetaCognition | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1593,6 +1609,7 @@ export class LocalBrain {
       decayRate: config?.decayRate ?? 0.01,
       minConfidence: config?.minConfidence ?? 0.1,
       useTfIdf: config?.useTfIdf ?? true,
+      enableIntelligence: config?.enableIntelligence ?? true,
     }
     this.knowledgeBase = buildKnowledgeBase()
     this.tfidfScorer = new TfIdfScorer()
@@ -1603,6 +1620,15 @@ export class LocalBrain {
     this.codeFixer = new CodeFixer()
     this.problemDecomposer = new ProblemDecomposer()
     this.codeLearningEngine = new LearningEngine()
+
+    // Initialize intelligence modules if enabled
+    if (this.config.enableIntelligence) {
+      this.semanticEngine = new SemanticEngine()
+      this.intentEngine = new IntentEngine()
+      this.contextManager = new ContextManager()
+      this.reasoningEngine = new ReasoningEngine()
+      this.metaCognition = new MetaCognition()
+    }
 
     const now = new Date().toISOString()
     this.stats = {
@@ -1634,8 +1660,38 @@ export class LocalBrain {
     const intent = detectIntent(userMessage)
     const keywords = extractKeywords(userMessage)
 
+    // Use IntentEngine for richer intent classification if available
+    if (this.intentEngine) {
+      const intentResult = this.intentEngine.classify(userMessage)
+      // Augment keywords with extracted entities
+      for (const entity of intentResult.entities) {
+        if (!keywords.includes(entity.value.toLowerCase())) {
+          keywords.push(entity.value.toLowerCase())
+        }
+      }
+    }
+
+    // Track context with ContextManager if available
+    if (this.contextManager) {
+      this.contextManager.addTurn({ role: 'user', content: userMessage, timestamp: Date.now() })
+    }
+
     // Search knowledge base
     const knowledgeResults = searchKnowledge(this.knowledgeBase, keywords)
+
+    // Use SemanticEngine for semantic search augmentation if available
+    if (this.semanticEngine && knowledgeResults.length < 3) {
+      const kbDocs = this.knowledgeBase.map(e => ({ id: e.id, text: e.content }))
+      const semanticResults = this.semanticEngine.findSimilar(userMessage, kbDocs, 3)
+      for (const sr of semanticResults) {
+        if (!knowledgeResults.some(kr => kr.entry.id === sr.id)) {
+          const entry = this.knowledgeBase.find(e => e.id === sr.id)
+          if (entry) {
+            knowledgeResults.push({ entry, score: sr.score * 5, matchedKeywords: keywords.slice(0, 3) })
+          }
+        }
+      }
+    }
 
     // Generate response (uses TF-IDF if enabled)
     const text = this.config.useTfIdf
@@ -1649,6 +1705,17 @@ export class LocalBrain {
     // Update knowledge use counts
     for (const result of knowledgeResults) {
       result.entry.useCount++
+    }
+
+    // Track assistant response in ContextManager
+    if (this.contextManager) {
+      this.contextManager.addTurn({ role: 'assistant', content: text, timestamp: Date.now() })
+    }
+
+    // Record outcome in MetaCognition for calibration
+    if (this.metaCognition) {
+      const assessment = this.metaCognition.assessConfidence(userMessage, text)
+      this.metaCognition.recordOutcome(assessment.calibrated, knowledgeResults.length > 0 ? 0.8 : 0.3)
     }
 
     this.conversationHistory.push({ role: 'assistant', content: text })
@@ -2152,6 +2219,7 @@ export class LocalBrain {
 
   /**
    * Solve a problem using chain-of-thought: decompose → plan → generate → review → refine.
+   * Enhanced with ReasoningEngine for structured multi-phase reasoning and MetaCognition for confidence calibration.
    */
   async reason(question: string): Promise<ReasoningResult> {
     const start = Date.now()
@@ -2159,6 +2227,18 @@ export class LocalBrain {
     this.stats.lastUsedAt = new Date().toISOString()
 
     const steps: ReasoningStep[] = []
+
+    // Use ReasoningEngine for structured decomposition if available
+    if (this.reasoningEngine) {
+      const subProblems = this.reasoningEngine.decompose(question)
+      if (subProblems.length > 0) {
+        steps.push({
+          type: 'decompose',
+          description: 'ReasoningEngine decomposed the problem into sub-problems',
+          output: `Sub-problems: ${subProblems.slice(0, 5).map(sp => sp.description).join('; ')}`,
+        })
+      }
+    }
 
     // Step 1: Decompose the problem
     const keywords = extractKeywords(question)
@@ -2211,7 +2291,15 @@ export class LocalBrain {
     // Update conversation context
     this.updateConversationContext(question, answer)
 
-    const confidence = Math.min(1, (questionCoverage * 0.5) + (knowledgeResults.length > 0 ? 0.3 : 0) + (knowledgeResults.length > 2 ? 0.2 : 0))
+    // Use MetaCognition for calibrated confidence if available
+    let confidence: number
+    if (this.metaCognition) {
+      const assessment = this.metaCognition.assessConfidence(question, answer)
+      confidence = Math.min(1, (assessment.calibrated * 0.4) + (questionCoverage * 0.3) + (knowledgeResults.length > 0 ? 0.2 : 0) + (knowledgeResults.length > 2 ? 0.1 : 0))
+      this.metaCognition.recordOutcome(confidence, questionCoverage > 0.3 ? 0.8 : 0.3)
+    } else {
+      confidence = Math.min(1, (questionCoverage * 0.5) + (knowledgeResults.length > 0 ? 0.3 : 0) + (knowledgeResults.length > 2 ? 0.2 : 0))
+    }
 
     return {
       answer,
@@ -2458,23 +2546,62 @@ export class LocalBrain {
 
   /**
    * Assess confidence for a question. If low, returns clarifying questions instead of guessing.
-   * Returns null if confident enough to answer, or an array of clarifying questions if not.
+   * Enhanced with MetaCognition for calibrated confidence assessment and knowledge gap detection.
    */
   assessConfidence(question: string): { confident: boolean; score: number; clarifyingQuestions?: string[] } {
     const keywords = extractKeywords(question)
     const knowledgeResults = searchKnowledge(this.knowledgeBase, keywords, 3)
     const patternMatch = findBestLearnedPattern(question, this.learnedPatterns)
 
-    // Calculate confidence
+    // Calculate base confidence
     let score = 0
     if (knowledgeResults.length > 0) score += Math.min(knowledgeResults[0]!.score / 5, 0.5)
     if (patternMatch) score += patternMatch.confidence * 0.5
+
+    // Use MetaCognition for calibrated confidence if available
+    if (this.metaCognition) {
+      const assessment = this.metaCognition.assessConfidence(question, 'pending answer')
+      // Blend local score with MetaCognition assessment (60% local, 40% meta)
+      score = score * 0.6 + assessment.calibrated * 0.4
+
+      // Use knowledge gap detection for better clarifying questions
+      if (score < 0.5) {
+        const gaps = this.metaCognition.detectKnowledgeGaps([question])
+        const clarifyingQuestions: string[] = []
+
+        // Add gap-specific questions
+        for (const gap of gaps.slice(0, 2)) {
+          clarifyingQuestions.push(`Could you clarify about ${gap.topic}? I'm not fully confident in this area.`)
+        }
+
+        if (keywords.length < 2) {
+          clarifyingQuestions.push('Could you provide more details about what you\'re looking for?')
+        }
+        if (!this.conversationContext.currentLanguage) {
+          clarifyingQuestions.push('Which programming language are you working with?')
+        }
+        if (/\b(fix|bug|error|issue)\b/i.test(question) && !code_likeContent(question)) {
+          clarifyingQuestions.push('Could you share the code that\'s causing the issue?')
+          clarifyingQuestions.push('What error message are you seeing?')
+        }
+        if (/\b(best|better|should|recommend)\b/i.test(question)) {
+          clarifyingQuestions.push('What are your specific requirements or constraints?')
+        }
+        if (clarifyingQuestions.length === 0) {
+          clarifyingQuestions.push('Could you rephrase or provide more context for your question?')
+        }
+
+        return { confident: false, score, clarifyingQuestions }
+      }
+
+      return { confident: true, score }
+    }
 
     if (score >= 0.5) {
       return { confident: true, score }
     }
 
-    // Generate clarifying questions
+    // Generate clarifying questions (fallback without MetaCognition)
     const clarifyingQuestions: string[] = []
     if (keywords.length < 2) {
       clarifyingQuestions.push('Could you provide more details about what you\'re looking for?')
@@ -2795,6 +2922,50 @@ export class LocalBrain {
   getStats(): Readonly<LocalBrainStats> { return { ...this.stats } }
   getLearnedPatternCount(): number { return this.learnedPatterns.length }
   getKnowledgeBaseSize(): number { return this.knowledgeBase.length }
+
+  // ── Intelligence Module Accessors ──
+
+  /** Get the SemanticEngine instance (null if intelligence modules are disabled). */
+  getSemanticEngine(): SemanticEngine | null { return this.semanticEngine }
+
+  /** Get the IntentEngine instance (null if intelligence modules are disabled). */
+  getIntentEngine(): IntentEngine | null { return this.intentEngine }
+
+  /** Get the ContextManager instance (null if intelligence modules are disabled). */
+  getContextManager(): ContextManager | null { return this.contextManager }
+
+  /** Get the ReasoningEngine instance (null if intelligence modules are disabled). */
+  getReasoningEngine(): ReasoningEngine | null { return this.reasoningEngine }
+
+  /** Get the MetaCognition instance (null if intelligence modules are disabled). */
+  getMetaCognition(): MetaCognition | null { return this.metaCognition }
+
+  /** Check if intelligence modules are enabled. */
+  isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
+
+  /** Get a summary of intelligence module state. */
+  getIntelligenceStats(): {
+    enabled: boolean
+    contextTurns: number
+    contextTopicCount: number
+    knowledgeGaps: number
+    calibrationAccuracy: number | null
+  } {
+    if (!this.config.enableIntelligence) {
+      return { enabled: false, contextTurns: 0, contextTopicCount: 0, knowledgeGaps: 0, calibrationAccuracy: null }
+    }
+
+    const contextStats = this.contextManager?.getStats() ?? null
+    const metaStats = this.metaCognition?.getStats() ?? null
+
+    return {
+      enabled: true,
+      contextTurns: contextStats?.totalTurns ?? 0,
+      contextTopicCount: contextStats?.uniqueTopics ?? 0,
+      knowledgeGaps: metaStats?.knownGaps ?? 0,
+      calibrationAccuracy: metaStats?.calibrationAccuracy ?? null,
+    }
+  }
 
   // ── Persistence ──
 

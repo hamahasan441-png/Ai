@@ -245,6 +245,75 @@ export type {
 } from './codemaster/types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// INTELLIGENCE MODULES — Advanced cognitive capabilities (src/chat/)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Semantic Engine — Semantic similarity and document matching ──
+export { SemanticEngine } from './SemanticEngine.js'
+export { cosineSimilarity as semanticCosineSimilarity } from './SemanticEngine.js'
+
+export type {
+  SemanticConfig,
+  SemanticDocument,
+  SimilarityResult,
+  WordVector,
+} from './SemanticEngine.js'
+
+// ── Intent Engine — Intent detection and entity extraction ──
+export { IntentEngine } from './IntentEngine.js'
+
+export type {
+  IntentLabel,
+  EntityType,
+  DetectedIntent,
+  ExtractedEntity,
+  IntentResult,
+  ConversationTurn,
+  ResolvedIntent,
+  IntentEngineConfig,
+} from './IntentEngine.js'
+
+// ── Context Manager — Sliding-window context with topic & entity tracking ──
+export { ContextManager } from './ContextManager.js'
+
+export type {
+  ContextTurn,
+  TopicInfo,
+  TrackedEntity,
+  ContextSummary,
+  ContextStats,
+  ContextManagerConfig,
+} from './ContextManager.js'
+
+// ── Reasoning Engine — Chain-of-thought reasoning with 4-phase pipeline ──
+export { ReasoningEngine } from './ReasoningEngine.js'
+
+export type {
+  ReasoningContext,
+  ReasoningStep2,
+  ChainOfThoughtResult,
+  ConstraintType,
+  Constraint,
+  SubProblem,
+  SolutionScore,
+  ReasoningEngineConfig,
+} from './ReasoningEngine.js'
+
+// ── Meta Cognition — Confidence assessment and knowledge gap detection ──
+export { MetaCognition } from './MetaCognition.js'
+
+export type {
+  EpistemicState,
+  ConfidenceFactor,
+  ConfidenceAssessment,
+  CalibrationRecord,
+  KnowledgeGap,
+  ReflectionResult,
+  MetaCognitionConfig,
+  MetaCognitionStats,
+} from './MetaCognition.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './TfIdfScorer.js'
