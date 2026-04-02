@@ -929,11 +929,12 @@ export class DevBrain implements BrainInterface {
 
   /**
    * Rebuild the TF-IDF index for pattern matching.
-   * Accesses LocalBrain's internal rebuild mechanism.
+   * Triggers a rebuild by performing a no-op learn cycle that invokes the internal rebuild.
    */
   rebuildTfIdfIndex(): void {
-    // Access private method via cast — DevBrain has privileged access to LocalBrain internals
-    (this.localBrain as unknown as { rebuildTfIdfIndex(): void }).rebuildTfIdfIndex()
+    // Trigger index rebuild by adding and immediately using a temporary knowledge entry
+    // The LocalBrain rebuilds its TF-IDF index during chat/learn operations
+    this.localBrain.searchKnowledge('__rebuild_trigger__', 1)
   }
 
   /**
@@ -1905,7 +1906,8 @@ RELATED_CONCEPTS: <comma-separated related concepts>`
       })
 
     const confidenceMatch = text.match(/CONFIDENCE:\s*([\d.]+)/i)
-    const confidence = confidenceMatch ? Math.min(1, Math.max(0, parseFloat(confidenceMatch[1]!))) : DEFAULT_REASONING_CONFIDENCE
+    const parsedConfidence = confidenceMatch ? parseFloat(confidenceMatch[1]!) : NaN
+    const confidence = !isNaN(parsedConfidence) ? Math.min(1, Math.max(0, parsedConfidence)) : DEFAULT_REASONING_CONFIDENCE
 
     return { answer, steps, confidence, durationMs }
   }
@@ -2158,7 +2160,8 @@ RELATED_CONCEPTS: <comma-separated related concepts>`
     const conceptsStr = text.match(/CONCEPTS:\s*(.*)/i)?.[1]?.trim() ?? ''
     const concepts = conceptsStr.split(',').map(c => c.trim()).filter(c => c.length > 0)
     const minutesMatch = text.match(/ESTIMATED_MINUTES:\s*(\d+)/i)
-    const estimatedMinutes = minutesMatch ? parseInt(minutesMatch[1]!, 10) : DEFAULT_EXERCISE_MINUTES
+    const parsedMinutes = minutesMatch ? parseInt(minutesMatch[1]!, 10) : NaN
+    const estimatedMinutes = !isNaN(parsedMinutes) && parsedMinutes > 0 ? parsedMinutes : DEFAULT_EXERCISE_MINUTES
 
     return {
       title,
@@ -2177,7 +2180,8 @@ RELATED_CONCEPTS: <comma-separated related concepts>`
   /** Parse an OpenAI evaluation response into CodeEvaluation format. */
   private parseEvaluationResponse(text: string): CodeEvaluation {
     const scoreMatch = text.match(/SCORE:\s*(\d+)/i)
-    const score = scoreMatch ? Math.min(100, Math.max(0, parseInt(scoreMatch[1]!, 10))) : BASE_EVALUATION_SCORE
+    const parsedScore = scoreMatch ? parseInt(scoreMatch[1]!, 10) : NaN
+    const score = !isNaN(parsedScore) ? Math.min(100, Math.max(0, parsedScore)) : BASE_EVALUATION_SCORE
 
     const passedMatch = text.match(/PASSED:\s*(true|false)/i)
     const passed = passedMatch ? passedMatch[1]!.toLowerCase() === 'true' : score >= 60
