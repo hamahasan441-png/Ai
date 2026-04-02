@@ -70,7 +70,7 @@ import { getCwd } from './cwd.js'
 import { logForDebugging } from './debug.js'
 import { logForDiagnosticsNoPII } from './diagLogs.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from './envUtils.js'
-import { isFsInaccessible } from './errors.js'
+import { errorMessage, isFsInaccessible } from './errors.js'
 import type { FileHistorySnapshot } from './fileHistory.js'
 import { formatFileSize } from './format.js'
 import { getFsImplementation } from './fsOperations.js'
@@ -289,7 +289,9 @@ export async function writeAgentMetadata(
     await mkdir(dirname(path), { recursive: true })
     await writeFile(path, JSON.stringify(metadata))
   } catch (e) {
-    logForDebugging(`Failed to write agent metadata for ${agentId}: ${e}`)
+    logForDebugging(
+      `Failed to write agent metadata for ${agentId}: ${errorMessage(e)}`,
+    )
   }
 }
 
@@ -347,7 +349,9 @@ export async function writeRemoteAgentMetadata(
     await mkdir(dirname(path), { recursive: true })
     await writeFile(path, JSON.stringify(metadata))
   } catch (e) {
-    logForDebugging(`Failed to write remote agent metadata for ${taskId}: ${e}`)
+    logForDebugging(
+      `Failed to write remote agent metadata for ${taskId}: ${errorMessage(e)}`,
+    )
   }
 }
 
@@ -650,7 +654,7 @@ class Project {
         await fsAppendFile(filePath, data, { mode: 0o600 })
       } catch (retryErr) {
         logForDebugging(
-          `Failed to append to file ${filePath} after retry: ${retryErr}`,
+          `Failed to append to file ${filePath} after retry: ${errorMessage(retryErr)}`,
         )
       }
     }
@@ -2597,7 +2601,7 @@ function appendEntryToFile(
       fs.appendFileSync(fullPath, line, { mode: 0o600 })
     } catch (retryErr) {
       logForDebugging(
-        `Failed to append entry to ${fullPath} after retry: ${retryErr}`,
+        `Failed to append entry to ${fullPath} after retry: ${errorMessage(retryErr)}`,
       )
     }
   }
