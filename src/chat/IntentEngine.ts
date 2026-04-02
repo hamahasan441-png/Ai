@@ -408,7 +408,7 @@ const COMPOUND_SEPARATORS = /\b(?:and then|and also|and|also|then|plus|as well a
 
 // ── Pronoun Patterns ─────────────────────────────────────────────────────────
 
-const PRONOUN_RE = /\b(it|that|this|those|these|them)\b/gi
+const PRONOUN_RE = /\b(it|that|this|those|these|them)\b/i
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §3  ENGINE — IntentEngine class                                            ║
@@ -685,8 +685,7 @@ export class IntentEngine {
     const lastNoun = this.extractLastNoun(context)
     if (!lastNoun) return input
 
-    // Reset regex state then replace
-    return input.replace(PRONOUN_RE, (_match, pronoun: string) => {
+    return input.replace(new RegExp(PRONOUN_RE.source, 'gi'), (_match, pronoun: string) => {
       const lower = pronoun.toLowerCase()
       if (['it', 'that', 'this', 'those', 'these', 'them'].includes(lower)) {
         return lastNoun
@@ -727,12 +726,14 @@ export class IntentEngine {
       // Try known programming languages / frameworks
       const lower = content.toLowerCase()
       for (const lang of PROGRAMMING_LANGUAGES) {
-        if (lower.includes(lang) && this.isWordBoundary(lower, lower.indexOf(lang), lang.length)) {
+        const langIdx = lower.indexOf(lang)
+        if (langIdx !== -1 && this.isWordBoundary(lower, langIdx, lang.length)) {
           return lang
         }
       }
       for (const fw of FRAMEWORKS) {
-        if (lower.includes(fw) && this.isWordBoundary(lower, lower.indexOf(fw), fw.length)) {
+        const fwIdx = lower.indexOf(fw)
+        if (fwIdx !== -1 && this.isWordBoundary(lower, fwIdx, fw.length)) {
           return fw
         }
       }
