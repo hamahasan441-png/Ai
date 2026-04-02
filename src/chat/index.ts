@@ -314,6 +314,66 @@ export type {
 } from './MetaCognition.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// ADVANCED INTELLIGENCE — Semantic Training Layer (src/chat/)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Semantic Memory — Persistent knowledge graph with spreading activation ──
+export { SemanticMemory, createProgrammingKnowledgeGraph } from './SemanticMemory.js'
+
+export type {
+  RelationType,
+  ConceptNode,
+  ConceptEdge,
+  SemanticMemoryConfig,
+  SemanticMemoryStats,
+  ActivationResult,
+  ConceptCluster,
+  Neighborhood,
+  ExtractedRelationship,
+} from './SemanticMemory.js'
+
+// ── Semantic Trainer — Online learning and domain adaptation ──
+export { SemanticTrainer } from './SemanticTrainer.js'
+
+export type {
+  DomainType,
+  TrainingExample,
+  TrainingSnapshot,
+  FeedbackSignal,
+  DomainProfile,
+  TrainerStats,
+  SemanticTrainerConfig,
+  VocabularyEntry,
+} from './SemanticTrainer.js'
+
+// ── Analogical Reasoner — Cross-domain analogy and transfer learning ──
+export { AnalogicalReasoner } from './AnalogicalReasoner.js'
+
+export type {
+  StructureElement,
+  StructureMapping,
+  AnalogyResult,
+  AnalogyPattern,
+  TransferResult,
+  AnalogicalReasonerConfig,
+  AnalogicalReasonerStats,
+} from './AnalogicalReasoner.js'
+
+// ── Topic Modeler — Unsupervised topic discovery and user profiling ──
+export { TopicModeler } from './TopicModeler.js'
+
+export type {
+  Topic,
+  TopicAssignment,
+  DocumentTopics,
+  TopicDrift,
+  UserInterestProfile,
+  TopicHierarchy,
+  TopicModelerConfig,
+  TopicModelerStats,
+} from './TopicModeler.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './TfIdfScorer.js'
