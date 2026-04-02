@@ -273,6 +273,12 @@ export type {
   DevBrainState,
   DevBrainLogEntry,
   OpenAIModel,
+  ExerciseDifficulty,
+  CodingExercise,
+  CodeEvaluation,
+  SkillAssessment,
+  TrainingPlan,
+  TrainingTopic,
 } from './DevBrain.js'
 
 // ── All Types ──
