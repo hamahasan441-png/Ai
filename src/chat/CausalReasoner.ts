@@ -176,7 +176,7 @@ function buildCausalPatternDatabase(): CausalPatternEntry[] {
     'Unreleased allocations accumulate until heap is exhausted',
     0.85, 'software-bugs', ['workload volume', 'available memory']);
   add('race condition', 'data corruption',
-    'Concurrent unsynchronised writes produce inconsistent state',
+    'Concurrent unsynchronized writes produce inconsistent state',
     0.80, 'software-bugs', ['thread count', 'lock granularity']);
   add('buffer overflow', 'security vulnerability',
     'Writing past buffer boundary overwrites adjacent memory',
@@ -191,7 +191,7 @@ function buildCausalPatternDatabase(): CausalPatternEntry[] {
     'Circular lock dependency prevents any thread from progressing',
     0.90, 'software-bugs', ['lock ordering']);
   add('SQL injection', 'data breach',
-    'Unsanitised input allows attacker to execute arbitrary queries',
+    'Unsanitized input allows attacker to execute arbitrary queries',
     0.85, 'software-bugs', ['input validation']);
   add('incorrect caching', 'stale data served',
     'Cache invalidation failure returns outdated values',
