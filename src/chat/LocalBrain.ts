@@ -45,6 +45,12 @@ import {
 } from './AiChat'
 
 import { TfIdfScorer } from './TfIdfScorer'
+import { CodeAnalyzer } from './codemaster/CodeAnalyzer.js'
+import { CodeReviewer } from './codemaster/CodeReviewer.js'
+import { CodeFixer } from './codemaster/CodeFixer.js'
+import { ProblemDecomposer } from './codemaster/ProblemDecomposer.js'
+import { LearningEngine } from './codemaster/LearningEngine.js'
+import type { CodeAnalysis, CodeReviewOutput, FixResult, TaskPlan, AnalysisLanguage } from './codemaster/types.js'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -156,6 +162,9 @@ export interface LocalBrainStats {
   totalChats: number
   totalCodeGenerations: number
   totalCodeReviews: number
+  totalCodeAnalyses: number
+  totalCodeFixes: number
+  totalDecompositions: number
   totalImageAnalyses: number
   totalLearnings: number
   patternsLearned: number
@@ -285,6 +294,99 @@ function buildKnowledgeBase(): KnowledgeEntry[] {
 
   add('architecture', ['solid', 'principle', 'clean code'],
     'SOLID principles: S — Single Responsibility, O — Open/Closed (open for extension, closed for modification), L — Liskov Substitution, I — Interface Segregation, D — Dependency Inversion. These guide writing maintainable, extensible, testable code.', 1.2)
+
+  // ── Frameworks & Libraries ──
+  add('frameworks', ['react', 'jsx', 'hooks', 'component', 'useState'],
+    'React is a UI library for building component-based interfaces. Key concepts: JSX, components, hooks (useState, useEffect, useContext, useReducer, useMemo, useCallback, useRef), virtual DOM, one-way data flow. Best practices: keep components small, lift state up, use custom hooks, memoize expensive computations.', 1.2)
+
+  add('frameworks', ['express', 'middleware', 'nodejs server', 'http server'],
+    'Express.js is the most popular Node.js web framework. Key concepts: middleware pipeline, routing (app.get/post/put/delete), request/response objects, error handling middleware, static file serving. Best practices: use helmet for security, cors for cross-origin, express-validator for input validation, structured error handling.', 1.1)
+
+  add('frameworks', ['django', 'flask', 'fastapi', 'python web'],
+    'Python web frameworks: Django (full-featured MVC, ORM, admin panel), Flask (lightweight, flexible), FastAPI (async, auto-docs, type hints, Pydantic validation). Best practices: use virtual environments, follow framework conventions, separate settings by environment, use migrations for DB changes.', 1.1)
+
+  add('frameworks', ['spring', 'spring boot', 'java web'],
+    'Spring Boot is Java\'s enterprise framework. Key concepts: dependency injection, auto-configuration, annotations (@RestController, @Service, @Repository), Spring Data JPA, Spring Security. Best practices: use constructor injection, profiles for environments, actuator for monitoring.', 1.0)
+
+  add('frameworks', ['vue', 'angular', 'svelte', 'frontend framework'],
+    'Frontend frameworks: Vue (reactive, composition API, single-file components), Angular (full framework, TypeScript, RxJS, dependency injection), Svelte (compile-time, no virtual DOM, minimal bundle). Choose Vue for simplicity, Angular for enterprise, Svelte for performance.', 1.0)
+
+  add('frameworks', ['nextjs', 'nuxt', 'remix', 'ssr', 'server side rendering'],
+    'Meta-frameworks: Next.js (React SSR/SSG, API routes, app router), Nuxt (Vue SSR/SSG), Remix (React, nested routes, progressive enhancement). Key concepts: server components, streaming SSR, static generation, incremental regeneration, edge functions.', 1.1)
+
+  // ── Error Patterns & Debugging ──
+  add('debugging', ['error', 'debug', 'stack trace', 'exception', 'crash'],
+    'Debugging strategy: 1) Read the error message and stack trace carefully, 2) Reproduce the bug consistently, 3) Isolate the cause (binary search through code), 4) Check recent changes (git diff), 5) Use debugger breakpoints, 6) Add targeted logging, 7) Verify the fix doesn\'t break other tests. Common: null reference, off-by-one, race condition, type mismatch.', 1.3)
+
+  add('debugging', ['null', 'undefined', 'typeerror', 'cannot read properties'],
+    'Null/undefined errors: "Cannot read properties of undefined" — the object you\'re accessing doesn\'t exist. Fixes: 1) Optional chaining (?.), 2) Nullish coalescing (??), 3) Guard clauses (if (!obj) return), 4) Default values, 5) TypeScript strict null checks. Prevention: always validate inputs, use non-nullable types.', 1.3)
+
+  add('debugging', ['memory leak', 'performance issue', 'slow', 'optimization'],
+    'Performance debugging: Memory leaks — unclosed event listeners, timers, closures holding references. CPU bottlenecks — profile with Chrome DevTools / flamegraphs. Fixes: remove event listeners on cleanup, use WeakMap/WeakRef, debounce/throttle handlers, lazy loading, caching, pagination, indexing queries.', 1.2)
+
+  add('debugging', ['race condition', 'deadlock', 'concurrent', 'thread safety'],
+    'Concurrency bugs: Race conditions — two operations compete for shared state. Deadlocks — two processes wait on each other. Fixes: locks/mutexes, atomic operations, immutable data, message passing, actor model. In JS: avoid shared mutable state between async operations, use proper await ordering.', 1.2)
+
+  // ── Code Quality & Best Practices ──
+  add('quality', ['refactor', 'refactoring', 'code smell', 'technical debt'],
+    'Common code smells: Long methods (>20 lines), God classes (>300 lines), deep nesting (>3 levels), magic numbers, duplicate code, feature envy, shotgun surgery. Refactoring techniques: Extract Method, Extract Class, Rename, Move, Inline, Replace Conditional with Polymorphism, Introduce Parameter Object.', 1.2)
+
+  add('quality', ['naming', 'convention', 'variable name', 'function name'],
+    'Naming conventions: Use descriptive names (getUserById not gUBI), camelCase for JS/TS vars/functions, PascalCase for classes/components, UPPER_SNAKE for constants, kebab-case for files/URLs. Booleans: isActive, hasPermission, canEdit. Functions: verb + noun (fetchUser, calculateTotal, validateEmail).', 1.1)
+
+  add('quality', ['error handling', 'try catch', 'exception handling'],
+    'Error handling best practices: 1) Never swallow errors silently (empty catch), 2) Use custom error classes, 3) Handle errors at the right abstraction level, 4) Log errors with context (user, request, timestamp), 5) Return meaningful error messages to users, 6) Use Result/Either types for expected failures, throw for unexpected ones.', 1.3)
+
+  add('quality', ['logging', 'log', 'monitoring', 'observability'],
+    'Logging best practices: Use structured logging (JSON), log levels (error, warn, info, debug), correlation IDs for request tracing. Include: timestamp, service name, request ID, user ID, action, result. Tools: Winston/Pino (Node), structlog (Python), Serilog (.NET). Never log sensitive data (passwords, tokens, PII).', 1.1)
+
+  add('quality', ['type safety', 'typing', 'generics', 'type guard'],
+    'Type safety patterns: Use generics for reusable type-safe code, discriminated unions for state machines, branded types for domain values (UserId vs string), type guards (is/as) for narrowing, const assertions for literal types, zod/io-ts for runtime validation matching compile-time types.', 1.2)
+
+  // ── Common Coding Tasks ──
+  add('tasks', ['authentication', 'login', 'jwt', 'oauth', 'session'],
+    'Authentication patterns: JWT (stateless, token in header, short-lived access + refresh tokens), Session (stateful, cookie-based, server-side storage), OAuth 2.0 (third-party login). Best practices: hash passwords with bcrypt/argon2, use HTTPS, httpOnly cookies for tokens, CSRF protection, rate limit login attempts.', 1.3)
+
+  add('tasks', ['validation', 'input validation', 'sanitize', 'form validation'],
+    'Input validation: Validate on both client (UX) and server (security). Patterns: schema validation (Zod, Joi, Yup), type coercion, whitelist over blacklist, sanitize HTML output. Check: required fields, string length limits, email/URL format, numeric ranges, enum values. Always validate before processing.', 1.2)
+
+  add('tasks', ['pagination', 'cursor', 'offset', 'infinite scroll'],
+    'Pagination strategies: Offset-based (LIMIT/OFFSET — simple but slow on large datasets), Cursor-based (keyset — fast, consistent, ideal for infinite scroll), Page-number (user-friendly for search results). Return: items, totalCount, hasNextPage, nextCursor. Use cursor-based for real-time feeds, offset for admin tables.', 1.1)
+
+  add('tasks', ['caching', 'cache', 'redis', 'memoize'],
+    'Caching strategies: In-memory (fastest, single process), Distributed (Redis/Memcached — shared across services), CDN (static assets), Browser cache (HTTP headers). Patterns: Cache-aside (lazy load), Write-through, Write-behind, TTL-based expiry. Invalidation: time-based, event-based, versioned keys. Cache the most frequently read, rarely changed data.', 1.2)
+
+  add('tasks', ['file upload', 'stream', 'buffer', 'blob'],
+    'File handling patterns: Streaming (process chunks, low memory), Buffering (load entire file, simple but memory-heavy), Multipart upload (form-data for web). Validation: check file type (magic bytes not just extension), size limits, virus scanning. Storage: local disk, S3/GCS (scalable), CDN for delivery.', 1.0)
+
+  add('tasks', ['websocket', 'realtime', 'sse', 'socket', 'event stream'],
+    'Real-time communication: WebSockets (bidirectional, persistent connection), Server-Sent Events (one-way server→client, auto-reconnect), Long polling (fallback). Use WebSockets for chat/gaming, SSE for notifications/feeds, polling for simple status checks. Libraries: Socket.io (Node), ws (lightweight).', 1.1)
+
+  add('tasks', ['regex', 'regular expression', 'pattern matching', 'string parsing'],
+    'Regex essentials: . (any char), \\d (digit), \\w (word char), \\s (whitespace), * (0+), + (1+), ? (0-1), [] (char class), () (group), | (or), ^ (start), $ (end). Common patterns: email (/\\S+@\\S+\\.\\S+/), URL, phone number, date. Use named groups (?<name>...) for readability. Test at regex101.com.', 1.1)
+
+  // ── DevOps & CI/CD ──
+  add('devops', ['ci', 'cd', 'pipeline', 'github actions', 'deployment'],
+    'CI/CD pipeline stages: 1) Lint & type-check, 2) Unit tests, 3) Integration tests, 4) Build, 5) Security scan (SAST/DAST), 6) Deploy to staging, 7) E2E tests, 8) Deploy to production, 9) Smoke tests. Tools: GitHub Actions, GitLab CI, Jenkins, CircleCI. Best practices: fail fast, cache dependencies, parallel jobs, rollback strategy.', 1.2)
+
+  add('devops', ['environment variable', 'env', 'config', 'secret management'],
+    'Configuration management: Use environment variables for deployment-specific config (DB URLs, API keys, feature flags). Never commit secrets to git. Tools: dotenv (development), Vault/AWS Secrets Manager (production), 1Password/Bitwarden (team). 12-Factor App: store config in the environment, not code.', 1.2)
+
+  add('devops', ['monitoring', 'alerting', 'metrics', 'apm'],
+    'Monitoring stack: Metrics (Prometheus/Datadog — CPU, memory, request rate), Logs (ELK/Loki — structured logging), Traces (Jaeger/Zipkin — request flow), APM (New Relic/Datadog — end-to-end). Alert on: error rate spikes, latency p99, resource exhaustion, business metrics. Use dashboards for real-time visibility.', 1.0)
+
+  // ── Code Fixing Patterns ──
+  add('fixing', ['fix', 'bug fix', 'patch', 'hotfix', 'repair code'],
+    'Code fixing strategy: 1) Reproduce the bug with a failing test, 2) Read the error and trace the root cause, 3) Make the minimal fix — change the least code possible, 4) Run the failing test (should pass now), 5) Run full test suite (no regressions), 6) Document what you fixed and why. The best fix addresses the root cause, not just the symptom.', 1.4)
+
+  add('fixing', ['import error', 'module not found', 'cannot find module'],
+    'Module resolution errors: "Cannot find module" — check: 1) Package is installed (npm install), 2) Correct import path (relative vs absolute), 3) File extension matches (.js, .ts, .mjs), 4) tsconfig paths/aliases configured, 5) Package.json exports field correct, 6) Node version supports the syntax. For TypeScript: check moduleResolution in tsconfig.', 1.2)
+
+  add('fixing', ['type error', 'type mismatch', 'argument type', 'assignable'],
+    'TypeScript type errors: "Type X is not assignable to type Y" — fixes: 1) Narrow the type with type guards, 2) Add missing properties, 3) Use optional chaining for nullable types, 4) Cast with \'as\' only as last resort, 5) Update the type definition if it\'s wrong. "Property does not exist" — add the property to the interface or use optional access.', 1.2)
+
+  add('fixing', ['async error', 'unhandled promise', 'await missing'],
+    'Async/Promise errors: "Unhandled promise rejection" — add .catch() or try/catch around await. Missing await — function returns Promise<T> instead of T. Fix: add await, ensure caller is async. "Cannot use await outside async function" — wrap in async IIFE or make the enclosing function async.', 1.2)
 
   return entries
 }
@@ -1024,7 +1126,10 @@ function reviewCodeLocally(request: CodeReviewRequest): CodeReviewResult {
  *  - **Chat**: Pattern-matching + knowledge-base powered responses
  *  - **Self-Learning**: Learns from conversations and corrections
  *  - **Code Generation**: Template + pattern based for 24 languages
- *  - **Code Review**: Rule-based static analysis
+ *  - **Code Review**: Deep static analysis via CodeMaster (CodeAnalyzer + CodeReviewer)
+ *  - **Code Fixing**: Auto-fix detected issues via CodeFixer with diff generation
+ *  - **Code Analysis**: Full complexity, anti-pattern, dependency, and smell detection
+ *  - **Problem Decomposition**: Break complex tasks into ordered steps
  *  - **Image Analysis**: Metadata extraction from base64 image data
  *  - **Knowledge Search**: Search through built-in + learned knowledge
  *  - **Persistence**: Save and restore entire brain state
@@ -1039,6 +1144,13 @@ export class LocalBrain {
   private stats: LocalBrainStats
   private tfidfScorer: TfIdfScorer
   private learningsSinceLastSave = 0
+
+  // ── CodeMaster sub-modules (offline intelligence) ──
+  private codeAnalyzer: CodeAnalyzer
+  private codeReviewer: CodeReviewer
+  private codeFixer: CodeFixer
+  private problemDecomposer: ProblemDecomposer
+  private codeLearningEngine: LearningEngine
 
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
@@ -1056,9 +1168,18 @@ export class LocalBrain {
     }
     this.knowledgeBase = buildKnowledgeBase()
     this.tfidfScorer = new TfIdfScorer()
+
+    // Initialize CodeMaster sub-modules
+    this.codeAnalyzer = new CodeAnalyzer()
+    this.codeReviewer = new CodeReviewer()
+    this.codeFixer = new CodeFixer()
+    this.problemDecomposer = new ProblemDecomposer()
+    this.codeLearningEngine = new LearningEngine()
+
     const now = new Date().toISOString()
     this.stats = {
       totalChats: 0, totalCodeGenerations: 0, totalCodeReviews: 0,
+      totalCodeAnalyses: 0, totalCodeFixes: 0, totalDecompositions: 0,
       totalImageAnalyses: 0, totalLearnings: 0, patternsLearned: 0,
       knowledgeEntriesAdded: 0, createdAt: now, lastUsedAt: now,
     }
@@ -1229,13 +1350,137 @@ export class LocalBrain {
     return generateCodeLocally(request)
   }
 
-  // ── Code Review (same interface as AiBrain.reviewCode) ──
+  // ── Code Review (enhanced with CodeMaster deep analysis) ──
 
-  /** Review code using rule-based static analysis. */
+  /**
+   * Review code using CodeMaster's deep analysis pipeline.
+   * Combines rule-based static analysis with CodeAnalyzer + CodeReviewer
+   * for more thorough bug detection, security scanning, and auto-fix suggestions.
+   */
   async reviewCode(request: CodeReviewRequest): Promise<CodeReviewResult> {
     this.stats.totalCodeReviews++
     this.stats.lastUsedAt = new Date().toISOString()
-    return reviewCodeLocally(request)
+
+    // Get base review from local rules
+    const baseReview = reviewCodeLocally(request)
+
+    // Enhance with CodeMaster deep analysis
+    const lang = request.language as AnalysisLanguage
+    const cmReview = this.codeReviewer.review(request.code, lang)
+
+    // Merge CodeMaster findings into base issues (avoiding duplicates)
+    const existingMessages = new Set(baseReview.issues.map(i => i.message.toLowerCase()))
+    for (const finding of cmReview.findings) {
+      const msg = finding.title.toLowerCase()
+      if (!existingMessages.has(msg)) {
+        const severity = finding.severity === 'critical' || finding.severity === 'high'
+          ? 'error' as const
+          : finding.severity === 'medium'
+            ? 'warning' as const
+            : 'info' as const
+        baseReview.issues.push({
+          severity,
+          line: finding.line,
+          message: finding.title,
+          suggestion: finding.suggestion,
+        })
+      }
+    }
+
+    // Generate auto-fix if issues found
+    if (baseReview.issues.length > 0) {
+      const fixResult = this.codeFixer.fixCode(request.code, lang, cmReview.findings)
+      if (fixResult.summary.applied > 0) {
+        const fixedCode = this.codeFixer.applyFixes(
+          request.code,
+          fixResult.fixes.filter(f => f.applied),
+        )
+        baseReview.improvedCode = fixedCode.code
+      }
+    }
+
+    // Use the lower (stricter) of the two scores
+    baseReview.score = Math.min(baseReview.score, cmReview.overallScore)
+
+    // Learn from this review for future improvement
+    if (this.config.learningEnabled) {
+      this.codeLearningEngine.learnFromReviewBatch(request.code, lang, cmReview.findings)
+    }
+
+    // Recalculate summary
+    const errorCount = baseReview.issues.filter(i => i.severity === 'error').length
+    const warningCount = baseReview.issues.filter(i => i.severity === 'warning').length
+    const infoCount = baseReview.issues.filter(i => i.severity === 'info').length
+    baseReview.summary = baseReview.issues.length === 0
+      ? 'Code looks clean! No significant issues found.'
+      : `Found ${baseReview.issues.length} issue(s): ${errorCount} errors, ${warningCount} warnings, ${infoCount} info. Score: ${baseReview.score}/100`
+
+    return baseReview
+  }
+
+  // ── Deep Code Analysis (new — powered by CodeMaster) ──
+
+  /**
+   * Perform deep code analysis: complexity metrics, anti-patterns,
+   * dependency mapping, code smells, and security scanning.
+   * Returns much richer data than reviewCode.
+   */
+  analyzeCode(code: string, language?: string): CodeAnalysis {
+    this.stats.totalCodeAnalyses++
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.codeAnalyzer.analyze(code, language as AnalysisLanguage | undefined)
+  }
+
+  // ── Auto-Fix Code (new — powered by CodeMaster) ──
+
+  /**
+   * Automatically fix detected issues in code.
+   * Returns the fixed code, applied fixes with diffs, and rollback state.
+   */
+  fixCode(code: string, language: string): FixResult {
+    this.stats.totalCodeFixes++
+    this.stats.lastUsedAt = new Date().toISOString()
+    const lang = language as AnalysisLanguage
+
+    // First review to find issues
+    const review = this.codeReviewer.review(code, lang)
+    const result = this.codeFixer.fixCode(code, lang, review.findings)
+
+    // Learn from successful fixes
+    if (this.config.learningEnabled && result.summary.applied > 0) {
+      const fixedCode = this.codeFixer.applyFixes(
+        code,
+        result.fixes.filter(f => f.applied),
+      ).code
+      this.codeLearningEngine.learnFromFix(code, fixedCode, lang, 'auto-fix')
+    }
+
+    return result
+  }
+
+  // ── Problem Decomposition (new — powered by CodeMaster) ──
+
+  /**
+   * Break a complex coding task into ordered, dependency-aware steps.
+   * Useful for planning large features, refactors, or bug fixes.
+   */
+  decomposeTask(description: string): TaskPlan {
+    this.stats.totalDecompositions++
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.problemDecomposer.decompose(description)
+  }
+
+  // ── Code Learning Engine Access ──
+
+  /** Get the CodeMaster learning engine for direct access to learned patterns. */
+  getCodeLearningEngine(): LearningEngine {
+    return this.codeLearningEngine
+  }
+
+  /** Get CodeMaster deep review output (richer than reviewCode). */
+  deepReview(code: string, language?: string): CodeReviewOutput {
+    const lang = language as AnalysisLanguage | undefined
+    return this.codeReviewer.review(code, lang)
   }
 
   // ── Image Analysis (same interface as AiBrain.analyzeImage) ──
