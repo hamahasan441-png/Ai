@@ -58,6 +58,12 @@ import { IntentEngine } from './IntentEngine.js'
 import { ContextManager } from './ContextManager.js'
 import { ReasoningEngine } from './ReasoningEngine.js'
 import { MetaCognition } from './MetaCognition.js'
+
+// Advanced intelligence modules (Phase 2)
+import { SemanticMemory, createProgrammingKnowledgeGraph } from './SemanticMemory.js'
+import { SemanticTrainer } from './SemanticTrainer.js'
+import { AnalogicalReasoner } from './AnalogicalReasoner.js'
+import { TopicModeler } from './TopicModeler.js'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1596,6 +1602,12 @@ export class LocalBrain {
   private reasoningEngine: ReasoningEngine | null = null
   private metaCognition: MetaCognition | null = null
 
+  // ── Advanced intelligence modules (semantic training layer) ──
+  private semanticMemory: SemanticMemory | null = null
+  private semanticTrainer: SemanticTrainer | null = null
+  private analogicalReasoner: AnalogicalReasoner | null = null
+  private topicModeler: TopicModeler | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1628,6 +1640,12 @@ export class LocalBrain {
       this.contextManager = new ContextManager()
       this.reasoningEngine = new ReasoningEngine()
       this.metaCognition = new MetaCognition()
+
+      // Advanced intelligence modules (semantic training layer)
+      this.semanticMemory = createProgrammingKnowledgeGraph()
+      this.semanticTrainer = new SemanticTrainer()
+      this.analogicalReasoner = new AnalogicalReasoner()
+      this.topicModeler = new TopicModeler()
     }
 
     const now = new Date().toISOString()
@@ -1693,6 +1711,31 @@ export class LocalBrain {
       }
     }
 
+    // Use SemanticMemory for graph-based knowledge retrieval if available
+    if (this.semanticMemory) {
+      // Find concepts matching the user's keywords via spreading activation
+      const seedIds: string[] = []
+      for (const kw of keywords.slice(0, 5)) {
+        const concept = this.semanticMemory.findConceptByName(kw)
+        if (concept) seedIds.push(concept.id)
+      }
+      if (seedIds.length > 0) {
+        // Spreading activation to find related concepts beyond keyword matching
+        const _activated = this.semanticMemory.spreadingActivation(seedIds, 2, 5)
+        // Extract relationships from the conversation to grow the graph
+        const extracted = this.semanticMemory.extractRelationships(userMessage)
+        for (const rel of extracted) {
+          const src = this.semanticMemory.findConceptByName(rel.source)
+            ?? (() => { const id = this.semanticMemory!.addConcept(rel.source, 'general'); return this.semanticMemory!.getConcept(id); })()
+          const tgt = this.semanticMemory.findConceptByName(rel.target)
+            ?? (() => { const id = this.semanticMemory!.addConcept(rel.target, 'general'); return this.semanticMemory!.getConcept(id); })()
+          if (src && tgt) {
+            this.semanticMemory.addRelation(src.id, tgt.id, rel.relation, rel.confidence)
+          }
+        }
+      }
+    }
+
     // Generate response (uses TF-IDF if enabled)
     const text = this.config.useTfIdf
       ? this.buildResponseWithTfIdf(intent, userMessage, knowledgeResults)
@@ -1716,6 +1759,18 @@ export class LocalBrain {
     if (this.metaCognition) {
       const assessment = this.metaCognition.assessConfidence(userMessage, text)
       this.metaCognition.recordOutcome(assessment.calibrated, knowledgeResults.length > 0 ? 0.8 : 0.3)
+    }
+
+    // SemanticTrainer: incrementally learn from this conversation turn
+    if (this.semanticTrainer) {
+      this.semanticTrainer.learnFromText(userMessage)
+      this.semanticTrainer.learnFromText(text)
+    }
+
+    // TopicModeler: track conversation topics
+    if (this.topicModeler) {
+      const docId = `chat-${Date.now()}`
+      this.topicModeler.addDocument(docId, `${userMessage} ${text}`)
     }
 
     this.conversationHistory.push({ role: 'assistant', content: text })
@@ -2201,6 +2256,16 @@ export class LocalBrain {
     if (issues.length > 0) summary += ` Found ${issues.length} potential issue(s).`
     else summary += ' No significant issues detected.'
 
+    // Enhance with analogy-based explanations for detected concepts
+    if (this.analogicalReasoner && concepts.length > 0) {
+      for (const concept of concepts.slice(0, 3)) {
+        const analogy = this.analogicalReasoner.explain(concept, 'beginner')
+        if (analogy) {
+          steps.push(`Analogy: ${analogy}`)
+        }
+      }
+    }
+
     return {
       summary,
       steps,
@@ -2236,6 +2301,18 @@ export class LocalBrain {
           type: 'decompose',
           description: 'ReasoningEngine decomposed the problem into sub-problems',
           output: `Sub-problems: ${subProblems.slice(0, 5).map(sp => sp.description).join('; ')}`,
+        })
+      }
+    }
+
+    // Use AnalogicalReasoner to find relevant analogies for the problem
+    if (this.analogicalReasoner) {
+      const analogies = this.analogicalReasoner.findAnalogies(question, 2)
+      for (const analogy of analogies) {
+        steps.push({
+          type: 'plan',
+          description: `Analogy: ${analogy.explanation}`,
+          output: `Similarity: ${Math.round(analogy.similarity * 100)}%`,
         })
       }
     }
@@ -2940,6 +3017,18 @@ export class LocalBrain {
   /** Get the MetaCognition instance (null if intelligence modules are disabled). */
   getMetaCognition(): MetaCognition | null { return this.metaCognition }
 
+  /** Get the SemanticMemory instance (null if intelligence modules are disabled). */
+  getSemanticMemory(): SemanticMemory | null { return this.semanticMemory }
+
+  /** Get the SemanticTrainer instance (null if intelligence modules are disabled). */
+  getSemanticTrainer(): SemanticTrainer | null { return this.semanticTrainer }
+
+  /** Get the AnalogicalReasoner instance (null if intelligence modules are disabled). */
+  getAnalogicalReasoner(): AnalogicalReasoner | null { return this.analogicalReasoner }
+
+  /** Get the TopicModeler instance (null if intelligence modules are disabled). */
+  getTopicModeler(): TopicModeler | null { return this.topicModeler }
+
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
 
@@ -2950,13 +3039,28 @@ export class LocalBrain {
     contextTopicCount: number
     knowledgeGaps: number
     calibrationAccuracy: number | null
+    semanticMemoryNodes: number
+    semanticMemoryEdges: number
+    trainerVocabularySize: number
+    trainerCurrentDomain: string | null
+    analogyPatterns: number
+    topicModelerTopics: number
+    topicModelerDocuments: number
   } {
     if (!this.config.enableIntelligence) {
-      return { enabled: false, contextTurns: 0, contextTopicCount: 0, knowledgeGaps: 0, calibrationAccuracy: null }
+      return {
+        enabled: false, contextTurns: 0, contextTopicCount: 0, knowledgeGaps: 0, calibrationAccuracy: null,
+        semanticMemoryNodes: 0, semanticMemoryEdges: 0, trainerVocabularySize: 0, trainerCurrentDomain: null,
+        analogyPatterns: 0, topicModelerTopics: 0, topicModelerDocuments: 0,
+      }
     }
 
     const contextStats = this.contextManager?.getStats() ?? null
     const metaStats = this.metaCognition?.getStats() ?? null
+    const memoryStats = this.semanticMemory?.getStats() ?? null
+    const trainerStats = this.semanticTrainer?.getStats() ?? null
+    const analogyStats = this.analogicalReasoner?.getStats() ?? null
+    const topicStats = this.topicModeler?.getStats() ?? null
 
     return {
       enabled: true,
@@ -2964,6 +3068,13 @@ export class LocalBrain {
       contextTopicCount: contextStats?.uniqueTopics ?? 0,
       knowledgeGaps: metaStats?.knownGaps ?? 0,
       calibrationAccuracy: metaStats?.calibrationAccuracy ?? null,
+      semanticMemoryNodes: memoryStats?.nodeCount ?? 0,
+      semanticMemoryEdges: memoryStats?.edgeCount ?? 0,
+      trainerVocabularySize: trainerStats?.totalExamples ?? 0,
+      trainerCurrentDomain: trainerStats?.currentDomain ?? null,
+      analogyPatterns: analogyStats?.patternsLearned ?? 0,
+      topicModelerTopics: topicStats?.totalTopics ?? 0,
+      topicModelerDocuments: topicStats?.totalDocuments ?? 0,
     }
   }
 
@@ -2978,7 +3089,15 @@ export class LocalBrain {
       knowledgeAdditions: this.knowledgeBase.filter(e => e.source === 'learned'),
       stats: this.stats,
     }
-    return JSON.stringify(state)
+
+    // Serialize advanced intelligence module states
+    const advancedState: Record<string, string> = {}
+    if (this.semanticMemory) advancedState.semanticMemory = this.semanticMemory.serialize()
+    if (this.semanticTrainer) advancedState.semanticTrainer = this.semanticTrainer.serialize()
+    if (this.analogicalReasoner) advancedState.analogicalReasoner = this.analogicalReasoner.serialize()
+    if (this.topicModeler) advancedState.topicModeler = this.topicModeler.serialize()
+
+    return JSON.stringify({ ...state, advancedIntelligence: advancedState })
   }
 
   /** Restore brain state from a serialized string. */
@@ -2996,6 +3115,24 @@ export class LocalBrain {
     // Restore learned knowledge entries
     for (const entry of state.knowledgeAdditions) {
       brain.knowledgeBase.push(entry)
+    }
+
+    // Restore advanced intelligence module states if present
+    const parsed = JSON.parse(json) as Record<string, unknown>
+    const advanced = parsed.advancedIntelligence as Record<string, string> | undefined
+    if (advanced && brain.config.enableIntelligence) {
+      if (advanced.semanticMemory) {
+        try { brain.semanticMemory = SemanticMemory.deserialize(advanced.semanticMemory) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.semanticTrainer) {
+        try { brain.semanticTrainer = SemanticTrainer.deserialize(advanced.semanticTrainer) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.analogicalReasoner) {
+        try { brain.analogicalReasoner = AnalogicalReasoner.deserialize(advanced.analogicalReasoner) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.topicModeler) {
+        try { brain.topicModeler = TopicModeler.deserialize(advanced.topicModeler) } catch { /* ignore corrupted state */ }
+      }
     }
 
     return brain
