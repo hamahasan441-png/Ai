@@ -352,6 +352,9 @@ function buildDistanceMatrix(items: string[][]): number[][] {
 
   for (let i = 0; i < n; i++) {
     matrix[i] = new Array(n).fill(0);
+  }
+
+  for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
       const dist = 1 - jaccardSimilarity(items[i], items[j]);
       matrix[i][j] = dist;
