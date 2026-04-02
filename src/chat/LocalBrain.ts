@@ -169,8 +169,132 @@ export interface LocalBrainStats {
   totalLearnings: number
   patternsLearned: number
   knowledgeEntriesAdded: number
+  totalCodeCompletions: number
+  totalCodeExplanations: number
+  totalMultiStepReasons: number
+  totalMultiFileGenerations: number
   createdAt: string
   lastUsedAt: string
+}
+
+/** Result of code completion. */
+export interface CodeCompletionResult {
+  /** The completed code (full, including the original partial). */
+  completedCode: string
+  /** Just the inserted portion. */
+  insertion: string
+  /** Confidence in the completion (0-1). */
+  confidence: number
+  /** Explanation of what was inserted. */
+  explanation: string
+}
+
+/** Result of code explanation. */
+export interface CodeExplanationResult {
+  /** High-level summary of what the code does. */
+  summary: string
+  /** Step-by-step breakdown. */
+  steps: string[]
+  /** Estimated time complexity. */
+  complexity: string
+  /** Potential issues found. */
+  issues: string[]
+  /** Detected language. */
+  language: string
+  /** Key concepts used. */
+  concepts: string[]
+}
+
+/** Multi-step reasoning result. */
+export interface ReasoningResult {
+  /** The final answer/response. */
+  answer: string
+  /** Chain-of-thought steps. */
+  steps: ReasoningStep[]
+  /** Overall confidence in the answer. */
+  confidence: number
+  /** Time taken in ms. */
+  durationMs: number
+}
+
+/** A single reasoning step. */
+export interface ReasoningStep {
+  /** Step type. */
+  type: 'decompose' | 'plan' | 'generate' | 'review' | 'refine'
+  /** Description of this step. */
+  description: string
+  /** Output of this step. */
+  output: string
+}
+
+/** Multi-file generation result. */
+export interface MultiFileResult {
+  /** Generated files. */
+  files: GeneratedFile[]
+  /** Total lines of code. */
+  totalLines: number
+  /** Explanation of the generation. */
+  explanation: string
+}
+
+/** A single generated file. */
+export interface GeneratedFile {
+  /** File path/name. */
+  filename: string
+  /** File content. */
+  content: string
+  /** Programming language. */
+  language: string
+  /** Lines of code. */
+  lines: number
+}
+
+/** User preferences for coding style. */
+export interface UserPreferences {
+  /** Indentation preference. */
+  indentation: 'tabs' | 'spaces-2' | 'spaces-4'
+  /** Quote preference. */
+  quotes: 'single' | 'double'
+  /** Semicolons preference (JS/TS). */
+  semicolons: boolean
+  /** Preferred naming convention. */
+  naming: 'camelCase' | 'snake_case' | 'PascalCase'
+  /** Preferred libraries per domain. */
+  preferredLibraries: Record<string, string>
+  /** Last updated timestamp. */
+  lastUpdated: string
+}
+
+/** Conversation context for multi-turn memory. */
+export interface ConversationContext {
+  /** Current file being discussed. */
+  currentFile: string | null
+  /** Current function/method in context. */
+  currentFunction: string | null
+  /** Current project/topic. */
+  currentProject: string | null
+  /** Current programming language. */
+  currentLanguage: string | null
+  /** Stack of topics discussed. */
+  topicStack: string[]
+  /** Extracted facts from conversation. */
+  facts: string[]
+}
+
+/** Refactoring suggestion. */
+export interface RefactoringSuggestion {
+  /** Type of code smell. */
+  smell: string
+  /** Location in code. */
+  location: string
+  /** Description of the issue. */
+  description: string
+  /** Suggested refactoring. */
+  suggestion: string
+  /** Refactored code (if available). */
+  refactoredCode?: string
+  /** Priority level. */
+  priority: 'high' | 'medium' | 'low'
 }
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
@@ -387,6 +511,295 @@ function buildKnowledgeBase(): KnowledgeEntry[] {
 
   add('fixing', ['async error', 'unhandled promise', 'await missing'],
     'Async/Promise errors: "Unhandled promise rejection" — add .catch() or try/catch around await. Missing await — function returns Promise<T> instead of T. Fix: add await, ensure caller is async. "Cannot use await outside async function" — wrap in async IIFE or make the enclosing function async.', 1.2)
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // EXPANDED KNOWLEDGE BASE — Phase 3: 500+ entries
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // ── React Ecosystem ──
+  add('frameworks', ['react hooks', 'usestate', 'useeffect', 'usecallback', 'usememo', 'useref'],
+    'React Hooks deep dive: useState (state management), useEffect (side effects, cleanup), useCallback (memoize callbacks for referential equality), useMemo (memoize computed values), useRef (persist values across renders without re-render). Rules: only call at top level, only in React functions. Custom hooks extract reusable stateful logic.', 1.3)
+
+  add('frameworks', ['react context', 'usecontext', 'provider', 'consumer', 'context api'],
+    'React Context: Share data across component tree without prop drilling. Create with createContext(), provide with <Provider value={...}>, consume with useContext(). Best practices: split contexts by domain (AuthContext, ThemeContext), memoize provider value to prevent unnecessary re-renders. Avoid for high-frequency state — use state management libraries instead.', 1.2)
+
+  add('frameworks', ['react router', 'routing', 'navigation', 'route', 'link'],
+    'React Router v6: createBrowserRouter for data APIs, <RouterProvider>, loader/action for data loading. Key components: <Route>, <Link>, <Outlet> for nested routes. Hooks: useNavigate(), useParams(), useSearchParams(), useLoaderData(). Patterns: protected routes (wrapper component), lazy loading with React.lazy(), error boundaries with errorElement.', 1.2)
+
+  add('frameworks', ['redux', 'zustand', 'jotai', 'state management', 'store'],
+    'State management: Redux Toolkit (predictable, devtools, middleware — for large apps), Zustand (simple, no boilerplate — for medium apps), Jotai (atomic, bottom-up — for granular state), Recoil (atoms + selectors — Facebook). Choose RTK for complex state logic, Zustand for simplicity, Jotai for fine-grained reactivity.', 1.2)
+
+  add('frameworks', ['react query', 'tanstack query', 'server state', 'data fetching'],
+    'TanStack Query (React Query): Server state management. Key: useQuery (fetch + cache), useMutation (create/update/delete), query invalidation, optimistic updates, infinite queries, prefetching. Replaces manual useEffect+useState for API calls. Config: staleTime, cacheTime, refetchOnWindowFocus. Pairs with axios/fetch.', 1.2)
+
+  add('frameworks', ['react testing', 'testing library', 'rtl', 'render', 'screen'],
+    'React Testing Library: Test behavior, not implementation. render() component, find elements with screen.getByRole/getByText/getByTestId. User events with userEvent.click/type. Assertions: expect(element).toBeInTheDocument(). Async: waitFor(), findBy*. Mock: jest.mock() for modules, MSW for API calls. Test what users see and do.', 1.2)
+
+  add('frameworks', ['react performance', 'memo', 'lazy', 'suspense', 'profiler'],
+    'React Performance: React.memo() prevents re-renders when props unchanged. useMemo/useCallback memoize values/callbacks. React.lazy() + Suspense for code splitting. Keys in lists must be stable. Avoid: anonymous functions in JSX props, creating objects/arrays in render. Profile with React DevTools Profiler.', 1.2)
+
+  add('frameworks', ['react server components', 'rsc', 'server actions', 'use server'],
+    'React Server Components (RSC): Components that render on the server, zero client JS. "use client" marks client boundary. Server Actions ("use server") handle form submissions. Benefits: smaller bundles, direct DB access, streaming. Limitations: no useState/useEffect/browser APIs. Use for data-heavy, non-interactive UI.', 1.1)
+
+  add('frameworks', ['react native', 'mobile', 'expo', 'react native cli'],
+    'React Native: Build iOS/Android apps with React. Core components: View, Text, ScrollView, FlatList, TextInput, TouchableOpacity. Navigation: React Navigation (stack, tab, drawer). Styling: StyleSheet.create() (no CSS). Expo: managed workflow (easier setup), bare workflow (more control). Use Hermes engine for performance.', 1.1)
+
+  add('frameworks', ['tailwind', 'tailwindcss', 'utility css', 'postcss'],
+    'Tailwind CSS: Utility-first CSS framework. Classes like flex, p-4, text-lg, bg-blue-500, hover:bg-blue-600, md:flex-row. Config: tailwind.config.js for custom colors/fonts/breakpoints. @apply for extracting components. JIT mode for on-demand generation. Pairs with: headlessui, radix-ui, shadcn/ui for accessible components.', 1.1)
+
+  // ── Backend Frameworks ──
+  add('frameworks', ['nestjs', 'nest', 'decorator', 'module', 'injectable'],
+    'NestJS: TypeScript-first Node.js framework. Architecture: modules → controllers → services. Key decorators: @Module, @Controller, @Injectable, @Get/@Post/@Put/@Delete. Features: dependency injection, guards (auth), interceptors (transform), pipes (validation), middleware. Built on Express/Fastify. Use for enterprise-grade APIs.', 1.2)
+
+  add('frameworks', ['fastify', 'fastify plugin', 'schema validation'],
+    'Fastify: High-performance Node.js web framework (2x faster than Express). Key features: schema-based validation (JSON Schema), plugin system, hooks (onRequest, preHandler, onSend), serialization, TypeScript support. Use @fastify/cors, @fastify/jwt, @fastify/swagger. Best for: high-throughput APIs, microservices.', 1.1)
+
+  add('frameworks', ['hono', 'edge', 'web standard', 'cloudflare workers'],
+    'Hono: Ultrafast web framework for edge/serverless. Runs on: Cloudflare Workers, Deno, Bun, Node.js. Web Standards-based (Request/Response). Features: middleware, routing, validator, OpenAPI, JSX. TypeScript-first with type-safe routing. Best for: edge computing, serverless APIs, lightweight services.', 1.0)
+
+  add('frameworks', ['graphql', 'apollo', 'schema', 'resolver', 'mutation'],
+    'GraphQL: Query language for APIs. Schema defines types/queries/mutations. Resolvers handle data fetching. Apollo Server (Node.js), Apollo Client (React). Key concepts: fragments, subscriptions, pagination (cursor-based), caching (normalized), error handling (errors field). Advantages: no over/under-fetching, strong typing, single endpoint.', 1.2)
+
+  add('frameworks', ['prisma', 'orm', 'schema prisma', 'migration'],
+    'Prisma ORM: Type-safe database toolkit for TypeScript. Schema: prisma/schema.prisma (models, relations, enums). Commands: prisma generate (client), prisma migrate dev (migrations), prisma studio (GUI). Features: auto-generated types, relation queries, transactions, raw SQL. Supports: PostgreSQL, MySQL, SQLite, MongoDB.', 1.2)
+
+  add('frameworks', ['drizzle', 'drizzle orm', 'sql like', 'type safe sql'],
+    'Drizzle ORM: Lightweight TypeScript ORM. SQL-like syntax: db.select().from(users).where(eq(users.id, 1)). Schema defined in TypeScript (no separate schema file). Features: type-safe queries, migrations, joins, transactions. Supports: PostgreSQL, MySQL, SQLite. Smaller bundle than Prisma. Good for: serverless, edge.', 1.1)
+
+  // ── Cloud Services ──
+  add('cloud', ['aws', 'amazon', 'ec2', 's3', 'lambda', 'dynamodb'],
+    'AWS core services: EC2 (virtual servers), S3 (object storage), Lambda (serverless functions), DynamoDB (NoSQL), RDS (managed SQL), SQS (message queues), SNS (pub/sub), CloudFront (CDN), IAM (access control), CloudWatch (monitoring). Best practices: use IAM roles (not keys), enable versioning on S3, set billing alerts.', 1.2)
+
+  add('cloud', ['aws lambda', 'serverless function', 'cold start', 'api gateway'],
+    'AWS Lambda: Serverless compute — pay per invocation. Triggers: API Gateway, S3, SQS, EventBridge, DynamoDB Streams. Cold starts: use provisioned concurrency or keep-warm. Limits: 15min timeout, 10GB memory, 250MB deploy package. Best practices: minimize package size, use layers for shared code, set appropriate timeouts.', 1.2)
+
+  add('cloud', ['gcp', 'google cloud', 'firebase', 'cloud run', 'bigquery'],
+    'Google Cloud: Cloud Run (containers), Cloud Functions (serverless), BigQuery (analytics), Firestore (NoSQL), Cloud SQL (managed SQL), Pub/Sub (messaging), GKE (Kubernetes). Firebase: Auth, Firestore, Hosting, Cloud Messaging. Best practices: use service accounts, enable audit logging, set budget alerts.', 1.1)
+
+  add('cloud', ['azure', 'microsoft cloud', 'app service', 'cosmos db'],
+    'Azure services: App Service (web hosting), Functions (serverless), Cosmos DB (global NoSQL), SQL Database (managed SQL), Blob Storage (objects), Service Bus (messaging), AKS (Kubernetes), Active Directory (identity). Best practices: use managed identities, Azure Key Vault for secrets, Application Insights for monitoring.', 1.1)
+
+  add('cloud', ['terraform', 'infrastructure as code', 'iac', 'pulumi', 'cloudformation'],
+    'Infrastructure as Code (IaC): Terraform (multi-cloud, HCL, state management), Pulumi (real programming languages), CloudFormation (AWS-specific, YAML/JSON). Terraform workflow: init → plan → apply. Best practices: remote state (S3+DynamoDB), modules for reuse, workspaces for environments, drift detection.', 1.2)
+
+  // ── Error Pattern Database ──
+  add('errors', ['cannot read properties', 'undefined is not an object', 'null reference'],
+    'TypeError: Cannot read properties of undefined/null — the most common JS error. Root causes: 1) Accessing nested property on missing object, 2) API returned unexpected shape, 3) Array is empty when accessing index, 4) Variable not initialized. Fixes: optional chaining (?.), nullish coalescing (??), guard clauses, TypeScript strict null checks, default values.', 1.4)
+
+  add('errors', ['referenceerror', 'not defined', 'is not defined'],
+    'ReferenceError: X is not defined — variable doesn\'t exist in scope. Causes: 1) Typo in variable name, 2) Variable declared in different scope/block, 3) Missing import, 4) Using variable before declaration (temporal dead zone with let/const). Fixes: check spelling, verify imports, ensure variable is declared before use.', 1.3)
+
+  add('errors', ['syntaxerror', 'unexpected token', 'parsing error'],
+    'SyntaxError: Unexpected token — code structure is invalid. Common causes: 1) Missing bracket/paren/quote, 2) JSON.parse on non-JSON string, 3) ES module syntax in CommonJS (import/export), 4) Optional chaining in old Node versions. Fixes: use a linter, check brackets match, verify JSON is valid, update Node.js version.', 1.3)
+
+  add('errors', ['rangeerror', 'maximum call stack', 'stack overflow', 'infinite recursion'],
+    'RangeError: Maximum call stack size exceeded — infinite recursion. Causes: 1) Missing base case in recursion, 2) Recursive getter/setter, 3) Circular JSON.stringify, 4) Event handler triggers itself. Fixes: add base case, use iteration instead, check for circular references (JSON.stringify with replacer), add depth limit.', 1.3)
+
+  add('errors', ['typeerror', 'is not a function', 'not a function'],
+    'TypeError: X is not a function — trying to call something that isn\'t callable. Causes: 1) Wrong variable type (object instead of function), 2) Missing parentheses on import, 3) Property name conflict with method name, 4) Forgot to export/import. Fixes: check the variable\'s actual type, verify imports, use typeof check before calling.', 1.3)
+
+  add('errors', ['cors', 'cross origin', 'access-control-allow-origin', 'blocked by cors'],
+    'CORS error: Browser blocks cross-origin requests without proper headers. Server must send: Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers. Fixes: 1) Add CORS middleware (cors package in Express), 2) Configure API Gateway CORS, 3) Use proxy in development (Vite/webpack proxy). Preflight: OPTIONS request for non-simple requests.', 1.3)
+
+  add('errors', ['econnrefused', 'connection refused', 'enotfound', 'network error'],
+    'ECONNREFUSED: Server is not listening on that port. Causes: 1) Service not running, 2) Wrong port/host, 3) Firewall blocking, 4) Docker network issue. ENOTFOUND: DNS resolution failed — wrong hostname. Fixes: check service is running (curl/netcat), verify port number, check Docker network, ensure DNS resolves.', 1.2)
+
+  add('errors', ['eaddrinuse', 'port in use', 'address already in use'],
+    'EADDRINUSE: Port is already occupied. Causes: 1) Another instance running, 2) Previous process didn\'t clean up. Fixes: 1) lsof -i :PORT then kill the process, 2) Use a different port, 3) Set SO_REUSEADDR in server options, 4) Use port 0 for auto-assignment in tests. Prevention: graceful shutdown handlers.', 1.2)
+
+  add('errors', ['out of memory', 'heap', 'javascript heap', 'memory limit'],
+    'JavaScript heap out of memory: Node.js exceeded memory limit (default ~1.7GB). Causes: 1) Memory leak (event listeners, closures, caches), 2) Loading huge file into memory, 3) Unbounded array growth. Fixes: --max-old-space-size=4096 flag, stream large files, use WeakMap/WeakRef, profile with --inspect + Chrome DevTools heap snapshot.', 1.2)
+
+  add('errors', ['timeout', 'etimedout', 'request timeout', 'gateway timeout'],
+    'Timeout errors: ETIMEDOUT (TCP connection timeout), request timeout (HTTP), 504 Gateway Timeout (proxy). Causes: 1) Slow API/database, 2) Network issues, 3) Server overloaded. Fixes: increase timeout values, add retry logic with exponential backoff, implement circuit breaker pattern, optimize slow queries, add caching.', 1.2)
+
+  add('errors', ['import error', 'module not found', 'err_module_not_found', 'esm cjs'],
+    'ERR_MODULE_NOT_FOUND / Cannot find module: Module resolution failure. ESM vs CJS: use "type": "module" in package.json for ESM, .mjs extension, or --experimental-modules flag. Fixes: 1) npm install the package, 2) Check relative path (./ prefix), 3) Add .js extension for ESM, 4) Check tsconfig paths, 5) Verify package.json exports field.', 1.2)
+
+  add('errors', ['permission denied', 'eacces', 'eperm', 'access denied'],
+    'Permission errors (EACCES/EPERM): Process lacks permissions. Causes: 1) File owned by root, 2) npm global install without sudo, 3) Docker volume permissions, 4) SELinux/AppArmor. Fixes: chown/chmod the file, use npm config set prefix, run Docker with --user flag, avoid running as root.', 1.1)
+
+  add('errors', ['segfault', 'segmentation fault', 'sigsegv', 'core dump'],
+    'Segmentation fault: Process accessed invalid memory. In Node.js: usually from native addons. Causes: 1) Buggy native module, 2) Incompatible Node version, 3) Corrupted node_modules. Fixes: rebuild native modules (npm rebuild), update packages, check Node version compatibility, try node --abort-on-uncaught-exception for debugging.', 1.1)
+
+  add('errors', ['docker error', 'container exit', 'image pull', 'build failed'],
+    'Docker errors: Build failures — check Dockerfile syntax, missing files in context, base image availability. Container exits — check logs (docker logs), entrypoint/cmd, health checks. Image pull — check registry auth, image name/tag. OOMKilled — increase memory limit. Networking — use docker network, check port mappings.', 1.1)
+
+  add('errors', ['git conflict', 'merge conflict', 'rebase conflict', 'conflict markers'],
+    'Git merge conflicts: <<<<<<< HEAD marks your changes, ======= divides them, >>>>>>> branch marks incoming. Resolution: 1) Open conflicted files, 2) Choose correct code (or combine), 3) Remove conflict markers, 4) git add resolved files, 5) git commit (or git rebase --continue). Tools: VS Code merge editor, git mergetool. Prevention: small frequent merges, communication.', 1.2)
+
+  add('errors', ['typescript error', 'ts2322', 'ts2345', 'ts2339', 'ts7006'],
+    'Common TypeScript errors: TS2322 (type not assignable — narrow or update type), TS2345 (argument type mismatch — check function signature), TS2339 (property doesn\'t exist — add to interface or use optional), TS7006 (implicit any — add type annotation), TS2304 (cannot find name — missing import or declaration).', 1.2)
+
+  add('errors', ['python error', 'indentationerror', 'keyerror', 'attributeerror'],
+    'Common Python errors: IndentationError (mix of tabs/spaces — use 4 spaces consistently), KeyError (dict key missing — use .get() with default), AttributeError (object lacks attribute — check type, use hasattr()), ImportError (module not found — install with pip, check PYTHONPATH), ValueError (wrong type conversion — validate input first).', 1.2)
+
+  add('errors', ['npm error', 'npm install fail', 'peer dependency', 'version conflict'],
+    'npm errors: ERESOLVE (peer dependency conflict — use --legacy-peer-deps or --force), ENOENT (missing package.json — npm init), permission errors (avoid sudo — fix npm prefix), cache issues (npm cache clean --force), lockfile conflicts (delete node_modules + package-lock.json, reinstall).', 1.2)
+
+  // ── Algorithms & Data Structures ──
+  add('algorithms', ['binary search', 'bisect', 'search sorted'],
+    'Binary Search: Find element in sorted array in O(log n). Algorithm: compare middle element, search left/right half. Variants: lower_bound (first >=), upper_bound (first >), find insertion point. Implementation: two pointers (lo, hi), while lo <= hi, mid = lo + Math.floor((hi - lo) / 2). Watch for: integer overflow in mid calculation, off-by-one errors.', 1.3)
+
+  add('algorithms', ['merge sort', 'divide and conquer', 'stable sort'],
+    'Merge Sort: Divide array into halves, sort recursively, merge sorted halves. Time: O(n log n) always. Space: O(n). Stable sort (preserves equal element order). Good for: linked lists, external sorting (large files). Merging: two pointers compare elements, build result array. Bottom-up variant avoids recursion.', 1.2)
+
+  add('algorithms', ['quick sort', 'partition', 'pivot'],
+    'Quick Sort: Choose pivot, partition into <pivot and >pivot, recurse. Time: O(n log n) average, O(n²) worst (bad pivot). Space: O(log n) stack. In-place (no extra array). Pivot strategies: random (recommended), median-of-three, last element. Hoare partition is more efficient than Lomuto. Use insertion sort for small subarrays (<10).', 1.2)
+
+  add('algorithms', ['dynamic programming', 'dp', 'memoization', 'tabulation', 'knapsack'],
+    'Dynamic Programming: Solve complex problems by breaking into overlapping subproblems. Memoization (top-down): cache recursive results. Tabulation (bottom-up): fill table iteratively. Key: identify state, recurrence relation, base cases. Classic problems: Fibonacci, knapsack, LCS, edit distance, coin change, longest increasing subsequence.', 1.3)
+
+  add('algorithms', ['bfs', 'breadth first search', 'level order', 'shortest path unweighted'],
+    'BFS (Breadth-First Search): Explore level by level using a queue. Time: O(V+E). Use for: shortest path in unweighted graph, level-order traversal, connected components. Implementation: queue, visited set, while queue not empty: dequeue, process, enqueue unvisited neighbors. Returns: shortest path, distance from source.', 1.2)
+
+  add('algorithms', ['dfs', 'depth first search', 'backtracking', 'topological sort'],
+    'DFS (Depth-First Search): Explore as deep as possible before backtracking. Time: O(V+E). Use for: cycle detection, topological sort, path finding, connected components, maze solving. Implementation: recursive or explicit stack. Variants: pre-order, in-order, post-order. Topological sort: DFS + reverse post-order for DAGs.', 1.2)
+
+  add('algorithms', ['dijkstra', 'shortest path', 'weighted graph', 'priority queue'],
+    'Dijkstra\'s Algorithm: Shortest path in weighted graph (non-negative edges). Time: O((V+E)log V) with min-heap. Implementation: priority queue, distance array (init infinity), relax edges. Process: extract min, update neighbors if shorter path found. For negative edges: use Bellman-Ford. For all-pairs: Floyd-Warshall.', 1.2)
+
+  add('algorithms', ['hash table', 'hashmap', 'hashtable', 'hash function', 'collision'],
+    'Hash Table: O(1) average lookup/insert/delete. Hash function maps keys to indices. Collision handling: chaining (linked lists at each bucket), open addressing (linear/quadratic probing, double hashing). Load factor: resize when > 0.75. In practice: Map/Object (JS), dict (Python), HashMap (Java), unordered_map (C++).', 1.3)
+
+  add('algorithms', ['linked list', 'node', 'pointer', 'singly linked', 'doubly linked'],
+    'Linked List: Sequence of nodes with pointers. Singly linked (next only), Doubly linked (prev + next). Operations: insert O(1) at head, delete O(1) if you have the node, search O(n). Patterns: two pointers (fast/slow for cycle detection, middle finding), dummy head (simplifies edge cases), reverse in-place.', 1.2)
+
+  add('algorithms', ['tree', 'binary tree', 'bst', 'binary search tree', 'traversal'],
+    'Binary Search Tree: Left < root < right. Operations: search/insert/delete O(log n) average, O(n) worst (unbalanced). Traversals: inorder (sorted), preorder (copy tree), postorder (delete tree), level-order (BFS). Self-balancing: AVL tree, Red-Black tree, B-tree. Common problems: validate BST, lowest common ancestor, serialize/deserialize.', 1.3)
+
+  add('algorithms', ['heap', 'priority queue', 'heapify', 'min heap', 'max heap'],
+    'Heap: Complete binary tree, parent ≥ children (max-heap) or ≤ (min-heap). Operations: insert O(log n), extract-min/max O(log n), peek O(1). Implemented as array: children at 2i+1, 2i+2, parent at floor((i-1)/2). Use for: priority queues, K largest/smallest, median finding (two heaps), Dijkstra\'s algorithm.', 1.2)
+
+  add('algorithms', ['graph', 'adjacency list', 'adjacency matrix', 'directed', 'undirected'],
+    'Graph representations: Adjacency list (Map<node, neighbors[]> — space efficient, good for sparse), Adjacency matrix (2D array — fast edge lookup, good for dense). Directed vs undirected, weighted vs unweighted, cyclic vs acyclic. Algorithms: BFS, DFS, Dijkstra, topological sort, minimum spanning tree (Prim/Kruskal).', 1.2)
+
+  add('algorithms', ['trie', 'prefix tree', 'autocomplete', 'word search'],
+    'Trie (Prefix Tree): Tree for string storage/search. Each node represents a character. Operations: insert O(m), search O(m), startsWith O(m) where m = word length. Use for: autocomplete, spell checking, IP routing, word games. Space optimization: compressed trie (radix tree). Implementation: Map<char, TrieNode> with isEnd flag.', 1.2)
+
+  add('algorithms', ['lru cache', 'cache eviction', 'least recently used'],
+    'LRU Cache: Evict least recently used item when capacity exceeded. Implementation: HashMap + Doubly Linked List. Operations: get O(1) — move to front, put O(1) — add to front, evict from back. In JavaScript: Map preserves insertion order (use delete+set to move to end). In Python: collections.OrderedDict.', 1.2)
+
+  add('algorithms', ['two pointers', 'sliding window', 'fast slow pointer'],
+    'Two Pointer techniques: 1) Opposite ends — converge inward (sorted array sum, palindrome), 2) Same direction — fast/slow (linked list cycle, remove duplicates), 3) Sliding window — expand/contract window (max sum subarray, longest substring without repeating). Time: usually O(n). Key: maintain invariant while moving pointers.', 1.3)
+
+  // ── Best Practices Library ──
+  add('practices', ['typescript best practice', 'strict mode', 'tsconfig'],
+    'TypeScript best practices: Enable strict mode in tsconfig.json (strict: true). Use interfaces for object shapes, type aliases for unions/intersections. Prefer readonly for immutable data. Use discriminated unions for state machines. Avoid \'any\' — use \'unknown\' for truly unknown types. Use zod/io-ts for runtime validation matching compile-time types.', 1.3)
+
+  add('practices', ['api design', 'rest best practice', 'api versioning'],
+    'REST API best practices: 1) Use nouns for resources (/users, /posts), 2) HTTP methods for actions (GET read, POST create, PUT replace, PATCH update, DELETE remove), 3) Status codes (201 Created, 204 No Content, 400 Bad Request, 422 Unprocessable), 4) Version APIs (/v1/, /v2/), 5) Pagination (cursor-based), 6) HATEOAS for discoverability.', 1.2)
+
+  add('practices', ['error response', 'api error', 'rfc 7807', 'problem details'],
+    'API Error Responses (RFC 7807 Problem Details): { type: "uri", title: "string", status: number, detail: "string", instance: "uri" }. Standardize error format across APIs. Include: correlation ID for tracing, validation errors as array, machine-readable error codes. Never expose stack traces or internal details in production.', 1.2)
+
+  add('practices', ['owasp', 'top 10', 'security checklist', 'web security'],
+    'OWASP Top 10: 1) Broken Access Control, 2) Cryptographic Failures, 3) Injection (SQL, XSS, command), 4) Insecure Design, 5) Security Misconfiguration, 6) Vulnerable Components, 7) Authentication Failures, 8) Data Integrity Failures, 9) Logging/Monitoring Failures, 10) Server-Side Request Forgery (SSRF). Regular security audits, dependency scanning, penetration testing.', 1.3)
+
+  add('practices', ['password security', 'bcrypt', 'argon2', 'hash password'],
+    'Password security: Never store plaintext passwords. Use: bcrypt (most common, work factor 12+), argon2id (best, memory-hard), scrypt (alternative). Always add salt (built into bcrypt/argon2). Password requirements: minimum 8 chars, check against breach databases (HaveIBeenPwned API), no maximum length limit, allow all characters.', 1.3)
+
+  add('practices', ['jwt best practice', 'token security', 'refresh token'],
+    'JWT security: Short-lived access tokens (15 min), long-lived refresh tokens (7 days) stored in httpOnly cookies. Never store JWTs in localStorage (XSS risk). Use RS256 or ES256 (asymmetric) in production, HS256 only for simple cases. Validate: signature, expiration, issuer, audience. Rotation: refresh token rotation with reuse detection.', 1.3)
+
+  add('practices', ['database optimization', 'query optimization', 'index strategy'],
+    'Database optimization: 1) Add indexes on WHERE/JOIN/ORDER BY columns, 2) Use EXPLAIN ANALYZE to find slow queries, 3) Avoid SELECT * — list needed columns, 4) Use connection pooling, 5) Normalize for writes, denormalize for reads, 6) Partition large tables, 7) Use read replicas for scaling reads, 8) Cache hot data in Redis.', 1.2)
+
+  add('practices', ['code review best practice', 'pull request', 'pr review'],
+    'Code review best practices: 1) Keep PRs small (<400 lines), 2) Write descriptive PR titles and descriptions, 3) Review for: correctness, readability, security, performance, tests, 4) Be constructive — suggest alternatives, 5) Use "nit:" for minor suggestions, 6) Approve with minor comments, request changes for blocking issues. Automate: linting, formatting, type checking.', 1.2)
+
+  add('practices', ['clean architecture', 'hexagonal', 'onion', 'domain driven'],
+    'Clean Architecture: Dependencies point inward (domain → use cases → interfaces → infrastructure). Layers: Entity (business rules), Use Case (application logic), Interface Adapter (controllers, presenters), Infrastructure (DB, frameworks). Benefits: testable, framework-independent, technology-agnostic. Related: Hexagonal (ports + adapters), Onion Architecture.', 1.2)
+
+  add('practices', ['functional programming', 'pure function', 'immutability', 'composition'],
+    'Functional programming patterns: Pure functions (same input → same output, no side effects), Immutability (never mutate, return new data), Composition (pipe/compose small functions), Higher-order functions (map, filter, reduce), Currying/Partial application, Monads (Maybe/Option for null safety, Either/Result for error handling). Benefits: testable, predictable, parallelizable.', 1.2)
+
+  // ── Common Libraries ──
+  add('libraries', ['axios', 'fetch', 'http client', 'request library'],
+    'HTTP clients: fetch (built-in, low-level, no auto-JSON, AbortController for cancellation), axios (interceptors, auto-JSON, request/response transforms, progress tracking, timeout, cancel tokens). ky: fetch wrapper with retries. got: Node.js only, streams. Best: fetch for simple, axios for complex with interceptors/retry logic.', 1.1)
+
+  add('libraries', ['zod', 'joi', 'yup', 'validation library', 'schema validation'],
+    'Validation libraries: Zod (TypeScript-first, infers types, composable, no dependencies), Joi (mature, extensive, enterprise), Yup (form validation, integrates with Formik). Zod example: const User = z.object({ name: z.string().min(1), age: z.number().positive() }). Use z.infer<typeof User> for TypeScript types. Validate: User.parse(data) or User.safeParse(data).', 1.2)
+
+  add('libraries', ['lodash', 'ramda', 'utility library', 'helper functions'],
+    'Utility libraries: Lodash (most popular — debounce, throttle, cloneDeep, groupBy, uniqBy), Ramda (functional, auto-curried, immutable). Modern alternatives: native JS (Array.flat, Object.entries, structuredClone), es-toolkit (lightweight modern Lodash). Import individual functions to reduce bundle: import debounce from \'lodash/debounce\'.', 1.0)
+
+  add('libraries', ['winston', 'pino', 'bunyan', 'logging library'],
+    'Logging libraries: Pino (fastest, JSON-only, low overhead — best for production), Winston (flexible, multiple transports, custom formats), Bunyan (JSON, child loggers). Best practices: structured logging (JSON), log levels (error > warn > info > debug), correlation IDs, don\'t log PII. Format: { timestamp, level, message, context, requestId }.', 1.1)
+
+  add('libraries', ['socket.io', 'ws', 'websocket library'],
+    'WebSocket libraries: ws (lightweight, Node.js only, raw WebSocket), Socket.io (fallback transport, rooms/namespaces, auto-reconnect, broadcasting). Socket.io: io.on("connection", socket => { socket.on("event", cb); socket.emit("event", data); }). Scaling: use Redis adapter for multi-server. Alternative: SSE for server→client only.', 1.1)
+
+  // ── Additional Languages & Tools ──
+  add('programming', ['scala', 'akka', 'functional jvm'],
+    'Scala: JVM language combining OOP + FP. Key features: pattern matching, case classes, traits, implicit conversions, for-comprehensions, futures, type system. Tools: sbt (build), Akka (actor model), Play (web framework). Best practices: prefer val over var, use Option instead of null, leverage pattern matching for control flow.', 0.9)
+
+  add('programming', ['elixir', 'phoenix', 'erlang', 'beam'],
+    'Elixir: Functional language on the BEAM VM (Erlang). Key features: pattern matching, pipes (|>), processes (lightweight concurrency), supervisors (fault tolerance), OTP. Framework: Phoenix (real-time web). Best practices: use pattern matching for control flow, leverage GenServer for stateful processes, Phoenix LiveView for interactive UIs.', 0.9)
+
+  add('programming', ['dart', 'flutter', 'mobile cross platform'],
+    'Dart/Flutter: Cross-platform mobile/web/desktop framework. Dart features: null safety, async/await, mixins, extensions, named parameters. Flutter: widget tree, StatelessWidget/StatefulWidget, Provider/Riverpod for state, hot reload. Best practices: prefer const constructors, use key for lists, separate UI and logic.', 1.0)
+
+  add('programming', ['zig', 'systems language', 'manual memory'],
+    'Zig: Low-level systems language. No hidden control flow, no hidden allocations, no garbage collector. Key features: comptime (compile-time execution), optional types, error unions, C interop. Competes with C/Rust for systems programming. Best for: performance-critical code, replacing C, embedded systems.', 0.8)
+
+  add('programming', ['wasm', 'webassembly', 'wasi', 'browser performance'],
+    'WebAssembly (Wasm): Binary instruction format for browser/server. Near-native speed. Compile from: C/C++, Rust, Go, AssemblyScript. Use cases: compute-heavy tasks (image processing, games, crypto), running existing C/Rust code in browser. Tools: wasm-pack (Rust), Emscripten (C/C++). WASI: WebAssembly System Interface for server-side.', 1.0)
+
+  // ── Design Patterns (expanded) ──
+  add('patterns', ['repository pattern', 'data access', 'persistence layer'],
+    'Repository Pattern: Abstracts data storage behind an interface. Interface defines methods (findById, save, delete), implementation handles specific storage (PostgreSQL, MongoDB, memory). Benefits: swap databases without changing business logic, easy to mock in tests, centralizes query logic. Use with: dependency injection, unit of work pattern.', 1.2)
+
+  add('patterns', ['dependency injection', 'ioc', 'inversion of control'],
+    'Dependency Injection: Pass dependencies to a class instead of creating them internally. Types: constructor injection (preferred), property injection, method injection. Benefits: testable (inject mocks), flexible (swap implementations), follows Open/Closed principle. Containers: InversifyJS (TS), Spring (Java), .NET DI. Use interfaces for abstractions.', 1.2)
+
+  add('patterns', ['event sourcing', 'cqrs', 'event driven architecture'],
+    'Event Sourcing: Store state as sequence of events, not current state. Replay events to reconstruct state. CQRS: separate read/write models — write side handles commands/events, read side optimized for queries. Benefits: complete audit trail, temporal queries, event replay. Challenges: eventual consistency, event schema evolution, projection management.', 1.1)
+
+  add('patterns', ['circuit breaker', 'retry', 'resilience pattern', 'bulkhead'],
+    'Resilience patterns: Circuit Breaker (stop calling failing service — closed→open→half-open), Retry with exponential backoff (2^n * base + jitter), Bulkhead (isolate failures), Timeout (fail fast), Fallback (graceful degradation). Libraries: resilience4j (Java), polly (.NET), cockatiel (TS). Essential for microservices.', 1.2)
+
+  add('patterns', ['pub sub', 'message queue', 'event bus', 'message broker'],
+    'Message patterns: Pub/Sub (publish to topic, many subscribers receive), Message Queue (point-to-point, one consumer processes), Event Bus (in-process pub/sub). Tools: RabbitMQ (AMQP, routing), Kafka (distributed log, high throughput), Redis Pub/Sub (simple, no persistence), SQS (AWS managed). Choose based on: ordering needs, delivery guarantees, throughput.', 1.2)
+
+  // ── Testing (expanded) ──
+  add('testing', ['jest', 'vitest', 'mocha', 'testing framework'],
+    'JS Testing frameworks: Jest (batteries-included, snapshots, coverage, mocking), Vitest (Vite-native, fast, Jest-compatible API, ESM-first), Mocha (flexible, BYO assertion/mocking). Vitest is recommended for Vite projects. Key APIs: describe/it/expect, beforeEach/afterEach, vi.mock/vi.fn (Vitest), jest.mock/jest.fn (Jest).', 1.2)
+
+  add('testing', ['mock', 'stub', 'spy', 'test double', 'fake'],
+    'Test doubles: Mock (verifies interactions — was function called with these args?), Stub (returns predetermined responses), Spy (wraps real function, records calls), Fake (simplified implementation — in-memory database). Use mocks sparingly — prefer testing behavior over implementation. Mock external dependencies (APIs, databases, file system).', 1.2)
+
+  add('testing', ['playwright', 'cypress', 'e2e testing', 'end to end'],
+    'E2E testing: Playwright (multi-browser, auto-wait, API testing, codegen), Cypress (developer-friendly, time-travel debugging, component testing). Playwright: page.goto(), page.click(), page.fill(), expect(locator).toBeVisible(). Best practices: use page objects, test user flows not implementation, keep E2E tests few and meaningful.', 1.2)
+
+  add('testing', ['property based testing', 'fuzzing', 'generative testing'],
+    'Property-based testing: Generate random inputs, verify properties hold. fast-check (JS): fc.assert(fc.property(fc.string(), s => reverse(reverse(s)) === s)). Hypothesis (Python). Benefits: finds edge cases humans miss, tests invariants. Properties: roundtrip (encode→decode), idempotency, commutativity, invariants (sorted output is sorted).', 1.1)
+
+  // ── Performance & Optimization ──
+  add('performance', ['web vitals', 'lcp', 'fid', 'cls', 'core web vitals'],
+    'Core Web Vitals: LCP (Largest Contentful Paint < 2.5s — optimize images, preload fonts, SSR), INP (Interaction to Next Paint < 200ms — break long tasks, use web workers), CLS (Cumulative Layout Shift < 0.1 — set image dimensions, avoid injected content, use transform for animations). Measure with: Lighthouse, PageSpeed Insights, web-vitals library.', 1.2)
+
+  add('performance', ['lazy loading', 'code splitting', 'tree shaking', 'bundle size'],
+    'Bundle optimization: Code splitting (dynamic import() — load on demand), Tree shaking (remove unused exports — use ESM), Lazy loading (React.lazy + Suspense), Image optimization (next/image, sharp, WebP/AVIF). Analyze: webpack-bundle-analyzer, vite-plugin-inspect. Targets: <200KB initial JS, <100ms TTI. Compression: gzip/brotli.', 1.2)
+
+  add('performance', ['caching strategy', 'cache control', 'etag', 'stale while revalidate'],
+    'HTTP Caching: Cache-Control headers (max-age, s-maxage, stale-while-revalidate, no-cache, no-store, immutable), ETag (conditional requests), Last-Modified. Strategy: immutable assets with hash in filename (cache forever), API responses with stale-while-revalidate, HTML with no-cache. CDN: cache at edge, purge on deploy.', 1.2)
+
+  add('performance', ['database pool', 'connection pooling', 'pgbouncer', 'pool size'],
+    'Connection pooling: Reuse database connections instead of creating new ones per request. Tools: pg-pool (Node.js), HikariCP (Java), pgBouncer (PostgreSQL proxy). Config: pool size = CPU cores * 2 + disk spindles (typically 10-20). Monitor: active/idle/waiting connections. Serverless: use RDS Proxy, PlanetScale, or Neon serverless drivers.', 1.1)
+
+  // ── Modern Web ──
+  add('web', ['typescript 5', 'decorators', 'const type', 'satisfies'],
+    'TypeScript 5 features: Decorators (stage 3, no experimentalDecorators), const type parameters, satisfies operator (validate type without widening), verbatimModuleSyntax (explicit type imports), moduleResolution: bundler (for modern bundlers). Use: const T extends readonly string[] for literal inference, satisfies for config objects.', 1.1)
+
+  add('web', ['bun', 'deno', 'runtime', 'alternative nodejs'],
+    'JS runtimes: Node.js (established, huge ecosystem, CommonJS + ESM), Bun (fast, built-in bundler/test runner/package manager, Node.js compatible), Deno (secure by default, built-in TypeScript, web standard APIs, npm compatibility). Bun for: speed-critical, all-in-one tooling. Deno for: security, modern standards. Node for: ecosystem, stability.', 1.1)
+
+  add('web', ['htmx', 'server driven', 'hypermedia', 'progressive enhancement'],
+    'HTMX: Add AJAX behavior with HTML attributes. hx-get/post (HTTP requests), hx-trigger (events), hx-target (update element), hx-swap (how to insert). No JavaScript needed for most interactions. Server returns HTML fragments. Benefits: simplicity, progressive enhancement, less JS. Good for: CRUD apps, admin panels, server-rendered sites.', 1.0)
+
+  add('web', ['astro', 'islands', 'static site', 'content driven'],
+    'Astro: Content-driven web framework. Islands architecture: static HTML + interactive components only where needed. Zero JS by default. Supports: React, Vue, Svelte, Solid components. Features: content collections, MDX, SSG/SSR, view transitions. Best for: blogs, docs, marketing sites, content-heavy sites. Ships minimal JavaScript.', 1.0)
 
   return entries
 }
@@ -713,6 +1126,11 @@ function toCamelCase(phrase: string): string {
     .split(/[\s_-]+/)
     .map((word, i) => i === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join('')
+}
+
+/** Check if text appears to contain code. */
+function code_likeContent(text: string): boolean {
+  return /[\{\}\[\];]|=>|function\s|class\s|def\s|import\s|const\s|let\s|var\s/.test(text)
 }
 
 /** Infer function parameters from description. */
@@ -1145,6 +1563,16 @@ export class LocalBrain {
   private tfidfScorer: TfIdfScorer
   private learningsSinceLastSave = 0
 
+  // ── Agent Intelligence ──
+  private conversationContext: ConversationContext = {
+    currentFile: null, currentFunction: null, currentProject: null,
+    currentLanguage: null, topicStack: [], facts: [],
+  }
+  private userPreferences: UserPreferences = {
+    indentation: 'spaces-2', quotes: 'single', semicolons: false,
+    naming: 'camelCase', preferredLibraries: {}, lastUpdated: new Date().toISOString(),
+  }
+
   // ── CodeMaster sub-modules (offline intelligence) ──
   private codeAnalyzer: CodeAnalyzer
   private codeReviewer: CodeReviewer
@@ -1181,7 +1609,9 @@ export class LocalBrain {
       totalChats: 0, totalCodeGenerations: 0, totalCodeReviews: 0,
       totalCodeAnalyses: 0, totalCodeFixes: 0, totalDecompositions: 0,
       totalImageAnalyses: 0, totalLearnings: 0, patternsLearned: 0,
-      knowledgeEntriesAdded: 0, createdAt: now, lastUsedAt: now,
+      knowledgeEntriesAdded: 0, totalCodeCompletions: 0, totalCodeExplanations: 0,
+      totalMultiStepReasons: 0, totalMultiFileGenerations: 0,
+      createdAt: now, lastUsedAt: now,
     }
 
     // Auto-load persisted brain state if path configured and file exists
@@ -1482,6 +1912,659 @@ export class LocalBrain {
   deepReview(code: string, language?: string): CodeReviewOutput {
     const lang = language as AnalysisLanguage | undefined
     return this.codeReviewer.review(code, lang)
+  }
+
+  // ── Code Completion (Phase 1) ──
+
+  /**
+   * Complete partial code based on context and cursor position.
+   * Analyzes the surrounding code to predict what comes next.
+   */
+  completeCode(partialCode: string, cursorPosition?: number): CodeCompletionResult {
+    this.stats.totalCodeCompletions++
+    this.stats.lastUsedAt = new Date().toISOString()
+
+    const pos = cursorPosition ?? partialCode.length
+    const before = partialCode.slice(0, pos)
+    const after = partialCode.slice(pos)
+    const lines = before.split('\n')
+    const currentLine = lines[lines.length - 1] ?? ''
+    const trimmed = currentLine.trim()
+
+    let insertion = ''
+    let confidence = 0.6
+    let explanation = ''
+
+    // Detect language from code context
+    const langHints = this.detectLanguageFromCode(partialCode)
+
+    // Pattern: incomplete function signature
+    if (/function\s+\w+\s*\([^)]*$/.test(trimmed)) {
+      insertion = ') {\n  \n}'
+      explanation = 'Completed function signature with body'
+      confidence = 0.8
+    }
+    // Pattern: arrow function start
+    else if (/=>\s*$/.test(trimmed) || /=>\s*\{\s*$/.test(trimmed)) {
+      insertion = trimmed.endsWith('{') ? '\n  return \n}' : '{\n  return \n}'
+      explanation = 'Completed arrow function body'
+      confidence = 0.7
+    }
+    // Pattern: if/else/for/while without body
+    else if (/\b(if|else if|for|while|else)\b.*\)\s*$/.test(trimmed)) {
+      insertion = ' {\n  \n}'
+      explanation = 'Added block body for control structure'
+      confidence = 0.8
+    }
+    // Pattern: class declaration
+    else if (/class\s+\w+(\s+extends\s+\w+)?\s*$/.test(trimmed)) {
+      insertion = ' {\n  constructor() {\n    \n  }\n}'
+      explanation = 'Completed class with constructor'
+      confidence = 0.7
+    }
+    // Pattern: interface/type with opening brace
+    else if (/(?:interface|type)\s+\w+\s*(?:=\s*)?\{\s*$/.test(trimmed)) {
+      insertion = '\n  \n}'
+      explanation = 'Added closing brace for type definition'
+      confidence = 0.8
+    }
+    // Pattern: import statement start
+    else if (/^import\s+\{\s*$/.test(trimmed)) {
+      insertion = ' } from \'\''
+      explanation = 'Completed import statement structure'
+      confidence = 0.6
+    }
+    // Pattern: return statement with nothing
+    else if (/return\s*$/.test(trimmed)) {
+      insertion = ' null'
+      explanation = 'Added default return value'
+      confidence = 0.4
+    }
+    // Pattern: try without catch
+    else if (/try\s*\{\s*$/.test(trimmed) || (before.includes('try {') && !before.includes('catch'))) {
+      const lastBrace = before.lastIndexOf('}')
+      if (lastBrace === before.length - 1 || trimmed === '}') {
+        insertion = ' catch (error) {\n  console.error(error)\n}'
+        explanation = 'Added catch block for try statement'
+        confidence = 0.7
+      }
+    }
+    // Pattern: switch without case
+    else if (/switch\s*\([^)]+\)\s*\{\s*$/.test(trimmed)) {
+      insertion = '\n  case \'\':\n    break\n  default:\n    break\n}'
+      explanation = 'Added case structure for switch'
+      confidence = 0.6
+    }
+    // Pattern: array/object literal opening
+    else if (/(?:const|let|var)\s+\w+\s*=\s*\[\s*$/.test(trimmed)) {
+      insertion = '\n  \n]'
+      explanation = 'Closed array literal'
+      confidence = 0.7
+    }
+    else if (/(?:const|let|var)\s+\w+\s*=\s*\{\s*$/.test(trimmed)) {
+      insertion = '\n  \n}'
+      explanation = 'Closed object literal'
+      confidence = 0.7
+    }
+    // Pattern: Python def without body
+    else if (/def\s+\w+\([^)]*\)\s*:\s*$/.test(trimmed)) {
+      insertion = '\n    pass'
+      explanation = 'Added Python function body placeholder'
+      confidence = 0.7
+    }
+    // Pattern: Python class without body
+    else if (/class\s+\w+.*:\s*$/.test(trimmed) && langHints === 'python') {
+      insertion = '\n    def __init__(self):\n        pass'
+      explanation = 'Added Python class constructor'
+      confidence = 0.7
+    }
+    // Fallback: try to close open brackets
+    else {
+      const opens = (before.match(/[\{\[\(]/g) ?? []).length
+      const closes = (before.match(/[\}\]\)]/g) ?? []).length
+      if (opens > closes) {
+        const diff = opens - closes
+        const closers = before.lastIndexOf('{') > before.lastIndexOf('[') ? '}' : ']'
+        insertion = closers.repeat(diff)
+        explanation = `Closed ${diff} open bracket(s)`
+        confidence = 0.5
+      } else {
+        insertion = '\n'
+        explanation = 'No clear completion pattern detected'
+        confidence = 0.2
+      }
+    }
+
+    return {
+      completedCode: before + insertion + after,
+      insertion,
+      confidence,
+      explanation,
+    }
+  }
+
+  // ── Code Explanation (Phase 4) ──
+
+  /**
+   * Explain what a piece of code does, its complexity, and potential issues.
+   * Produces clear, structured explanations.
+   */
+  explainCode(code: string, language?: string): CodeExplanationResult {
+    this.stats.totalCodeExplanations++
+    this.stats.lastUsedAt = new Date().toISOString()
+
+    const lang = language ?? this.detectLanguageFromCode(code)
+    const lines = code.split('\n')
+    const steps: string[] = []
+    const issues: string[] = []
+    const concepts: string[] = []
+
+    // Run deep analysis
+    const analysis = this.codeAnalyzer.analyze(code, lang as AnalysisLanguage)
+
+    // Build summary from analysis
+    let summary = `This is a ${lang} code block with ${lines.length} lines.`
+
+    // Detect structures
+    const functionMatches = code.match(/(?:function|def|fn|func)\s+(\w+)/g) ?? []
+    const classMatches = code.match(/(?:class|struct|interface)\s+(\w+)/g) ?? []
+    const importMatches = code.match(/(?:import|require|use|include|from)\b/g) ?? []
+
+    if (functionMatches.length > 0) {
+      steps.push(`Defines ${functionMatches.length} function(s): ${functionMatches.map(f => f.split(/\s+/)[1]).join(', ')}`)
+      concepts.push('functions')
+    }
+    if (classMatches.length > 0) {
+      steps.push(`Defines ${classMatches.length} class(es): ${classMatches.map(c => c.split(/\s+/)[1]).join(', ')}`)
+      concepts.push('classes')
+    }
+    if (importMatches.length > 0) {
+      steps.push(`Has ${importMatches.length} import(s)/dependency references`)
+      concepts.push('modules')
+    }
+
+    // Detect patterns
+    if (/async|await|Promise|then\(/.test(code)) {
+      concepts.push('async programming')
+      steps.push('Uses asynchronous operations (async/await or Promises)')
+    }
+    if (/try\s*\{[\s\S]*catch/.test(code)) {
+      concepts.push('error handling')
+      steps.push('Includes try/catch error handling')
+    }
+    if (/\.(map|filter|reduce|forEach)\(/.test(code)) {
+      concepts.push('functional programming')
+      steps.push('Uses functional array methods (map/filter/reduce)')
+    }
+    if (/for\s*\(|while\s*\(|\.forEach\(/.test(code)) {
+      concepts.push('iteration')
+      steps.push('Contains loops/iteration')
+    }
+    if (/if\s*\(|switch\s*\(|\?.*:/.test(code)) {
+      concepts.push('conditionals')
+      steps.push('Contains conditional logic')
+    }
+    if (/export|module\.exports/.test(code)) {
+      concepts.push('module exports')
+      steps.push('Exports functionality for use by other modules')
+    }
+
+    // Check for issues
+    if (analysis.smells.length > 0) {
+      for (const smell of analysis.smells.slice(0, 3)) {
+        issues.push(`Code smell: ${smell.type} — ${smell.description}`)
+      }
+    }
+    if (analysis.security.length > 0) {
+      for (const sec of analysis.security.slice(0, 3)) {
+        issues.push(`Security: ${sec.type} (${sec.severity}) — ${sec.description}`)
+      }
+    }
+    if (analysis.antiPatterns.length > 0) {
+      for (const ap of analysis.antiPatterns.slice(0, 3)) {
+        issues.push(`Anti-pattern: ${ap.name} — ${ap.description}`)
+      }
+    }
+
+    // Update summary with what was found
+    const parts = []
+    if (functionMatches.length > 0) parts.push(`${functionMatches.length} function(s)`)
+    if (classMatches.length > 0) parts.push(`${classMatches.length} class(es)`)
+    if (parts.length > 0) summary += ` It contains ${parts.join(' and ')}.`
+    if (issues.length > 0) summary += ` Found ${issues.length} potential issue(s).`
+    else summary += ' No significant issues detected.'
+
+    return {
+      summary,
+      steps,
+      complexity: analysis.complexity.cyclomaticComplexity > 10
+        ? `High (cyclomatic complexity: ${analysis.complexity.cyclomaticComplexity})`
+        : analysis.complexity.cyclomaticComplexity > 5
+          ? `Medium (cyclomatic complexity: ${analysis.complexity.cyclomaticComplexity})`
+          : `Low (cyclomatic complexity: ${analysis.complexity.cyclomaticComplexity})`,
+      issues,
+      language: lang,
+      concepts,
+    }
+  }
+
+  // ── Multi-Step Reasoning (Phase 4) ──
+
+  /**
+   * Solve a problem using chain-of-thought: decompose → plan → generate → review → refine.
+   */
+  async reason(question: string): Promise<ReasoningResult> {
+    const start = Date.now()
+    this.stats.totalMultiStepReasons++
+    this.stats.lastUsedAt = new Date().toISOString()
+
+    const steps: ReasoningStep[] = []
+
+    // Step 1: Decompose the problem
+    const keywords = extractKeywords(question)
+    const intent = detectIntent(question)
+    steps.push({
+      type: 'decompose',
+      description: 'Analyzing the question and identifying key components',
+      output: `Intent: ${intent}. Keywords: ${keywords.slice(0, 10).join(', ')}`,
+    })
+
+    // Step 2: Plan approach
+    const knowledgeResults = searchKnowledge(this.knowledgeBase, keywords, 5)
+    const relevantKnowledge = knowledgeResults.map(r => r.entry.content).join('\n')
+    steps.push({
+      type: 'plan',
+      description: 'Searching knowledge base and planning response',
+      output: `Found ${knowledgeResults.length} relevant knowledge entries`,
+    })
+
+    // Step 3: Generate initial answer
+    let answer = buildResponse(intent, question, knowledgeResults, this.learnedPatterns, this.conversationHistory, this.config.creativity)
+    steps.push({
+      type: 'generate',
+      description: 'Generating initial response based on knowledge',
+      output: answer.slice(0, 200) + (answer.length > 200 ? '...' : ''),
+    })
+
+    // Step 4: Self-review — check if answer addresses the question
+    const answerKeywords = extractKeywords(answer)
+    const questionCoverage = keywords.filter(k => answerKeywords.some(ak => ak.includes(k) || k.includes(ak))).length / Math.max(keywords.length, 1)
+
+    steps.push({
+      type: 'review',
+      description: 'Self-reviewing response quality',
+      output: `Question coverage: ${Math.round(questionCoverage * 100)}%. Knowledge entries used: ${knowledgeResults.length}`,
+    })
+
+    // Step 5: Refine if coverage is low
+    if (questionCoverage < 0.3 && knowledgeResults.length > 1) {
+      // Combine multiple knowledge entries for a more comprehensive answer
+      const combined = knowledgeResults.slice(0, 3).map(r => r.entry.content).join('\n\n')
+      answer = `Here's what I know about this topic:\n\n${combined}`
+      steps.push({
+        type: 'refine',
+        description: 'Enriching response with additional knowledge',
+        output: 'Combined multiple knowledge entries for comprehensive answer',
+      })
+    }
+
+    // Update conversation context
+    this.updateConversationContext(question, answer)
+
+    const confidence = Math.min(1, (questionCoverage * 0.5) + (knowledgeResults.length > 0 ? 0.3 : 0) + (knowledgeResults.length > 2 ? 0.2 : 0))
+
+    return {
+      answer,
+      steps,
+      confidence,
+      durationMs: Date.now() - start,
+    }
+  }
+
+  // ── Multi-File Code Generation (Phase 1) ──
+
+  /**
+   * Generate multiple related files together (e.g., component + test + types).
+   */
+  async generateMultiFile(description: string, language: ProgrammingLanguage, fileTypes?: string[]): Promise<MultiFileResult> {
+    this.stats.totalMultiFileGenerations++
+    this.stats.lastUsedAt = new Date().toISOString()
+
+    const types = fileTypes ?? this.inferFileTypes(description)
+    const files: GeneratedFile[] = []
+    const name = toCamelCase(extractMainSubject(description))
+    const pascalName = name.charAt(0).toUpperCase() + name.slice(1)
+
+    for (const fileType of types) {
+      let filename = ''
+      let desc = description
+      let lang = language
+
+      switch (fileType) {
+        case 'component': {
+          filename = language === 'typescript' ? `${pascalName}.tsx` : `${pascalName}.jsx`
+          desc = `React component for ${description}`
+          break
+        }
+        case 'test': {
+          filename = language === 'typescript' ? `${pascalName}.test.ts` : `${pascalName}.test.js`
+          desc = `Unit tests for ${description}`
+          break
+        }
+        case 'types': {
+          filename = `${pascalName}.types.ts`
+          desc = `TypeScript types/interfaces for ${description}`
+          lang = 'typescript'
+          break
+        }
+        case 'styles': {
+          filename = `${pascalName}.module.css`
+          desc = `CSS module styles for ${description}`
+          lang = 'css'
+          break
+        }
+        case 'hook': {
+          filename = `use${pascalName}.ts`
+          desc = `Custom React hook for ${description}`
+          break
+        }
+        case 'api': {
+          filename = language === 'typescript' ? `${name}.api.ts` : `${name}.api.js`
+          desc = `API route handler for ${description}`
+          break
+        }
+        case 'model': {
+          filename = language === 'typescript' ? `${name}.model.ts` : `${name}.model.js`
+          desc = `Data model for ${description}`
+          break
+        }
+        case 'service': {
+          filename = language === 'typescript' ? `${name}.service.ts` : `${name}.service.js`
+          desc = `Service layer for ${description}`
+          break
+        }
+        default: {
+          filename = language === 'typescript' ? `${name}.ts` : `${name}.js`
+          break
+        }
+      }
+
+      const result = generateCodeLocally({ description: desc, language: lang, style: 'production' })
+      files.push({
+        filename,
+        content: result.code,
+        language: lang,
+        lines: result.linesOfCode,
+      })
+    }
+
+    const totalLines = files.reduce((sum, f) => sum + f.lines, 0)
+    return {
+      files,
+      totalLines,
+      explanation: `Generated ${files.length} files (${totalLines} total lines) for: ${description}. Files: ${files.map(f => f.filename).join(', ')}`,
+    }
+  }
+
+  // ── Refactoring Suggestions (Phase 2) ──
+
+  /**
+   * Detect code smells and suggest refactored versions.
+   */
+  suggestRefactorings(code: string, language?: string): RefactoringSuggestion[] {
+    const lang = (language ?? this.detectLanguageFromCode(code)) as AnalysisLanguage
+    const analysis = this.codeAnalyzer.analyze(code, lang)
+    const suggestions: RefactoringSuggestion[] = []
+    const lines = code.split('\n')
+
+    // Check for long methods
+    const funcStarts: { name: string; start: number; end: number }[] = []
+    let braceCount = 0
+    let currentFunc = ''
+    let funcStart = -1
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!
+      const funcMatch = line.match(/(?:function|def|fn|func|async\s+function)\s+(\w+)/)
+      if (funcMatch) {
+        currentFunc = funcMatch[1]!
+        funcStart = i
+      }
+      braceCount += (line.match(/\{/g) ?? []).length - (line.match(/\}/g) ?? []).length
+      if (funcStart >= 0 && braceCount === 0 && i > funcStart) {
+        funcStarts.push({ name: currentFunc, start: funcStart, end: i })
+        funcStart = -1
+      }
+    }
+
+    for (const func of funcStarts) {
+      const length = func.end - func.start + 1
+      if (length > 30) {
+        suggestions.push({
+          smell: 'Long Method',
+          location: `lines ${func.start + 1}-${func.end + 1}`,
+          description: `Function '${func.name}' is ${length} lines long`,
+          suggestion: 'Extract logical sections into smaller helper functions. Each function should do one thing well.',
+          priority: length > 60 ? 'high' : 'medium',
+        })
+      }
+    }
+
+    // Check for magic numbers
+    const magicNumberPattern = /(?<!["\w])(?<!\.)(\d{2,})(?!\d)(?!["\w])/g
+    const seenNumbers = new Set<string>()
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!
+      if (/^\s*\/\/|^\s*#|^\s*\*/.test(line)) continue // skip comments
+      let match
+      while ((match = magicNumberPattern.exec(line)) !== null) {
+        const num = match[1]!
+        if (!seenNumbers.has(num) && !['100', '1000', '10'].includes(num)) {
+          seenNumbers.add(num)
+          suggestions.push({
+            smell: 'Magic Number',
+            location: `line ${i + 1}`,
+            description: `Magic number ${num} found — unclear meaning`,
+            suggestion: `Extract to a named constant: const MEANINGFUL_NAME = ${num}`,
+            priority: 'low',
+          })
+          break // one per line is enough
+        }
+      }
+    }
+
+    // Check for deep nesting
+    let maxNesting = 0
+    let nestLevel = 0
+    let maxNestLine = 0
+    for (let i = 0; i < lines.length; i++) {
+      const leadingSpaces = (lines[i]!.match(/^(\s*)/) ?? [''])[0]!.length
+      const indent = leadingSpaces / 2 // assume 2-space indent
+      if (indent > maxNesting) {
+        maxNesting = indent
+        maxNestLine = i + 1
+      }
+    }
+    if (maxNesting >= 4) {
+      suggestions.push({
+        smell: 'Deep Nesting',
+        location: `line ${maxNestLine}`,
+        description: `Code is nested ${maxNesting} levels deep`,
+        suggestion: 'Use early returns (guard clauses), extract inner logic into functions, or use strategy pattern',
+        priority: maxNesting >= 6 ? 'high' : 'medium',
+      })
+    }
+
+    // Check for duplicate code patterns (simple)
+    const lineGroups = new Map<string, number[]>()
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i]!.trim()
+      if (trimmed.length > 20 && !trimmed.startsWith('//') && !trimmed.startsWith('#') && !trimmed.startsWith('*')) {
+        const existing = lineGroups.get(trimmed) ?? []
+        existing.push(i + 1)
+        lineGroups.set(trimmed, existing)
+      }
+    }
+    for (const [line, positions] of lineGroups) {
+      if (positions.length >= 3) {
+        suggestions.push({
+          smell: 'Duplicate Code',
+          location: `lines ${positions.join(', ')}`,
+          description: `Same code appears ${positions.length} times: "${line.slice(0, 60)}..."`,
+          suggestion: 'Extract duplicated code into a reusable function',
+          priority: 'medium',
+        })
+        break // report first duplicate only
+      }
+    }
+
+    // Check for God class (from CodeAnalyzer)
+    for (const smell of analysis.smells) {
+      if (smell.type === 'god-class' || smell.type === 'large-class') {
+        suggestions.push({
+          smell: 'God Class',
+          location: `entire file`,
+          description: smell.description,
+          suggestion: 'Split into multiple classes with single responsibilities. Use composition over inheritance.',
+          priority: 'high',
+        })
+      }
+    }
+
+    return suggestions.sort((a, b) => {
+      const pri = { high: 0, medium: 1, low: 2 }
+      return pri[a.priority] - pri[b.priority]
+    })
+  }
+
+  // ── Conversation Memory (Phase 4) ──
+
+  /** Get the current conversation context (what the brain remembers about the session). */
+  getConversationContext(): Readonly<ConversationContext> {
+    return { ...this.conversationContext }
+  }
+
+  /** Get user preferences (learned coding style). */
+  getUserPreferences(): Readonly<UserPreferences> {
+    return { ...this.userPreferences }
+  }
+
+  /** Update user preference for coding style. */
+  setUserPreference<K extends keyof UserPreferences>(key: K, value: UserPreferences[K]): void {
+    this.userPreferences[key] = value
+    this.userPreferences.lastUpdated = new Date().toISOString()
+  }
+
+  // ── Active Learning (Phase 5) ──
+
+  /**
+   * Assess confidence for a question. If low, returns clarifying questions instead of guessing.
+   * Returns null if confident enough to answer, or an array of clarifying questions if not.
+   */
+  assessConfidence(question: string): { confident: boolean; score: number; clarifyingQuestions?: string[] } {
+    const keywords = extractKeywords(question)
+    const knowledgeResults = searchKnowledge(this.knowledgeBase, keywords, 3)
+    const patternMatch = findBestLearnedPattern(question, this.learnedPatterns)
+
+    // Calculate confidence
+    let score = 0
+    if (knowledgeResults.length > 0) score += Math.min(knowledgeResults[0]!.score / 5, 0.5)
+    if (patternMatch) score += patternMatch.confidence * 0.5
+
+    if (score >= 0.5) {
+      return { confident: true, score }
+    }
+
+    // Generate clarifying questions
+    const clarifyingQuestions: string[] = []
+    if (keywords.length < 2) {
+      clarifyingQuestions.push('Could you provide more details about what you\'re looking for?')
+    }
+    if (!this.conversationContext.currentLanguage) {
+      clarifyingQuestions.push('Which programming language are you working with?')
+    }
+    if (/\b(fix|bug|error|issue)\b/i.test(question) && !code_likeContent(question)) {
+      clarifyingQuestions.push('Could you share the code that\'s causing the issue?')
+      clarifyingQuestions.push('What error message are you seeing?')
+    }
+    if (/\b(best|better|should|recommend)\b/i.test(question)) {
+      clarifyingQuestions.push('What are your specific requirements or constraints?')
+    }
+    if (clarifyingQuestions.length === 0) {
+      clarifyingQuestions.push('Could you rephrase or provide more context for your question?')
+    }
+
+    return { confident: false, score, clarifyingQuestions }
+  }
+
+  // ── Private helpers for new features ──
+
+  /** Detect language from code content heuristically. */
+  private detectLanguageFromCode(code: string): string {
+    if (/\bfn\s+\w+\s*\(/.test(code) && /->/.test(code)) return 'rust'
+    if (/\bfunc\s+\w+\s*\(/.test(code) && /\bpackage\b/.test(code)) return 'go'
+    if (/\bdef\s+\w+\s*\(/.test(code) && /:\s*$/.test(code.split('\n')[0] ?? '')) return 'python'
+    if (/\binterface\b|\btype\b.*=.*\{/.test(code) && /:\s*(string|number|boolean)/.test(code)) return 'typescript'
+    if (/\bclass\b.*\bextends\b/.test(code) && /public\s+(static\s+)?void/.test(code)) return 'java'
+    if (/import\s+\w+\s+from/.test(code) || /const\s+\w+\s*=/.test(code)) return 'typescript'
+    if (/\bvar\s+\w+\b/.test(code) && /\bfmt\./.test(code)) return 'go'
+    if (/\blet\b|\bconst\b|\bvar\b/.test(code)) return 'javascript'
+    return 'unknown'
+  }
+
+  /** Infer which file types to generate based on description. */
+  private inferFileTypes(description: string): string[] {
+    const lower = description.toLowerCase()
+    const types: string[] = []
+
+    if (/\b(component|ui|widget|view)\b/.test(lower)) {
+      types.push('component', 'test', 'types', 'styles')
+    } else if (/\b(api|endpoint|route|handler)\b/.test(lower)) {
+      types.push('api', 'test', 'types')
+    } else if (/\b(model|entity|schema)\b/.test(lower)) {
+      types.push('model', 'test', 'types')
+    } else if (/\b(service|manager|provider)\b/.test(lower)) {
+      types.push('service', 'test', 'types')
+    } else if (/\b(hook|use\w+)\b/.test(lower)) {
+      types.push('hook', 'test')
+    } else {
+      types.push('component', 'test')
+    }
+
+    return types
+  }
+
+  /** Update conversation context from the current exchange. */
+  private updateConversationContext(userMessage: string, _response: string): void {
+    // Detect file references
+    const fileMatch = userMessage.match(/(?:file|in)\s+["`']?(\w+\.\w+)["`']?/i)
+    if (fileMatch) this.conversationContext.currentFile = fileMatch[1]!
+
+    // Detect function references
+    const funcMatch = userMessage.match(/(?:function|method|def)\s+["`']?(\w+)["`']?/i)
+    if (funcMatch) this.conversationContext.currentFunction = funcMatch[1]!
+
+    // Detect language references
+    const langPatterns: [RegExp, string][] = [
+      [/\btypescript\b|\bts\b/i, 'typescript'], [/\bjavascript\b|\bjs\b/i, 'javascript'],
+      [/\bpython\b|\bpy\b/i, 'python'], [/\brust\b/i, 'rust'], [/\bgo\b|\bgolang\b/i, 'go'],
+      [/\bjava\b/i, 'java'], [/\bc#\b|\bcsharp\b/i, 'csharp'], [/\bc\+\+\b|\bcpp\b/i, 'cpp'],
+    ]
+    for (const [pattern, lang] of langPatterns) {
+      if (pattern.test(userMessage)) {
+        this.conversationContext.currentLanguage = lang
+        break
+      }
+    }
+
+    // Track topics
+    const keywords = extractKeywords(userMessage)
+    const topic = keywords.slice(0, 3).join(' ')
+    if (topic && !this.conversationContext.topicStack.includes(topic)) {
+      this.conversationContext.topicStack.push(topic)
+      if (this.conversationContext.topicStack.length > 20) {
+        this.conversationContext.topicStack.shift()
+      }
+    }
   }
 
   // ── Image Analysis (same interface as AiBrain.analyzeImage) ──

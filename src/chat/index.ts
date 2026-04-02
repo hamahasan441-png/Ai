@@ -195,6 +195,15 @@ export type {
   LocalBrainStats,
   LearnedPatternPriority,
   PatternConflict,
+  CodeCompletionResult,
+  CodeExplanationResult,
+  ReasoningResult,
+  ReasoningStep,
+  MultiFileResult,
+  GeneratedFile,
+  UserPreferences,
+  ConversationContext,
+  RefactoringSuggestion,
 } from './LocalBrain.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
