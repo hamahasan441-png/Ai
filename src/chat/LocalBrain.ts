@@ -2110,17 +2110,17 @@ export class LocalBrain {
     }
 
     // Check for issues
-    if (analysis.smells.length > 0) {
+    if (analysis?.smells?.length > 0) {
       for (const smell of analysis.smells.slice(0, 3)) {
         issues.push(`Code smell: ${smell.type} — ${smell.description}`)
       }
     }
-    if (analysis.security.length > 0) {
+    if (analysis?.security?.length > 0) {
       for (const sec of analysis.security.slice(0, 3)) {
         issues.push(`Security: ${sec.type} (${sec.severity}) — ${sec.description}`)
       }
     }
-    if (analysis.antiPatterns.length > 0) {
+    if (analysis?.antiPatterns?.length > 0) {
       for (const ap of analysis.antiPatterns.slice(0, 3)) {
         issues.push(`Anti-pattern: ${ap.name} — ${ap.description}`)
       }
@@ -2137,11 +2137,11 @@ export class LocalBrain {
     return {
       summary,
       steps,
-      complexity: analysis.complexity.cyclomaticComplexity > 10
-        ? `High (cyclomatic complexity: ${analysis.complexity.cyclomaticComplexity})`
-        : analysis.complexity.cyclomaticComplexity > 5
-          ? `Medium (cyclomatic complexity: ${analysis.complexity.cyclomaticComplexity})`
-          : `Low (cyclomatic complexity: ${analysis.complexity.cyclomaticComplexity})`,
+      complexity: (analysis?.complexity?.cyclomaticComplexity ?? 0) > 10
+        ? `High (cyclomatic complexity: ${analysis?.complexity?.cyclomaticComplexity ?? 0})`
+        : (analysis?.complexity?.cyclomaticComplexity ?? 0) > 5
+          ? `Medium (cyclomatic complexity: ${analysis?.complexity?.cyclomaticComplexity ?? 0})`
+          : `Low (cyclomatic complexity: ${analysis?.complexity?.cyclomaticComplexity ?? 0})`,
       issues,
       language: lang,
       concepts,
@@ -2418,7 +2418,7 @@ export class LocalBrain {
     }
 
     // Check for God class (from CodeAnalyzer)
-    for (const smell of analysis.smells) {
+    for (const smell of analysis?.smells ?? []) {
       if (smell.type === 'god-class' || smell.type === 'large-class') {
         suggestions.push({
           smell: 'God Class',
