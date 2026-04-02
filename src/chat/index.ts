@@ -374,6 +374,76 @@ export type {
 } from './TopicModeler.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// COGNITIVE INTELLIGENCE — Higher-order reasoning modules (src/chat/)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Causal Reasoner — Graph-based causal analysis and counterfactual reasoning ──
+export { CausalReasoner } from './CausalReasoner.js'
+
+export type {
+  CausalReasonerConfig,
+  CausalReasonerStats,
+  CausalNode,
+  CausalEdge,
+  CausalGraph,
+  CausalChain,
+  CounterfactualResult,
+  RootCauseResult,
+  CausalInference,
+  InterventionResult,
+} from './CausalReasoner.js'
+
+// ── Abstraction Engine — Concept abstraction and generalization ──
+export { AbstractionEngine, createProgrammingAbstractionEngine } from './AbstractionEngine.js'
+
+export type {
+  AbstractionEngineConfig,
+  AbstractionEngineStats,
+  AbstractionLevel,
+  ConceptHierarchy,
+  AbstractConcept,
+  GeneralizationResult,
+  SpecializationResult,
+  PatternAbstraction,
+  AbstractionMapping,
+  PrototypeEntry,
+} from './AbstractionEngine.js'
+
+// ── Planning Engine — Goal-directed planning and dependency analysis ──
+export { PlanningEngine } from './PlanningEngine.js'
+
+export type {
+  PlanningEngineConfig,
+  PlanningEngineStats,
+  Goal,
+  PlanStep,
+  Plan,
+  PlanEvaluation,
+  ResourceConstraint,
+  PlanOptimization,
+  Milestone,
+  DependencyGraph,
+  PlanComparison,
+} from './PlanningEngine.js'
+
+// ── Creative Engine — Creative thinking and lateral reasoning ──
+export { CreativeEngine } from './CreativeEngine.js'
+
+export type {
+  CreativeEngineConfig,
+  CreativeEngineStats,
+  CreativeIdea,
+  BrainstormResult,
+  LateralThinkingResult,
+  Metaphor,
+  CreativeCombination,
+  ReframingResult,
+  InspirationSource,
+  CreativeConstraint,
+  IdeaEvolution,
+} from './CreativeEngine.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './TfIdfScorer.js'
