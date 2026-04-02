@@ -64,6 +64,12 @@ import { SemanticMemory, createProgrammingKnowledgeGraph } from './SemanticMemor
 import { SemanticTrainer } from './SemanticTrainer.js'
 import { AnalogicalReasoner } from './AnalogicalReasoner.js'
 import { TopicModeler } from './TopicModeler.js'
+
+// Cognitive intelligence modules (Phase 3)
+import { CausalReasoner } from './CausalReasoner.js'
+import { AbstractionEngine, createProgrammingAbstractionEngine } from './AbstractionEngine.js'
+import { PlanningEngine } from './PlanningEngine.js'
+import { CreativeEngine } from './CreativeEngine.js'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1608,6 +1614,12 @@ export class LocalBrain {
   private analogicalReasoner: AnalogicalReasoner | null = null
   private topicModeler: TopicModeler | null = null
 
+  // ── Cognitive intelligence modules (higher-order reasoning) ──
+  private causalReasoner: CausalReasoner | null = null
+  private abstractionEngine: AbstractionEngine | null = null
+  private planningEngine: PlanningEngine | null = null
+  private creativeEngine: CreativeEngine | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1646,6 +1658,12 @@ export class LocalBrain {
       this.semanticTrainer = new SemanticTrainer()
       this.analogicalReasoner = new AnalogicalReasoner()
       this.topicModeler = new TopicModeler()
+
+      // Cognitive intelligence modules (higher-order reasoning)
+      this.causalReasoner = new CausalReasoner()
+      this.abstractionEngine = createProgrammingAbstractionEngine()
+      this.planningEngine = new PlanningEngine()
+      this.creativeEngine = new CreativeEngine()
     }
 
     const now = new Date().toISOString()
@@ -3029,6 +3047,18 @@ export class LocalBrain {
   /** Get the TopicModeler instance (null if intelligence modules are disabled). */
   getTopicModeler(): TopicModeler | null { return this.topicModeler }
 
+  /** Get the CausalReasoner instance (null if intelligence modules are disabled). */
+  getCausalReasoner(): CausalReasoner | null { return this.causalReasoner }
+
+  /** Get the AbstractionEngine instance (null if intelligence modules are disabled). */
+  getAbstractionEngine(): AbstractionEngine | null { return this.abstractionEngine }
+
+  /** Get the PlanningEngine instance (null if intelligence modules are disabled). */
+  getPlanningEngine(): PlanningEngine | null { return this.planningEngine }
+
+  /** Get the CreativeEngine instance (null if intelligence modules are disabled). */
+  getCreativeEngine(): CreativeEngine | null { return this.creativeEngine }
+
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
 
@@ -3046,12 +3076,22 @@ export class LocalBrain {
     analogyPatterns: number
     topicModelerTopics: number
     topicModelerDocuments: number
+    causalGraphsBuilt: number
+    causalInferences: number
+    abstractionConcepts: number
+    abstractionDepth: number
+    plansCreated: number
+    avgPlanConfidence: number
+    totalBrainstorms: number
+    totalIdeasGenerated: number
   } {
     if (!this.config.enableIntelligence) {
       return {
         enabled: false, contextTurns: 0, contextTopicCount: 0, knowledgeGaps: 0, calibrationAccuracy: null,
         semanticMemoryNodes: 0, semanticMemoryEdges: 0, trainerVocabularySize: 0, trainerCurrentDomain: null,
         analogyPatterns: 0, topicModelerTopics: 0, topicModelerDocuments: 0,
+        causalGraphsBuilt: 0, causalInferences: 0, abstractionConcepts: 0, abstractionDepth: 0,
+        plansCreated: 0, avgPlanConfidence: 0, totalBrainstorms: 0, totalIdeasGenerated: 0,
       }
     }
 
@@ -3061,6 +3101,10 @@ export class LocalBrain {
     const trainerStats = this.semanticTrainer?.getStats() ?? null
     const analogyStats = this.analogicalReasoner?.getStats() ?? null
     const topicStats = this.topicModeler?.getStats() ?? null
+    const causalStats = this.causalReasoner?.getStats() ?? null
+    const abstractionStats = this.abstractionEngine?.getStats() ?? null
+    const planningStats = this.planningEngine?.getStats() ?? null
+    const creativeStats = this.creativeEngine?.getStats() ?? null
 
     return {
       enabled: true,
@@ -3075,6 +3119,14 @@ export class LocalBrain {
       analogyPatterns: analogyStats?.patternsLearned ?? 0,
       topicModelerTopics: topicStats?.totalTopics ?? 0,
       topicModelerDocuments: topicStats?.totalDocuments ?? 0,
+      causalGraphsBuilt: causalStats?.totalGraphsBuilt ?? 0,
+      causalInferences: causalStats?.totalInferences ?? 0,
+      abstractionConcepts: abstractionStats?.conceptCount ?? 0,
+      abstractionDepth: abstractionStats?.hierarchyDepth ?? 0,
+      plansCreated: planningStats?.totalPlansCreated ?? 0,
+      avgPlanConfidence: planningStats?.avgConfidence ?? 0,
+      totalBrainstorms: creativeStats?.totalBrainstorms ?? 0,
+      totalIdeasGenerated: creativeStats?.totalIdeasGenerated ?? 0,
     }
   }
 
@@ -3096,6 +3148,10 @@ export class LocalBrain {
     if (this.semanticTrainer) advancedState.semanticTrainer = this.semanticTrainer.serialize()
     if (this.analogicalReasoner) advancedState.analogicalReasoner = this.analogicalReasoner.serialize()
     if (this.topicModeler) advancedState.topicModeler = this.topicModeler.serialize()
+    if (this.causalReasoner) advancedState.causalReasoner = this.causalReasoner.serialize()
+    if (this.abstractionEngine) advancedState.abstractionEngine = this.abstractionEngine.serialize()
+    if (this.planningEngine) advancedState.planningEngine = this.planningEngine.serialize()
+    if (this.creativeEngine) advancedState.creativeEngine = this.creativeEngine.serialize()
 
     return JSON.stringify({ ...state, advancedIntelligence: advancedState })
   }
@@ -3132,6 +3188,18 @@ export class LocalBrain {
       }
       if (advanced.topicModeler) {
         try { brain.topicModeler = TopicModeler.deserialize(advanced.topicModeler) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.causalReasoner) {
+        try { brain.causalReasoner = CausalReasoner.deserialize(advanced.causalReasoner) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.abstractionEngine) {
+        try { brain.abstractionEngine = AbstractionEngine.deserialize(advanced.abstractionEngine) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.planningEngine) {
+        try { brain.planningEngine = PlanningEngine.deserialize(advanced.planningEngine) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.creativeEngine) {
+        try { brain.creativeEngine = CreativeEngine.deserialize(advanced.creativeEngine) } catch { /* ignore corrupted state */ }
       }
     }
 
