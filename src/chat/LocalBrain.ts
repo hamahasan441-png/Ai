@@ -3260,11 +3260,17 @@ export class LocalBrain {
    * Useful for backup, transfer, or sharing learned knowledge.
    */
   exportBrain(filePath: string): void {
-    const dir = path.dirname(filePath)
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true })
+    try {
+      const dir = path.dirname(filePath)
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+      }
+      fs.writeFileSync(filePath, this.serializeBrain(), 'utf-8')
+    } catch (e) {
+      throw new Error(
+        `Failed to export brain to ${filePath}: ${e instanceof Error ? e.message : String(e)}`,
+      )
     }
-    fs.writeFileSync(filePath, this.serializeBrain(), 'utf-8')
   }
 
   /**

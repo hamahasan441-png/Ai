@@ -967,10 +967,14 @@ async function saveFacets(facets: SessionFacets): Promise<void> {
     // Directory may already exist
   }
   const facetPath = join(getFacetsDir(), `${facets.session_id}.json`)
-  await writeFile(facetPath, jsonStringify(facets, null, 2), {
-    encoding: 'utf-8',
-    mode: 0o600,
-  })
+  try {
+    await writeFile(facetPath, jsonStringify(facets, null, 2), {
+      encoding: 'utf-8',
+      mode: 0o600,
+    })
+  } catch (e) {
+    logError(toError(e))
+  }
 }
 
 async function loadCachedSessionMeta(
@@ -992,10 +996,14 @@ async function saveSessionMeta(meta: SessionMeta): Promise<void> {
     // Directory may already exist
   }
   const metaPath = join(getSessionMetaDir(), `${meta.session_id}.json`)
-  await writeFile(metaPath, jsonStringify(meta, null, 2), {
-    encoding: 'utf-8',
-    mode: 0o600,
-  })
+  try {
+    await writeFile(metaPath, jsonStringify(meta, null, 2), {
+      encoding: 'utf-8',
+      mode: 0o600,
+    })
+  } catch (e) {
+    logError(toError(e))
+  }
 }
 
 async function extractFacetsFromAPI(
@@ -3008,10 +3016,14 @@ export async function generateUsageReport(options?: {
   }
 
   const htmlPath = join(getDataDir(), 'report.html')
-  await writeFile(htmlPath, htmlReport, {
-    encoding: 'utf-8',
-    mode: 0o600,
-  })
+  try {
+    await writeFile(htmlPath, htmlReport, {
+      encoding: 'utf-8',
+      mode: 0o600,
+    })
+  } catch (e) {
+    logError(toError(e))
+  }
 
   return {
     insights,
