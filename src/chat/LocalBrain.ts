@@ -1373,6 +1373,7 @@ export class LocalBrain {
     for (const finding of cmReview.findings) {
       const msg = finding.title.toLowerCase()
       if (!existingMessages.has(msg)) {
+        existingMessages.add(msg)
         const severity = finding.severity === 'critical' || finding.severity === 'high'
           ? 'error' as const
           : finding.severity === 'medium'

@@ -599,7 +599,7 @@ function process(data) {
     })
 
     it('responds to CI/CD questions', async () => {
-      const result = await brain.chat('What is a CI CD pipeline?')
+      const result = await brain.chat('What is a CI/CD pipeline?')
       expect(result.text.length).toBeGreaterThan(0)
     })
 
