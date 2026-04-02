@@ -195,7 +195,54 @@ export type {
   LocalBrainStats,
   LearnedPatternPriority,
   PatternConflict,
+  CodeCompletionResult,
+  CodeExplanationResult,
+  ReasoningResult,
+  ReasoningStep,
+  MultiFileResult,
+  GeneratedFile,
+  UserPreferences,
+  ConversationContext,
+  RefactoringSuggestion,
 } from './LocalBrain.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CODEMASTER — Deep code intelligence sub-modules (src/chat/codemaster/)
+// ══════════════════════════════════════════════════════════════════════════════
+export { CodeAnalyzer } from './codemaster/CodeAnalyzer.js'
+export { CodeReviewer } from './codemaster/CodeReviewer.js'
+export { CodeFixer } from './codemaster/CodeFixer.js'
+export { ProblemDecomposer } from './codemaster/ProblemDecomposer.js'
+export { LearningEngine } from './codemaster/LearningEngine.js'
+
+export type {
+  Severity,
+  AnalysisLanguage,
+  AnalysisDepth,
+  ComplexityMetrics,
+  AntiPattern,
+  DependencyInfo,
+  CodeSmell,
+  SecurityIssue,
+  CodeAnalysis,
+  ReviewCategory,
+  ReviewFinding,
+  ReviewSummary,
+  CodeFix,
+  CodeReviewOutput,
+  FixResult,
+  TaskIntent,
+  StepStatus,
+  TaskStep,
+  TaskPlan,
+  ReviewPattern,
+  FixPattern,
+  LearningStats,
+  SecurityCheckLevel,
+  CodeMasterBrainConfig,
+  CodeMasterBrainStats,
+  CodeMasterBrainState,
+} from './codemaster/types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
