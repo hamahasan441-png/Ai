@@ -409,6 +409,28 @@ export type {
   MarketSummary,
 } from './MarketAnalyzer.js'
 
+// ── Portfolio Optimizer — Portfolio optimization and risk management ──
+export { PortfolioOptimizer } from './PortfolioOptimizer.js'
+
+export type {
+  PortfolioOptimizerConfig,
+  PortfolioOptimizerStats,
+  Asset,
+  Portfolio,
+  EfficientFrontierPoint,
+  OptimizationResult,
+  StressTestResult,
+  RiskAssessment,
+  RiskProfile,
+  AllocationEntry,
+  AllocationRecommendation,
+  RebalanceTrade,
+  PositionSize,
+  RecoveryPeriod,
+  DrawdownAnalysis,
+  PerformanceAttribution,
+} from './PortfolioOptimizer.js'
+
 // ── Abstraction Engine — Concept abstraction and generalization ──
 export { AbstractionEngine, createProgrammingAbstractionEngine } from './AbstractionEngine.js'
 
