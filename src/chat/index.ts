@@ -431,6 +431,23 @@ export type {
   PerformanceAttribution,
 } from './PortfolioOptimizer.js'
 
+// ── Strategy Engine — Trading strategy generation, backtesting, and optimization ──
+export { StrategyEngine } from './StrategyEngine.js'
+
+export type {
+  StrategyEngineConfig,
+  StrategyEngineStats,
+  StrategyRule,
+  Strategy,
+  BacktestResult,
+  TradeRecord,
+  SignalEvent,
+  RiskRule,
+  StrategyComparison,
+  MonteCarloResult,
+  OptimizationResult,
+} from './StrategyEngine.js'
+
 // ── Abstraction Engine — Concept abstraction and generalization ──
 export { AbstractionEngine, createProgrammingAbstractionEngine } from './AbstractionEngine.js'
 
