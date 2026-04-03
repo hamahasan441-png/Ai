@@ -160,7 +160,7 @@ function mean(values: number[]): number {
 function stddev(values: number[]): number {
   if (values.length < 2) return 0;
   const avg = mean(values);
-  const variance = values.reduce((s, v) => s + (v - avg) ** 2, 0) / values.length;
+  const variance = values.reduce((s, v) => s + (v - avg) ** 2, 0) / (values.length - 1);
   return Math.sqrt(variance);
 }
 
@@ -475,7 +475,7 @@ export class TradingEngine {
       if (range > 0 && upperShadow > body * 2 && lowerShadow < body * 0.5) {
         patterns.push({
           name: 'Inverted Hammer',
-          type: 'bearish',
+          type: 'bullish',
           confidence: round2(clamp(upperShadow / range, 0.5, 0.95)),
           position: i,
         });
@@ -626,8 +626,8 @@ export class TradingEngine {
 
     // Sortino Ratio (downside deviation only)
     const downsideReturns = returns.filter(r => r < dailyRiskFree);
-    const downsideDev = downsideReturns.length > 0
-      ? Math.sqrt(downsideReturns.reduce((s, r) => s + (r - dailyRiskFree) ** 2, 0) / downsideReturns.length)
+    const downsideDev = downsideReturns.length > 1
+      ? Math.sqrt(downsideReturns.reduce((s, r) => s + (r - dailyRiskFree) ** 2, 0) / (downsideReturns.length - 1))
       : 0;
     const annualizedDownside = downsideDev * Math.sqrt(252);
     const sortino = annualizedDownside > 0
