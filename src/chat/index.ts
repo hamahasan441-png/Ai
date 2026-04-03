@@ -445,7 +445,7 @@ export type {
   RiskRule,
   StrategyComparison,
   MonteCarloResult,
-  OptimizationResult,
+  StrategyOptimizationResult,
 } from './StrategyEngine.js'
 
 // ── Abstraction Engine — Concept abstraction and generalization ──

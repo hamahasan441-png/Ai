@@ -123,7 +123,7 @@ export interface MonteCarloResult {
   stdReturn: number;
 }
 
-export interface OptimizationResult {
+export interface StrategyOptimizationResult {
   bestParameters: Record<string, number>;
   performanceSurface: Array<{ params: Record<string, number>; sharpe: number }>;
   walkForwardResults: Array<{ window: number; inSampleSharpe: number; outSampleSharpe: number }>;
@@ -595,7 +595,7 @@ export class StrategyEngine {
     prices: number[],
     paramRanges: Record<string, { min: number; max: number; step: number }>,
     volumes?: number[],
-  ): OptimizationResult {
+  ): StrategyOptimizationResult {
     const paramNames = Object.keys(paramRanges);
     const paramCombinations = this.generateParamGrid(paramRanges);
     const performanceSurface: Array<{ params: Record<string, number>; sharpe: number }> = [];
@@ -612,7 +612,7 @@ export class StrategyEngine {
 
     // Walk-forward validation
     const windowSize = Math.floor(prices.length / (this.config.walkForwardWindows + 1));
-    const walkForwardResults: OptimizationResult['walkForwardResults'] = [];
+    const walkForwardResults: StrategyOptimizationResult['walkForwardResults'] = [];
 
     for (let w = 0; w < this.config.walkForwardWindows; w++) {
       const inStart = w * windowSize;
