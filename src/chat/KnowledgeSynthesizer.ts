@@ -9,7 +9,7 @@
  * ║     • Combine knowledge from multiple domains into unified insights         ║
  * ║     • Detect contradictions across knowledge sources                        ║
  * ║     • Generate non-obvious connections between concepts                     ║
- * ║     • Analyse gaps in a knowledge base                                      ║
+ * ║     • Analyze gaps in a knowledge base                                      ║
  * ║     • Synthesize comprehensive summaries from multiple inputs               ║
  * ║     • Map concepts from one domain to another                               ║
  * ║     • Weigh and aggregate evidence from multiple sources                    ║
@@ -435,8 +435,8 @@ export class KnowledgeSynthesizer {
     return insights;
   }
 
-  /** Analyse knowledge gaps relative to a reference set of areas. */
-  analyseKnowledgeGaps(
+  /** Analyze knowledge gaps relative to a reference set of areas. */
+  analyzeKnowledgeGaps(
     sources?: KnowledgeSource[],
     referenceAreas?: string[],
   ): KnowledgeGapResult {
