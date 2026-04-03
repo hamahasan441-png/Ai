@@ -393,6 +393,22 @@ export type {
   InterventionResult,
 } from './CausalReasoner.js'
 
+// ── Market Analyzer — Comprehensive market analysis with multi-signal processing ──
+export { MarketAnalyzer } from './MarketAnalyzer.js'
+
+export type {
+  MarketAnalyzerConfig,
+  MarketAnalyzerStats,
+  SentimentResult,
+  TrendResult,
+  VolatilityResult,
+  CorrelationMatrix,
+  MarketBreadth,
+  NewsImpact,
+  AnomalyResult,
+  MarketSummary,
+} from './MarketAnalyzer.js'
+
 // ── Abstraction Engine — Concept abstraction and generalization ──
 export { AbstractionEngine, createProgrammingAbstractionEngine } from './AbstractionEngine.js'
 
