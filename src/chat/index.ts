@@ -499,6 +499,103 @@ export type {
 } from './CreativeEngine.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// TRADING & FINANCIAL INTELLIGENCE (src/chat/)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Trading Engine — Technical analysis, indicators, and signal generation ──
+export { TradingEngine } from './TradingEngine.js'
+
+export type {
+  TradingEngineConfig,
+  TradingEngineStats,
+  OHLCV,
+  TechnicalIndicators,
+  TradeSignal,
+  TrendAnalysis,
+  CandlestickPattern,
+  ChartPattern,
+  RiskMetrics,
+  MarketRegime,
+} from './TradingEngine.js'
+
+// ── Decision Engine — Multi-criteria decision making, Bayesian inference, game theory ──
+export { DecisionEngine } from './DecisionEngine.js'
+
+export type {
+  DecisionEngineConfig,
+  DecisionEngineStats,
+  Alternative,
+  Criterion,
+  MCDAResult,
+  BayesianBelief,
+  BayesianUpdate,
+  GameMatrix,
+  DecisionNode,
+  DecisionTreeResult,
+  ProspectEvaluation,
+  SensitivityResult,
+  GroupDecision,
+  DecisionRecord,
+} from './DecisionEngine.js'
+
+// ── Knowledge Synthesizer — Cross-domain knowledge fusion and insight generation ──
+export { KnowledgeSynthesizer } from './KnowledgeSynthesizer.js'
+
+export type {
+  KnowledgeSynthesizerConfig,
+  KnowledgeSynthesizerStats,
+  KnowledgeSource,
+  FusionResult,
+  Contradiction,
+  Insight,
+  KnowledgeGapResult,
+  SynthesizedSummary,
+  DomainMapping,
+  EvidenceAggregation,
+} from './KnowledgeSynthesizer.js'
+
+// ── Economic Analyzer — Macroeconomic analysis and forecasting ──
+export { EconomicAnalyzer } from './EconomicAnalyzer.js'
+
+export type {
+  EconomicAnalyzerConfig,
+  EconomicAnalyzerStats,
+  EconomicIndicator,
+  EconomicSnapshot,
+  BusinessCycle,
+  MonetaryPolicyAnalysis,
+  FiscalPolicyAnalysis,
+  InflationForecast,
+  CurrencyAnalysis,
+  YieldCurveAnalysis,
+  EconomicReport,
+  SectorAnalysis,
+  MacroScenario,
+} from './EconomicAnalyzer.js'
+
+// ── Security Trainer — Cybersecurity training, pen-testing, and CTF challenges ──
+export { SecurityTrainer } from './SecurityTrainer.js'
+
+export type {
+  SecurityTrainerConfig,
+  SecurityTrainerStats,
+  VulnerabilityInfo,
+  PenTestScenario,
+  PenTestPhase,
+  NetworkAnalysis,
+  WebVulnerability,
+  CryptoChallenge,
+  SocialEngineering,
+  CTFChallenge,
+  ExploitTechnique,
+  SecurityAudit,
+  AuditFinding,
+  IncidentResponse,
+  SecuritySkillAssessment,
+  TrainingModule,
+} from './SecurityTrainer.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './TfIdfScorer.js'

@@ -77,6 +77,16 @@ import type {
 
 import { LearningEngine } from './codemaster/LearningEngine.js'
 
+// Trading & intelligence module type imports
+import type { TradingEngine } from './TradingEngine.js'
+import type { MarketAnalyzer } from './MarketAnalyzer.js'
+import type { PortfolioOptimizer } from './PortfolioOptimizer.js'
+import type { StrategyEngine } from './StrategyEngine.js'
+import type { DecisionEngine } from './DecisionEngine.js'
+import type { KnowledgeSynthesizer } from './KnowledgeSynthesizer.js'
+import type { EconomicAnalyzer } from './EconomicAnalyzer.js'
+import type { SecurityTrainer } from './SecurityTrainer.js'
+
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §1  TYPES — Configuration, state, and interfaces for DevBrain               ║
 // ╚═══════════════════════════════════════════════════════════════════════════════╝
@@ -951,6 +961,50 @@ export class DevBrain implements BrainInterface {
    */
   getKnowledgeBaseSize(): number {
     return this.localBrain.getKnowledgeBaseSize()
+  }
+
+  // ╔═══════════════════════════════════════════════════════════════════════════╗
+  // ║  Trading & Intelligence Module Delegation                                ║
+  // ╚═══════════════════════════════════════════════════════════════════════════╝
+
+  /** Get the TradingEngine instance. Delegates to LocalBrain. */
+  getTradingEngine(): TradingEngine | null {
+    return this.localBrain.getTradingEngine()
+  }
+
+  /** Get the MarketAnalyzer instance. Delegates to LocalBrain. */
+  getMarketAnalyzer(): MarketAnalyzer | null {
+    return this.localBrain.getMarketAnalyzer()
+  }
+
+  /** Get the PortfolioOptimizer instance. Delegates to LocalBrain. */
+  getPortfolioOptimizer(): PortfolioOptimizer | null {
+    return this.localBrain.getPortfolioOptimizer()
+  }
+
+  /** Get the StrategyEngine instance. Delegates to LocalBrain. */
+  getStrategyEngine(): StrategyEngine | null {
+    return this.localBrain.getStrategyEngine()
+  }
+
+  /** Get the DecisionEngine instance. Delegates to LocalBrain. */
+  getDecisionEngine(): DecisionEngine | null {
+    return this.localBrain.getDecisionEngine()
+  }
+
+  /** Get the KnowledgeSynthesizer instance. Delegates to LocalBrain. */
+  getKnowledgeSynthesizer(): KnowledgeSynthesizer | null {
+    return this.localBrain.getKnowledgeSynthesizer()
+  }
+
+  /** Get the EconomicAnalyzer instance. Delegates to LocalBrain. */
+  getEconomicAnalyzer(): EconomicAnalyzer | null {
+    return this.localBrain.getEconomicAnalyzer()
+  }
+
+  /** Get the SecurityTrainer instance. Delegates to LocalBrain. */
+  getSecurityTrainer(): SecurityTrainer | null {
+    return this.localBrain.getSecurityTrainer()
   }
 
   // ╔═══════════════════════════════════════════════════════════════════════════╗

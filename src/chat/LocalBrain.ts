@@ -70,6 +70,17 @@ import { CausalReasoner } from './CausalReasoner.js'
 import { AbstractionEngine, createProgrammingAbstractionEngine } from './AbstractionEngine.js'
 import { PlanningEngine } from './PlanningEngine.js'
 import { CreativeEngine } from './CreativeEngine.js'
+
+// Trading & financial intelligence modules (Phase 4)
+import { TradingEngine } from './TradingEngine.js'
+import { MarketAnalyzer } from './MarketAnalyzer.js'
+import { PortfolioOptimizer } from './PortfolioOptimizer.js'
+import { StrategyEngine } from './StrategyEngine.js'
+import { DecisionEngine } from './DecisionEngine.js'
+import { KnowledgeSynthesizer } from './KnowledgeSynthesizer.js'
+import { EconomicAnalyzer } from './EconomicAnalyzer.js'
+import { SecurityTrainer } from './SecurityTrainer.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1620,6 +1631,16 @@ export class LocalBrain {
   private planningEngine: PlanningEngine | null = null
   private creativeEngine: CreativeEngine | null = null
 
+  // ── Trading & financial intelligence modules (Phase 4) ──
+  private tradingEngine: TradingEngine | null = null
+  private marketAnalyzer: MarketAnalyzer | null = null
+  private portfolioOptimizer: PortfolioOptimizer | null = null
+  private strategyEngine: StrategyEngine | null = null
+  private decisionEngine: DecisionEngine | null = null
+  private knowledgeSynthesizer: KnowledgeSynthesizer | null = null
+  private economicAnalyzer: EconomicAnalyzer | null = null
+  private securityTrainer: SecurityTrainer | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1664,6 +1685,16 @@ export class LocalBrain {
       this.abstractionEngine = createProgrammingAbstractionEngine()
       this.planningEngine = new PlanningEngine()
       this.creativeEngine = new CreativeEngine()
+
+      // Trading & financial intelligence modules (Phase 4)
+      this.tradingEngine = new TradingEngine()
+      this.marketAnalyzer = new MarketAnalyzer()
+      this.portfolioOptimizer = new PortfolioOptimizer()
+      this.strategyEngine = new StrategyEngine()
+      this.decisionEngine = new DecisionEngine()
+      this.knowledgeSynthesizer = new KnowledgeSynthesizer()
+      this.economicAnalyzer = new EconomicAnalyzer()
+      this.securityTrainer = new SecurityTrainer()
     }
 
     const now = new Date().toISOString()
@@ -3059,6 +3090,30 @@ export class LocalBrain {
   /** Get the CreativeEngine instance (null if intelligence modules are disabled). */
   getCreativeEngine(): CreativeEngine | null { return this.creativeEngine }
 
+  /** Get the TradingEngine instance (null if intelligence modules are disabled). */
+  getTradingEngine(): TradingEngine | null { return this.tradingEngine }
+
+  /** Get the MarketAnalyzer instance (null if intelligence modules are disabled). */
+  getMarketAnalyzer(): MarketAnalyzer | null { return this.marketAnalyzer }
+
+  /** Get the PortfolioOptimizer instance (null if intelligence modules are disabled). */
+  getPortfolioOptimizer(): PortfolioOptimizer | null { return this.portfolioOptimizer }
+
+  /** Get the StrategyEngine instance (null if intelligence modules are disabled). */
+  getStrategyEngine(): StrategyEngine | null { return this.strategyEngine }
+
+  /** Get the DecisionEngine instance (null if intelligence modules are disabled). */
+  getDecisionEngine(): DecisionEngine | null { return this.decisionEngine }
+
+  /** Get the KnowledgeSynthesizer instance (null if intelligence modules are disabled). */
+  getKnowledgeSynthesizer(): KnowledgeSynthesizer | null { return this.knowledgeSynthesizer }
+
+  /** Get the EconomicAnalyzer instance (null if intelligence modules are disabled). */
+  getEconomicAnalyzer(): EconomicAnalyzer | null { return this.economicAnalyzer }
+
+  /** Get the SecurityTrainer instance (null if intelligence modules are disabled). */
+  getSecurityTrainer(): SecurityTrainer | null { return this.securityTrainer }
+
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
 
@@ -3084,6 +3139,16 @@ export class LocalBrain {
     avgPlanConfidence: number
     totalBrainstorms: number
     totalIdeasGenerated: number
+    tradingAnalyses: number
+    tradingSignals: number
+    marketSentimentAnalyses: number
+    portfolioOptimizations: number
+    strategyBacktests: number
+    decisionsAnalyzed: number
+    knowledgeFusions: number
+    economicForecasts: number
+    securityTrainingSessions: number
+    securityChallengesGenerated: number
   } {
     if (!this.config.enableIntelligence) {
       return {
@@ -3092,6 +3157,9 @@ export class LocalBrain {
         analogyPatterns: 0, topicModelerTopics: 0, topicModelerDocuments: 0,
         causalGraphsBuilt: 0, causalInferences: 0, abstractionConcepts: 0, abstractionDepth: 0,
         plansCreated: 0, avgPlanConfidence: 0, totalBrainstorms: 0, totalIdeasGenerated: 0,
+        tradingAnalyses: 0, tradingSignals: 0, marketSentimentAnalyses: 0,
+        portfolioOptimizations: 0, strategyBacktests: 0, decisionsAnalyzed: 0,
+        knowledgeFusions: 0, economicForecasts: 0, securityTrainingSessions: 0, securityChallengesGenerated: 0,
       }
     }
 
@@ -3105,6 +3173,14 @@ export class LocalBrain {
     const abstractionStats = this.abstractionEngine?.getStats() ?? null
     const planningStats = this.planningEngine?.getStats() ?? null
     const creativeStats = this.creativeEngine?.getStats() ?? null
+    const tradingStats = this.tradingEngine?.getStats() ?? null
+    const marketStats = this.marketAnalyzer?.getStats() ?? null
+    const portfolioStats = this.portfolioOptimizer?.getStats() ?? null
+    const strategyStats = this.strategyEngine?.getStats() ?? null
+    const decisionStats = this.decisionEngine?.getStats() ?? null
+    const synthesizerStats = this.knowledgeSynthesizer?.getStats() ?? null
+    const economicStats = this.economicAnalyzer?.getStats() ?? null
+    const securityStats = this.securityTrainer?.getStats() ?? null
 
     return {
       enabled: true,
@@ -3127,6 +3203,16 @@ export class LocalBrain {
       avgPlanConfidence: planningStats?.avgConfidence ?? 0,
       totalBrainstorms: creativeStats?.totalBrainstorms ?? 0,
       totalIdeasGenerated: creativeStats?.totalIdeasGenerated ?? 0,
+      tradingAnalyses: tradingStats?.totalAnalyses ?? 0,
+      tradingSignals: tradingStats?.totalSignals ?? 0,
+      marketSentimentAnalyses: marketStats?.totalSentimentAnalyses ?? 0,
+      portfolioOptimizations: portfolioStats?.totalOptimizations ?? 0,
+      strategyBacktests: strategyStats?.totalBacktests ?? 0,
+      decisionsAnalyzed: decisionStats?.totalDecisions ?? 0,
+      knowledgeFusions: synthesizerStats?.totalFusions ?? 0,
+      economicForecasts: economicStats?.totalForecasts ?? 0,
+      securityTrainingSessions: securityStats?.totalTrainingSessions ?? 0,
+      securityChallengesGenerated: securityStats?.totalChallengesGenerated ?? 0,
     }
   }
 
@@ -3152,6 +3238,14 @@ export class LocalBrain {
     if (this.abstractionEngine) advancedState.abstractionEngine = this.abstractionEngine.serialize()
     if (this.planningEngine) advancedState.planningEngine = this.planningEngine.serialize()
     if (this.creativeEngine) advancedState.creativeEngine = this.creativeEngine.serialize()
+    if (this.tradingEngine) advancedState.tradingEngine = this.tradingEngine.serialize()
+    if (this.marketAnalyzer) advancedState.marketAnalyzer = this.marketAnalyzer.serialize()
+    if (this.portfolioOptimizer) advancedState.portfolioOptimizer = this.portfolioOptimizer.serialize()
+    if (this.strategyEngine) advancedState.strategyEngine = this.strategyEngine.serialize()
+    if (this.decisionEngine) advancedState.decisionEngine = this.decisionEngine.serialize()
+    if (this.knowledgeSynthesizer) advancedState.knowledgeSynthesizer = this.knowledgeSynthesizer.serialize()
+    if (this.economicAnalyzer) advancedState.economicAnalyzer = this.economicAnalyzer.serialize()
+    if (this.securityTrainer) advancedState.securityTrainer = this.securityTrainer.serialize()
 
     return JSON.stringify({ ...state, advancedIntelligence: advancedState })
   }
@@ -3200,6 +3294,30 @@ export class LocalBrain {
       }
       if (advanced.creativeEngine) {
         try { brain.creativeEngine = CreativeEngine.deserialize(advanced.creativeEngine) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.tradingEngine) {
+        try { brain.tradingEngine = TradingEngine.deserialize(advanced.tradingEngine) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.marketAnalyzer) {
+        try { brain.marketAnalyzer = MarketAnalyzer.deserialize(advanced.marketAnalyzer) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.portfolioOptimizer) {
+        try { brain.portfolioOptimizer = PortfolioOptimizer.deserialize(advanced.portfolioOptimizer) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.strategyEngine) {
+        try { brain.strategyEngine = StrategyEngine.deserialize(advanced.strategyEngine) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.decisionEngine) {
+        try { brain.decisionEngine = DecisionEngine.deserialize(advanced.decisionEngine) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.knowledgeSynthesizer) {
+        try { brain.knowledgeSynthesizer = KnowledgeSynthesizer.deserialize(advanced.knowledgeSynthesizer) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.economicAnalyzer) {
+        try { brain.economicAnalyzer = EconomicAnalyzer.deserialize(advanced.economicAnalyzer) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.securityTrainer) {
+        try { brain.securityTrainer = SecurityTrainer.deserialize(advanced.securityTrainer) } catch { /* ignore corrupted state */ }
       }
     }
 
