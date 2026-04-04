@@ -57,6 +57,9 @@ export interface ReplayConfig {
   readonly deterministicMode: boolean
 }
 
+/** Confidence delta below which two values are considered equal. */
+export const CONFIDENCE_MATCH_TOLERANCE = 0.01
+
 export const DEFAULT_REPLAY_CONFIG: ReplayConfig = {
   maxSessions: 50,
   deterministicMode: true,
@@ -202,7 +205,7 @@ export class ReplayEngine {
       }
 
       const confDelta = Math.abs(replayed.confidence - origDecision.confidence)
-      if (confDelta > 0.01) {
+      if (confDelta > CONFIDENCE_MATCH_TOLERANCE) {
         differences.push(
           `confidence: ${origDecision.confidence.toFixed(3)} → ${replayed.confidence.toFixed(3)}`,
         )

@@ -1022,6 +1022,7 @@ export {
   SeededRandom,
   ReplayEngine,
   DEFAULT_REPLAY_CONFIG,
+  CONFIDENCE_MATCH_TOLERANCE,
 } from './pipeline/ReplayEngine.js'
 
 export type {
