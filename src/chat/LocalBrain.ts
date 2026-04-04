@@ -81,6 +81,16 @@ import { KnowledgeSynthesizer } from './KnowledgeSynthesizer.js'
 import { EconomicAnalyzer } from './EconomicAnalyzer.js'
 import { SecurityTrainer } from './SecurityTrainer.js'
 
+// Semantic intelligence modules (Phase 5)
+import { EmotionEngine } from './EmotionEngine.js'
+import { TemporalReasoner } from './TemporalReasoner.js'
+import { NormalizationEngine } from './NormalizationEngine.js'
+import { BayesianNetwork } from './BayesianNetwork.js'
+import { OntologyManager } from './OntologyManager.js'
+import { DialogueManager } from './DialogueManager.js'
+import { ArgumentAnalyzer } from './ArgumentAnalyzer.js'
+import { NarrativeEngine } from './NarrativeEngine.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1641,6 +1651,16 @@ export class LocalBrain {
   private economicAnalyzer: EconomicAnalyzer | null = null
   private securityTrainer: SecurityTrainer | null = null
 
+  // Semantic intelligence modules (Phase 5)
+  private emotionEngine: EmotionEngine | null = null
+  private temporalReasoner: TemporalReasoner | null = null
+  private normalizationEngine: NormalizationEngine | null = null
+  private bayesianNetwork: BayesianNetwork | null = null
+  private ontologyManager: OntologyManager | null = null
+  private dialogueManager: DialogueManager | null = null
+  private argumentAnalyzer: ArgumentAnalyzer | null = null
+  private narrativeEngine: NarrativeEngine | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1695,6 +1715,16 @@ export class LocalBrain {
       this.knowledgeSynthesizer = new KnowledgeSynthesizer()
       this.economicAnalyzer = new EconomicAnalyzer()
       this.securityTrainer = new SecurityTrainer()
+
+      // Phase 5 — Semantic intelligence modules
+      this.emotionEngine = new EmotionEngine()
+      this.temporalReasoner = new TemporalReasoner()
+      this.normalizationEngine = new NormalizationEngine()
+      this.bayesianNetwork = new BayesianNetwork()
+      this.ontologyManager = new OntologyManager()
+      this.dialogueManager = new DialogueManager()
+      this.argumentAnalyzer = new ArgumentAnalyzer()
+      this.narrativeEngine = new NarrativeEngine()
     }
 
     const now = new Date().toISOString()
@@ -3114,6 +3144,30 @@ export class LocalBrain {
   /** Get the SecurityTrainer instance (null if intelligence modules are disabled). */
   getSecurityTrainer(): SecurityTrainer | null { return this.securityTrainer }
 
+  /** Get the EmotionEngine instance (null if intelligence modules are disabled). */
+  getEmotionEngine(): EmotionEngine | null { return this.emotionEngine }
+
+  /** Get the TemporalReasoner instance (null if intelligence modules are disabled). */
+  getTemporalReasoner(): TemporalReasoner | null { return this.temporalReasoner }
+
+  /** Get the NormalizationEngine instance (null if intelligence modules are disabled). */
+  getNormalizationEngine(): NormalizationEngine | null { return this.normalizationEngine }
+
+  /** Get the BayesianNetwork instance (null if intelligence modules are disabled). */
+  getBayesianNetwork(): BayesianNetwork | null { return this.bayesianNetwork }
+
+  /** Get the OntologyManager instance (null if intelligence modules are disabled). */
+  getOntologyManager(): OntologyManager | null { return this.ontologyManager }
+
+  /** Get the DialogueManager instance (null if intelligence modules are disabled). */
+  getDialogueManager(): DialogueManager | null { return this.dialogueManager }
+
+  /** Get the ArgumentAnalyzer instance (null if intelligence modules are disabled). */
+  getArgumentAnalyzer(): ArgumentAnalyzer | null { return this.argumentAnalyzer }
+
+  /** Get the NarrativeEngine instance (null if intelligence modules are disabled). */
+  getNarrativeEngine(): NarrativeEngine | null { return this.narrativeEngine }
+
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
 
@@ -3149,6 +3203,14 @@ export class LocalBrain {
     economicForecasts: number
     securityTrainingSessions: number
     securityChallengesGenerated: number
+    emotionAnalyses: number
+    temporalEvents: number
+    normalizationRuns: number
+    bayesianInferences: number
+    ontologyConcepts: number
+    dialogueTurns: number
+    argumentsAnalyzed: number
+    narrativesAnalyzed: number
   } {
     if (!this.config.enableIntelligence) {
       return {
@@ -3160,6 +3222,8 @@ export class LocalBrain {
         tradingAnalyses: 0, tradingSignals: 0, marketSentimentAnalyses: 0,
         portfolioOptimizations: 0, strategyBacktests: 0, decisionsAnalyzed: 0,
         knowledgeFusions: 0, economicForecasts: 0, securityTrainingSessions: 0, securityChallengesGenerated: 0,
+        emotionAnalyses: 0, temporalEvents: 0, normalizationRuns: 0, bayesianInferences: 0,
+        ontologyConcepts: 0, dialogueTurns: 0, argumentsAnalyzed: 0, narrativesAnalyzed: 0,
       }
     }
 
@@ -3181,6 +3245,14 @@ export class LocalBrain {
     const synthesizerStats = this.knowledgeSynthesizer?.getStats() ?? null
     const economicStats = this.economicAnalyzer?.getStats() ?? null
     const securityStats = this.securityTrainer?.getStats() ?? null
+    const emotionStats = this.emotionEngine?.getStats() ?? null
+    const temporalStats = this.temporalReasoner?.getStats() ?? null
+    const normalizationStats = this.normalizationEngine?.getStats() ?? null
+    const bayesianStats = this.bayesianNetwork?.getStats() ?? null
+    const ontologyStats = this.ontologyManager?.getStats() ?? null
+    const dialogueStats = this.dialogueManager?.getStats() ?? null
+    const argumentStats = this.argumentAnalyzer?.getStats() ?? null
+    const narrativeStats = this.narrativeEngine?.getStats() ?? null
 
     return {
       enabled: true,
@@ -3213,6 +3285,14 @@ export class LocalBrain {
       economicForecasts: economicStats?.totalForecasts ?? 0,
       securityTrainingSessions: securityStats?.totalTrainingSessions ?? 0,
       securityChallengesGenerated: securityStats?.totalChallengesGenerated ?? 0,
+      emotionAnalyses: emotionStats?.totalAnalyses ?? 0,
+      temporalEvents: temporalStats?.totalEvents ?? 0,
+      normalizationRuns: normalizationStats?.totalNormalizations ?? 0,
+      bayesianInferences: bayesianStats?.nodeCount ?? 0,
+      ontologyConcepts: ontologyStats?.totalConcepts ?? 0,
+      dialogueTurns: dialogueStats?.totalTurns ?? 0,
+      argumentsAnalyzed: argumentStats?.totalArguments ?? 0,
+      narrativesAnalyzed: narrativeStats?.totalBeats ?? 0,
     }
   }
 
@@ -3246,6 +3326,13 @@ export class LocalBrain {
     if (this.knowledgeSynthesizer) advancedState.knowledgeSynthesizer = this.knowledgeSynthesizer.serialize()
     if (this.economicAnalyzer) advancedState.economicAnalyzer = this.economicAnalyzer.serialize()
     if (this.securityTrainer) advancedState.securityTrainer = this.securityTrainer.serialize()
+    if (this.temporalReasoner) advancedState.temporalReasoner = this.temporalReasoner.serialize()
+    if (this.normalizationEngine) advancedState.normalizationEngine = this.normalizationEngine.serialize()
+    if (this.bayesianNetwork) advancedState.bayesianNetwork = this.bayesianNetwork.serialize()
+    if (this.ontologyManager) advancedState.ontologyManager = this.ontologyManager.serialize()
+    if (this.dialogueManager) advancedState.dialogueManager = this.dialogueManager.serialize()
+    if (this.argumentAnalyzer) advancedState.argumentAnalyzer = this.argumentAnalyzer.serialize()
+    if (this.narrativeEngine) advancedState.narrativeEngine = this.narrativeEngine.serialize()
 
     return JSON.stringify({ ...state, advancedIntelligence: advancedState })
   }
@@ -3318,6 +3405,27 @@ export class LocalBrain {
       }
       if (advanced.securityTrainer) {
         try { brain.securityTrainer = SecurityTrainer.deserialize(advanced.securityTrainer) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.temporalReasoner) {
+        try { brain.temporalReasoner = TemporalReasoner.deserialize(advanced.temporalReasoner) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.normalizationEngine) {
+        try { brain.normalizationEngine = NormalizationEngine.deserialize(advanced.normalizationEngine) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.bayesianNetwork) {
+        try { brain.bayesianNetwork = BayesianNetwork.deserialize(advanced.bayesianNetwork) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.ontologyManager) {
+        try { brain.ontologyManager = OntologyManager.deserialize(advanced.ontologyManager) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.dialogueManager) {
+        try { brain.dialogueManager = DialogueManager.deserialize(advanced.dialogueManager) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.argumentAnalyzer) {
+        try { brain.argumentAnalyzer = ArgumentAnalyzer.deserialize(advanced.argumentAnalyzer) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.narrativeEngine) {
+        try { brain.narrativeEngine = NarrativeEngine.deserialize(advanced.narrativeEngine) } catch { /* ignore corrupted state */ }
       }
     }
 
