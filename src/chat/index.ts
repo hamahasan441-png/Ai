@@ -999,6 +999,49 @@ export type {
   HealthReport,
 } from './pipeline/PhaseRunner.js'
 
+// ── Error Taxonomy — Standardized failure classes + retry strategy ──
+export {
+  EngineErrorClass,
+  RETRYABLE_ERRORS,
+  ERROR_PRIORITY,
+  createEngineError,
+  classifyError,
+  calculateRetryDelay,
+  shouldRetry,
+  DEFAULT_RETRY_CONFIG,
+  ErrorAggregator,
+} from './pipeline/ErrorTaxonomy.js'
+
+export type {
+  EngineError,
+  RetryConfig,
+} from './pipeline/ErrorTaxonomy.js'
+
+// ── Replay Engine — Deterministic replay for debugging ──
+export {
+  SeededRandom,
+  ReplayEngine,
+  DEFAULT_REPLAY_CONFIG,
+  CONFIDENCE_MATCH_TOLERANCE,
+} from './pipeline/ReplayEngine.js'
+
+export type {
+  ReplayDecision,
+  ReplaySession,
+  DecisionComparison,
+  ReplayResult,
+  ReplayConfig,
+} from './pipeline/ReplayEngine.js'
+
+// ── Prompt Registry — Versioned prompt templates & model configs ──
+export { PromptRegistry } from './pipeline/PromptRegistry.js'
+
+export type {
+  PromptTemplate,
+  ModelConfig,
+  RenderedPrompt,
+} from './pipeline/PromptRegistry.js'
+
 // ══════════════════════════════════════════════════════════════════════════════
 // SCORING — Centralized scoring engine with normalized formulas
 // ══════════════════════════════════════════════════════════════════════════════
