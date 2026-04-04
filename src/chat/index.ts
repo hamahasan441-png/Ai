@@ -373,6 +373,21 @@ export type {
   TopicModelerStats,
 } from './TopicModeler.js'
 
+// ── Bayesian Network — Probabilistic reasoning with directed graphical models ──
+export { BayesianNetwork } from './BayesianNetwork.js'
+
+export type {
+  BayesianNetworkConfig,
+  BayesianNode,
+  BayesianEdge,
+  ConditionalProbabilityTable,
+  Evidence,
+  InferenceResult,
+  NetworkStructure,
+  NetworkValidation,
+  BayesianNetworkStats,
+} from './BayesianNetwork.js'
+
 // ── Temporal Reasoner — Time, events, sequences & temporal patterns ──
 export { TemporalReasoner } from './TemporalReasoner.js'
 
