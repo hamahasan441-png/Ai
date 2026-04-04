@@ -91,6 +91,12 @@ import { DialogueManager } from './DialogueManager.js'
 import { ArgumentAnalyzer } from './ArgumentAnalyzer.js'
 import { NarrativeEngine } from './NarrativeEngine.js'
 
+// Cybersecurity intelligence modules (Phase 6)
+import { VulnerabilityScanner } from './VulnerabilityScanner.js'
+import { ThreatModeler } from './ThreatModeler.js'
+import { ExploitAnalyzer } from './ExploitAnalyzer.js'
+import { NetworkForensics } from './NetworkForensics.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1778,6 +1784,12 @@ export class LocalBrain {
   private argumentAnalyzer: ArgumentAnalyzer | null = null
   private narrativeEngine: NarrativeEngine | null = null
 
+  // Cybersecurity intelligence modules (Phase 6)
+  private vulnerabilityScanner: VulnerabilityScanner | null = null
+  private threatModeler: ThreatModeler | null = null
+  private exploitAnalyzer: ExploitAnalyzer | null = null
+  private networkForensics: NetworkForensics | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1842,6 +1854,12 @@ export class LocalBrain {
       this.dialogueManager = new DialogueManager()
       this.argumentAnalyzer = new ArgumentAnalyzer()
       this.narrativeEngine = new NarrativeEngine()
+
+      // Phase 6 — Cybersecurity intelligence modules
+      this.vulnerabilityScanner = new VulnerabilityScanner()
+      this.threatModeler = new ThreatModeler()
+      this.exploitAnalyzer = new ExploitAnalyzer()
+      this.networkForensics = new NetworkForensics()
     }
 
     const now = new Date().toISOString()
@@ -3285,6 +3303,18 @@ export class LocalBrain {
   /** Get the NarrativeEngine instance (null if intelligence modules are disabled). */
   getNarrativeEngine(): NarrativeEngine | null { return this.narrativeEngine }
 
+  /** Get the VulnerabilityScanner instance (null if intelligence modules are disabled). */
+  getVulnerabilityScanner(): VulnerabilityScanner | null { return this.vulnerabilityScanner }
+
+  /** Get the ThreatModeler instance (null if intelligence modules are disabled). */
+  getThreatModeler(): ThreatModeler | null { return this.threatModeler }
+
+  /** Get the ExploitAnalyzer instance (null if intelligence modules are disabled). */
+  getExploitAnalyzer(): ExploitAnalyzer | null { return this.exploitAnalyzer }
+
+  /** Get the NetworkForensics instance (null if intelligence modules are disabled). */
+  getNetworkForensics(): NetworkForensics | null { return this.networkForensics }
+
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
 
@@ -3450,6 +3480,10 @@ export class LocalBrain {
     if (this.dialogueManager) advancedState.dialogueManager = this.dialogueManager.serialize()
     if (this.argumentAnalyzer) advancedState.argumentAnalyzer = this.argumentAnalyzer.serialize()
     if (this.narrativeEngine) advancedState.narrativeEngine = this.narrativeEngine.serialize()
+    if (this.vulnerabilityScanner) advancedState.vulnerabilityScanner = this.vulnerabilityScanner.serialize()
+    if (this.threatModeler) advancedState.threatModeler = this.threatModeler.serialize()
+    if (this.exploitAnalyzer) advancedState.exploitAnalyzer = this.exploitAnalyzer.serialize()
+    if (this.networkForensics) advancedState.networkForensics = this.networkForensics.serialize()
 
     return JSON.stringify({ ...state, advancedIntelligence: advancedState })
   }
@@ -3543,6 +3577,18 @@ export class LocalBrain {
       }
       if (advanced.narrativeEngine) {
         try { brain.narrativeEngine = NarrativeEngine.deserialize(advanced.narrativeEngine) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.vulnerabilityScanner) {
+        try { brain.vulnerabilityScanner = VulnerabilityScanner.deserialize(advanced.vulnerabilityScanner) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.threatModeler) {
+        try { brain.threatModeler = ThreatModeler.deserialize(advanced.threatModeler) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.exploitAnalyzer) {
+        try { brain.exploitAnalyzer = ExploitAnalyzer.deserialize(advanced.exploitAnalyzer) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.networkForensics) {
+        try { brain.networkForensics = NetworkForensics.deserialize(advanced.networkForensics) } catch { /* ignore corrupted state */ }
       }
     }
 

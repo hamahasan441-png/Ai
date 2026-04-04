@@ -730,6 +730,82 @@ export type {
   TrainingModule,
 } from './SecurityTrainer.js'
 
+// ── Vulnerability Scanner — Static/dynamic code vulnerability scanning and taint analysis ──
+export { VulnerabilityScanner } from './VulnerabilityScanner.js'
+
+export type {
+  VulnerabilityScannerConfig,
+  VulnerabilityScannerStats,
+  VulnCategory,
+  VulnFinding,
+  TaintNode,
+  TaintPath,
+  ScanSummary,
+  ScanResult,
+  CodePattern,
+  TaintRule,
+  ScanProfile,
+} from './VulnerabilityScanner.js'
+
+// ── Threat Modeler — STRIDE/DREAD threat modeling, attack trees, threat intelligence ──
+export { ThreatModeler } from './ThreatModeler.js'
+
+export type {
+  ThreatModelerConfig,
+  ThreatModelerStats,
+  ThreatCategory,
+  StrideCategory,
+  DreadScore,
+  Mitigation,
+  Asset,
+  Threat,
+  DataFlow,
+  TrustBoundary,
+  AttackNode,
+  AttackTree,
+  ThreatIntelEntry,
+  ThreatModel,
+} from './ThreatModeler.js'
+
+// ── Exploit Analyzer — Exploit pattern analysis, CVE correlation, attack surface assessment ──
+export { ExploitAnalyzer } from './ExploitAnalyzer.js'
+
+export type {
+  ExploitAnalyzerConfig,
+  ExploitAnalyzerStats,
+  ExploitCategory,
+  ExploitInfo,
+  PayloadInfo,
+  CVEEntry,
+  ExploitChainStep,
+  ExploitChain,
+  MitigationStrategy,
+  SurfaceComponent,
+  AttackSurface,
+  ExploitAnalysisResult,
+} from './ExploitAnalyzer.js'
+
+// ── Network Forensics — Traffic analysis, anomaly detection, incident response ──
+export { NetworkForensics } from './NetworkForensics.js'
+
+export type {
+  NetworkForensicsConfig,
+  NetworkForensicsStats,
+  AnomalyType,
+  PacketInfo,
+  NetworkAnomaly,
+  ProtocolAnalysis,
+  IncidentTimelineEntry,
+  PlaybookStep,
+  IncidentPlaybook,
+  NetworkIncident,
+  TrafficPattern,
+  TopologyNode,
+  TopologyConnection,
+  NetworkTopology,
+  ForensicReport,
+} from './NetworkForensics.js'
+
 // ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
