@@ -373,6 +373,22 @@ export type {
   TopicModelerStats,
 } from './TopicModeler.js'
 
+// ── Ontology Manager — Hierarchical concept & taxonomy management ──
+export { OntologyManager } from './OntologyManager.js'
+
+export type {
+  OntologyManagerConfig,
+  OntologyConcept,
+  OntologyRelation,
+  OntologyProperty,
+  ConceptHierarchy,
+  InheritancePath,
+  OntologyQuery,
+  OntologyQueryResult,
+  OntologyValidation,
+  OntologyManagerStats,
+} from './OntologyManager.js'
+
 // ── Bayesian Network — Probabilistic reasoning with directed graphical models ──
 export { BayesianNetwork } from './BayesianNetwork.js'
 
