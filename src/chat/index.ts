@@ -373,6 +373,24 @@ export type {
   TopicModelerStats,
 } from './TopicModeler.js'
 
+// ── Temporal Reasoner — Time, events, sequences & temporal patterns ──
+export { TemporalReasoner } from './TemporalReasoner.js'
+
+export type {
+  TimePoint,
+  TimeInterval,
+  TemporalEvent,
+  EventSequence,
+  TemporalRelation,
+  TemporalConstraint,
+  TemporalPattern,
+  TimelineAnalysis,
+  TemporalQuery,
+  TemporalQueryResult,
+  TemporalReasonerConfig,
+  TemporalReasonerStats,
+} from './TemporalReasoner.js'
+
 // ══════════════════════════════════════════════════════════════════════════════
 // COGNITIVE INTELLIGENCE — Higher-order reasoning modules (src/chat/)
 // ══════════════════════════════════════════════════════════════════════════════
