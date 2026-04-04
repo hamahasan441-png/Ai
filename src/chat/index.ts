@@ -1034,6 +1034,21 @@ export type {
   CrossDomainInsight,
 } from './MultiModalFusion.js'
 
+// ── Curriculum Optimizer — Learning path generation, spaced repetition, gap detection ──
+export { CurriculumOptimizer } from './CurriculumOptimizer.js'
+
+export type {
+  CurriculumOptimizerConfig,
+  CurriculumOptimizerStats,
+  Skill,
+  SkillMastery,
+  KnowledgeGap,
+  LearningPath,
+  LearningStep,
+  ReviewRecommendation,
+  LearningVelocity,
+} from './CurriculumOptimizer.js'
+
 // ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
