@@ -210,7 +210,13 @@ export interface ActiveTaskInfo {
 
 // ── Internal Types ───────────────────────────────────────────────────────────
 
-/** Snapshot of a task plan used for backtracking rollback. */
+/**
+ * Snapshot of a task plan used for backtracking rollback.
+ *
+ * A snapshot is taken before each step begins execution. If a failure occurs
+ * or the user requests a backtrack, the orchestrator restores the step states
+ * from the closest snapshot matching the target step ID.
+ */
 interface TaskSnapshot {
   /** The step ID that was about to execute when this snapshot was taken. */
   beforeStepId: string;
@@ -220,7 +226,13 @@ interface TaskSnapshot {
   timestamp: number;
 }
 
-/** Internal record for tracking retry backoff per step. */
+/**
+ * Internal record for tracking retry backoff per step.
+ *
+ * Uses exponential backoff: each failed retry doubles the current backoff
+ * delay (starting at 1000 ms). Records are keyed by "taskId:stepId" and
+ * persist across retries until the step succeeds or exhausts maxRetries.
+ */
 interface RetryRecord {
   /** Number of attempts so far. */
   attempts: number;
@@ -230,7 +242,13 @@ interface RetryRecord {
   currentBackoffMs: number;
 }
 
-/** Feedback log entry. */
+/**
+ * Feedback log entry.
+ *
+ * Records user-provided feedback about orchestrator behaviour. Positive
+ * feedback confirms decomposition quality; negative feedback (with an
+ * optional message) can inform future template or heuristic tuning.
+ */
 interface FeedbackEntry {
   /** Epoch timestamp. */
   timestamp: number;
@@ -242,7 +260,14 @@ interface FeedbackEntry {
 
 // ── Template Definition ──────────────────────────────────────────────────────
 
-/** A predefined decomposition template for a known task pattern. */
+/**
+ * A predefined decomposition template for a known task pattern.
+ *
+ * Templates are matched by scoring keyword overlap between the user's goal
+ * description and the template's keyword list. A minimum of 2 keyword
+ * matches is required. The highest-scoring template is selected and its
+ * step definitions are instantiated with unique IDs and proper dependency wiring.
+ */
 interface TaskTemplate {
   /** Keywords that trigger this template. */
   keywords: string[];
@@ -1548,7 +1573,7 @@ export class TaskOrchestrator {
         if (used.has(j)) continue;
 
         // Check if groups are independent (no step in one group depends on the other)
-        const canMerge = this.areGroupsIndependent(mergedGroup, allDepSets[j], plan);
+        const canMerge = this.areGroupsIndependent(mergedGroup, allDepSets[j]);
         if (canMerge) {
           mergedGroup.push(...allDepSets[j]);
           used.add(j);
@@ -1577,7 +1602,7 @@ export class TaskOrchestrator {
    * Check whether two groups of steps are mutually independent.
    * Groups are independent if no step in either group depends on any step in the other.
    */
-  private areGroupsIndependent(groupA: TaskStep[], groupB: TaskStep[], _plan: TaskPlan): boolean {
+  private areGroupsIndependent(groupA: TaskStep[], groupB: TaskStep[]): boolean {
     const idsA = new Set(groupA.map(s => s.id));
     const idsB = new Set(groupB.map(s => s.id));
 

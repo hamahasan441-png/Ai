@@ -898,7 +898,7 @@ export type {
 } from './HybridBrain.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
-// PHASE 8 — DEEP UNDERSTANDING INTELLIGENCE MODULES
+// PHASE 8 — INTELLIGENCE MODULES
 // ══════════════════════════════════════════════════════════════════════════════
 
 // ── Deep Understanding Engine — Semantic similarity, multi-intent, ambiguity ──
@@ -919,6 +919,20 @@ export type {
   ContextualClassification,
   UnderstandingResult,
 } from './DeepUnderstandingEngine.js'
+
+// ── Task Orchestrator — Goal decomposition, execution tracking, recovery ──
+export { TaskOrchestrator } from './TaskOrchestrator.js'
+
+export type {
+  TaskOrchestratorConfig,
+  TaskOrchestratorStats,
+  TaskState,
+  StepType,
+  StepResult,
+  TaskStatus,
+  ProgressReport,
+  ActiveTaskInfo,
+} from './TaskOrchestrator.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // DEV BRAIN — Private developer module (src/chat/DevBrain.ts)
