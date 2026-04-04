@@ -807,6 +807,79 @@ export type {
 } from './NetworkForensics.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// PHASE 7 — UNDERSTANDING INTELLIGENCE MODULES
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Pattern Recognizer — Pattern recognition in data, code, and text ──
+export { PatternRecognizer } from './PatternRecognizer.js'
+
+export type {
+  PatternRecognizerConfig,
+  PatternRecognizerStats,
+  PatternType,
+  DataPattern,
+  SequenceInfo,
+  AnomalyInfo,
+  FrequencyInfo,
+  CorrelationInfo,
+  ClusterInfo,
+  PatternAnalysisResult,
+} from './PatternRecognizer.js'
+
+// ── Concept Mapper — Concept mapping and knowledge graph navigation ──
+export { ConceptMapper } from './ConceptMapper.js'
+
+export type {
+  ConceptMapperConfig,
+  ConceptMapperStats,
+  RelationType,
+  Concept,
+  Relation,
+  ConceptPath,
+  ConceptCluster,
+  InferenceResult as ConceptInferenceResult,
+  SimilarityResult,
+  ConceptMapSummary,
+  SpreadingActivationResult,
+} from './ConceptMapper.js'
+
+// ── Inference Engine — Logical inference and deductive reasoning ──
+export { InferenceEngine } from './InferenceEngine.js'
+
+export type {
+  InferenceEngineConfig,
+  InferenceEngineStats,
+  LogicalOperator,
+  Proposition,
+  Condition,
+  Rule,
+  InferenceStep,
+  InferenceChain,
+  Conflict,
+  TruthTableRow,
+  TruthTable,
+  QueryResult,
+} from './InferenceEngine.js'
+
+// ── Sentiment Analyzer — Sentiment and opinion analysis ──
+export { SentimentAnalyzer } from './SentimentAnalyzer.js'
+
+export type {
+  SentimentAnalyzerConfig,
+  SentimentAnalyzerStats,
+  SentimentLabel,
+  EmotionType,
+  SentimentScore,
+  AspectSentiment,
+  EmotionScore,
+  SubjectivityScore,
+  OpinionInfo,
+  SentenceSentiment,
+  SentimentSummary,
+  SentimentAnalysisResult,
+} from './SentimentAnalyzer.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './TfIdfScorer.js'
