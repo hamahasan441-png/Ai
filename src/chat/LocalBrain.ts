@@ -843,6 +843,74 @@ function buildKnowledgeBase(): KnowledgeEntry[] {
   add('web', ['astro', 'islands', 'static site', 'content driven'],
     'Astro: Content-driven web framework. Islands architecture: static HTML + interactive components only where needed. Zero JS by default. Supports: React, Vue, Svelte, Solid components. Features: content collections, MDX, SSG/SSR, view transitions. Best for: blogs, docs, marketing sites, content-heavy sites. Ships minimal JavaScript.', 1.0)
 
+  // ── Cybersecurity Coding — Secure coding patterns and vulnerability prevention ──
+  add('practices', ['secure coding', 'defensive coding', 'secure development', 'sdlc security'],
+    'Secure Development Lifecycle: 1) Threat modeling (STRIDE, DREAD) during design, 2) Static analysis (SAST) in CI — Semgrep, SonarQube, CodeQL, 3) Dependency scanning (SCA) — npm audit, Snyk, Dependabot, 4) Dynamic testing (DAST) — OWASP ZAP, Burp Suite, 5) Secret scanning — git-secrets, truffleHog, 6) Container scanning — Trivy, Grype. Shift-left: catch vulnerabilities early, automate in CI/CD pipeline.', 1.4)
+
+  add('practices', ['input sanitization', 'output encoding', 'xss prevention', 'html sanitization'],
+    'XSS prevention patterns: 1) Output encoding — escape HTML entities (&lt; &gt; &amp; &quot;) for HTML context, URL-encode for URL context, JS-encode for JavaScript context. 2) Content Security Policy (CSP) headers — restrict script sources. 3) Use DOMPurify for HTML sanitization. 4) React/Angular auto-escape by default — avoid dangerouslySetInnerHTML/bypassSecurityTrust. 5) HttpOnly cookies prevent JS access. 6) X-XSS-Protection header (legacy). Code: `const safe = DOMPurify.sanitize(userInput); element.textContent = userInput;`', 1.4)
+
+  add('practices', ['sql injection prevention', 'parameterized query', 'prepared statement', 'orm security'],
+    'SQL injection prevention: ALWAYS use parameterized queries. Node.js: `db.query("SELECT * FROM users WHERE id = $1", [userId])`. Python: `cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))`. Java: `PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?"); ps.setInt(1, userId)`. ORMs (Prisma, Sequelize, SQLAlchemy) are safe by default but beware raw query methods. Never concatenate user input into SQL strings.', 1.5)
+
+  add('practices', ['csrf protection', 'cross site request forgery', 'csrf token', 'same site cookie'],
+    'CSRF protection: 1) SameSite cookie attribute (Strict or Lax) — blocks cross-origin requests, 2) CSRF tokens — unique per session, included in forms and validated server-side, 3) Double-submit cookie pattern — send token in both cookie and header, 4) Check Origin/Referer headers. Express: use csurf middleware. Django: built-in {% csrf_token %}. SPA pattern: read XSRF-TOKEN cookie, send in X-XSRF-TOKEN header.', 1.3)
+
+  add('practices', ['command injection', 'os command', 'shell injection', 'subprocess security'],
+    'Command injection prevention: NEVER use shell=True or string concatenation for OS commands. Node.js: use `execFile()` (not exec), pass args as array: `execFile("git", ["log", "--oneline", userBranch])`. Python: `subprocess.run(["git", "log", "--oneline", branch], shell=False)`. Avoid: `exec("git log " + userInput)`. Always validate/whitelist inputs, use libraries instead of shell commands when possible (e.g., archiver instead of tar).', 1.4)
+
+  add('practices', ['path traversal', 'directory traversal', 'file inclusion', 'safe file path'],
+    'Path traversal prevention: Never directly use user input in file paths. Patterns: 1) Validate — reject paths containing "..", "~", or absolute paths. 2) Normalize — `path.resolve(baseDir, userInput)` then verify it starts with baseDir. 3) Whitelist — map user IDs to allowed files. Node.js: `const safe = path.join(BASE, path.basename(input)); if (!safe.startsWith(BASE)) throw new Error("Traversal attempt")`. Chroot/sandboxing for defense-in-depth.', 1.4)
+
+  add('practices', ['rate limiting', 'brute force prevention', 'ddos protection', 'api throttle'],
+    'Rate limiting patterns: 1) Token bucket — fixed rate with burst allowance (express-rate-limit), 2) Sliding window — count requests in rolling time window, 3) Leaky bucket — constant drain rate. Implementation: Redis-based for distributed systems (rate-limiter-flexible). Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset. Auth endpoints: stricter limits + account lockout after N failures. Use Cloudflare/AWS WAF for DDoS at network level.', 1.3)
+
+  add('practices', ['cors security', 'cross origin', 'cors configuration', 'origin whitelist'],
+    'CORS security: Never use `Access-Control-Allow-Origin: *` with credentials. Whitelist specific origins: `const allowed = ["https://app.example.com"]; if (allowed.includes(origin)) res.setHeader("Access-Control-Allow-Origin", origin)`. Set `Access-Control-Allow-Credentials: true` only when needed. Restrict allowed methods and headers. Pre-flight caching: `Access-Control-Max-Age: 86400`. In Express: `cors({ origin: allowedOrigins, credentials: true })`.', 1.3)
+
+  add('concepts', ['cryptography', 'encryption', 'hashing', 'digital signature', 'crypto coding'],
+    'Cryptography in code: Hashing (one-way): SHA-256 for data integrity, bcrypt/argon2 for passwords. Symmetric encryption: AES-256-GCM (authenticated encryption). Asymmetric: RSA-OAEP (key exchange), Ed25519 (signatures). Node.js: `crypto.createCipheriv("aes-256-gcm", key, iv)`. Never: roll your own crypto, use ECB mode, use MD5/SHA1 for security. Always: use authenticated encryption (GCM/ChaCha20-Poly1305), secure random IVs (`crypto.randomBytes(16)`), constant-time comparison for secrets.', 1.4)
+
+  add('concepts', ['pentest', 'penetration testing', 'security assessment', 'vulnerability scanning'],
+    'Penetration testing workflow: 1) Reconnaissance — nmap port scan, subdomain enumeration (subfinder, amass), tech stack fingerprinting (Wappalyzer). 2) Vulnerability scanning — Nessus, OpenVAS, nuclei templates. 3) Exploitation — SQL injection (sqlmap), XSS (dalfox), SSRF, auth bypass. 4) Post-exploitation — privilege escalation, lateral movement. 5) Reporting — findings, impact, remediation. Tools: Burp Suite (web proxy), Metasploit (exploitation framework), John/Hashcat (password cracking). Always have written authorization.', 1.3)
+
+  add('concepts', ['ctf', 'capture the flag', 'security challenge', 'ctf writeup'],
+    'CTF categories: 1) Web — SQL injection, XSS, SSRF, deserialization, JWT manipulation, 2) Crypto — RSA attacks, block cipher modes, hash collisions, 3) Reverse engineering — binary analysis (Ghidra, IDA), debugging (GDB), anti-debugging, 4) Pwn — buffer overflow, ROP chains, format strings, heap exploitation, 5) Forensics — file carving, steganography, memory dumps, PCAP analysis, 6) Misc — OSINT, scripting challenges. Platforms: HackTheBox, TryHackMe, PicoCTF, OverTheWire. Use pwntools for exploit scripting.', 1.2)
+
+  add('concepts', ['secure api', 'api security', 'api key management', 'api authentication'],
+    'API security checklist: 1) Authentication — OAuth 2.0/OIDC for user APIs, API keys for service-to-service, mutual TLS for internal. 2) Authorization — RBAC/ABAC, validate on every request, principle of least privilege. 3) Input validation — schema validation (Zod/Joi), request size limits, content-type validation. 4) Rate limiting per client/endpoint. 5) Logging — log all auth events, anomalies, errors (no PII in logs). 6) Transport — TLS 1.3, HSTS, certificate pinning for mobile. 7) API versioning + deprecation policy.', 1.3)
+
+  add('concepts', ['supply chain security', 'dependency security', 'lockfile', 'sbom'],
+    'Supply chain security: 1) Lock files — always commit package-lock.json/yarn.lock, 2) Audit — `npm audit`, Snyk, Socket.dev for dependency analysis, 3) Pin versions — exact versions or tight ranges, 4) SBOM — Software Bill of Materials (CycloneDX, SPDX format), 5) Verify — check package provenance, npm package signing, 6) Minimal dependencies — prefer standard library, audit transitive deps, 7) Private registry — Verdaccio, GitHub Packages for internal packages. Use Renovate/Dependabot for automated updates with test gating.', 1.3)
+
+  add('concepts', ['zero trust', 'network security', 'mTLS', 'service mesh security'],
+    'Zero Trust architecture: Never trust, always verify. Principles: 1) Verify explicitly — authenticate and authorize every request, 2) Least privilege access — JIT/JEA, RBAC with minimal permissions, 3) Assume breach — segment network, encrypt all traffic. Implementation: mTLS between services (Istio/Linkerd service mesh), identity-aware proxy (BeyondCorp model), microsegmentation, continuous validation. Code impact: every service validates tokens, no implicit trust of internal networks.', 1.2)
+
+  add('practices', ['secrets management', 'env vars', 'vault', 'secret rotation'],
+    'Secrets management: Never hardcode secrets. Hierarchy: 1) HashiCorp Vault / AWS Secrets Manager / Azure Key Vault (best), 2) CI/CD secrets (GitHub Secrets, GitLab CI vars), 3) .env files (dev only, never commit). Patterns: secret rotation (auto-rotate every 90 days), envelope encryption, secret referencing vs embedding. Code: `const secret = await vault.read("secret/data/api-key")`. Detection: use pre-commit hooks (detect-secrets, git-secrets), .gitignore .env files, scan git history with truffleHog.', 1.4)
+
+  add('practices', ['container security', 'docker security', 'kubernetes security', 'k8s security'],
+    'Container security: 1) Minimal base images (distroless, Alpine), 2) Non-root USER in Dockerfile, 3) Read-only filesystem (`--read-only`), 4) No privileged mode, drop capabilities, 5) Scan images (Trivy, Grype), 6) Sign images (Cosign/Notary). K8s: PodSecurityStandards (restricted), NetworkPolicies, RBAC, OPA/Kyverno policies, encrypted secrets (sealed-secrets/external-secrets), resource limits. Runtime: Falco for anomaly detection, seccomp/AppArmor profiles.', 1.3)
+
+  // ── Semantic Code Analysis — Understanding code meaning, structure, and quality ──
+  add('concepts', ['semantic analysis', 'code understanding', 'ast', 'abstract syntax tree'],
+    'Semantic code analysis: Goes beyond syntax to understand code meaning. AST (Abstract Syntax Tree): parse code into tree structure for analysis — TypeScript compiler API, Babel parser, tree-sitter. Use cases: 1) Dead code detection — find unreachable/unused code, 2) Complexity analysis — cyclomatic complexity, cognitive complexity, 3) Data flow analysis — track variable assignments and usage, 4) Type inference — deduce types from usage patterns, 5) Pattern matching — find code that matches semantic templates. Tools: SonarQube, ESLint custom rules, CodeQL semantic queries.', 1.3)
+
+  add('concepts', ['code smell', 'refactoring indicator', 'technical debt', 'code quality metric'],
+    'Code smells and semantic indicators: 1) Long method (>20 lines) — extract method, 2) God class (>300 lines, many responsibilities) — single responsibility principle, 3) Feature envy — method uses another class more than its own, 4) Shotgun surgery — one change requires many small edits, 5) Primitive obsession — use value objects, 6) Data clumps — group into class/interface, 7) Divergent change — class changes for multiple reasons. Metrics: cyclomatic complexity (<10), cognitive complexity (<15), coupling (afferent/efferent), lack of cohesion (LCOM).', 1.3)
+
+  add('concepts', ['control flow analysis', 'data flow', 'taint analysis', 'code tracing'],
+    'Control and data flow analysis: Control flow graph (CFG) maps all possible execution paths. Data flow analysis tracks variable definitions and uses. Taint analysis: mark untrusted inputs as "tainted", track propagation through code, flag when tainted data reaches sensitive sinks (SQL queries, file paths, eval). Forward analysis: where does this data go? Backward analysis: where did this value come from? Used in: SAST tools (CodeQL, Semgrep), IDE refactoring, dead code elimination, security vulnerability detection.', 1.3)
+
+  add('concepts', ['dependency graph', 'module coupling', 'code architecture analysis', 'import analysis'],
+    'Dependency and architecture analysis: Build module dependency graphs to understand structure. Metrics: 1) Afferent coupling (Ca) — incoming dependencies (how many modules depend on this), 2) Efferent coupling (Ce) — outgoing dependencies (how many modules this depends on), 3) Instability = Ce/(Ca+Ce), 4) Abstractness = abstract classes / total classes. Stable Dependency Principle: depend in direction of stability. Tools: dependency-cruiser (JS/TS), madge (circular deps), NDepend (.NET), ArchUnit (Java). Detect: circular dependencies, layer violations, unstable dependencies.', 1.2)
+
+  add('concepts', ['code similarity', 'clone detection', 'duplicate code', 'semantic clone'],
+    'Code clone detection: Type-1 (exact copy), Type-2 (renamed variables), Type-3 (modified statements), Type-4 (semantic clones — different code, same behavior). Detection: token-based (PMD CPD), AST-based (JSCPD), semantic (code2vec, CodeBERT embeddings). TF-IDF + cosine similarity for finding related code. Refactoring: extract shared function/class, template method pattern, strategy pattern for behavioral variants. Threshold: >6 lines duplicated or >3 instances → refactor.', 1.2)
+
+  add('concepts', ['code generation pattern', 'template coding', 'scaffold', 'boilerplate generation'],
+    'Semantic code generation patterns: 1) Template-based — fill placeholders in code templates (Handlebars, EJS), 2) AST manipulation — parse, transform, and regenerate code (jscodeshift, ts-morph), 3) Schema-driven — generate code from OpenAPI/GraphQL/Prisma schemas, 4) Pattern-based — match intent to code patterns (CRUD → repository + service + controller). Best practices: type-safe generation, format output (prettier), validate generated code compiles, generate tests alongside code. Tools: Plop.js, Hygen, GraphQL Code Generator, Prisma Client.', 1.2)
+
   return entries
 }
 
@@ -1491,6 +1559,55 @@ function reviewCodeLocally(request: CodeReviewRequest): CodeReviewResult {
     if (/\.innerHTML\s*=/.test(code)) {
       const lineNum = lines.findIndex(l => /\.innerHTML\s*=/.test(l)) + 1
       issues.push({ severity: 'warning', line: lineNum || undefined, message: 'innerHTML assignment may be vulnerable to XSS', suggestion: 'Use textContent or sanitize HTML before assignment' })
+    }
+
+    // Command injection via exec/spawn with string concatenation
+    if (/(?:exec|execSync|spawn|spawnSync)\s*\(.*\+/.test(code) || /(?:exec|execSync)\s*\([^)]*\$\{/.test(code)) {
+      const lineNum = lines.findIndex(l => /(?:exec|execSync|spawn)\s*\(/.test(l)) + 1
+      issues.push({ severity: 'error', line: lineNum || undefined, message: 'Potential command injection — user input in shell command', suggestion: 'Use execFile() with argument arrays instead of exec() with string concatenation' })
+    }
+
+    // Path traversal risk — user input in file operations without validation
+    if (/(?:readFile|writeFile|createReadStream|createWriteStream|access|stat|unlink|rmdir|mkdir)\s*\(.*\+/.test(code) || /(?:readFile|writeFile|open)\s*\([^)]*\$\{/.test(code)) {
+      const lineNum = lines.findIndex(l => /(?:readFile|writeFile|createReadStream)\s*\(/.test(l)) + 1
+      issues.push({ severity: 'warning', line: lineNum || undefined, message: 'Potential path traversal — validate file paths before file operations', suggestion: 'Use path.resolve() + startsWith() check against base directory, or path.basename() to strip directory components' })
+    }
+
+    // Insecure randomness for security-critical operations
+    if (/Math\.random\s*\(\)/.test(code) && /(?:token|secret|password|key|salt|nonce|csrf|session)/i.test(code)) {
+      const lineNum = lines.findIndex(l => /Math\.random\s*\(\)/.test(l)) + 1
+      issues.push({ severity: 'error', line: lineNum || undefined, message: 'Math.random() is not cryptographically secure', suggestion: 'Use crypto.randomBytes() or crypto.randomUUID() for security-critical values' })
+    }
+
+    // Prototype pollution risk
+    if (/\[.*\]\s*=/.test(code) && /(?:__proto__|constructor|prototype)/.test(code)) {
+      issues.push({ severity: 'error', message: 'Potential prototype pollution — sanitize object keys from user input', suggestion: 'Use Object.create(null) for dictionary objects, or validate keys against a whitelist' })
+    }
+
+    // Insecure deserialization
+    if (/JSON\.parse\s*\(.*(?:req|request|body|params|query|input|data)/.test(code) && !/try\s*\{/.test(code)) {
+      issues.push({ severity: 'warning', message: 'JSON.parse of user input without try/catch — may throw on malformed input', suggestion: 'Wrap JSON.parse in try/catch and validate the parsed schema with Zod/Joi' })
+    }
+
+    // Regex DoS (ReDoS) — nested quantifiers
+    if (/new RegExp\s*\(.*\+/.test(code)) {
+      issues.push({ severity: 'warning', message: 'Dynamic regex from user input may cause ReDoS', suggestion: 'Sanitize regex input or use re2 (safe regex library) for user-provided patterns' })
+    }
+
+    // dangerouslySetInnerHTML (React XSS)
+    if (/dangerouslySetInnerHTML/.test(code)) {
+      const lineNum = lines.findIndex(l => /dangerouslySetInnerHTML/.test(l)) + 1
+      issues.push({ severity: 'warning', line: lineNum || undefined, message: 'dangerouslySetInnerHTML bypasses React XSS protection', suggestion: 'Use DOMPurify to sanitize HTML before passing to dangerouslySetInnerHTML' })
+    }
+
+    // Insecure cookie settings
+    if (/(?:set-cookie|setCookie|cookie)\s*[=(]/.test(code) && !/(?:httpOnly|secure|sameSite)/i.test(code)) {
+      issues.push({ severity: 'warning', message: 'Cookie may be missing security attributes', suggestion: 'Set httpOnly: true, secure: true, sameSite: "Strict" or "Lax" on cookies' })
+    }
+
+    // CORS wildcard with credentials
+    if (/Access-Control-Allow-Origin.*\*/.test(code) && /credentials/i.test(code)) {
+      issues.push({ severity: 'error', message: 'CORS wildcard (*) with credentials is insecure', suggestion: 'Whitelist specific allowed origins instead of using * when credentials are enabled' })
     }
   }
 
