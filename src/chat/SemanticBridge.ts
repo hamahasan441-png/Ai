@@ -271,8 +271,8 @@ export class SemanticBridge {
     else if (/\binterface\b|\btype\b|\bschema\b|\bcontract\b/.test(lower)) structureType = 'interface'
     else if (/\btest\b|\bspec\b|\bverify\b/.test(lower)) structureType = 'test'
 
-    // Extract name
-    const nameMatch = lower.match(/(?:called|named|for)\s+['"]?(\w+)['"]?/)
+    // Extract name (use original description to preserve casing)
+    const nameMatch = description.match(/(?:called|named|for)\s+['"]?(\w+)['"]?/i)
     let name = nameMatch?.[1] ?? this.inferName(lower, structureType)
 
     // Extract parameters
