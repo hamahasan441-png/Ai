@@ -495,6 +495,9 @@ export class CurriculumOptimizer {
     };
   }
 
+  /** Hours required for full mastery of an easiest-difficulty skill. */
+  private static readonly BASE_HOURS_TO_MASTERY = 10;
+
   /**
    * Estimate effort (in hours) to go from currentMastery to targetMastery
    * at the given difficulty level.
@@ -507,7 +510,7 @@ export class CurriculumOptimizer {
     const gap = Math.max(0, targetMastery - currentMastery);
     // Harder skills take disproportionately more time
     const difficultyMultiplier = 1 + difficulty * 2;
-    return gap * difficultyMultiplier * 10; // base: 10h for full mastery at easiest
+    return gap * difficultyMultiplier * CurriculumOptimizer.BASE_HOURS_TO_MASTERY;
   }
 
   /** Apply calibration offset to a skill's raw difficulty. */
@@ -529,7 +532,8 @@ export class CurriculumOptimizer {
     score: number,
     nominalDifficulty: number,
   ): void {
-    const expected = 1 - nominalDifficulty; // expected score given difficulty
+    // Linear inverse model: difficulty 0 → expected score 1, difficulty 1 → expected score 0
+    const expected = 1 - nominalDifficulty;
     const surprise = score - expected; // positive = outperformed
     const rate = this.config.difficultyAdjustRate;
 
