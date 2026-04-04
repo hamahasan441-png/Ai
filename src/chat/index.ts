@@ -393,6 +393,61 @@ export type {
   InterventionResult,
 } from './CausalReasoner.js'
 
+// ── Market Analyzer — Comprehensive market analysis with multi-signal processing ──
+export { MarketAnalyzer } from './MarketAnalyzer.js'
+
+export type {
+  MarketAnalyzerConfig,
+  MarketAnalyzerStats,
+  SentimentResult,
+  TrendResult,
+  VolatilityResult,
+  CorrelationMatrix,
+  MarketBreadth,
+  NewsImpact,
+  AnomalyResult,
+  MarketSummary,
+} from './MarketAnalyzer.js'
+
+// ── Portfolio Optimizer — Portfolio optimization and risk management ──
+export { PortfolioOptimizer } from './PortfolioOptimizer.js'
+
+export type {
+  PortfolioOptimizerConfig,
+  PortfolioOptimizerStats,
+  Asset,
+  Portfolio,
+  EfficientFrontierPoint,
+  OptimizationResult,
+  StressTestResult,
+  RiskAssessment,
+  RiskProfile,
+  AllocationEntry,
+  AllocationRecommendation,
+  RebalanceTrade,
+  PositionSize,
+  RecoveryPeriod,
+  DrawdownAnalysis,
+  PerformanceAttribution,
+} from './PortfolioOptimizer.js'
+
+// ── Strategy Engine — Trading strategy generation, backtesting, and optimization ──
+export { StrategyEngine } from './StrategyEngine.js'
+
+export type {
+  StrategyEngineConfig,
+  StrategyEngineStats,
+  StrategyRule,
+  Strategy,
+  BacktestResult,
+  TradeRecord,
+  SignalEvent,
+  RiskRule,
+  StrategyComparison,
+  MonteCarloResult,
+  StrategyOptimizationResult,
+} from './StrategyEngine.js'
+
 // ── Abstraction Engine — Concept abstraction and generalization ──
 export { AbstractionEngine, createProgrammingAbstractionEngine } from './AbstractionEngine.js'
 
@@ -442,6 +497,103 @@ export type {
   CreativeConstraint,
   IdeaEvolution,
 } from './CreativeEngine.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TRADING & FINANCIAL INTELLIGENCE (src/chat/)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Trading Engine — Technical analysis, indicators, and signal generation ──
+export { TradingEngine } from './TradingEngine.js'
+
+export type {
+  TradingEngineConfig,
+  TradingEngineStats,
+  OHLCV,
+  TechnicalIndicators,
+  TradeSignal,
+  TrendAnalysis,
+  CandlestickPattern,
+  ChartPattern,
+  RiskMetrics,
+  MarketRegime,
+} from './TradingEngine.js'
+
+// ── Decision Engine — Multi-criteria decision making, Bayesian inference, game theory ──
+export { DecisionEngine } from './DecisionEngine.js'
+
+export type {
+  DecisionEngineConfig,
+  DecisionEngineStats,
+  Alternative,
+  Criterion,
+  MCDAResult,
+  BayesianBelief,
+  BayesianUpdate,
+  GameMatrix,
+  DecisionNode,
+  DecisionTreeResult,
+  ProspectEvaluation,
+  SensitivityResult,
+  GroupDecision,
+  DecisionRecord,
+} from './DecisionEngine.js'
+
+// ── Knowledge Synthesizer — Cross-domain knowledge fusion and insight generation ──
+export { KnowledgeSynthesizer } from './KnowledgeSynthesizer.js'
+
+export type {
+  KnowledgeSynthesizerConfig,
+  KnowledgeSynthesizerStats,
+  KnowledgeSource,
+  FusionResult,
+  Contradiction,
+  Insight,
+  KnowledgeGapResult,
+  SynthesizedSummary,
+  DomainMapping,
+  EvidenceAggregation,
+} from './KnowledgeSynthesizer.js'
+
+// ── Economic Analyzer — Macroeconomic analysis and forecasting ──
+export { EconomicAnalyzer } from './EconomicAnalyzer.js'
+
+export type {
+  EconomicAnalyzerConfig,
+  EconomicAnalyzerStats,
+  EconomicIndicator,
+  EconomicSnapshot,
+  BusinessCycle,
+  MonetaryPolicyAnalysis,
+  FiscalPolicyAnalysis,
+  InflationForecast,
+  CurrencyAnalysis,
+  YieldCurveAnalysis,
+  EconomicReport,
+  SectorAnalysis,
+  MacroScenario,
+} from './EconomicAnalyzer.js'
+
+// ── Security Trainer — Cybersecurity training, pen-testing, and CTF challenges ──
+export { SecurityTrainer } from './SecurityTrainer.js'
+
+export type {
+  SecurityTrainerConfig,
+  SecurityTrainerStats,
+  VulnerabilityInfo,
+  PenTestScenario,
+  PenTestPhase,
+  NetworkAnalysis,
+  WebVulnerability,
+  CryptoChallenge,
+  SocialEngineering,
+  CTFChallenge,
+  ExploitTechnique,
+  SecurityAudit,
+  AuditFinding,
+  IncidentResponse,
+  SecuritySkillAssessment,
+  TrainingModule,
+} from './SecurityTrainer.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
