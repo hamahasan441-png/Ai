@@ -898,6 +898,29 @@ export type {
 } from './HybridBrain.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// PHASE 8 — DEEP UNDERSTANDING INTELLIGENCE MODULES
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Deep Understanding Engine — Semantic similarity, multi-intent, ambiguity ──
+export { DeepUnderstandingEngine } from './DeepUnderstandingEngine.js'
+
+export type {
+  DeepUnderstandingConfig,
+  DeepUnderstandingStats,
+  ConversationTurn,
+  SimilarityMatch,
+  IntentType,
+  ParsedIntent,
+  AmbiguityResult,
+  ResolvedReference,
+  EntityType,
+  ExtractedEntity,
+  EntityRelation,
+  ContextualClassification,
+  UnderstandingResult,
+} from './DeepUnderstandingEngine.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // DEV BRAIN — Private developer module (src/chat/DevBrain.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { DevBrain } from './DevBrain.js'
