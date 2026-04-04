@@ -1018,6 +1018,23 @@ export type {
 } from './SemanticBridge.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// PHASE 10 — MULTI-MODAL FUSION INTELLIGENCE
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Multi-Modal Fusion — Fuse insights from multiple modules into unified results ──
+export { MultiModalFusion } from './MultiModalFusion.js'
+
+export type {
+  MultiModalFusionConfig,
+  MultiModalFusionStats,
+  IntelligenceSource,
+  SourceOutput,
+  FusionResult,
+  FusionConflict,
+  CrossDomainInsight,
+} from './MultiModalFusion.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './TfIdfScorer.js'
