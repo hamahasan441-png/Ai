@@ -87,6 +87,16 @@ import type { KnowledgeSynthesizer } from './KnowledgeSynthesizer.js'
 import type { EconomicAnalyzer } from './EconomicAnalyzer.js'
 import type { SecurityTrainer } from './SecurityTrainer.js'
 
+// Semantic intelligence module type imports (Phase 5)
+import type { EmotionEngine } from './EmotionEngine.js'
+import type { TemporalReasoner } from './TemporalReasoner.js'
+import type { NormalizationEngine } from './NormalizationEngine.js'
+import type { BayesianNetwork } from './BayesianNetwork.js'
+import type { OntologyManager } from './OntologyManager.js'
+import type { DialogueManager } from './DialogueManager.js'
+import type { ArgumentAnalyzer } from './ArgumentAnalyzer.js'
+import type { NarrativeEngine } from './NarrativeEngine.js'
+
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §1  TYPES — Configuration, state, and interfaces for DevBrain               ║
 // ╚═══════════════════════════════════════════════════════════════════════════════╝
@@ -1005,6 +1015,46 @@ export class DevBrain implements BrainInterface {
   /** Get the SecurityTrainer instance. Delegates to LocalBrain. */
   getSecurityTrainer(): SecurityTrainer | null {
     return this.localBrain.getSecurityTrainer()
+  }
+
+  /** Get the EmotionEngine instance. Delegates to LocalBrain. */
+  getEmotionEngine(): EmotionEngine | null {
+    return this.localBrain.getEmotionEngine()
+  }
+
+  /** Get the TemporalReasoner instance. Delegates to LocalBrain. */
+  getTemporalReasoner(): TemporalReasoner | null {
+    return this.localBrain.getTemporalReasoner()
+  }
+
+  /** Get the NormalizationEngine instance. Delegates to LocalBrain. */
+  getNormalizationEngine(): NormalizationEngine | null {
+    return this.localBrain.getNormalizationEngine()
+  }
+
+  /** Get the BayesianNetwork instance. Delegates to LocalBrain. */
+  getBayesianNetwork(): BayesianNetwork | null {
+    return this.localBrain.getBayesianNetwork()
+  }
+
+  /** Get the OntologyManager instance. Delegates to LocalBrain. */
+  getOntologyManager(): OntologyManager | null {
+    return this.localBrain.getOntologyManager()
+  }
+
+  /** Get the DialogueManager instance. Delegates to LocalBrain. */
+  getDialogueManager(): DialogueManager | null {
+    return this.localBrain.getDialogueManager()
+  }
+
+  /** Get the ArgumentAnalyzer instance. Delegates to LocalBrain. */
+  getArgumentAnalyzer(): ArgumentAnalyzer | null {
+    return this.localBrain.getArgumentAnalyzer()
+  }
+
+  /** Get the NarrativeEngine instance. Delegates to LocalBrain. */
+  getNarrativeEngine(): NarrativeEngine | null {
+    return this.localBrain.getNarrativeEngine()
   }
 
   // ╔═══════════════════════════════════════════════════════════════════════════╗

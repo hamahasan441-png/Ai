@@ -373,6 +373,141 @@ export type {
   TopicModelerStats,
 } from './TopicModeler.js'
 
+// ── Ontology Manager — Hierarchical concept & taxonomy management ──
+export { OntologyManager } from './OntologyManager.js'
+
+export type {
+  OntologyManagerConfig,
+  OntologyConcept,
+  OntologyRelation,
+  OntologyProperty,
+  // ConceptHierarchy — already exported from AbstractionEngine
+  InheritancePath,
+  OntologyQuery,
+  OntologyQueryResult,
+  OntologyValidation,
+  OntologyManagerStats,
+} from './OntologyManager.js'
+
+// ── Bayesian Network — Probabilistic reasoning with directed graphical models ──
+export { BayesianNetwork } from './BayesianNetwork.js'
+
+export type {
+  BayesianNetworkConfig,
+  BayesianNode,
+  BayesianEdge,
+  ConditionalProbabilityTable,
+  Evidence,
+  InferenceResult,
+  NetworkStructure,
+  NetworkValidation,
+  BayesianNetworkStats,
+} from './BayesianNetwork.js'
+
+// ── Temporal Reasoner — Time, events, sequences & temporal patterns ──
+export { TemporalReasoner } from './TemporalReasoner.js'
+
+export type {
+  TimePoint,
+  TimeInterval,
+  TemporalEvent,
+  EventSequence,
+  TemporalRelation,
+  TemporalConstraint,
+  TemporalPattern,
+  TimelineAnalysis,
+  TemporalQuery,
+  TemporalQueryResult,
+  TemporalReasonerConfig,
+  TemporalReasonerStats,
+} from './TemporalReasoner.js'
+
+// ── Normalization Engine — Text and data normalization, canonicalization ──
+export { NormalizationEngine } from './NormalizationEngine.js'
+
+export type {
+  NormalizationEngineConfig,
+  NormalizationRule,
+  NormalizationPipeline,
+  PipelineStep,
+  NormalizedText,
+  NormalizationChange,
+  NormalizationResult,
+  TokenNormalization,
+  SynonymMap,
+  TextProfile,
+  NormalizationStats,
+} from './NormalizationEngine.js'
+
+// ── Emotion Engine — Sentiment analysis, emotion detection, empathetic response ──
+export { EmotionEngine } from './EmotionEngine.js'
+
+export type {
+  EmotionEngineConfig,
+  EmotionEngineStats,
+  EmotionCategory,
+  // SentimentResult — already exported from MarketAnalyzer
+  EmotionDetection,
+  EmpathyResponse,
+  EmotionTimeline,
+  EmotionalContext,
+  EmotionPattern,
+} from './EmotionEngine.js'
+
+// ── Dialogue Manager — Dialogue state tracking, slot filling, conversation flow ──
+export { DialogueManager } from './DialogueManager.js'
+
+export type {
+  DialogueManagerConfig,
+  DialogueState,
+  DialogueTurn,
+  DialogueAct,
+  DialogueSlot,
+  SlotFillingResult,
+  DialoguePolicy,
+  DialogueGoal,
+  ConversationFlow,
+  FlowTransition,
+  DialogueManagerStats,
+} from './DialogueManager.js'
+
+// ── Argument Analyzer — Argument mining, claim detection, fallacy analysis ──
+export { ArgumentAnalyzer } from './ArgumentAnalyzer.js'
+
+export type {
+  ArgumentAnalyzerConfig,
+  Argument,
+  Claim,
+  Premise,
+  Conclusion,
+  ArgumentRelation,
+  LogicalFallacy,
+  FallacyType,
+  ArgumentStrength,
+  ArgumentMap,
+  DebatePosition,
+  CounterArgument,
+  ArgumentAnalyzerStats,
+} from './ArgumentAnalyzer.js'
+
+// ── Narrative Engine — Story structure, plot analysis, character arcs ──
+export { NarrativeEngine } from './NarrativeEngine.js'
+
+export type {
+  NarrativeEngineConfig,
+  NarrativeArc,
+  StoryBeat,
+  PlotPoint,
+  Character,
+  CharacterArc,
+  CharacterRelation,
+  NarrativeStructure,
+  Theme,
+  NarrativePattern,
+  NarrativeAnalysis,
+  NarrativeEngineStats,
+} from './NarrativeEngine.js'
+
 // ══════════════════════════════════════════════════════════════════════════════
 // COGNITIVE INTELLIGENCE — Higher-order reasoning modules (src/chat/)
 // ══════════════════════════════════════════════════════════════════════════════
@@ -594,6 +729,82 @@ export type {
   SecuritySkillAssessment,
   TrainingModule,
 } from './SecurityTrainer.js'
+
+// ── Vulnerability Scanner — Static/dynamic code vulnerability scanning and taint analysis ──
+export { VulnerabilityScanner } from './VulnerabilityScanner.js'
+
+export type {
+  VulnerabilityScannerConfig,
+  VulnerabilityScannerStats,
+  VulnCategory,
+  VulnFinding,
+  TaintNode,
+  TaintPath,
+  ScanSummary,
+  ScanResult,
+  CodePattern,
+  TaintRule,
+  ScanProfile,
+} from './VulnerabilityScanner.js'
+
+// ── Threat Modeler — STRIDE/DREAD threat modeling, attack trees, threat intelligence ──
+export { ThreatModeler } from './ThreatModeler.js'
+
+export type {
+  ThreatModelerConfig,
+  ThreatModelerStats,
+  ThreatCategory,
+  StrideCategory,
+  DreadScore,
+  Mitigation,
+  Asset,
+  Threat,
+  DataFlow,
+  TrustBoundary,
+  AttackNode,
+  AttackTree,
+  ThreatIntelEntry,
+  ThreatModel,
+} from './ThreatModeler.js'
+
+// ── Exploit Analyzer — Exploit pattern analysis, CVE correlation, attack surface assessment ──
+export { ExploitAnalyzer } from './ExploitAnalyzer.js'
+
+export type {
+  ExploitAnalyzerConfig,
+  ExploitAnalyzerStats,
+  ExploitCategory,
+  ExploitInfo,
+  PayloadInfo,
+  CVEEntry,
+  ExploitChainStep,
+  ExploitChain,
+  MitigationStrategy,
+  SurfaceComponent,
+  AttackSurface,
+  ExploitAnalysisResult,
+} from './ExploitAnalyzer.js'
+
+// ── Network Forensics — Traffic analysis, anomaly detection, incident response ──
+export { NetworkForensics } from './NetworkForensics.js'
+
+export type {
+  NetworkForensicsConfig,
+  NetworkForensicsStats,
+  AnomalyType,
+  PacketInfo,
+  NetworkAnomaly,
+  ProtocolAnalysis,
+  IncidentTimelineEntry,
+  PlaybookStep,
+  IncidentPlaybook,
+  NetworkIncident,
+  TrafficPattern,
+  TopologyNode,
+  TopologyConnection,
+  NetworkTopology,
+  ForensicReport,
+} from './NetworkForensics.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
