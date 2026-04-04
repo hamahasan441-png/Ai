@@ -313,7 +313,7 @@ export class DocumentAnalyzer {
     this.analysisCount++
 
     const content = this.preprocessContent(request.content)
-    if (content.length === 0) {
+    if (content.trim().length === 0) {
       throw new Error('Document content is empty')
     }
 
