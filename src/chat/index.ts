@@ -1,165 +1,40 @@
 /**
- * 🤖 Advanced AI — Complete Integrated System
+ * 🤖 AI System — 100% Offline, Local-First Intelligence
  *
- * This module exports the ENTIRE AI system built from ALL repository files:
+ * Two models, zero API dependencies:
  *
- *   • AiChat.ts         → Core brain (chat, code, images, search, analytics)
- *   • AiIntegration.ts  → Integration layer (38 tools, 50+ commands, services)
- *   • LocalBrain.ts     → Standalone offline brain (self-learning, no API needed)
- *   • HybridBrain.ts    → Cloud + Offline hybrid (auto-fallback, self-learning)
- *   • DevBrain.ts       → Private developer brain (LocalBrain + OpenAI, unrestricted)
+ *   • LocalBrain.ts  → Standalone offline brain (self-learning, 47 intelligence modules)
+ *   • DevBrain.ts    → Coding practice agent (exercises, skill assessment, code review)
  *
- * The IntegratedAI class uses ALL 1,886 source files across 36+ modules.
+ * All intelligence runs locally — no API keys, no network, no cloud.
  *
  * @example
  * ```ts
- * import { IntegratedAI, ALL_TOOLS, MODULE_DIRECTORY } from './chat/index.js'
- *
- * // Create AI that uses ALL repository modules
- * const ai = new IntegratedAI({
- *   title: 'Full AI Session',
- *   apiKey: 'sk-ant-...',
- *   model: 'claude-sonnet-4-20250514',
- * })
- *
- * // 🌐🧠 Create HYBRID AI — cloud + offline with auto-learning
- * const hybridAi = new IntegratedAI({
- *   title: 'Hybrid AI Session',
- *   apiKey: 'sk-ant-...',
- *   mode: 'hybrid',  // Uses Claude Opus 4.6 + LocalBrain auto-fallback
- * })
- *
- * // 💬 Chat (uses AiChat.ts AI Brain → Claude API)
- * await ai.chat_send('Explain how this project works')
- *
- * // 💻 Write code (uses AiChat.ts Code Writer — 24 languages)
- * await ai.writeCode({ description: 'REST API', language: 'typescript', style: 'production' })
- *
- * // 🖼 Analyze images (uses AiChat.ts Image Analyzer — like Claude Opus vision)
- * await ai.analyzeImage({ imageData: base64, mediaType: 'image/png' })
- *
- * // 🔧 Use any of the 38 tools (from src/tools/*)
- * console.log(`Tools available: ${ai.getToolCount()}`)  // 38
- *
- * // 📋 Use any of 50+ commands (from src/commands/*)
- * const cmds = await ai.getAvailableCommands()
- *
- * // 🌍 Get project context (from src/context.ts)
- * const ctx = await ai.getProjectContext()
- *
- * // 🧠 Load AI memory (from src/memdir/)
- * const memory = await ai.loadMemory()
- *
- * // 💰 Track costs (from src/cost-tracker.ts)
- * const costs = ai.getCostStats()
- *
- * // 📊 Full stats combining ALL modules
- * const stats = ai.getFullStats()
- *
- * // 📖 See what every module does
- * console.log(MODULE_DIRECTORY)
- * ```
- *
- * @example
- * ```ts
- * // 🧠 Standalone offline AI (no API key needed)
+ * // 🧠 LocalBrain — Standalone offline AI
  * import { LocalBrain } from './chat/index.js'
  *
  * const brain = new LocalBrain({ learningEnabled: true })
- *
- * // Chat offline
  * const response = await brain.chat('How do I sort an array in Python?')
- *
- * // Write code offline
  * const code = await brain.writeCode({ description: 'binary search', language: 'typescript' })
- *
- * // Teach the brain
  * brain.learn('What is Redux?', 'Redux is a state management library for JavaScript apps.')
- *
- * // Save brain state
- * const state = brain.serializeBrain()
- * const restored = LocalBrain.deserializeBrain(state)
  * ```
  *
  * @example
  * ```ts
- * // 🌐🧠 Hybrid Brain — Cloud API + Offline (auto-fallback + self-learning)
- * import { HybridBrain } from './chat/index.js'
- *
- * const brain = new HybridBrain({
- *   apiKey: 'sk-ant-...',
- *   deepThinking: true,  // Claude Opus 4.6 level reasoning
- * })
- *
- * // Uses cloud when available, falls back to offline seamlessly
- * const response = await brain.chat('Design a microservices architecture')
- *
- * // Cloud responses automatically train the offline brain
- * // Over time, offline gets smarter from cloud interactions!
- *
- * // Check status
- * console.log(brain.isCloudAvailable())  // true/false
- * console.log(brain.getStats())          // { cloudRequests, offlineRequests, autoLearnCount, ... }
- *
- * // Manually teach the brain
- * brain.teach('What is event sourcing?', 'Event sourcing stores state as a sequence of events...')
- *
- * // Persist hybrid state (preserves ALL learned knowledge)
- * const state = brain.serializeState()
- * const restored = HybridBrain.deserializeState(state)
- * ```
- *
- * @example
- * ```ts
- * // 🔓🧠 DevBrain — Private developer brain (LocalBrain + OpenAI, unrestricted)
+ * // 💻 DevBrain — Offline coding practice agent
  * import { DevBrain } from './chat/index.js'
  *
- * const dev = new DevBrain({ openaiApiKey: 'sk-...' })
- *
- * // Chat — local brain thinks first, OpenAI enhances
- * const response = await dev.chat('How do I reverse-engineer this binary?')
- *
- * // Raw prompt — bypass local thinking, direct to OpenAI
- * const raw = await dev.rawPrompt('Explain V8 memory internals')
- *
- * // System override — custom persona for one request
- * const custom = await dev.chatWithSystem('You are a kernel dev', 'Explain mmap')
- *
- * // Write code — no restrictions
- * const code = await dev.writeCode({ description: 'TCP port scanner', language: 'python' })
- *
- * // Debug log — see what happened
- * console.log(dev.getDebugLog())
+ * const dev = new DevBrain()
+ * const response = await dev.chat('Explain binary search')
+ * const code = await dev.writeCode({ description: 'REST API server', language: 'typescript' })
+ * const exercise = await dev.generateExercise('sorting', 'intermediate', 'python')
+ * const plan = dev.getTrainingPlan('typescript', 'beginner', 'advanced')
  * ```
  */
 
 // ══════════════════════════════════════════════════════════════════════════════
-// INTEGRATED AI — Uses ALL repository files (src/chat/AiIntegration.ts)
+// SHARED TYPES & UTILITIES — Offline types (src/chat/types.ts)
 // ══════════════════════════════════════════════════════════════════════════════
-export {
-  IntegratedAI,
-  ALL_TOOLS,
-  TOOL_COUNT,
-  MODULE_DIRECTORY,
-  TOTAL_MODULES,
-  TOTAL_SOURCE_FILES,
-} from './AiIntegration.js'
-
-// ══════════════════════════════════════════════════════════════════════════════
-// AI CHAT BRAIN — Core intelligence (src/chat/AiChat.ts)
-// ══════════════════════════════════════════════════════════════════════════════
-
-// ── Main Classes ──
-export { AdvancedChat, AiBrain } from './AiChat.js'
-
-// ── Search Functions ──
-export { searchMessages, searchByTool, getPinnedMessages } from './AiChat.js'
-
-// ── Analytics Functions ──
-export { computeAnalytics, getTopTools, getTurnBreakdown } from './AiChat.js'
-
-// ── Export Functions ──
-export { exportConversation } from './AiChat.js'
 
 // ── Code Writer Functions ──
 export {
@@ -169,7 +44,7 @@ export {
   getCodeTemplate,
   getLanguageInfo,
   formatCode,
-} from './AiChat.js'
+} from './types.js'
 
 // ── Image Analyzer Functions ──
 export {
@@ -179,7 +54,7 @@ export {
   buildImageContentBlock,
   createImageBlock,
   parseImageAnalysis,
-} from './AiChat.js'
+} from './types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // LOCAL BRAIN — Standalone offline AI (src/chat/LocalBrain.ts)
@@ -1057,17 +932,6 @@ export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './Tf
 export type { TfIdfDocument, TfIdfResult } from './TfIdfScorer.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
-// HYBRID BRAIN — Cloud + Offline intelligence (src/chat/HybridBrain.ts)
-// ══════════════════════════════════════════════════════════════════════════════
-export { HybridBrain } from './HybridBrain.js'
-
-export type {
-  HybridBrainConfig,
-  HybridBrainStats,
-  HybridBrainState,
-} from './HybridBrain.js'
-
-// ══════════════════════════════════════════════════════════════════════════════
 // PHASE 8 — INTELLIGENCE MODULES
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -1105,7 +969,7 @@ export type {
 } from './TaskOrchestrator.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
-// DEV BRAIN — Private developer module (src/chat/DevBrain.ts)
+// DEV BRAIN — Offline coding practice agent (src/chat/DevBrain.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { DevBrain } from './DevBrain.js'
 
@@ -1114,7 +978,6 @@ export type {
   DevBrainStats,
   DevBrainState,
   DevBrainLogEntry,
-  OpenAIModel,
   ExerciseDifficulty,
   CodingExercise,
   CodeEvaluation,
@@ -1143,7 +1006,7 @@ export type {
   ImageAnalysisRequest, ImageAnalysisResult,
   // AI Brain
   AiBrainConfig, ApiMessage, ApiContentBlock, BrainInterface,
-} from './AiChat.js'
+} from './types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // PIPELINE — Phase registry, module lifecycle, orchestration
