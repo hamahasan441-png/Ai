@@ -97,6 +97,12 @@ import { ThreatModeler } from './ThreatModeler.js'
 import { ExploitAnalyzer } from './ExploitAnalyzer.js'
 import { NetworkForensics } from './NetworkForensics.js'
 
+// Understanding intelligence modules (Phase 7)
+import { PatternRecognizer } from './PatternRecognizer.js'
+import { ConceptMapper } from './ConceptMapper.js'
+import { InferenceEngine } from './InferenceEngine.js'
+import { SentimentAnalyzer } from './SentimentAnalyzer.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1790,6 +1796,12 @@ export class LocalBrain {
   private exploitAnalyzer: ExploitAnalyzer | null = null
   private networkForensics: NetworkForensics | null = null
 
+  // Understanding intelligence modules (Phase 7)
+  private patternRecognizer: PatternRecognizer | null = null
+  private conceptMapper: ConceptMapper | null = null
+  private inferenceEngine: InferenceEngine | null = null
+  private sentimentAnalyzer: SentimentAnalyzer | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1860,6 +1872,12 @@ export class LocalBrain {
       this.threatModeler = new ThreatModeler()
       this.exploitAnalyzer = new ExploitAnalyzer()
       this.networkForensics = new NetworkForensics()
+
+      // Phase 7 — Understanding intelligence modules
+      this.patternRecognizer = new PatternRecognizer()
+      this.conceptMapper = new ConceptMapper()
+      this.inferenceEngine = new InferenceEngine()
+      this.sentimentAnalyzer = new SentimentAnalyzer()
     }
 
     const now = new Date().toISOString()
@@ -3315,6 +3333,18 @@ export class LocalBrain {
   /** Get the NetworkForensics instance (null if intelligence modules are disabled). */
   getNetworkForensics(): NetworkForensics | null { return this.networkForensics }
 
+  /** Get the PatternRecognizer instance (null if intelligence modules are disabled). */
+  getPatternRecognizer(): PatternRecognizer | null { return this.patternRecognizer }
+
+  /** Get the ConceptMapper instance (null if intelligence modules are disabled). */
+  getConceptMapper(): ConceptMapper | null { return this.conceptMapper }
+
+  /** Get the InferenceEngine instance (null if intelligence modules are disabled). */
+  getInferenceEngine(): InferenceEngine | null { return this.inferenceEngine }
+
+  /** Get the SentimentAnalyzer instance (null if intelligence modules are disabled). */
+  getSentimentAnalyzer(): SentimentAnalyzer | null { return this.sentimentAnalyzer }
+
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
 
@@ -3484,6 +3514,10 @@ export class LocalBrain {
     if (this.threatModeler) advancedState.threatModeler = this.threatModeler.serialize()
     if (this.exploitAnalyzer) advancedState.exploitAnalyzer = this.exploitAnalyzer.serialize()
     if (this.networkForensics) advancedState.networkForensics = this.networkForensics.serialize()
+    if (this.patternRecognizer) advancedState.patternRecognizer = this.patternRecognizer.serialize()
+    if (this.conceptMapper) advancedState.conceptMapper = this.conceptMapper.serialize()
+    if (this.inferenceEngine) advancedState.inferenceEngine = this.inferenceEngine.serialize()
+    if (this.sentimentAnalyzer) advancedState.sentimentAnalyzer = this.sentimentAnalyzer.serialize()
 
     return JSON.stringify({ ...state, advancedIntelligence: advancedState })
   }
@@ -3589,6 +3623,18 @@ export class LocalBrain {
       }
       if (advanced.networkForensics) {
         try { brain.networkForensics = NetworkForensics.deserialize(advanced.networkForensics) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.patternRecognizer) {
+        try { brain.patternRecognizer = PatternRecognizer.deserialize(advanced.patternRecognizer) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.conceptMapper) {
+        try { brain.conceptMapper = ConceptMapper.deserialize(advanced.conceptMapper) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.inferenceEngine) {
+        try { brain.inferenceEngine = InferenceEngine.deserialize(advanced.inferenceEngine) } catch { /* ignore corrupted state */ }
+      }
+      if (advanced.sentimentAnalyzer) {
+        try { brain.sentimentAnalyzer = SentimentAnalyzer.deserialize(advanced.sentimentAnalyzer) } catch { /* ignore corrupted state */ }
       }
     }
 
