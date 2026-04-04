@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 
-// Mock the AiChat imports since they're not available in test context
-vi.mock('../AiChat', () => ({
+// Mock the types imports since they're not available in test context
+vi.mock('../types', () => ({
   estimateComplexity: vi.fn(() => 'O(n)'),
   getCodeTemplate: vi.fn(() => null),
   getLanguageInfo: vi.fn(() => ({ name: 'TypeScript', extension: '.ts', comment: '//' })),
@@ -48,11 +48,9 @@ vi.mock('path', () => ({
 import { DevBrain } from '../DevBrain'
 import type { DevBrainConfig, DevBrainStats, DevBrainLogEntry } from '../DevBrain'
 
-// Helper to create a DevBrain with no API key (offline-only mode)
+// Helper to create a DevBrain in offline mode
 function createOfflineDevBrain(overrides?: Partial<DevBrainConfig>): DevBrain {
   return new DevBrain({
-    offlineFallback: true,
-    localThinkFirst: true,
     autoLearn: true,
     debugMode: false,
     ...overrides,
@@ -83,11 +81,9 @@ describe('DevBrain', () => {
 
     it('should create with custom config', () => {
       const dev = new DevBrain({
-        openaiModel: 'gpt-4',
         temperature: 0.5,
         maxTokens: 4096,
         debugMode: true,
-        localThinkFirst: false,
       })
       expect(dev).toBeInstanceOf(DevBrain)
     })
@@ -107,13 +103,8 @@ describe('DevBrain', () => {
     it('should initialize stats correctly', () => {
       const stats = brain.getStats()
       expect(stats.totalRequests).toBe(0)
-      expect(stats.openaiRequests).toBe(0)
       expect(stats.localRequests).toBe(0)
-      expect(stats.hybridRequests).toBe(0)
-      expect(stats.fallbackCount).toBe(0)
       expect(stats.autoLearnCount).toBe(0)
-      expect(stats.rawPromptsUsed).toBe(0)
-      expect(stats.systemOverridesUsed).toBe(0)
       expect(stats.createdAt).toBeTruthy()
     })
 
@@ -235,7 +226,7 @@ describe('DevBrain', () => {
     })
 
     it('should reject unsupported image types', async () => {
-      const { isSupportedImageType } = await import('../AiChat')
+      const { isSupportedImageType } = await import('../types')
       vi.mocked(isSupportedImageType).mockReturnValueOnce(false)
 
       await expect(brain.analyzeImage({
@@ -245,7 +236,7 @@ describe('DevBrain', () => {
     })
 
     it('should reject invalid image data', async () => {
-      const { validateImageData } = await import('../AiChat')
+      const { validateImageData } = await import('../types')
       vi.mocked(validateImageData).mockReturnValueOnce(false)
 
       await expect(brain.analyzeImage({
@@ -346,48 +337,6 @@ describe('DevBrain', () => {
   })
 
   // ══════════════════════════════════════════════════════════════════════════
-  // OPENAI STATUS
-  // ══════════════════════════════════════════════════════════════════════════
-
-  describe('OpenAI Status', () => {
-    it('should report OpenAI unavailable without key', () => {
-      expect(brain.isOpenAIAvailable()).toBe(false)
-    })
-
-    it('should reset OpenAI status', () => {
-      brain.resetOpenAIStatus()
-      // Without API key, still unavailable
-      expect(brain.isOpenAIAvailable()).toBe(false)
-    })
-  })
-
-  // ══════════════════════════════════════════════════════════════════════════
-  // RAW PROMPT & SYSTEM OVERRIDE (no API key — should throw)
-  // ══════════════════════════════════════════════════════════════════════════
-
-  describe('Raw Prompt (no key)', () => {
-    it('should throw when rawPrompt called without API key', async () => {
-      await expect(brain.rawPrompt('test')).rejects.toThrow('No OpenAI API key')
-    })
-
-    it('should track rawPromptsUsed stat even on failure', async () => {
-      try { await brain.rawPrompt('test') } catch { /* expected */ }
-      expect(brain.getStats().rawPromptsUsed).toBe(1)
-    })
-  })
-
-  describe('Chat with System Override (no key)', () => {
-    it('should throw when chatWithSystem called without API key', async () => {
-      await expect(brain.chatWithSystem('custom system', 'hello')).rejects.toThrow('No OpenAI API key')
-    })
-
-    it('should track systemOverridesUsed stat even on failure', async () => {
-      try { await brain.chatWithSystem('sys', 'msg') } catch { /* expected */ }
-      expect(brain.getStats().systemOverridesUsed).toBe(1)
-    })
-  })
-
-  // ══════════════════════════════════════════════════════════════════════════
   // PERSISTENCE
   // ══════════════════════════════════════════════════════════════════════════
 
@@ -401,12 +350,6 @@ describe('DevBrain', () => {
       expect(parsed.stats).toBeDefined()
     })
 
-    it('should not include API key in serialized state', () => {
-      const brainWithKey = new DevBrain({ openaiApiKey: 'sk-secret-key-12345' })
-      const json = brainWithKey.serializeState()
-      expect(json).not.toContain('sk-secret-key-12345')
-    })
-
     it('should deserialize state correctly', async () => {
       // Teach something first
       brain.teach('What is DevBrain?', 'DevBrain is a private developer AI module.')
@@ -417,13 +360,6 @@ describe('DevBrain', () => {
 
       expect(restored.getStats().totalRequests).toBe(brain.getStats().totalRequests)
       expect(restored.getLocalBrain().getLearnedPatternCount()).toBeGreaterThan(0)
-    })
-
-    it('should re-inject API key on deserialization', () => {
-      const json = brain.serializeState()
-      const restored = DevBrain.deserializeState(json, 'sk-new-key')
-      // The restored brain should have the new key configured
-      expect(restored).toBeInstanceOf(DevBrain)
     })
 
     it('should include debug log in state when debug mode is on', async () => {
@@ -464,234 +400,6 @@ describe('DevBrain', () => {
       const stats2 = brain.getStats()
       expect(stats1).not.toBe(stats2)
       expect(stats1).toEqual(stats2)
-    })
-  })
-
-  // ══════════════════════════════════════════════════════════════════════════
-  // OPENAI INTEGRATION (mocked)
-  // ══════════════════════════════════════════════════════════════════════════
-
-  describe('OpenAI Integration (mocked)', () => {
-    let devWithKey: DevBrain
-
-    beforeEach(() => {
-      devWithKey = new DevBrain({
-        openaiApiKey: 'sk-test-key',
-        autoLearn: true,
-        localThinkFirst: true,
-        debugMode: true,
-      })
-    })
-
-    it('should report model as openai when key is present and available', () => {
-      const model = devWithKey.getModel()
-      expect(model).toContain('openai:gpt-4o')
-    })
-
-    it('should fall back to local on API failure', async () => {
-      // Mock fetch to fail
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
-
-      const result = await devWithKey.chat('Hello')
-
-      // Should get a response from local brain fallback
-      expect(result.text).toBeTruthy()
-      expect(devWithKey.getStats().fallbackCount).toBeGreaterThan(0)
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should handle OpenAI API success', async () => {
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          choices: [{ message: { content: 'OpenAI response: TypeScript is great!' } }],
-          usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
-        }),
-      }) as unknown as typeof fetch
-
-      const result = await devWithKey.chat('What is TypeScript?')
-
-      expect(result.text).toBe('OpenAI response: TypeScript is great!')
-      expect(result.usage.inputTokens).toBe(10)
-      expect(result.usage.outputTokens).toBe(20)
-      expect(devWithKey.getStats().openaiRequests).toBe(1)
-      expect(devWithKey.getStats().openaiAvailable).toBe(true)
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should auto-learn from OpenAI responses', async () => {
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          choices: [{ message: { content: 'A detailed response about containers and Docker internals.' } }],
-          usage: { prompt_tokens: 15, completion_tokens: 25, total_tokens: 40 },
-        }),
-      }) as unknown as typeof fetch
-
-      await devWithKey.chat('Explain Docker')
-
-      expect(devWithKey.getStats().autoLearnCount).toBeGreaterThan(0)
-      expect(devWithKey.getLocalBrain().getLearnedPatternCount()).toBeGreaterThan(0)
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should include local thinking context in OpenAI request', async () => {
-      const originalFetch = globalThis.fetch
-      const fetchMock = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          choices: [{ message: { content: 'Enhanced response' } }],
-          usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
-        }),
-      })
-      globalThis.fetch = fetchMock as unknown as typeof fetch
-
-      await devWithKey.chat('What is TypeScript?')
-
-      // Check that the fetch was called with enhanced message containing local analysis
-      const callBody = JSON.parse(fetchMock.mock.calls[0][1].body)
-      const lastMessage = callBody.messages[callBody.messages.length - 1]
-      expect(lastMessage.content).toContain('[Local Analysis]')
-      expect(lastMessage.content).toContain('[User Query]')
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should create debug log entries for hybrid requests', async () => {
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          choices: [{ message: { content: 'Response' } }],
-          usage: { prompt_tokens: 5, completion_tokens: 10, total_tokens: 15 },
-        }),
-      }) as unknown as typeof fetch
-
-      await devWithKey.chat('Test message')
-
-      const log = devWithKey.getDebugLog()
-      expect(log.length).toBeGreaterThan(0)
-      expect(log[0]!.provider).toBe('hybrid')
-      expect(log[0]!.localThinking).toBeTruthy()
-      expect(log[0]!.openaiResponse).toBeTruthy()
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should handle writeCode with OpenAI', async () => {
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          choices: [{ message: { content: '```typescript\nfunction sort(arr: number[]): number[] {\n  return arr.sort((a, b) => a - b);\n}\n```\nA simple sorting function.' } }],
-          usage: { prompt_tokens: 10, completion_tokens: 30, total_tokens: 40 },
-        }),
-      }) as unknown as typeof fetch
-
-      const result = await devWithKey.writeCode({
-        description: 'sort an array',
-        language: 'typescript',
-      })
-
-      expect(result.code).toContain('function sort')
-      expect(result.language).toBe('typescript')
-      expect(devWithKey.getStats().openaiRequests).toBe(1)
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should handle reviewCode with OpenAI', async () => {
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          choices: [{ message: { content: '[warning] line 1: Use === instead of ==\n[error] line 2: Undefined variable\nScore: 65/100\nSummary: Needs improvement.' } }],
-          usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
-        }),
-      }) as unknown as typeof fetch
-
-      const result = await devWithKey.reviewCode({
-        code: 'const x = 1; if (x == 2) {}',
-        language: 'javascript',
-      })
-
-      expect(result.issues.length).toBeGreaterThan(0)
-      expect(result.score).toBe(65)
-      expect(result.summary).toContain('Needs improvement')
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should handle rawPrompt with API key', async () => {
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          choices: [{ message: { content: 'Raw response' } }],
-          usage: { prompt_tokens: 5, completion_tokens: 10, total_tokens: 15 },
-        }),
-      }) as unknown as typeof fetch
-
-      const result = await devWithKey.rawPrompt('Direct prompt')
-
-      expect(result.text).toBe('Raw response')
-      expect(devWithKey.getStats().rawPromptsUsed).toBe(1)
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should handle chatWithSystem with API key', async () => {
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({
-          choices: [{ message: { content: 'Custom system response' } }],
-          usage: { prompt_tokens: 5, completion_tokens: 10, total_tokens: 15 },
-        }),
-      }) as unknown as typeof fetch
-
-      const result = await devWithKey.chatWithSystem('You are a kernel developer', 'Explain mmap')
-
-      expect(result.text).toBe('Custom system response')
-      expect(devWithKey.getStats().systemOverridesUsed).toBe(1)
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should handle API error response', async () => {
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 429,
-        text: () => Promise.resolve('Rate limited'),
-      }) as unknown as typeof fetch
-
-      // With offline fallback, should still get a response
-      const result = await devWithKey.chat('Hello')
-      expect(result.text).toBeTruthy()
-      expect(devWithKey.getStats().fallbackCount).toBeGreaterThan(0)
-
-      globalThis.fetch = originalFetch
-    })
-
-    it('should throw API error when fallback is disabled', async () => {
-      const devNoFallback = new DevBrain({
-        openaiApiKey: 'sk-test',
-        offlineFallback: false,
-      })
-
-      const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
-
-      await expect(devNoFallback.chat('Hello')).rejects.toThrow()
-
-      globalThis.fetch = originalFetch
     })
   })
 
@@ -907,7 +615,7 @@ describe('DevBrain', () => {
   })
 
   // ══════════════════════════════════════════════════════════════════════════
-  // ENHANCED METHODS (local → OpenAI → learn)
+  // ENHANCED METHODS (powered by LocalBrain)
   // ══════════════════════════════════════════════════════════════════════════
 
   describe('Enhanced Methods (offline fallback)', () => {
