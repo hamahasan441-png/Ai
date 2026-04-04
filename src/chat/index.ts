@@ -1144,3 +1144,55 @@ export type {
   // AI Brain
   AiBrainConfig, ApiMessage, ApiContentBlock, BrainInterface,
 } from './AiChat.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PIPELINE — Phase registry, module lifecycle, orchestration
+// ══════════════════════════════════════════════════════════════════════════════
+export {
+  PipelinePhase,
+  PHASE_LABELS,
+  MODULE_REGISTRY,
+  TOTAL_MODULES,
+  getModulesByPhase,
+  getPhaseModuleCounts,
+  findModule,
+  getAllModuleNames,
+  validateDependencies,
+  getPhaseOrder,
+  getInitOrder,
+} from './pipeline/PipelineContract.js'
+
+export type { ModuleDescriptor } from './pipeline/PipelineContract.js'
+
+export { PhaseRunner } from './pipeline/PhaseRunner.js'
+
+export type {
+  ModuleSlot,
+  PhaseResult,
+  ModuleSlotSummary,
+  HealthReport,
+} from './pipeline/PhaseRunner.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SCORING — Centralized scoring engine with normalized formulas
+// ══════════════════════════════════════════════════════════════════════════════
+export {
+  ScoringEngine,
+  DEFAULT_SCORING_CONFIG,
+  DEFAULT_KNOWLEDGE_WEIGHTS,
+  DEFAULT_PATTERN_WEIGHTS,
+  DEFAULT_CONFIDENCE_WEIGHTS,
+  DEFAULT_CODE_REVIEW_WEIGHTS,
+} from './scoring/ScoringEngine.js'
+
+export type {
+  KnowledgeScoreWeights,
+  PatternScoreWeights,
+  ConfidenceWeights,
+  CodeReviewWeights,
+  ScoringConfig,
+  KnowledgeScoreResult,
+  PatternScoreResult,
+  ConfidenceResult,
+  CodeReviewScoreResult,
+} from './scoring/ScoringEngine.js'
