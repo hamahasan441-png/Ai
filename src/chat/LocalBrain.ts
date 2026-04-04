@@ -115,6 +115,10 @@ import { IntelligentRefactorer } from './IntelligentRefactorer.js'
 import { CodeIntentPredictor } from './CodeIntentPredictor.js'
 import { SemanticBridge } from './SemanticBridge.js'
 
+// Training excellence modules (Phase 10)
+import { MultiModalFusion } from './MultiModalFusion.js'
+import { CurriculumOptimizer } from './CurriculumOptimizer.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1826,6 +1830,10 @@ export class LocalBrain {
   private codeIntentPredictor: CodeIntentPredictor | null = null
   private semanticBridge: SemanticBridge | null = null
 
+  // Training excellence modules (Phase 10)
+  private multiModalFusion: MultiModalFusion | null = null
+  private curriculumOptimizer: CurriculumOptimizer | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1914,6 +1922,10 @@ export class LocalBrain {
       this.intelligentRefactorer = new IntelligentRefactorer()
       this.codeIntentPredictor = new CodeIntentPredictor()
       this.semanticBridge = new SemanticBridge()
+
+      // Phase 10 — Training excellence modules
+      this.multiModalFusion = new MultiModalFusion()
+      this.curriculumOptimizer = new CurriculumOptimizer()
     }
 
     const now = new Date().toISOString()
@@ -3431,6 +3443,12 @@ export class LocalBrain {
   /** Get the SemanticBridge instance (null if intelligence modules are disabled). */
   getSemanticBridge(): SemanticBridge | null { return this.semanticBridge }
 
+  /** Get the MultiModalFusion instance (null if intelligence modules are disabled). */
+  getMultiModalFusion(): MultiModalFusion | null { return this.multiModalFusion }
+
+  /** Get the CurriculumOptimizer instance (null if intelligence modules are disabled). */
+  getCurriculumOptimizer(): CurriculumOptimizer | null { return this.curriculumOptimizer }
+
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
 
@@ -3474,6 +3492,8 @@ export class LocalBrain {
     dialogueTurns: number
     argumentsAnalyzed: number
     narrativesAnalyzed: number
+    totalFusions: number
+    totalSkillsTracked: number
   } {
     if (!this.config.enableIntelligence) {
       return {
@@ -3487,6 +3507,7 @@ export class LocalBrain {
         knowledgeFusions: 0, economicForecasts: 0, securityTrainingSessions: 0, securityChallengesGenerated: 0,
         emotionAnalyses: 0, temporalEvents: 0, normalizationRuns: 0, bayesianInferences: 0,
         ontologyConcepts: 0, dialogueTurns: 0, argumentsAnalyzed: 0, narrativesAnalyzed: 0,
+        totalFusions: 0, totalSkillsTracked: 0,
       }
     }
 
@@ -3516,6 +3537,8 @@ export class LocalBrain {
     const dialogueStats = this.dialogueManager?.getStats() ?? null
     const argumentStats = this.argumentAnalyzer?.getStats() ?? null
     const narrativeStats = this.narrativeEngine?.getStats() ?? null
+    const fusionStats = this.multiModalFusion?.getStats() ?? null
+    const curriculumStats = this.curriculumOptimizer?.getStats() ?? null
 
     return {
       enabled: true,
@@ -3556,6 +3579,8 @@ export class LocalBrain {
       dialogueTurns: dialogueStats?.totalTurns ?? 0,
       argumentsAnalyzed: argumentStats?.totalArguments ?? 0,
       narrativesAnalyzed: narrativeStats?.totalBeats ?? 0,
+      totalFusions: fusionStats?.totalFusions ?? 0,
+      totalSkillsTracked: curriculumStats?.totalSkills ?? 0,
     }
   }
 
