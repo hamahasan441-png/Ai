@@ -109,6 +109,12 @@ import { TaskOrchestrator } from './TaskOrchestrator.js'
 import { KnowledgeReasoner } from './KnowledgeReasoner.js'
 import { AdaptiveLearner } from './AdaptiveLearner.js'
 
+// Intelligent coding & semantic modules (Phase 9)
+import { SemanticCodeAnalyzer } from './SemanticCodeAnalyzer.js'
+import { IntelligentRefactorer } from './IntelligentRefactorer.js'
+import { CodeIntentPredictor } from './CodeIntentPredictor.js'
+import { SemanticBridge } from './SemanticBridge.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1814,6 +1820,12 @@ export class LocalBrain {
   private knowledgeReasoner: KnowledgeReasoner | null = null
   private adaptiveLearner: AdaptiveLearner | null = null
 
+  // Intelligent coding & semantic modules (Phase 9)
+  private semanticCodeAnalyzer: SemanticCodeAnalyzer | null = null
+  private intelligentRefactorer: IntelligentRefactorer | null = null
+  private codeIntentPredictor: CodeIntentPredictor | null = null
+  private semanticBridge: SemanticBridge | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1896,6 +1908,12 @@ export class LocalBrain {
       this.taskOrchestrator = new TaskOrchestrator()
       this.knowledgeReasoner = new KnowledgeReasoner()
       this.adaptiveLearner = new AdaptiveLearner()
+
+      // Phase 9 — Intelligent coding & semantic modules
+      this.semanticCodeAnalyzer = new SemanticCodeAnalyzer()
+      this.intelligentRefactorer = new IntelligentRefactorer()
+      this.codeIntentPredictor = new CodeIntentPredictor()
+      this.semanticBridge = new SemanticBridge()
     }
 
     const now = new Date().toISOString()
@@ -3400,6 +3418,18 @@ export class LocalBrain {
 
   /** Get the AdaptiveLearner instance (null if intelligence modules are disabled). */
   getAdaptiveLearner(): AdaptiveLearner | null { return this.adaptiveLearner }
+
+  /** Get the SemanticCodeAnalyzer instance (null if intelligence modules are disabled). */
+  getSemanticCodeAnalyzer(): SemanticCodeAnalyzer | null { return this.semanticCodeAnalyzer }
+
+  /** Get the IntelligentRefactorer instance (null if intelligence modules are disabled). */
+  getIntelligentRefactorer(): IntelligentRefactorer | null { return this.intelligentRefactorer }
+
+  /** Get the CodeIntentPredictor instance (null if intelligence modules are disabled). */
+  getCodeIntentPredictor(): CodeIntentPredictor | null { return this.codeIntentPredictor }
+
+  /** Get the SemanticBridge instance (null if intelligence modules are disabled). */
+  getSemanticBridge(): SemanticBridge | null { return this.semanticBridge }
 
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }

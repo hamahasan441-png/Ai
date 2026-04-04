@@ -951,6 +951,73 @@ export type {
 } from './AdaptiveLearner.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// PHASE 9 — INTELLIGENT CODING & SEMANTIC MODULES
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Semantic Code Analyzer — Deep semantic analysis of code structure, patterns, quality ──
+export { SemanticCodeAnalyzer } from './SemanticCodeAnalyzer.js'
+
+export type {
+  SemanticCodeAnalyzerConfig,
+  SemanticCodeAnalyzerStats,
+  CodePatternType,
+  DetectedPattern,
+  AntiPatternType,
+  DetectedAntiPattern,
+  CodeSymbol,
+  DependencyEdge,
+  QualityMetrics,
+  SemanticCodeAnalysis,
+} from './SemanticCodeAnalyzer.js'
+
+// ── Intelligent Refactorer — Smart refactoring with semantic understanding ──
+export { IntelligentRefactorer } from './IntelligentRefactorer.js'
+
+export type {
+  IntelligentRefactorerConfig,
+  IntelligentRefactorerStats,
+  RefactoringType,
+  RefactoringSuggestion as IntelligentRefactoringSuggestion,
+  ExtractMethodResult,
+  RenameResult,
+  SimplificationResult,
+  DuplicateBlock,
+  RefactoringPlan,
+} from './IntelligentRefactorer.js'
+
+// ── Code Intent Predictor — Predict coding intent from context and history ──
+export { CodeIntentPredictor } from './CodeIntentPredictor.js'
+
+export type {
+  CodeIntentPredictorConfig,
+  CodeIntentPredictorStats,
+  CodingIntentType,
+  IntentPrediction,
+  ContextSignal,
+  SequencePrediction,
+  CompletionPrediction,
+  PredictionResult as IntentPredictionResult,
+  IntentFeedback,
+} from './CodeIntentPredictor.js'
+
+// ── Semantic Bridge — Bridge between natural language and code semantics ──
+export { SemanticBridge } from './SemanticBridge.js'
+
+export type {
+  SemanticBridgeConfig,
+  SemanticBridgeStats,
+  NlToCodeResult,
+  CodeToNlResult,
+  ConceptMapping,
+  SemanticSearchResult,
+  SemanticMatch,
+  CodeSkeleton,
+  SkeletonPlaceholder,
+  TranslationFeedback,
+  BridgeAnalysis,
+} from './SemanticBridge.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './TfIdfScorer.js'
