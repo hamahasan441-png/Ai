@@ -44,14 +44,14 @@ import type {
   BrainInterface,
   ApiMessage,
   ProgrammingLanguage,
-} from './AiChat.js'
+} from './types.js'
 
 import {
   estimateComplexity,
   isSupportedImageType,
   validateImageData,
   parseImageAnalysis,
-} from './AiChat.js'
+} from './types.js'
 
 import { LocalBrain } from './LocalBrain.js'
 

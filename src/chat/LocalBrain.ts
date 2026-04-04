@@ -32,7 +32,7 @@ import type {
   ProgrammingLanguage,
   AiBrainConfig,
   ApiMessage,
-} from './AiChat'
+} from './types.js'
 
 import {
   estimateComplexity,
@@ -42,7 +42,7 @@ import {
   isSupportedImageType,
   validateImageData,
   parseImageAnalysis,
-} from './AiChat'
+} from './types.js'
 
 import { TfIdfScorer } from './TfIdfScorer'
 import { CodeAnalyzer } from './codemaster/CodeAnalyzer.js'
