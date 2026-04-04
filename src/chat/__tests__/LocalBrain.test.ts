@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 
-// Mock the AiChat imports since they're not available in test context
-vi.mock('../AiChat', () => ({
+// Mock the types imports since they're not available in test context
+vi.mock('../types', () => ({
   estimateComplexity: vi.fn(() => 'O(n)'),
   getCodeTemplate: vi.fn(() => null),
   getLanguageInfo: vi.fn(() => ({ name: 'TypeScript', extension: '.ts', comment: '//' })),
