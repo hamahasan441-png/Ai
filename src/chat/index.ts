@@ -932,43 +932,6 @@ export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './Tf
 export type { TfIdfDocument, TfIdfResult } from './TfIdfScorer.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
-// PHASE 8 — INTELLIGENCE MODULES
-// ══════════════════════════════════════════════════════════════════════════════
-
-// ── Deep Understanding Engine — Semantic similarity, multi-intent, ambiguity ──
-export { DeepUnderstandingEngine } from './DeepUnderstandingEngine.js'
-
-export type {
-  DeepUnderstandingConfig,
-  DeepUnderstandingStats,
-  ConversationTurn,
-  SimilarityMatch,
-  IntentType,
-  ParsedIntent,
-  AmbiguityResult,
-  ResolvedReference,
-  EntityType,
-  ExtractedEntity,
-  EntityRelation,
-  ContextualClassification,
-  UnderstandingResult,
-} from './DeepUnderstandingEngine.js'
-
-// ── Task Orchestrator — Goal decomposition, execution tracking, recovery ──
-export { TaskOrchestrator } from './TaskOrchestrator.js'
-
-export type {
-  TaskOrchestratorConfig,
-  TaskOrchestratorStats,
-  TaskState,
-  StepType,
-  StepResult,
-  TaskStatus,
-  ProgressReport,
-  ActiveTaskInfo,
-} from './TaskOrchestrator.js'
-
-// ══════════════════════════════════════════════════════════════════════════════
 // DEV BRAIN — Offline coding practice agent (src/chat/DevBrain.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { DevBrain } from './DevBrain.js'
