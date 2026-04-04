@@ -880,6 +880,77 @@ export type {
 } from './SentimentAnalyzer.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// PHASE 8 — DEEP INTELLIGENCE MODULES
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Deep Understanding Engine — Semantic similarity, multi-intent parsing, ambiguity detection ──
+export { DeepUnderstandingEngine } from './DeepUnderstandingEngine.js'
+
+export type {
+  DeepUnderstandingConfig,
+  DeepUnderstandingStats,
+  ConversationTurn,
+  SimilarityMatch,
+  IntentType,
+  ParsedIntent,
+  AmbiguityResult,
+  ResolvedReference,
+  EntityType,
+  ExtractedEntity,
+  EntityRelation,
+  ContextualClassification,
+  UnderstandingResult,
+} from './DeepUnderstandingEngine.js'
+
+// ── Task Orchestrator — Multi-step task execution with planning and state tracking ──
+export { TaskOrchestrator } from './TaskOrchestrator.js'
+
+export type {
+  TaskOrchestratorConfig,
+  TaskOrchestratorStats,
+  TaskState,
+  StepType,
+  TaskStep,
+  StepResult,
+  TaskPlan as OrchestratorTaskPlan,
+  TaskStatus,
+  ProgressReport,
+  ActiveTaskInfo,
+} from './TaskOrchestrator.js'
+
+// ── Knowledge Reasoner — Transitive inference, knowledge composition, contradiction detection ──
+export { KnowledgeReasoner } from './KnowledgeReasoner.js'
+
+export type {
+  KnowledgeReasonerConfig,
+  KnowledgeReasonerStats,
+  KnowledgeFact,
+  InferenceChain as ReasonerInferenceChain,
+  ComposedAnswer,
+  Contradiction,
+  ExplanationResult,
+  ExplanationPath,
+  Hypothesis,
+} from './KnowledgeReasoner.js'
+
+// ── Adaptive Learner — Fact extraction, concept generalization, transfer learning ──
+export { AdaptiveLearner } from './AdaptiveLearner.js'
+
+export type {
+  AdaptiveLearnerConfig,
+  AdaptiveLearnerStats,
+  ExtractedFact,
+  Example,
+  GeneralizedRule,
+  TransferResult,
+  DomainMapping,
+  MistakeLesson,
+  MistakeCategory,
+  PredictionRecord,
+  CalibrationReport,
+} from './AdaptiveLearner.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // TF-IDF SCORER — Semantic similarity for pattern matching (src/chat/TfIdfScorer.ts)
 // ══════════════════════════════════════════════════════════════════════════════
 export { TfIdfScorer, tokenize, cosineSimilarity, ngramOverlapScore } from './TfIdfScorer.js'

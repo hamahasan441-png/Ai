@@ -103,6 +103,12 @@ import { ConceptMapper } from './ConceptMapper.js'
 import { InferenceEngine } from './InferenceEngine.js'
 import { SentimentAnalyzer } from './SentimentAnalyzer.js'
 
+// Deep intelligence modules (Phase 8)
+import { DeepUnderstandingEngine } from './DeepUnderstandingEngine.js'
+import { TaskOrchestrator } from './TaskOrchestrator.js'
+import { KnowledgeReasoner } from './KnowledgeReasoner.js'
+import { AdaptiveLearner } from './AdaptiveLearner.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1802,6 +1808,12 @@ export class LocalBrain {
   private inferenceEngine: InferenceEngine | null = null
   private sentimentAnalyzer: SentimentAnalyzer | null = null
 
+  // Deep intelligence modules (Phase 8)
+  private deepUnderstanding: DeepUnderstandingEngine | null = null
+  private taskOrchestrator: TaskOrchestrator | null = null
+  private knowledgeReasoner: KnowledgeReasoner | null = null
+  private adaptiveLearner: AdaptiveLearner | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1878,6 +1890,12 @@ export class LocalBrain {
       this.conceptMapper = new ConceptMapper()
       this.inferenceEngine = new InferenceEngine()
       this.sentimentAnalyzer = new SentimentAnalyzer()
+
+      // Phase 8 — Deep intelligence modules
+      this.deepUnderstanding = new DeepUnderstandingEngine()
+      this.taskOrchestrator = new TaskOrchestrator()
+      this.knowledgeReasoner = new KnowledgeReasoner()
+      this.adaptiveLearner = new AdaptiveLearner()
     }
 
     const now = new Date().toISOString()
@@ -1909,6 +1927,32 @@ export class LocalBrain {
     // Detect intent and extract keywords
     const intent = detectIntent(userMessage)
     const keywords = extractKeywords(userMessage)
+
+    // Phase 8: Deep Understanding — multi-intent parsing, entity extraction, ambiguity detection
+    let understanding: ReturnType<DeepUnderstandingEngine['understand']> | null = null
+    if (this.deepUnderstanding) {
+      const contextTurns = this.conversationHistory.slice(-10).map((m, i) => ({
+        role: m.role, content: m.content, timestamp: Date.now() - (10 - i) * 1000,
+      }))
+      understanding = this.deepUnderstanding.understand(userMessage, contextTurns)
+      // Augment keywords with extracted entities from deep understanding
+      for (const entity of understanding.entities) {
+        const val = entity.value.toLowerCase()
+        if (!keywords.includes(val)) {
+          keywords.push(val)
+        }
+      }
+    }
+
+    // Phase 8: KnowledgeReasoner — feed extracted facts into knowledge graph
+    if (this.knowledgeReasoner && this.adaptiveLearner) {
+      const facts = this.adaptiveLearner.extractFacts(userMessage)
+      for (const fact of facts) {
+        if (fact.confidence >= 0.5 && !fact.negated) {
+          this.knowledgeReasoner.addFact(fact.subject, fact.relation, fact.object, fact.confidence, 'conversation')
+        }
+      }
+    }
 
     // Use IntentEngine for richer intent classification if available
     if (this.intentEngine) {
@@ -3344,6 +3388,18 @@ export class LocalBrain {
 
   /** Get the SentimentAnalyzer instance (null if intelligence modules are disabled). */
   getSentimentAnalyzer(): SentimentAnalyzer | null { return this.sentimentAnalyzer }
+
+  /** Get the DeepUnderstandingEngine instance (null if intelligence modules are disabled). */
+  getDeepUnderstanding(): DeepUnderstandingEngine | null { return this.deepUnderstanding }
+
+  /** Get the TaskOrchestrator instance (null if intelligence modules are disabled). */
+  getTaskOrchestrator(): TaskOrchestrator | null { return this.taskOrchestrator }
+
+  /** Get the KnowledgeReasoner instance (null if intelligence modules are disabled). */
+  getKnowledgeReasoner(): KnowledgeReasoner | null { return this.knowledgeReasoner }
+
+  /** Get the AdaptiveLearner instance (null if intelligence modules are disabled). */
+  getAdaptiveLearner(): AdaptiveLearner | null { return this.adaptiveLearner }
 
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
