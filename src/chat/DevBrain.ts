@@ -47,6 +47,8 @@ import type {
   BrainInterface,
   ApiMessage,
   ProgrammingLanguage,
+  DocumentAnalysisInput,
+  DocumentAnalysisOutput,
 } from './types.js'
 
 import {
@@ -393,6 +395,14 @@ export class DevBrain implements BrainInterface {
     }
 
     return this.localBrain.analyzeImage(request)
+  }
+
+  /** Analyze a document using the DevBrain. Delegates to LocalBrain. */
+  async analyzeDocument(request: DocumentAnalysisInput): Promise<DocumentAnalysisOutput> {
+    this.stats.totalRequests++
+    this.stats.localRequests++
+
+    return this.localBrain.analyzeDocument(request)
   }
 
   /** Get the current model name. */

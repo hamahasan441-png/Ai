@@ -969,6 +969,8 @@ export type {
   ImageAnalysisRequest, ImageAnalysisResult,
   // AI Brain
   AiBrainConfig, ApiMessage, ApiContentBlock, BrainInterface,
+  // Document Analysis (lightweight types from BrainInterface)
+  DocumentAnalysisInput, DocumentAnalysisOutput,
 } from './types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1147,3 +1149,53 @@ export type {
   SessionSummary,
   ReplayStoreStats,
 } from './pipeline/ReplayStore.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// IMAGE ANALYZER — Deep offline image understanding (Phase 11)
+// ══════════════════════════════════════════════════════════════════════════════
+export { ImageAnalyzer, DEFAULT_ANALYZER_CONFIG } from './ImageAnalyzer.js'
+
+export type {
+  DeepImageAnalysis,
+  ImageFormatInfo,
+  PixelAnalysis,
+  ColorInfo,
+  HistogramBucket,
+  StructureAnalysis,
+  CompositionType,
+  ContentClassification,
+  ImageContentType,
+  TextRegion,
+  SceneAnalysis,
+  QualityAssessment,
+  ImageAnalyzerConfig,
+  ImageAnalyzerStats,
+} from './ImageAnalyzer.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DOCUMENT ANALYZER — Deep offline document understanding (Phase 11)
+// ══════════════════════════════════════════════════════════════════════════════
+export { DocumentAnalyzer, DEFAULT_DOC_ANALYZER_CONFIG } from './DocumentAnalyzer.js'
+
+export type {
+  DocumentAnalysisRequest,
+  DocumentAnalysisResult,
+  DocumentMetadata,
+  DocumentFormat,
+  DocumentStructure,
+  DocumentSection,
+  OutlineEntry,
+  ContentAnalysis,
+  NamedEntity,
+  ReadabilityMetrics,
+  DocumentClassification,
+  DocumentType,
+  KeywordResult,
+  SectionSummary,
+  DetectedTable,
+  DetectedCodeBlock,
+  CrossReference,
+  DocumentSentiment,
+  DocumentAnalyzerConfig,
+  DocumentAnalyzerStats,
+} from './DocumentAnalyzer.js'

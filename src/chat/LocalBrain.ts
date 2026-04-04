@@ -32,6 +32,8 @@ import type {
   ProgrammingLanguage,
   AiBrainConfig,
   ApiMessage,
+  DocumentAnalysisInput,
+  DocumentAnalysisOutput,
 } from './types.js'
 
 import {
@@ -118,6 +120,10 @@ import { SemanticBridge } from './SemanticBridge.js'
 // Training excellence modules (Phase 10)
 import { MultiModalFusion } from './MultiModalFusion.js'
 import { CurriculumOptimizer } from './CurriculumOptimizer.js'
+
+// Deep analysis modules (Phase 11)
+import { ImageAnalyzer } from './ImageAnalyzer.js'
+import { DocumentAnalyzer } from './DocumentAnalyzer.js'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -1834,6 +1840,10 @@ export class LocalBrain {
   private multiModalFusion: MultiModalFusion | null = null
   private curriculumOptimizer: CurriculumOptimizer | null = null
 
+  // Deep analysis modules (Phase 11)
+  private imageAnalyzer: ImageAnalyzer | null = null
+  private documentAnalyzer: DocumentAnalyzer | null = null
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1926,6 +1936,10 @@ export class LocalBrain {
       // Phase 10 — Training excellence modules
       this.multiModalFusion = new MultiModalFusion()
       this.curriculumOptimizer = new CurriculumOptimizer()
+
+      // Phase 11 — Deep analysis modules
+      this.imageAnalyzer = new ImageAnalyzer()
+      this.documentAnalyzer = new DocumentAnalyzer()
     }
 
     const now = new Date().toISOString()
@@ -3079,7 +3093,7 @@ export class LocalBrain {
 
   // ── Image Analysis (same interface as AiBrain.analyzeImage) ──
 
-  /** Analyze image metadata (limited without a vision model). */
+  /** Analyze image with deep offline understanding via ImageAnalyzer. */
   async analyzeImage(request: ImageAnalysisRequest): Promise<ImageAnalysisResult> {
     this.stats.totalImageAnalyses++
     this.stats.lastUsedAt = new Date().toISOString()
@@ -3091,7 +3105,22 @@ export class LocalBrain {
       throw new Error('Invalid image data')
     }
 
-    // Extract what we can from metadata (no vision model available)
+    // Use deep ImageAnalyzer if available (Phase 11)
+    if (this.imageAnalyzer) {
+      const deepResult = this.imageAnalyzer.analyze(request.imageData, request.mediaType, request.question)
+      return {
+        description: deepResult.description,
+        objects: deepResult.scene.subjects.slice(),
+        colors: deepResult.pixelAnalysis.dominantColors.map(c => c.name),
+        text: deepResult.textRegions.length > 0
+          ? deepResult.textRegions.map(r => r.text).join('; ')
+          : undefined,
+        sentiment: deepResult.scene.mood,
+        tags: deepResult.classification.tags.slice(),
+      }
+    }
+
+    // Fallback: basic metadata analysis
     const sizeBytes = Math.floor(request.imageData.length * 0.75)
     const sizeKB = Math.round(sizeBytes / 1024)
     const format = request.mediaType.split('/')[1] ?? 'unknown'
@@ -3101,6 +3130,85 @@ export class LocalBrain {
       'Note: Detailed visual analysis requires a vision model. LocalBrain can identify format and size metadata.'
 
     return parseImageAnalysis(description)
+  }
+
+  /**
+   * Deep image analysis returning the full DeepImageAnalysis result.
+   * Provides pixel analysis, structure, classification, text detection, scene, and quality.
+   */
+  analyzeImageDeep(imageData: string, mediaType: string, question?: string) {
+    if (!this.imageAnalyzer) {
+      throw new Error('ImageAnalyzer not available — enable intelligence modules')
+    }
+    return this.imageAnalyzer.analyze(imageData, mediaType, question)
+  }
+
+  // ── Document Analysis ──
+
+  /**
+   * Analyze a document (PDF text, markdown, plaintext, code, etc.).
+   * Returns structure, keywords, readability, classification, summaries, and more.
+   */
+  async analyzeDocument(request: DocumentAnalysisInput): Promise<DocumentAnalysisOutput> {
+    this.stats.lastUsedAt = new Date().toISOString()
+
+    if (!request.content || request.content.trim().length === 0) {
+      throw new Error('Document content is empty')
+    }
+
+    // Use deep DocumentAnalyzer if available (Phase 11)
+    if (this.documentAnalyzer) {
+      const result = this.documentAnalyzer.analyze({
+        content: request.content,
+        fileName: request.fileName,
+        mimeType: request.mimeType,
+        question: request.question,
+      })
+
+      return {
+        description: result.description,
+        wordCount: result.metadata.wordCount,
+        estimatedPages: result.metadata.estimatedPages,
+        keywords: result.keywords.map(k => k.word),
+        readabilityLevel: result.readability.level.replace(/_/g, ' '),
+        documentType: result.classification.primaryType.replace(/_/g, ' '),
+        sentiment: result.sentiment.overall,
+        sections: result.structure.sections.map(s => ({
+          title: s.title,
+          wordCount: s.wordCount,
+        })),
+        answer: result.answer,
+        confidence: result.confidence,
+        processingMs: result.processingMs,
+      }
+    }
+
+    // Fallback: basic analysis
+    const words = request.content.split(/\s+/).filter(Boolean)
+    return {
+      description: `Document analysis: ${words.length} words.`,
+      wordCount: words.length,
+      estimatedPages: Math.max(1, Math.ceil(words.length / 250)),
+      keywords: [],
+      readabilityLevel: 'unknown',
+      documentType: 'general',
+      sentiment: 'neutral',
+      sections: [{ title: 'Content', wordCount: words.length }],
+      answer: null,
+      confidence: 0.3,
+      processingMs: 0,
+    }
+  }
+
+  /**
+   * Deep document analysis returning the full DocumentAnalysisResult.
+   * Provides readability metrics, classification, section summaries, tables, code blocks, etc.
+   */
+  analyzeDocumentDeep(content: string, fileName?: string, mimeType?: string, question?: string) {
+    if (!this.documentAnalyzer) {
+      throw new Error('DocumentAnalyzer not available — enable intelligence modules')
+    }
+    return this.documentAnalyzer.analyze({ content, fileName, mimeType, question })
   }
 
   // ── Self-Learning ──
@@ -3448,6 +3556,12 @@ export class LocalBrain {
 
   /** Get the CurriculumOptimizer instance (null if intelligence modules are disabled). */
   getCurriculumOptimizer(): CurriculumOptimizer | null { return this.curriculumOptimizer }
+
+  /** Get the ImageAnalyzer instance (null if intelligence modules are disabled). */
+  getImageAnalyzer(): ImageAnalyzer | null { return this.imageAnalyzer }
+
+  /** Get the DocumentAnalyzer instance (null if intelligence modules are disabled). */
+  getDocumentAnalyzer(): DocumentAnalyzer | null { return this.documentAnalyzer }
 
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }

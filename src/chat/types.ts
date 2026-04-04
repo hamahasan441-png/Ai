@@ -267,9 +267,33 @@ export interface BrainInterface {
   writeCode(request: CodeRequest): Promise<CodeResult>
   reviewCode(request: CodeReviewRequest): Promise<CodeReviewResult>
   analyzeImage(request: ImageAnalysisRequest): Promise<ImageAnalysisResult>
+  analyzeDocument(request: DocumentAnalysisInput): Promise<DocumentAnalysisOutput>
   getModel(): string
   setModel(model: string): void
   clearHistory(): void
+}
+
+/** Lightweight document analysis input (full types in DocumentAnalyzer). */
+export interface DocumentAnalysisInput {
+  content: string
+  fileName?: string
+  mimeType?: string
+  question?: string
+}
+
+/** Lightweight document analysis output (compatible with DocumentAnalysisResult). */
+export interface DocumentAnalysisOutput {
+  description: string
+  wordCount: number
+  estimatedPages: number
+  keywords: readonly string[]
+  readabilityLevel: string
+  documentType: string
+  sentiment: string
+  sections: readonly { title: string; wordCount: number }[]
+  answer: string | null
+  confidence: number
+  processingMs: number
 }
 
 export interface ApiContentBlock {
