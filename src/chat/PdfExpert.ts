@@ -216,7 +216,8 @@ export class PdfExpert {
       ? content.slice(0, this.config.maxContentLength)
       : content
 
-    const id = `doc-${this.nextDocId++}`
+    const docNumber = this.nextDocId++
+    const id = `doc-${docNumber}`
     const analysis = this.analyzer.analyze({
       content: truncated,
       fileName,
@@ -225,7 +226,7 @@ export class PdfExpert {
 
     const doc: LoadedDocument = {
       id,
-      fileName: fileName ?? `Document ${this.nextDocId - 1}`,
+      fileName: fileName ?? `Document ${docNumber}`,
       content: truncated,
       analysis,
       loadedAt: new Date().toISOString(),

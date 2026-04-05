@@ -261,7 +261,7 @@ describe('PdfExpert', () => {
     it('assigns default file name when not provided', () => {
       expert.loadDocument(TYPESCRIPT_DOC)
       const docs = expert.listDocuments()
-      expect(docs[0]!.fileName).toContain('Document')
+      expect(docs[0]!.fileName).toBe('Document 1')
     })
   })
 
