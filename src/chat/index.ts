@@ -969,6 +969,8 @@ export type {
   ImageAnalysisRequest, ImageAnalysisResult,
   // AI Brain
   AiBrainConfig, ApiMessage, ApiContentBlock, BrainInterface,
+  // Document Analysis (lightweight types from BrainInterface)
+  DocumentAnalysisInput, DocumentAnalysisOutput,
 } from './types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1065,3 +1067,135 @@ export type {
   ConfidenceResult,
   CodeReviewScoreResult,
 } from './scoring/ScoringEngine.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MEMORY CONSOLIDATOR — Session → long-term memory bridge with retrieval
+// ══════════════════════════════════════════════════════════════════════════════
+export { MemoryConsolidator, DEFAULT_CONSOLIDATOR_CONFIG } from './MemoryConsolidator.js'
+
+export type {
+  SessionTurn,
+  LongTermEntry,
+  RetrievalResult,
+  MemoryConsolidatorConfig,
+  MemoryConflict,
+  ConsolidatorStats,
+} from './MemoryConsolidator.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONFIDENCE GATE — Decision quality control with abstain mode
+// ══════════════════════════════════════════════════════════════════════════════
+export { ConfidenceGate, DEFAULT_GATE_CONFIG } from './ConfidenceGate.js'
+
+export type {
+  ConfidenceSignal,
+  GateDecision,
+  GateResult,
+  ConfidenceGateConfig,
+  CalibrationEntry,
+  CalibrationStats,
+} from './ConfidenceGate.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BRAIN CONTRACT — Input → Think → Tool → Verify → Output schema
+// ══════════════════════════════════════════════════════════════════════════════
+export {
+  BrainStep,
+  BRAIN_STEP_ORDER,
+  TraceBuilder,
+  validateTrace,
+} from './BrainContract.js'
+
+export type {
+  InputStepData,
+  ThinkStepData,
+  ToolStepData,
+  VerifyStepData,
+  OutputStepData,
+  PipelineTraceStep,
+  PipelineTrace,
+  ContractValidation,
+  ToolInvocation,
+} from './BrainContract.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BRAIN EVAL HARNESS — Objective evaluation tests for quality
+// ══════════════════════════════════════════════════════════════════════════════
+export {
+  BrainEvalHarness,
+  GOLDEN_CASES,
+  DEFAULT_EVAL_CONFIG,
+} from './BrainEvalHarness.js'
+
+export type {
+  EvalCase,
+  EvalCategory,
+  EvalResult,
+  CategoryScore,
+  EvalReport,
+  Regression,
+  EvalHarnessConfig,
+  EvalTarget,
+} from './BrainEvalHarness.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REPLAY STORE — Persistent storage for deterministic replay sessions
+// ══════════════════════════════════════════════════════════════════════════════
+export { ReplayStore, DEFAULT_STORE_CONFIG } from './pipeline/ReplayStore.js'
+
+export type {
+  PipelineSnapshot,
+  ReplayStoreConfig,
+  SessionSummary,
+  ReplayStoreStats,
+} from './pipeline/ReplayStore.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// IMAGE ANALYZER — Deep offline image understanding (Phase 11)
+// ══════════════════════════════════════════════════════════════════════════════
+export { ImageAnalyzer, DEFAULT_ANALYZER_CONFIG } from './ImageAnalyzer.js'
+
+export type {
+  DeepImageAnalysis,
+  ImageFormatInfo,
+  PixelAnalysis,
+  ColorInfo,
+  HistogramBucket,
+  StructureAnalysis,
+  CompositionType,
+  ContentClassification,
+  ImageContentType,
+  TextRegion,
+  SceneAnalysis,
+  QualityAssessment,
+  ImageAnalyzerConfig,
+  ImageAnalyzerStats,
+} from './ImageAnalyzer.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DOCUMENT ANALYZER — Deep offline document understanding (Phase 11)
+// ══════════════════════════════════════════════════════════════════════════════
+export { DocumentAnalyzer, DEFAULT_DOC_ANALYZER_CONFIG } from './DocumentAnalyzer.js'
+
+export type {
+  DocumentAnalysisRequest,
+  DocumentAnalysisResult,
+  DocumentMetadata,
+  DocumentFormat,
+  DocumentStructure,
+  DocumentSection,
+  OutlineEntry,
+  ContentAnalysis,
+  NamedEntity,
+  ReadabilityMetrics,
+  DocumentClassification,
+  DocumentType,
+  KeywordResult,
+  SectionSummary,
+  DetectedTable,
+  DetectedCodeBlock,
+  CrossReference,
+  DocumentSentiment,
+  DocumentAnalyzerConfig,
+  DocumentAnalyzerStats,
+} from './DocumentAnalyzer.js'
