@@ -1225,3 +1225,12 @@ export type {
   BudgetReport,
   InteractionUsage,
 } from './TokenBudgetManager.js'
+
+// ── Kurdish Translation Corpus (CKB-ENG Parallel Data) ──
+
+export { KurdishTranslationCorpus } from './KurdishTranslationCorpus.js'
+
+export type {
+  TranslationPair,
+  TranslationCategory,
+} from './KurdishTranslationCorpus.js'

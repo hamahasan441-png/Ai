@@ -9,6 +9,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { LocalBrain } from '../LocalBrain.js'
 import { SemanticMemory, createProgrammingKnowledgeGraph } from '../SemanticMemory.js'
+import { KurdishTranslationCorpus } from '../KurdishTranslationCorpus.js'
 
 describe('Kurdish Sorani Language Knowledge', () => {
   let brain: LocalBrain
@@ -1791,6 +1792,353 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('finds Sorani religion vocabulary via search', () => {
       const results = brain.searchKnowledge('sorani religion vocabulary')
       expect(results.length).toBeGreaterThan(0)
+    })
+  })
+
+  // ── CKB-ENG Translation Corpus — Knowledge Base Tests ──────────────────
+
+  describe('CKB-ENG Translation Corpus Knowledge', () => {
+    it('knows about the Kurdish Sorani translation corpus', async () => {
+      const r = await brain.chat('What is the Kurdish English translation corpus?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/corpus|translat|ckb|parallel|kurdish/)
+    })
+
+    it('knows cultural translations from the corpus', async () => {
+      const r = await brain.chat('sorani translation culture')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/cultur|kurdish|sorani|translat/)
+    })
+
+    it('knows education translations from the corpus', async () => {
+      const r = await brain.chat('sorani translation education')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/educat|language|sorani|translat/)
+    })
+
+    it('knows history translations from the corpus', async () => {
+      const r = await brain.chat('sorani translation history')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/histor|village|sorani|translat/)
+    })
+
+    it('knows film and arts translations from the corpus', async () => {
+      const r = await brain.chat('sorani translation film')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/film|art|sorani|translat/)
+    })
+
+    it('knows health translations from the corpus', async () => {
+      const r = await brain.chat('sorani translation health')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/health|hospital|sorani|translat|pandemic/)
+    })
+
+    it('knows human rights translations from the corpus', async () => {
+      const r = await brain.chat('sorani translation human rights')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/human rights|violence|sorani|translat/)
+    })
+
+    it('knows legal and political translations from the corpus', async () => {
+      const r = await brain.chat('sorani translation legal')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/legal|court|sorani|translat|political/)
+    })
+
+    it('knows news headline translations from the corpus', async () => {
+      const r = await brain.chat('sorani translation news')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/news|headline|sorani|translat/)
+    })
+
+    it('knows parallel sentence examples from the corpus', async () => {
+      const r = await brain.chat('sorani english sentence pairs')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/sentence|parallel|sorani|translat|victory/)
+    })
+
+    it('knows corpus vocabulary', async () => {
+      const r = await brain.chat('sorani corpus vocabulary')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/vocabular|citizen|language|sorani/)
+    })
+  })
+
+  // ── CKB-ENG Translation Corpus — Search Tests ────────────────────────
+
+  describe('CKB-ENG Translation Corpus Search', () => {
+    it('finds translation corpus via search', () => {
+      const results = brain.searchKnowledge('sorani english translation corpus')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds cultural translations via search', () => {
+      const results = brain.searchKnowledge('kurdish culture translation')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds education translations via search', () => {
+      const results = brain.searchKnowledge('kurdish education translation')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds history translations via search', () => {
+      const results = brain.searchKnowledge('kurdish history translation')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds film translations via search', () => {
+      const results = brain.searchKnowledge('kurdish film translation')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds health translations via search', () => {
+      const results = brain.searchKnowledge('kurdish health translation')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds human rights translations via search', () => {
+      const results = brain.searchKnowledge('kurdish human rights translation')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds legal translations via search', () => {
+      const results = brain.searchKnowledge('kurdish legal translation')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds news translations via search', () => {
+      const results = brain.searchKnowledge('kurdish news translation')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds parallel sentence pairs via search', () => {
+      const results = brain.searchKnowledge('kurdish parallel sentences')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds corpus vocabulary via search', () => {
+      const results = brain.searchKnowledge('ckb eng vocabulary')
+      expect(results.length).toBeGreaterThan(0)
+    })
+  })
+
+  // ── CKB-ENG Translation Corpus — Semantic Memory Tests ────────────────
+
+  describe('CKB-ENG Translation Corpus Semantic Memory', () => {
+    let memory: SemanticMemory
+
+    beforeEach(() => {
+      memory = createProgrammingKnowledgeGraph()
+    })
+
+    it('has Sorani Translation Corpus concept', () => {
+      const id = memory.findConceptByName('Sorani Translation Corpus')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani Cultural Translation concept', () => {
+      const id = memory.findConceptByName('Sorani Cultural Translation')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani Education Translation concept', () => {
+      const id = memory.findConceptByName('Sorani Education Translation')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani History Translation concept', () => {
+      const id = memory.findConceptByName('Sorani History Translation')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani Arts Translation concept', () => {
+      const id = memory.findConceptByName('Sorani Arts Translation')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani Health Translation concept', () => {
+      const id = memory.findConceptByName('Sorani Health Translation')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani Human Rights Translation concept', () => {
+      const id = memory.findConceptByName('Sorani Human Rights Translation')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani Legal Translation concept', () => {
+      const id = memory.findConceptByName('Sorani Legal Translation')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani News Translation concept', () => {
+      const id = memory.findConceptByName('Sorani News Translation')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani Parallel Sentences concept', () => {
+      const id = memory.findConceptByName('Sorani Parallel Sentences')
+      expect(id).toBeDefined()
+    })
+
+    it('has Sorani Corpus Vocabulary concept', () => {
+      const id = memory.findConceptByName('Sorani Corpus Vocabulary')
+      expect(id).toBeDefined()
+    })
+
+    it('relates translation corpus to Kurdish Sorani', () => {
+      const corpusId = memory.findConceptByName('Sorani Translation Corpus')
+      const kurdishId = memory.findConceptByName('Kurdish Sorani')
+      expect(corpusId).toBeDefined()
+      expect(kurdishId).toBeDefined()
+      const related = memory.findRelated(corpusId!, undefined, 30)
+      expect(related.some(r => r.concept.name === 'Kurdish Sorani')).toBe(true)
+    })
+
+    it('relates cultural translation to translation corpus', () => {
+      const cultureId = memory.findConceptByName('Sorani Cultural Translation')
+      expect(cultureId).toBeDefined()
+      const related = memory.findRelated(cultureId!, undefined, 30)
+      expect(related.some(r => r.concept.name === 'Sorani Translation Corpus')).toBe(true)
+    })
+
+    it('relates corpus vocabulary to Sorani vocabulary', () => {
+      const vocabId = memory.findConceptByName('Sorani Corpus Vocabulary')
+      expect(vocabId).toBeDefined()
+      const related = memory.findRelated(vocabId!, undefined, 30)
+      expect(related.some(r => r.concept.name === 'Sorani Vocabulary')).toBe(true)
+    })
+  })
+
+  // ── KurdishTranslationCorpus Module Tests ─────────────────────────────
+
+  describe('KurdishTranslationCorpus Module', () => {
+    let corpus: KurdishTranslationCorpus
+
+    beforeEach(() => {
+      corpus = new KurdishTranslationCorpus()
+    })
+
+    it('has translation categories', () => {
+      expect(corpus.totalCategories).toBeGreaterThan(0)
+      expect(corpus.totalCategories).toBe(10)
+    })
+
+    it('has translation pairs', () => {
+      expect(corpus.totalPairs).toBeGreaterThan(40)
+    })
+
+    it('can get all categories', () => {
+      const cats = corpus.getCategories()
+      expect(cats.length).toBe(10)
+      expect(cats.map(c => c.name)).toContain('Culture & Festivals')
+      expect(cats.map(c => c.name)).toContain('Language Rights & Education')
+      expect(cats.map(c => c.name)).toContain('History & Heritage')
+    })
+
+    it('can get a specific category', () => {
+      const cat = corpus.getCategory('Culture & Festivals')
+      expect(cat).toBeDefined()
+      expect(cat!.pairs.length).toBeGreaterThan(0)
+      expect(cat!.nameKurdish).toBe('کولتوور و فێستیڤاڵ')
+    })
+
+    it('returns undefined for non-existent category', () => {
+      const cat = corpus.getCategory('Nonexistent')
+      expect(cat).toBeUndefined()
+    })
+
+    it('can get all pairs', () => {
+      const pairs = corpus.getAllPairs()
+      expect(pairs.length).toBe(corpus.totalPairs)
+      expect(pairs[0].ckb).toBeTruthy()
+      expect(pairs[0].eng).toBeTruthy()
+    })
+
+    it('can search English text', () => {
+      const results = corpus.search('victory')
+      expect(results.length).toBeGreaterThan(0)
+      expect(results[0].eng.toLowerCase()).toContain('victory')
+    })
+
+    it('can search Kurdish text', () => {
+      const results = corpus.search('نەورۆز')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('respects search limit', () => {
+      const results = corpus.search('the', 3)
+      expect(results.length).toBeLessThanOrEqual(3)
+    })
+
+    it('can sample random pairs', () => {
+      const samples = corpus.sample(3)
+      expect(samples.length).toBe(3)
+    })
+
+    it('can sample from specific category', () => {
+      const samples = corpus.sample(2, 'News Headlines')
+      expect(samples.length).toBe(2)
+    })
+
+    it('has Language Rights & Education category', () => {
+      const cat = corpus.getCategory('Language Rights & Education')
+      expect(cat).toBeDefined()
+      expect(cat!.pairs.length).toBeGreaterThanOrEqual(5)
+    })
+
+    it('has Health & Pandemic category', () => {
+      const cat = corpus.getCategory('Health & Pandemic')
+      expect(cat).toBeDefined()
+      expect(cat!.pairs.length).toBeGreaterThanOrEqual(3)
+    })
+
+    it('has Key Vocabulary category', () => {
+      const cat = corpus.getCategory('Key Vocabulary')
+      expect(cat).toBeDefined()
+      expect(cat!.pairs.length).toBeGreaterThanOrEqual(3)
+    })
+
+    it('has Human Rights category', () => {
+      const cat = corpus.getCategory('Human Rights')
+      expect(cat).toBeDefined()
+      expect(cat!.pairs.length).toBeGreaterThanOrEqual(3)
+    })
+
+    it('has Legal & Political category', () => {
+      const cat = corpus.getCategory('Legal & Political')
+      expect(cat).toBeDefined()
+    })
+
+    it('has Film & Arts category', () => {
+      const cat = corpus.getCategory('Film & Arts')
+      expect(cat).toBeDefined()
+    })
+
+    it('has Inspirational & Poetic category', () => {
+      const cat = corpus.getCategory('Inspirational & Poetic')
+      expect(cat).toBeDefined()
+    })
+
+    it('category names are case-insensitive', () => {
+      expect(corpus.getCategory('culture & festivals')).toBeDefined()
+      expect(corpus.getCategory('CULTURE & FESTIVALS')).toBeDefined()
+    })
+
+    it('each pair has both Kurdish and English text', () => {
+      for (const pair of corpus.getAllPairs()) {
+        expect(pair.ckb.length).toBeGreaterThan(0)
+        expect(pair.eng.length).toBeGreaterThan(0)
+      }
+    })
+
+    it('each category has Kurdish name and description', () => {
+      for (const cat of corpus.getCategories()) {
+        expect(cat.nameKurdish.length).toBeGreaterThan(0)
+        expect(cat.description.length).toBeGreaterThan(0)
+      }
     })
   })
 })

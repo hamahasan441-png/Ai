@@ -1252,5 +1252,36 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(soranReligion, kurdishSorani, 'related-to', 0.85)
   memory.addRelation(soranWeather, soranVocabulary, 'part-of', 0.8)
 
+  // ── Kurdish Sorani — CKB-ENG Translation Corpus Concepts ──────────────
+  // Sourced from KurdishBLARK/InterdialectCorpus CKB-ENG dataset
+  const soranTranslation = memory.addConcept('Sorani Translation Corpus', 'language')
+  const soranTranslationCulture = memory.addConcept('Sorani Cultural Translation', 'language')
+  const soranTranslationEducation = memory.addConcept('Sorani Education Translation', 'language')
+  const soranTranslationHistory = memory.addConcept('Sorani History Translation', 'language')
+  const soranTranslationArts = memory.addConcept('Sorani Arts Translation', 'language')
+  const soranTranslationHealth = memory.addConcept('Sorani Health Translation', 'language')
+  const soranTranslationRights = memory.addConcept('Sorani Human Rights Translation', 'language')
+  const soranTranslationLegal = memory.addConcept('Sorani Legal Translation', 'language')
+  const soranTranslationNews = memory.addConcept('Sorani News Translation', 'language')
+  const soranParallelSentences = memory.addConcept('Sorani Parallel Sentences', 'language')
+  const soranCorpusVocabulary = memory.addConcept('Sorani Corpus Vocabulary', 'language')
+
+  // Translation corpus relations
+  memory.addRelation(soranTranslation, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranTranslationCulture, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranTranslationEducation, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranTranslationHistory, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranTranslationArts, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranTranslationHealth, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranTranslationRights, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranTranslationLegal, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranTranslationNews, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranParallelSentences, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranCorpusVocabulary, soranTranslation, 'part-of', 0.9)
+  memory.addRelation(soranCorpusVocabulary, soranVocabulary, 'related-to', 0.85)
+  memory.addRelation(soranTranslationCulture, soranFestivals, 'related-to', 0.8)
+  memory.addRelation(soranTranslationHistory, soranHistory, 'related-to', 0.85)
+  memory.addRelation(soranTranslationHealth, soranVocabulary, 'related-to', 0.75)
+
   return memory
 }
