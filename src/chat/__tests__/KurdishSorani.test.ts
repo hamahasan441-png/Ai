@@ -797,7 +797,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(sorani).not.toBeNull()
       expect(kurm).not.toBeNull()
 
-      const related = memory.findRelated(sorani!.id)
+      const related = memory.findRelated(sorani!.id, undefined, 30)
       const hasKurmanji = related.some(n => n.id === kurm!.id)
       expect(hasKurmanji).toBe(true)
     })
@@ -808,7 +808,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(sorani).not.toBeNull()
       expect(alphabet).not.toBeNull()
 
-      const related = memory.findRelated(sorani!.id)
+      const related = memory.findRelated(sorani!.id, undefined, 30)
       const hasAlphabet = related.some(n => n.id === alphabet!.id)
       expect(hasAlphabet).toBe(true)
     })
@@ -819,7 +819,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(sorani).not.toBeNull()
       expect(grammar).not.toBeNull()
 
-      const related = memory.findRelated(sorani!.id)
+      const related = memory.findRelated(sorani!.id, undefined, 30)
       const hasGrammar = related.some(n => n.id === grammar!.id)
       expect(hasGrammar).toBe(true)
     })
@@ -830,7 +830,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(grammar).not.toBeNull()
       expect(ezafe).not.toBeNull()
 
-      const related = memory.findRelated(grammar!.id)
+      const related = memory.findRelated(grammar!.id, undefined, 30)
       const hasEzafe = related.some(n => n.id === ezafe!.id)
       expect(hasEzafe).toBe(true)
     })
@@ -841,7 +841,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(semantics).not.toBeNull()
       expect(compounds).not.toBeNull()
 
-      const related = memory.findRelated(semantics!.id)
+      const related = memory.findRelated(semantics!.id, undefined, 30)
       const hasCompounds = related.some(n => n.id === compounds!.id)
       expect(hasCompounds).toBe(true)
     })
@@ -852,7 +852,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(verbs).not.toBeNull()
       expect(passive).not.toBeNull()
 
-      const related = memory.findRelated(verbs!.id)
+      const related = memory.findRelated(verbs!.id, undefined, 30)
       const hasPassive = related.some(n => n.id === passive!.id)
       expect(hasPassive).toBe(true)
     })
@@ -863,7 +863,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(sorani).not.toBeNull()
       expect(morph).not.toBeNull()
 
-      const related = memory.findRelated(sorani!.id)
+      const related = memory.findRelated(sorani!.id, undefined, 30)
       const hasMorph = related.some(n => n.id === morph!.id)
       expect(hasMorph).toBe(true)
     })
@@ -874,7 +874,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(morph).not.toBeNull()
       expect(deriv).not.toBeNull()
 
-      const related = memory.findRelated(morph!.id)
+      const related = memory.findRelated(morph!.id, undefined, 30)
       const hasDeriv = related.some(n => n.id === deriv!.id)
       expect(hasDeriv).toBe(true)
     })
@@ -885,7 +885,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(semantics).not.toBeNull()
       expect(prag).not.toBeNull()
 
-      const related = memory.findRelated(semantics!.id)
+      const related = memory.findRelated(semantics!.id, undefined, 30)
       const hasPrag = related.some(n => n.id === prag!.id)
       expect(hasPrag).toBe(true)
     })
@@ -896,7 +896,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(semantics).not.toBeNull()
       expect(meta).not.toBeNull()
 
-      const related = memory.findRelated(semantics!.id)
+      const related = memory.findRelated(semantics!.id, undefined, 30)
       const hasMeta = related.some(n => n.id === meta!.id)
       expect(hasMeta).toBe(true)
     })
@@ -907,7 +907,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(sorani).not.toBeNull()
       expect(poetry).not.toBeNull()
 
-      const related = memory.findRelated(sorani!.id)
+      const related = memory.findRelated(sorani!.id, undefined, 30)
       const hasPoetry = related.some(n => n.id === poetry!.id)
       expect(hasPoetry).toBe(true)
     })
@@ -918,7 +918,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(erga).not.toBeNull()
       expect(clitics).not.toBeNull()
 
-      const related = memory.findRelated(erga!.id)
+      const related = memory.findRelated(erga!.id, undefined, 30)
       const hasClit = related.some(n => n.id === clitics!.id)
       expect(hasClit).toBe(true)
     })
@@ -929,7 +929,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(sorani).not.toBeNull()
       expect(dials).not.toBeNull()
 
-      const related = memory.findRelated(sorani!.id)
+      const related = memory.findRelated(sorani!.id, undefined, 30)
       const hasDials = related.some(n => n.id === dials!.id)
       expect(hasDials).toBe(true)
     })
@@ -940,7 +940,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
       expect(morph).not.toBeNull()
       expect(redup).not.toBeNull()
 
-      const related = memory.findRelated(morph!.id)
+      const related = memory.findRelated(morph!.id, undefined, 30)
       const hasRedup = related.some(n => n.id === redup!.id)
       expect(hasRedup).toBe(true)
     })
