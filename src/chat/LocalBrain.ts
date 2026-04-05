@@ -1333,7 +1333,7 @@ function buildKnowledgeBase(): KnowledgeEntry[] {
   add('language', ['sorani modal verbs', 'kurdish modal', 'sorani can should must', 'کرداری مۆداڵ'],
     'Sorani Kurdish modal verbs (کرداری مۆداڵ): ABILITY: توانین (twanîn — can/be able): "دەتوانم بنووسم" (datwanim binûsim — I can write). OBLIGATION: دەبێ/پێویستە (dabê/pêwista — must/should): "دەبێ بچم" (dabê bchim — I must go). DESIRE: ویستن (wistin — to want): "دەمەوێ بخوام" (damawê bxwam — I want to eat). PERMISSION: ئیجازە (îjaza — permission): "دەتوانم بچمە ژوور؟" (datwanim bchima zhûr? — May I go to the room?). PROBABILITY: لەوانەیە (lawanaya — maybe): "لەوانەیە ببارێت" (lawanaya bbarêt — It might rain). NECESSITY: پێویستە (pêwista — necessary): "پێویستە فێربیت" (pêwista fêrbît — You need to learn).', 1.3)
 
-  add('language', ['sorani adverbs', 'kurdish adverbs', 'sorani adverb types', 'ئاوەڵکار'],
+  add('language', ['sorani adverbs', 'kurdish adverbs', 'sorani ئاوەڵکار', 'sorani time place manner'],
     'Sorani Kurdish adverbs (ئاوەڵکار — awaḷkar): TIME: ئێستا (êsta — now), هەمیشە (hamîsha — always), هەرگیز (hargîz — never), زوو (zû — quickly/soon), درەنگ (drang — late), گاهێک (gahêk — sometimes). PLACE: ئێرە (êra — here), ئەوێ (awê — there), لەدەرەوە (ladarawa — outside), لەژوورەوە (lazhûrawa — inside). MANNER: باش (bash — well), خراپ (xrap — badly), بەخێرایی (baxêrayî — quickly), هێواش (hêwash — slowly/gently). DEGREE: زۆر (zor — very/much), کەم (kam — little), تەواو (tawaw — completely). Adverbs precede the verb: "زۆر باش دەزانم" (zor bash dazanim — I know very well).', 1.2)
 
   add('language', ['sorani conjunctions', 'kurdish conjunctions', 'sorani linking words', 'بەستنەوە'],
