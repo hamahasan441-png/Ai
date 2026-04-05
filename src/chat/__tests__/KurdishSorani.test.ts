@@ -944,5 +944,853 @@ describe('Kurdish Sorani Language Knowledge', () => {
       const hasRedup = related.some(n => n.id === redup!.id)
       expect(hasRedup).toBe(true)
     })
+
+    // ── Phase 3 semantic memory concept existence tests ───────────────
+
+    it('has Sorani Conversation concept', () => {
+      const concept = memory.findConceptByName('Sorani Conversation')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Shopping Language concept', () => {
+      const concept = memory.findConceptByName('Sorani Shopping Language')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Technology Vocab concept', () => {
+      const concept = memory.findConceptByName('Sorani Technology Vocab')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Social Media concept', () => {
+      const concept = memory.findConceptByName('Sorani Social Media')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Science Vocab concept', () => {
+      const concept = memory.findConceptByName('Sorani Science Vocab')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Medical Vocab concept', () => {
+      const concept = memory.findConceptByName('Sorani Medical Vocab')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Legal Vocab concept', () => {
+      const concept = memory.findConceptByName('Sorani Legal Vocab')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Political Vocab concept', () => {
+      const concept = memory.findConceptByName('Sorani Political Vocab')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Education Vocab concept', () => {
+      const concept = memory.findConceptByName('Sorani Education Vocab')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Modern Literature concept', () => {
+      const concept = memory.findConceptByName('Sorani Modern Literature')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Folk Tales concept', () => {
+      const concept = memory.findConceptByName('Sorani Folk Tales')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Music concept', () => {
+      const concept = memory.findConceptByName('Sorani Music')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Festivals concept', () => {
+      const concept = memory.findConceptByName('Sorani Festivals')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Relative Clauses concept', () => {
+      const concept = memory.findConceptByName('Sorani Relative Clauses')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Sorani Subjunctive concept', () => {
+      const concept = memory.findConceptByName('Sorani Subjunctive')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Kurdish History concept', () => {
+      const concept = memory.findConceptByName('Kurdish History')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    it('has Kurdistan Geography concept', () => {
+      const concept = memory.findConceptByName('Kurdistan Geography')
+      expect(concept).not.toBeNull()
+      expect(concept!.domain).toBe('language')
+    })
+
+    // ── Phase 3 semantic memory relationship tests ────────────────────
+
+    it('Sorani Conversation is part of Kurdish Sorani', () => {
+      const sorani = memory.findConceptByName('Kurdish Sorani')
+      const conv = memory.findConceptByName('Sorani Conversation')
+      expect(sorani).not.toBeNull()
+      expect(conv).not.toBeNull()
+
+      const related = memory.findRelated(sorani!.id, undefined, 30)
+      const hasConv = related.some(n => n.id === conv!.id)
+      expect(hasConv).toBe(true)
+    })
+
+    it('Sorani Shopping Language is part of Sorani Conversation', () => {
+      const conv = memory.findConceptByName('Sorani Conversation')
+      const shop = memory.findConceptByName('Sorani Shopping Language')
+      expect(conv).not.toBeNull()
+      expect(shop).not.toBeNull()
+
+      const related = memory.findRelated(conv!.id, undefined, 30)
+      const hasShop = related.some(n => n.id === shop!.id)
+      expect(hasShop).toBe(true)
+    })
+
+    it('Sorani Technology Vocab is part of Sorani Vocabulary', () => {
+      const vocab = memory.findConceptByName('Sorani Vocabulary')
+      const tech = memory.findConceptByName('Sorani Technology Vocab')
+      expect(vocab).not.toBeNull()
+      expect(tech).not.toBeNull()
+
+      const related = memory.findRelated(vocab!.id, undefined, 30)
+      const hasTech = related.some(n => n.id === tech!.id)
+      expect(hasTech).toBe(true)
+    })
+
+    it('Sorani Social Media relates to Sorani Technology', () => {
+      const tech = memory.findConceptByName('Sorani Technology Vocab')
+      const social = memory.findConceptByName('Sorani Social Media')
+      expect(tech).not.toBeNull()
+      expect(social).not.toBeNull()
+
+      const related = memory.findRelated(tech!.id, undefined, 30)
+      const hasSocial = related.some(n => n.id === social!.id)
+      expect(hasSocial).toBe(true)
+    })
+
+    it('Sorani Science Vocab is part of Sorani Vocabulary', () => {
+      const vocab = memory.findConceptByName('Sorani Vocabulary')
+      const science = memory.findConceptByName('Sorani Science Vocab')
+      expect(vocab).not.toBeNull()
+      expect(science).not.toBeNull()
+
+      const related = memory.findRelated(vocab!.id, undefined, 30)
+      const hasScience = related.some(n => n.id === science!.id)
+      expect(hasScience).toBe(true)
+    })
+
+    it('Sorani Medical Vocab relates to Sorani Science', () => {
+      const science = memory.findConceptByName('Sorani Science Vocab')
+      const medical = memory.findConceptByName('Sorani Medical Vocab')
+      expect(science).not.toBeNull()
+      expect(medical).not.toBeNull()
+
+      const related = memory.findRelated(science!.id, undefined, 30)
+      const hasMedical = related.some(n => n.id === medical!.id)
+      expect(hasMedical).toBe(true)
+    })
+
+    it('Sorani Legal Vocab is part of Sorani Vocabulary', () => {
+      const vocab = memory.findConceptByName('Sorani Vocabulary')
+      const legal = memory.findConceptByName('Sorani Legal Vocab')
+      expect(vocab).not.toBeNull()
+      expect(legal).not.toBeNull()
+
+      const related = memory.findRelated(vocab!.id, undefined, 30)
+      const hasLegal = related.some(n => n.id === legal!.id)
+      expect(hasLegal).toBe(true)
+    })
+
+    it('Sorani Political Vocab relates to Sorani Legal', () => {
+      const legal = memory.findConceptByName('Sorani Legal Vocab')
+      const political = memory.findConceptByName('Sorani Political Vocab')
+      expect(legal).not.toBeNull()
+      expect(political).not.toBeNull()
+
+      const related = memory.findRelated(legal!.id, undefined, 30)
+      const hasPolitical = related.some(n => n.id === political!.id)
+      expect(hasPolitical).toBe(true)
+    })
+
+    it('Sorani Education Vocab is part of Sorani Vocabulary', () => {
+      const vocab = memory.findConceptByName('Sorani Vocabulary')
+      const edu = memory.findConceptByName('Sorani Education Vocab')
+      expect(vocab).not.toBeNull()
+      expect(edu).not.toBeNull()
+
+      const related = memory.findRelated(vocab!.id, undefined, 30)
+      const hasEdu = related.some(n => n.id === edu!.id)
+      expect(hasEdu).toBe(true)
+    })
+
+    it('Sorani Modern Literature relates to Sorani Poetry', () => {
+      const poetry = memory.findConceptByName('Sorani Poetry')
+      const modlit = memory.findConceptByName('Sorani Modern Literature')
+      expect(poetry).not.toBeNull()
+      expect(modlit).not.toBeNull()
+
+      const related = memory.findRelated(poetry!.id, undefined, 30)
+      const hasModLit = related.some(n => n.id === modlit!.id)
+      expect(hasModLit).toBe(true)
+    })
+
+    it('Sorani Folk Tales relates to Kurdish Sorani', () => {
+      const sorani = memory.findConceptByName('Kurdish Sorani')
+      const folk = memory.findConceptByName('Sorani Folk Tales')
+      expect(sorani).not.toBeNull()
+      expect(folk).not.toBeNull()
+
+      const related = memory.findRelated(sorani!.id, undefined, 30)
+      const hasFolk = related.some(n => n.id === folk!.id)
+      expect(hasFolk).toBe(true)
+    })
+
+    it('Sorani Music relates to Kurdish Sorani', () => {
+      const sorani = memory.findConceptByName('Kurdish Sorani')
+      const music = memory.findConceptByName('Sorani Music')
+      expect(sorani).not.toBeNull()
+      expect(music).not.toBeNull()
+
+      const related = memory.findRelated(sorani!.id, undefined, 30)
+      const hasMusic = related.some(n => n.id === music!.id)
+      expect(hasMusic).toBe(true)
+    })
+
+    it('Sorani Festivals relates to Kurdish Sorani', () => {
+      const sorani = memory.findConceptByName('Kurdish Sorani')
+      const festivals = memory.findConceptByName('Sorani Festivals')
+      expect(sorani).not.toBeNull()
+      expect(festivals).not.toBeNull()
+
+      const related = memory.findRelated(sorani!.id, undefined, 30)
+      const hasFestivals = related.some(n => n.id === festivals!.id)
+      expect(hasFestivals).toBe(true)
+    })
+
+    it('Sorani Relative Clauses is part of Sorani Grammar', () => {
+      const grammar = memory.findConceptByName('Sorani Grammar')
+      const relcl = memory.findConceptByName('Sorani Relative Clauses')
+      expect(grammar).not.toBeNull()
+      expect(relcl).not.toBeNull()
+
+      const related = memory.findRelated(grammar!.id, undefined, 30)
+      const hasRelCl = related.some(n => n.id === relcl!.id)
+      expect(hasRelCl).toBe(true)
+    })
+
+    it('Sorani Subjunctive relates to Sorani Verb System', () => {
+      const verbs = memory.findConceptByName('Sorani Verb System')
+      const subj = memory.findConceptByName('Sorani Subjunctive')
+      expect(verbs).not.toBeNull()
+      expect(subj).not.toBeNull()
+
+      const related = memory.findRelated(verbs!.id, undefined, 30)
+      const hasSubj = related.some(n => n.id === subj!.id)
+      expect(hasSubj).toBe(true)
+    })
+
+    it('Kurdish History relates to Kurdish Sorani', () => {
+      const sorani = memory.findConceptByName('Kurdish Sorani')
+      const history = memory.findConceptByName('Kurdish History')
+      expect(sorani).not.toBeNull()
+      expect(history).not.toBeNull()
+
+      const related = memory.findRelated(sorani!.id, undefined, 30)
+      const hasHistory = related.some(n => n.id === history!.id)
+      expect(hasHistory).toBe(true)
+    })
+
+    it('Kurdistan Geography relates to Kurdish Sorani', () => {
+      const sorani = memory.findConceptByName('Kurdish Sorani')
+      const geo = memory.findConceptByName('Kurdistan Geography')
+      expect(sorani).not.toBeNull()
+      expect(geo).not.toBeNull()
+
+      const related = memory.findRelated(sorani!.id, undefined, 30)
+      const hasGeo = related.some(n => n.id === geo!.id)
+      expect(hasGeo).toBe(true)
+    })
+  })
+
+  // ── Conversation & Daily Dialogue ───────────────────────────────────
+
+  describe('Conversation & Daily Dialogue', () => {
+    it('knows Sorani conversation phrases and greetings', async () => {
+      const r = await brain.chat('What are Sorani Kurdish conversation phrases?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/conversation|daily|dialogue|greet|sorani|kurdish/)
+    })
+
+    it('knows Sorani introduction phrases', async () => {
+      const r = await brain.chat('How do you introduce yourself in Sorani Kurdish daily conversation?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/name|introduction|sorani|kurdish|conversation/)
+    })
+
+    it('knows Sorani shopping and bazaar dialogue', async () => {
+      const r = await brain.chat('What are Sorani Kurdish shopping dialogue phrases?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/shopping|bazaar|price|bargain|sorani|kurdish/)
+    })
+
+    it('knows Sorani market bargaining phrases', async () => {
+      const r = await brain.chat('How do you bargain at a Kurdish bazaar in Sorani?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/bargain|discount|expensive|bazaar|sorani|kurdish/)
+    })
+
+    it('knows Sorani restaurant and dining phrases', async () => {
+      const r = await brain.chat('What are Sorani Kurdish restaurant phrases?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/restaurant|dining|menu|order|food|sorani|kurdish/)
+    })
+
+    it('knows Sorani food ordering vocabulary', async () => {
+      const r = await brain.chat('How do you order food at a restaurant in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/order|dish|water|meat|spicy|sorani|kurdish/)
+    })
+  })
+
+  // ── Technology & Modern Vocabulary ──────────────────────────────────
+
+  describe('Technology & Modern Vocabulary', () => {
+    it('knows Sorani technology and computing words', async () => {
+      const r = await brain.chat('What are Sorani Kurdish technology words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/technolog|computer|internet|keyboard|sorani|kurdish/)
+    })
+
+    it('knows Sorani digital and internet vocabulary', async () => {
+      const r = await brain.chat('How do you say internet terms in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/internet|website|download|digital|sorani|kurdish/)
+    })
+
+    it('knows Sorani social media terms', async () => {
+      const r = await brain.chat('What are Sorani Kurdish social media terms?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/social media|facebook|instagram|like|share|sorani|kurdish/)
+    })
+
+    it('knows Sorani online communication vocabulary', async () => {
+      const r = await brain.chat('How do you discuss online communication in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/online|comment|hashtag|post|sorani|kurdish/)
+    })
+  })
+
+  // ── Science & Academic ─────────────────────────────────────────────
+
+  describe('Science & Academic', () => {
+    it('knows Sorani science vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish science vocabulary words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/science|physics|chemistry|biology|sorani|kurdish/)
+    })
+
+    it('knows Sorani scientific discipline names', async () => {
+      const r = await brain.chat('How do you say scientific fields in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/science|math|engineer|research|sorani|kurdish/)
+    })
+
+    it('knows Sorani medical terms', async () => {
+      const r = await brain.chat('What are Sorani Kurdish medical terms?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/medical|doctor|hospital|pharmacy|health|sorani|kurdish/)
+    })
+
+    it('knows Sorani hospital and health vocabulary', async () => {
+      const r = await brain.chat('How do you discuss health and hospitals in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/hospital|surgery|medicine|health|sorani|kurdish/)
+    })
+  })
+
+  // ── Law & Politics ─────────────────────────────────────────────────
+
+  describe('Law & Politics', () => {
+    it('knows Sorani legal vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish legal terms?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/legal|law|court|judge|lawyer|sorani|kurdish/)
+    })
+
+    it('knows Sorani judicial system vocabulary', async () => {
+      const r = await brain.chat('How does the legal system work in Sorani Kurdish terminology?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/court|evidence|crime|law|sorani|kurdish/)
+    })
+
+    it('knows Sorani political vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish political vocabulary words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/politic|government|parliament|minister|president|sorani|kurdish/)
+    })
+
+    it('knows Sorani governance and democracy terms', async () => {
+      const r = await brain.chat('How do you discuss government and democracy in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/government|democra|election|party|sorani|kurdish/)
+    })
+  })
+
+  // ── Education ──────────────────────────────────────────────────────
+
+  describe('Education Vocabulary', () => {
+    it('knows Sorani education and school vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish education vocabulary words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/education|school|university|student|sorani|kurdish/)
+    })
+
+    it('knows Sorani academic levels and subjects', async () => {
+      const r = await brain.chat('What are the academic levels and subjects in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/school|university|math|language|history|sorani|kurdish/)
+    })
+
+    it('knows Sorani classroom and library terms', async () => {
+      const r = await brain.chat('What are Sorani Kurdish school and learning words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/school|learn|teacher|student|education|sorani|kurdish/)
+    })
+  })
+
+  // ── Agriculture ────────────────────────────────────────────────────
+
+  describe('Agriculture Vocabulary', () => {
+    it('knows Sorani agriculture vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish agriculture vocabulary words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/agricultur|farm|plant|harvest|crop|sorani|kurdish/)
+    })
+
+    it('knows Sorani farming and crop terms', async () => {
+      const r = await brain.chat('What are farming and crop words in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/farm|wheat|rice|barley|crop|sorani|kurdish/)
+    })
+  })
+
+  // ── Commerce ───────────────────────────────────────────────────────
+
+  describe('Commerce Vocabulary', () => {
+    it('knows Sorani commerce and business vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish commerce vocabulary words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/commerce|business|trade|company|bank|sorani|kurdish/)
+    })
+
+    it('knows Sorani economy and finance terms', async () => {
+      const r = await brain.chat('How do you discuss business and economy in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/capital|profit|money|sell|buy|sorani|kurdish/)
+    })
+  })
+
+  // ── Literature & Folklore ──────────────────────────────────────────
+
+  describe('Literature & Folklore', () => {
+    it('knows Sorani modern literature and writers', async () => {
+      const r = await brain.chat('What is Sorani Kurdish modern literature?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/literature|modern|poet|novel|sorani|kurdish/)
+    })
+
+    it('knows prominent Kurdish literary figures', async () => {
+      const r = await brain.chat('Who are the famous Sorani Kurdish contemporary writers?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/sherko bekas|pashew|bakhtiar|writer|poet|sorani|kurdish/)
+    })
+
+    it('knows Sorani literary movements', async () => {
+      const r = await brain.chat('What are the Sorani Kurdish literary movements?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/literature|movement|modern|romantis|realis|sorani|kurdish/)
+    })
+
+    it('knows Sorani folk tales and oral tradition', async () => {
+      const r = await brain.chat('What are Sorani Kurdish folk tales?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/folk tale|oral|tradition|story|sorani|kurdish/)
+    })
+
+    it('knows famous Kurdish mythical stories', async () => {
+      const r = await brain.chat('Tell me about famous Kurdish mythology stories in Sorani')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/mam|zîn|kawa|myth|legend|story|sorani|kurdish/)
+    })
+  })
+
+  // ── Music & Arts ───────────────────────────────────────────────────
+
+  describe('Music & Arts', () => {
+    it('knows Sorani music vocabulary and instruments', async () => {
+      const r = await brain.chat('What are Sorani Kurdish music vocabulary words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/music|instrument|song|drum|sorani|kurdish/)
+    })
+
+    it('knows Kurdish musical instruments and genres', async () => {
+      const r = await brain.chat('What are Kurdish musical instruments and song genres in Sorani?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/instrument|genre|lute|drum|flute|song|sorani|kurdish/)
+    })
+  })
+
+  // ── Media & Journalism ─────────────────────────────────────────────
+
+  describe('Media & Journalism', () => {
+    it('knows Sorani media and journalism vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish media vocabulary words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/media|newspaper|radio|television|journalism|sorani|kurdish/)
+    })
+
+    it('knows Sorani news and press terminology', async () => {
+      const r = await brain.chat('How do you discuss news and journalism in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/news|journalist|magazine|reporter|digital|sorani|kurdish/)
+    })
+  })
+
+  // ── Complex Grammar ────────────────────────────────────────────────
+
+  describe('Complex Grammar', () => {
+    it('knows Sorani relative clause constructions', async () => {
+      const r = await brain.chat('How do relative clauses work in Sorani Kurdish grammar?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/relative|clause|subordinate|who|which|that|sorani|kurdish/)
+    })
+
+    it('knows Sorani relative clause marker ka', async () => {
+      const r = await brain.chat('What is the Sorani Kurdish relative pronoun for subordinate clauses?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/relative|clause|marker|sorani|kurdish/)
+    })
+
+    it('knows Sorani reported speech constructions', async () => {
+      const r = await brain.chat('How does reported speech work in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/reported speech|indirect|direct|said|quotation|sorani|kurdish/)
+    })
+
+    it('knows Sorani direct vs indirect speech', async () => {
+      const r = await brain.chat('What is the difference between direct and indirect speech in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/direct|indirect|speech|said|sorani|kurdish/)
+    })
+
+    it('knows Sorani subjunctive mood', async () => {
+      const r = await brain.chat('What is the Sorani Kurdish subjunctive mood?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/subjunctive|mood|wish|purpose|sorani|kurdish/)
+    })
+
+    it('knows Sorani subjunctive verb formation', async () => {
+      const r = await brain.chat('How do you form the subjunctive verb in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/subjunctive|verb|prefix|stem|request|sorani|kurdish/)
+    })
+  })
+
+  // ── History & Geography ────────────────────────────────────────────
+
+  describe('History & Geography', () => {
+    it('knows Kurdish history overview', async () => {
+      const r = await brain.chat('What is the history of the Kurdish people in Sorani?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/history|kurd|ancient|medieval|sorani|saladin/)
+    })
+
+    it('knows about key Kurdish historical events', async () => {
+      const r = await brain.chat('What are major events in Kurdish history?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/history|kurd|republic|emirate|war|sorani/)
+    })
+
+    it('knows Kurdistan geography', async () => {
+      const r = await brain.chat('What is the geography of Kurdistan in Sorani?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/geography|kurdistan|iraq|turkey|iran|syria|sorani/)
+    })
+
+    it('knows Iraqi Kurdistan cities and regions', async () => {
+      const r = await brain.chat('What are the main cities of Iraqi Kurdistan?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/erbil|sulaymaniyah|duhok|kirkuk|kurdistan|city/)
+    })
+  })
+
+  // ── Culture ────────────────────────────────────────────────────────
+
+  describe('Culture', () => {
+    it('knows about Kurdish Newroz celebration', async () => {
+      const r = await brain.chat('What is the Sorani Kurdish Newroz celebration?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/newroz|new year|spring|march|bonfire|celebrat|kurdish/)
+    })
+
+    it('knows about Kawa legend and Newroz', async () => {
+      const r = await brain.chat('What is the Kawa legend associated with Kurdish Newroz?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/kawa|blacksmith|fire|resist|newroz|kurdish/)
+    })
+
+    it('knows about Kurdish cultural festivals', async () => {
+      const r = await brain.chat('What are the main Sorani Kurdish cultural festivals?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/festival|newroz|celebrat|holiday|sorani|kurdish/)
+    })
+
+    it('knows about Sorani Kurdish traditional clothing', async () => {
+      const r = await brain.chat('What is Sorani Kurdish traditional clothing?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/traditional|clothing|dress|trouser|turban|sorani|kurdish/)
+    })
+
+    it('knows about Kurdish mens traditional garments', async () => {
+      const r = await brain.chat('What do Kurdish men traditionally wear in Sorani regions?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/men|trouser|jacket|vest|turban|cloth|kurdish/)
+    })
+  })
+
+  // ── Transportation ─────────────────────────────────────────────────
+
+  describe('Transportation', () => {
+    it('knows Sorani transportation vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish transportation words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/transport|car|bus|airplane|train|sorani|kurdish/)
+    })
+
+    it('knows Sorani vehicle and direction terms', async () => {
+      const r = await brain.chat('How do you say vehicles and directions in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/vehicle|car|taxi|bicycle|direction|sorani|kurdish/)
+    })
+  })
+
+  // ── Weather ────────────────────────────────────────────────────────
+
+  describe('Weather Expressions', () => {
+    it('knows Sorani weather vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish weather expressions?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/weather|sun|rain|snow|wind|cloud|sorani|kurdish/)
+    })
+
+    it('knows Sorani climate and weather phrases', async () => {
+      const r = await brain.chat('How do you discuss weather and climate in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/weather|climate|hot|cold|storm|sorani|kurdish/)
+    })
+  })
+
+  // ── Sports ─────────────────────────────────────────────────────────
+
+  describe('Sports Vocabulary', () => {
+    it('knows Sorani sports vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish sports vocabulary words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/sport|football|basketball|volleyball|swim|sorani|kurdish/)
+    })
+
+    it('knows Sorani athletic and game terms', async () => {
+      const r = await brain.chat('What are Sorani Kurdish game and athletics terms?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/sport|team|player|referee|game|sorani|kurdish/)
+    })
+  })
+
+  // ── Religion ───────────────────────────────────────────────────────
+
+  describe('Religion Vocabulary', () => {
+    it('knows Sorani religion vocabulary', async () => {
+      const r = await brain.chat('What are Sorani Kurdish religion vocabulary words?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/religion|mosque|prayer|fasting|pilgrimage|sorani|kurdish/)
+    })
+
+    it('knows Sorani multi-faith vocabulary', async () => {
+      const r = await brain.chat('What are the different faiths discussed in Sorani Kurdish?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/islam|yazidi|christian|faith|religion|sorani|kurdish/)
+    })
+
+    it('knows Sorani Islamic religious terms', async () => {
+      const r = await brain.chat('What are Sorani Kurdish Islamic religious terms?')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/mosque|prayer|quran|cleric|imam|sorani|kurdish/)
+    })
+  })
+
+  // ── Knowledge Search (Phase 3) ─────────────────────────────────────
+
+  describe('Knowledge Search (Phase 3)', () => {
+    it('finds Sorani conversation phrases via search', () => {
+      const results = brain.searchKnowledge('sorani conversation phrases')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani shopping dialogue via search', () => {
+      const results = brain.searchKnowledge('sorani shopping dialogue bazaar')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani restaurant phrases via search', () => {
+      const results = brain.searchKnowledge('sorani restaurant phrases dining')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani technology words via search', () => {
+      const results = brain.searchKnowledge('sorani technology words digital')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani social media terms via search', () => {
+      const results = brain.searchKnowledge('sorani social media terms')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani science vocabulary via search', () => {
+      const results = brain.searchKnowledge('sorani science vocabulary')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani medical terms via search', () => {
+      const results = brain.searchKnowledge('sorani medical terms hospital')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani legal terms via search', () => {
+      const results = brain.searchKnowledge('sorani legal terms court')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani political vocabulary via search', () => {
+      const results = brain.searchKnowledge('sorani political vocabulary')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani education vocabulary via search', () => {
+      const results = brain.searchKnowledge('sorani education vocabulary')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani agriculture vocabulary via search', () => {
+      const results = brain.searchKnowledge('sorani agriculture vocabulary')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani commerce vocabulary via search', () => {
+      const results = brain.searchKnowledge('sorani commerce vocabulary')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani modern literature via search', () => {
+      const results = brain.searchKnowledge('sorani modern literature')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani folk tales via search', () => {
+      const results = brain.searchKnowledge('sorani folk tales mythology')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani music vocabulary via search', () => {
+      const results = brain.searchKnowledge('sorani music vocabulary')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani media vocabulary via search', () => {
+      const results = brain.searchKnowledge('sorani media vocabulary journalism')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani relative clauses via search', () => {
+      const results = brain.searchKnowledge('sorani relative clauses')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani reported speech via search', () => {
+      const results = brain.searchKnowledge('sorani reported speech')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani subjunctive mood via search', () => {
+      const results = brain.searchKnowledge('sorani subjunctive mood')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Kurdish history via search', () => {
+      const results = brain.searchKnowledge('sorani kurdish history')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Kurdistan geography via search', () => {
+      const results = brain.searchKnowledge('sorani kurdistan geography')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani newroz celebration via search', () => {
+      const results = brain.searchKnowledge('sorani newroz celebration')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani traditional clothing via search', () => {
+      const results = brain.searchKnowledge('sorani traditional clothing')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani transportation words via search', () => {
+      const results = brain.searchKnowledge('sorani transportation words')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani weather expressions via search', () => {
+      const results = brain.searchKnowledge('sorani weather expressions')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani sports vocabulary via search', () => {
+      const results = brain.searchKnowledge('sorani sports vocabulary')
+      expect(results.length).toBeGreaterThan(0)
+    })
+
+    it('finds Sorani religion vocabulary via search', () => {
+      const results = brain.searchKnowledge('sorani religion vocabulary')
+      expect(results.length).toBeGreaterThan(0)
+    })
   })
 })
