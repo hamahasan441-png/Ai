@@ -125,6 +125,9 @@ import { CurriculumOptimizer } from './CurriculumOptimizer.js'
 import { ImageAnalyzer } from './ImageAnalyzer.js'
 import { DocumentAnalyzer } from './DocumentAnalyzer.js'
 
+// Document-grounded Q&A (Phase 12 — PdfExpert)
+import { PdfExpert } from './PdfExpert.js'
+
 // Decision quality & memory modules
 import { ConfidenceGate } from './ConfidenceGate.js'
 import type { ConfidenceSignal, GateDecision } from './ConfidenceGate.js'
@@ -2103,6 +2106,9 @@ export class LocalBrain {
   private imageAnalyzer: ImageAnalyzer | null = null
   private documentAnalyzer: DocumentAnalyzer | null = null
 
+  // Document-grounded Q&A (Phase 12 — PdfExpert)
+  private pdfExpert: PdfExpert | null = null
+
   // Decision quality & memory consolidation
   private confidenceGate: ConfidenceGate | null = null
   private memoryConsolidator: MemoryConsolidator | null = null
@@ -2223,6 +2229,9 @@ export class LocalBrain {
       // Phase 11 — Deep analysis modules
       this.imageAnalyzer = new ImageAnalyzer()
       this.documentAnalyzer = new DocumentAnalyzer()
+
+      // Phase 12 — Document-grounded Q&A
+      this.pdfExpert = new PdfExpert()
 
       // Decision quality & memory consolidation
       this.confidenceGate = new ConfidenceGate()
@@ -4280,6 +4289,9 @@ export class LocalBrain {
 
   /** Get the DocumentAnalyzer instance (null if intelligence modules are disabled). */
   getDocumentAnalyzer(): DocumentAnalyzer | null { return this.documentAnalyzer }
+
+  /** Get the PdfExpert instance (null if intelligence modules are disabled). */
+  getPdfExpert(): PdfExpert | null { return this.pdfExpert }
 
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }

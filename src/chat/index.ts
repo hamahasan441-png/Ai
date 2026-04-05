@@ -1200,6 +1200,22 @@ export type {
   DocumentAnalyzerStats,
 } from './DocumentAnalyzer.js'
 
+// ── PdfExpert (Phase 12 — Document-Grounded Q&A) ──
+
+export { PdfExpert, DEFAULT_PDF_EXPERT_CONFIG } from './PdfExpert.js'
+
+export type {
+  PdfExpertConfig,
+  LoadedDocument,
+  DocumentCitation,
+  PdfExpertAnswer,
+  PdfExpertQuery,
+  DocumentComparison,
+  DocumentConnection,
+  DocumentSearchResult,
+  PdfExpertStats,
+} from './PdfExpert.js'
+
 // ── Token Budget Manager (Phase 12 — Cloud Limit & Continuation) ──
 
 export { TokenBudgetManager, DEFAULT_BUDGET_CONFIG } from './TokenBudgetManager.js'
