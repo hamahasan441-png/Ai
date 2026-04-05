@@ -138,6 +138,16 @@ import type { SessionTurn } from './MemoryConsolidator.js'
 import { TokenBudgetManager } from './TokenBudgetManager.js'
 import type { BudgetReport } from './TokenBudgetManager.js'
 
+// Kurdish NLP modules
+import { KurdishMorphologicalAnalyzer } from './KurdishMorphologicalAnalyzer.js'
+import { KurdishSentimentAnalyzer } from './KurdishSentimentAnalyzer.js'
+import type { SentimentResult } from './KurdishSentimentAnalyzer.js'
+import { KurdishTranslationCorpus } from './KurdishTranslationCorpus.js'
+
+// New intelligence modules
+import { HypothesisEngine } from './HypothesisEngine.js'
+import { EthicalReasoner } from './EthicalReasoner.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -1612,6 +1622,29 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('language', ['sorani corpus vocabulary', 'kurdish english vocabulary corpus', 'ckb eng vocabulary', 'sorani key words translation', 'وشەی سەرەکی'],
     'Key Kurdish Sorani – English vocabulary from the CKB-ENG parallel corpus: CITIZEN & STATE: هاووڵاتی (hawlatî — citizen), دەوڵەت (dawlat — state/government), حکوومەت (ḥikûmat — government). LANGUAGE & EDUCATION: زمان (zman — language), زمانی دایکی (zmanî dayikî — mother tongue), فێرکاری (fêrkarî — education), قوتابخانە (qutabxane — school), مامۆستا (mamosta — teacher), خوێندن (xwêndin — studying). CULTURE & ARTS: فیلم (fîlm — film), گۆرانی (goranî — song), هونەر (hunar — art), کتێب (ktêb — book), فێستیڤاڵ (fêstîval — festival), کولتوور (kultûr — culture), فەرهەنگ (farhang — culture/dictionary). RIGHTS & JUSTICE: مافی مرۆڤ (mafî mirov — human rights), ئازادی (azadî — freedom), دادوەری (dadwerî — justice), زیندان (zindan — prison). HEALTH: نەخۆشخانە (nexoshxane — hospital), دکتۆر (dktor — doctor), تەندروستی (tandirustî — health), پەتا (pata — pandemic). GEOGRAPHY: گوند (gund — village), شار (shar — city), وڵات (wilat — country).', 1.3)
 
+  // ── Kurdish Sorani — Sentiment Analysis ───────────────────────────────────
+  // Based on data from Hrazhan/sentiment (Hameed, Ahmadi & Daneshfar, 2023)
+  // "Transfer Learning for Low-Resource Sentiment Analysis"
+  // https://github.com/Hrazhan/sentiment
+
+  add('language', ['sorani sentiment', 'kurdish sentiment', 'kurdish sentiment analysis', 'sorani emotion analysis', 'هەستی کوردی'],
+    'Kurdish Sorani sentiment analysis is based on the gold-standard benchmark dataset (1,189 tweets) and silver-standard dataset (1,500 tweets) from Hameed, Ahmadi & Daneshfar (2023). Classes: positive (خۆشحاڵ), negative (خەمبار), neutral (بێلایەن), mixed (تێکەڵ). The gold standard uses 5 classes (positive, negative, neutral, mixed, none) with human annotation. The silver standard is auto-annotated with 3 classes. Source: https://github.com/Hrazhan/sentiment — "Transfer Learning for Low-Resource Sentiment Analysis" (ACM Trans. Asian Low-Resour. Lang. Inf. Process.). The dataset contains Central Kurdish tweets annotated for sentiment, subjectivity, offensiveness, and targeting.', 1.4)
+
+  add('language', ['sorani positive words', 'kurdish positive sentiment', 'kurdish happy words', 'وشەی خۆش'],
+    'Kurdish Sorani positive sentiment words (from Hrazhan/sentiment corpus analysis): خۆشحاڵ (xoshḥal — happy), جوان (cwan — beautiful), باش (bash — good), خۆش (xosh — pleasant), سوپاس (supas — thanks), سپاس (spas — gratitude), بەختەوەر (baxtawar — fortunate), ئازاد (azad — free), سەرکەوتن (sarkawtin — success), هیوا (hîwa — hope), خۆشەویستی (xoshawîstî — love), ئارام (aram — calm), دڵخۆش (diłxosh — glad), پیرۆز (pîroz — congratulations), گەشبین (gashbîn — optimistic), توانا (twana — capable), ئاسوودە (asûda — peaceful), دڵسۆز (diłsoz — loyal), شانازی (shanazî — pride), پاک (pak — pure), ڕاست (rast — honest), شیرین (shirîn — sweet). Example: "زۆر خۆشحاڵ ئەبین" (I am very happy).', 1.3)
+
+  add('language', ['sorani negative words', 'kurdish negative sentiment', 'kurdish sad words', 'وشەی خەمبار'],
+    'Kurdish Sorani negative sentiment words (from Hrazhan/sentiment corpus analysis): خەم (xam — sadness), ئازار (azar — pain), ترس (tirs — fear), بێزار (bêzar — fed up), ناشرین (nashrîn — ugly), خراپ (xirap — bad), قەلەق (qalaq — anxious), نەخۆش (naxosh — sick), هەڵە (hała — wrong), تووڕە (tûra — angry), شەڕ (sharr — conflict), کێشە (kêsha — problem), ئەندوو (andû — sorrow), نارەزایی (narazayî — disapproval), زیان (ziyan — damage), دڵتەنگ (diltang — sad/homesick), ڕق (riq — hatred), نەفرەت (nafrat — hate), درۆ (dirrô — lie), داخ (dax — regret), مردن (mirdin — death), گەندەڵ (gandał — corrupt), شکست (shikast — defeat), زوڵم (zulm — oppression), تەنیا (tanya — lonely), گریان (giryan — crying). Example: "زۆر دڵتەنگم" (I am very sad/homesick).', 1.3)
+
+  add('language', ['sorani sentiment examples', 'kurdish tweet sentiment', 'kurdish sentiment samples', 'نموونەی هەست'],
+    'Kurdish Sorani sentiment examples from Hrazhan/sentiment gold-standard corpus (real tweets): POSITIVE: "بەختەوەرترینی ئەو مرۆڤانە ئەوەن کە بە هەموو بەشێکی خودا ڕازین" (Blessed are those content with God\'s gifts) | "جوانی ئەوەیە بە ناو خەڵک‌دا بڕۆی بۆنی ئەخلاقت لێ‌ بێت" (Beauty is when your manners precede you). NEGATIVE: "ناشرینترین کەس ئەو کەسەیە کە هەڵەکانت تۆمار دەکات" (Ugliest person records your mistakes) | "لە ماڵەوە بێزارن و کە دەچیتە دەرەوە هەست بە ترس و قەلەقی دەکەی" (Fed up at home, scared outside). MIXED: "ئەوەی زۆر پێدەکەنێ کێشەی زۆرە ئەوەی زۆر دەگرێ کەسایەتی پاک" (Who laughs most has many problems, who cries most has a pure personality).', 1.3)
+
+  add('language', ['sorani morphology analysis', 'kurdish morphological analysis', 'kurdish word structure', 'شیکاری وشە'],
+    'Kurdish Sorani morphological analysis enables decomposition of words into morphemes. Prefixes: دە- (da — present tense), نا- (na — negation), بـ (bi — subjunctive), هەڵ- (hał — up/rising), دا- (da — down), ڕا- (ra — away/direct), وەر- (war — receive). Suffixes: -ان (an — plural), -ەکان (akan — definite plural), -ەکە (aka — definite singular), -ێک (êk — indefinite), -ی (î — ezafe/possessive), -ن (n — verb plural), -م (m — 1st person), -ت (t — 2nd person), -ین (în — 1st plural), -انە (ana — abstract noun), -کار (kar — doer), -گەر (gar — doer). Examples: خوێندکار → خوێند+کار (student = study+doer), دادپەروەر → داد+پەروەر (judge = justice+keeper), سەرکەوتوو → سەر+کەوت+وو (successful = head+fell+past participle).', 1.4)
+
+  add('language', ['sorani transliteration', 'kurdish script conversion', 'kurdish latin arabic script', 'ڕێنووسی لاتین'],
+    'Kurdish Sorani transliteration converts between Arabic-based Kurdish script and Latin script. Key mappings: ئ↔\' (hamza), ا↔a, ب↔b, پ↔p, ت↔t, ج↔c, چ↔ç, ح↔ḥ, خ↔x, د↔d, ر↔r, ڕ↔ř (trilled r — unique to Kurdish), ز↔z, ژ↔j (zh sound), س↔s, ش↔ş, ع↔\', غ↔ẍ, ف↔f, ڤ↔v (unique to Kurdish), ق↔q, ک↔k, گ↔g, ل↔l, ڵ↔ł (velarized l — unique to Kurdish), م↔m, ن↔n, و↔w/û, ۆ↔o, ه↔h, ە↔e, ی↔y/î, ێ↔ê. Unique Kurdish letters not in Arabic: ڕ (ř), ڵ (ł), ڤ (v), ێ (ê), ۆ (o), پ (p), چ (ç), گ (g), ژ (j). Examples: "کوردستان" → "Kurdistan", "سڵاو" → "sław", "خوێندکار" → "xwêndkar".', 1.3)
+
   return entries
 }
 
@@ -2519,6 +2552,15 @@ export class LocalBrain {
   private memoryConsolidator: MemoryConsolidator | null = null
   private chatTurnsSinceConsolidation = 0
 
+  // Kurdish NLP modules
+  private kurdishMorphology: KurdishMorphologicalAnalyzer | null = null
+  private kurdishSentiment: KurdishSentimentAnalyzer | null = null
+  private kurdishCorpus: KurdishTranslationCorpus | null = null
+
+  // New intelligence modules
+  private hypothesisEngine: HypothesisEngine | null = null
+  private ethicalReasoner: EthicalReasoner | null = null
+
   // Token budget management
   private tokenBudget: TokenBudgetManager
 
@@ -2641,6 +2683,15 @@ export class LocalBrain {
       // Decision quality & memory consolidation
       this.confidenceGate = new ConfidenceGate()
       this.memoryConsolidator = new MemoryConsolidator()
+
+      // Kurdish NLP modules
+      this.kurdishMorphology = new KurdishMorphologicalAnalyzer()
+      this.kurdishSentiment = new KurdishSentimentAnalyzer()
+      this.kurdishCorpus = new KurdishTranslationCorpus()
+
+      // New intelligence modules
+      this.hypothesisEngine = new HypothesisEngine()
+      this.ethicalReasoner = new EthicalReasoner()
     }
 
     const now = new Date().toISOString()
@@ -2918,6 +2969,71 @@ export class LocalBrain {
           }
         }
       } catch { /* non-critical */ }
+    }
+
+    // HypothesisEngine: for observation/explanation queries
+    if (this.hypothesisEngine && this.isHypothesisQuery(userMessage)) {
+      try {
+        const hypotheses = this.hypothesisEngine.generateHypotheses(userMessage)
+        if (hypotheses.length > 0) {
+          const topH = hypotheses[0]
+          if (topH && topH.confidence > 0.2) {
+            smartAugmentation += `\n\n**Hypothesis:** ${topH.statement} (confidence: ${(topH.confidence * 100).toFixed(0)}%)`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // EthicalReasoner: for ethical/moral dilemma queries
+    if (this.ethicalReasoner && this.isEthicalQuery(userMessage)) {
+      try {
+        const analysis = this.ethicalReasoner.analyze(userMessage)
+        if (analysis.confidence > 0.2) {
+          smartAugmentation += `\n\n**Ethical Analysis:** ${analysis.overallAssessment}`
+          if (analysis.recommendation) {
+            smartAugmentation += `\n**Recommendation:** ${analysis.recommendation}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // Kurdish NLP: morphology, sentiment, translation for Kurdish queries
+    if (this.isKurdishSoraniQuery(userMessage)) {
+      // Kurdish Sentiment Analysis
+      if (this.kurdishSentiment) {
+        try {
+          const sentimentResult: SentimentResult = this.kurdishSentiment.analyzeSentiment(userMessage)
+          if (sentimentResult.confidence > 0.3) {
+            smartAugmentation += `\n\n**Kurdish Sentiment:** ${sentimentResult.label} (${sentimentResult.dominantEmotion}, confidence: ${(sentimentResult.confidence * 100).toFixed(0)}%)`
+          }
+        } catch { /* non-critical */ }
+      }
+
+      // Kurdish Morphological Analysis (for single-word or short Kurdish text queries)
+      if (this.kurdishMorphology && /[\u0626-\u06FF]/.test(userMessage)) {
+        try {
+          const words = userMessage.split(/\s+/).filter(w => /[\u0626-\u06FF]/.test(w))
+          const morphResults = words.slice(0, 3).map(w => {
+            const analysis = this.kurdishMorphology!.analyze(w)
+            return analysis.root !== w ? `${w} → root: ${analysis.root} (${analysis.pos})` : null
+          }).filter(Boolean)
+          if (morphResults.length > 0) {
+            smartAugmentation += `\n\n**Morphological Analysis:** ${morphResults.join('; ')}`
+          }
+        } catch { /* non-critical */ }
+      }
+
+      // Kurdish Translation Corpus — find relevant parallel sentences
+      if (this.kurdishCorpus) {
+        try {
+          const searchTerms = userMessage.replace(/[\u0626-\u06FF]/g, '').trim() || userMessage
+          const translations = this.kurdishCorpus.search(searchTerms)
+          if (translations.length > 0) {
+            const top = translations[0]!
+            smartAugmentation += `\n\n**Translation Example:** ${top.ckb} → ${top.eng}`
+          }
+        } catch { /* non-critical */ }
+      }
     }
 
     // ── Generate base response (uses TF-IDF if enabled) ──────────────────────
@@ -3207,11 +3323,22 @@ export class LocalBrain {
   private isKurdishSoraniQuery(msg: string): boolean {
     const kurdishPattern = /\b(kurdish|sorani|kurmanji|kurdistan|kurd|erbil|sulaymaniyah|hawler|silêmanî|kirkuk|sanandaj)\b/i
     const scriptPattern = /[\u0626-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/ // Arabic/Kurdish script
-    const topicPattern = /\b(sorani\s+(alphabet|grammar|verb|noun|pronoun|adjective|vowel|consonant|phrase|word|sentence|number|greet|family|color|food|time|nature|emotion|idiom|phonolog|dialect|semantic|compound|ezafe|ergativ|passive|causative|conditional|modal|adverb|conjunction|negat|aspect|clitic|morpholog|derivat|loanword|pragmatic|discourse|evidential|metaphor|proverb|poetry|kinship|register|reduplicat|synonym|antonym|onomatop|profession|animal|weather|travel|health|technolog|sport|music|cloth|house|shop|direction|city|religion|bazaar|conversation|restaurant|shopping|social media|science|medical|legal|political|education|agriculture|commerce|literature|folk tale|relative clause|reported speech|subjunctive|geography|festival|newroz|transportation|translat|corpus|parallel|sentence pair|news headline|human rights|vocabulary corpus))\b/i
-    const learnPattern = /\b(learn\s+kurdish|learn\s+sorani|kurdish\s+(language|alphabet|grammar|vocabulary|phrase|word|writing|script|culture|poetry|music|proverb|idiom|history|geography|festival|clothing|food|politics|religion|literature|science|technology|media|translat|corpus|parallel|sentence))\b/i
+    const topicPattern = /\b(sorani\s+(alphabet|grammar|verb|noun|pronoun|adjective|vowel|consonant|phrase|word|sentence|number|greet|family|color|food|time|nature|emotion|idiom|phonolog|dialect|semantic|compound|ezafe|ergativ|passive|causative|conditional|modal|adverb|conjunction|negat|aspect|clitic|morpholog|derivat|loanword|pragmatic|discourse|evidential|metaphor|proverb|poetry|kinship|register|reduplicat|synonym|antonym|onomatop|profession|animal|weather|travel|health|technolog|sport|music|cloth|house|shop|direction|city|religion|bazaar|conversation|restaurant|shopping|social media|science|medical|legal|political|education|agriculture|commerce|literature|folk tale|relative clause|reported speech|subjunctive|geography|festival|newroz|transportation|translat|corpus|parallel|sentence pair|news headline|human rights|vocabulary corpus|sentiment))\b/i
+    const learnPattern = /\b(learn\s+kurdish|learn\s+sorani|kurdish\s+(language|alphabet|grammar|vocabulary|phrase|word|writing|script|culture|poetry|music|proverb|idiom|history|geography|festival|clothing|food|politics|religion|literature|science|technology|media|translat|corpus|parallel|sentence|sentiment|morpholog))\b/i
     const translatePattern = /\b(in\s+kurdish|in\s+sorani|kurdish\s+for|sorani\s+for|translate.+kurdish|how\s+to\s+say.+kurdish|ckb.eng|kurdish.english\s+(translat|parallel|corpus)|sorani.english\s+(translat|parallel|corpus))\b/i
+    const sentimentPattern = /\b(kurdish\s+sentiment|sorani\s+sentiment|sentiment.+kurdish|sentiment.+sorani|kurdish\s+emotion|sorani\s+emotion)\b/i
 
-    return kurdishPattern.test(msg) || scriptPattern.test(msg) || topicPattern.test(msg) || learnPattern.test(msg) || translatePattern.test(msg)
+    return kurdishPattern.test(msg) || scriptPattern.test(msg) || topicPattern.test(msg) || learnPattern.test(msg) || translatePattern.test(msg) || sentimentPattern.test(msg)
+  }
+
+  /** Check if query involves hypothesis generation or testing. */
+  private isHypothesisQuery(msg: string): boolean {
+    return /\b(hypothes[ie]s|what\s+if|suppose|assume|could\s+it\s+be|theory|predict|observation|explain\s+why|possible\s+(explanation|reason|cause)|might\s+be\s+(because|due|caused)|what\s+would\s+happen)\b/i.test(msg)
+  }
+
+  /** Check if query involves ethical or moral reasoning. */
+  private isEthicalQuery(msg: string): boolean {
+    return /\b(ethic|moral|right\s+or\s+wrong|should\s+i|is\s+it\s+(right|wrong|fair|just|ethical)|dilemma|fairness|justice|responsib|duty|consequen|virtue|harm|principle|values|integrity)\b/i.test(msg)
   }
 
   /** Extract probable cause from a causal query. */
