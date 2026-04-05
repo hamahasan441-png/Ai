@@ -332,8 +332,16 @@ describe('AdaptiveLearner learnFromMistake', () => {
   })
 
   it('tracks mistake frequency by category', () => {
-    learner.learnFromMistake('wrong', 'totally different answer here', 'ctx')
-    learner.learnFromMistake('another wrong', 'completely unrelated response', 'ctx')
+    learner.learnFromMistake(
+      'Use setState directly',
+      'setState was deprecated, use useState hook instead',
+      'React state management',
+    )
+    learner.learnFromMistake(
+      'All frameworks always use virtual DOM',
+      'Some frameworks use specific compilation strategies',
+      'framework rendering',
+    )
     const freq = learner.getMistakeFrequency()
     expect(freq.size).toBeGreaterThan(0)
   })
@@ -641,8 +649,7 @@ describe('AdaptiveLearner stats tracking', () => {
     const before = learner.getStats().lastUsedAt
     learner.extractFacts('React uses JSX')
     const after = learner.getStats().lastUsedAt
-    expect(after).toBeDefined()
-    expect(typeof after).toBe('string')
+    expect(new Date(after).getTime()).toBeGreaterThanOrEqual(new Date(before).getTime())
   })
 
   it('factsStored reflects number of stored facts', () => {
