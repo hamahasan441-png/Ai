@@ -1989,26 +1989,30 @@ describe('Kurdish Sorani Language Knowledge', () => {
     })
 
     it('relates translation corpus to Kurdish Sorani', () => {
-      const corpusId = memory.findConceptByName('Sorani Translation Corpus')
-      const kurdishId = memory.findConceptByName('Kurdish Sorani')
-      expect(corpusId).toBeDefined()
-      expect(kurdishId).toBeDefined()
-      const related = memory.findRelated(corpusId!, undefined, 30)
-      expect(related.some(r => r.concept.name === 'Kurdish Sorani')).toBe(true)
+      const corpus = memory.findConceptByName('Sorani Translation Corpus')
+      const kurdish = memory.findConceptByName('Kurdish Sorani')
+      expect(corpus).not.toBeNull()
+      expect(kurdish).not.toBeNull()
+      const related = memory.findRelated(corpus!.id, undefined, 30)
+      expect(related.some(r => r.id === kurdish!.id)).toBe(true)
     })
 
     it('relates cultural translation to translation corpus', () => {
-      const cultureId = memory.findConceptByName('Sorani Cultural Translation')
-      expect(cultureId).toBeDefined()
-      const related = memory.findRelated(cultureId!, undefined, 30)
-      expect(related.some(r => r.concept.name === 'Sorani Translation Corpus')).toBe(true)
+      const culture = memory.findConceptByName('Sorani Cultural Translation')
+      const corpus = memory.findConceptByName('Sorani Translation Corpus')
+      expect(culture).not.toBeNull()
+      expect(corpus).not.toBeNull()
+      const related = memory.findRelated(culture!.id, undefined, 30)
+      expect(related.some(r => r.id === corpus!.id)).toBe(true)
     })
 
     it('relates corpus vocabulary to Sorani vocabulary', () => {
-      const vocabId = memory.findConceptByName('Sorani Corpus Vocabulary')
-      expect(vocabId).toBeDefined()
-      const related = memory.findRelated(vocabId!, undefined, 30)
-      expect(related.some(r => r.concept.name === 'Sorani Vocabulary')).toBe(true)
+      const corpusVocab = memory.findConceptByName('Sorani Corpus Vocabulary')
+      const soranVocab = memory.findConceptByName('Sorani Vocabulary')
+      expect(corpusVocab).not.toBeNull()
+      expect(soranVocab).not.toBeNull()
+      const related = memory.findRelated(corpusVocab!.id, undefined, 30)
+      expect(related.some(r => r.id === soranVocab!.id)).toBe(true)
     })
   })
 
@@ -2023,7 +2027,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
 
     it('has translation categories', () => {
       expect(corpus.totalCategories).toBeGreaterThan(0)
-      expect(corpus.totalCategories).toBe(10)
+      expect(corpus.totalCategories).toBe(11)
     })
 
     it('has translation pairs', () => {
@@ -2032,7 +2036,7 @@ describe('Kurdish Sorani Language Knowledge', () => {
 
     it('can get all categories', () => {
       const cats = corpus.getCategories()
-      expect(cats.length).toBe(10)
+      expect(cats.length).toBe(11)
       expect(cats.map(c => c.name)).toContain('Culture & Festivals')
       expect(cats.map(c => c.name)).toContain('Language Rights & Education')
       expect(cats.map(c => c.name)).toContain('History & Heritage')
