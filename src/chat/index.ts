@@ -1199,3 +1199,13 @@ export type {
   DocumentAnalyzerConfig,
   DocumentAnalyzerStats,
 } from './DocumentAnalyzer.js'
+
+// ── Token Budget Manager (Phase 12 — Cloud Limit & Continuation) ──
+
+export { TokenBudgetManager, DEFAULT_BUDGET_CONFIG } from './TokenBudgetManager.js'
+
+export type {
+  TokenBudgetConfig,
+  BudgetReport,
+  InteractionUsage,
+} from './TokenBudgetManager.js'
