@@ -14,7 +14,7 @@
 
 /** Configuration for the token budget manager. */
 export interface TokenBudgetConfig {
-  /** Maximum tokens allowed per session before pausing. Default: 80 000. */
+  /** Maximum tokens allowed per session before pausing. Default: 80_000. */
   readonly maxSessionTokens: number
   /** Fraction of budget at which to warn (0-1). Default: 0.85. */
   readonly warningThreshold: number

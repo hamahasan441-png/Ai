@@ -2147,7 +2147,7 @@ export class LocalBrain {
       // Find concepts matching the user's keywords via spreading activation
       const seedIds: string[] = []
       for (const kw of keywords.slice(0, 5)) {
-        if (!kw) continue
+        if (!kw || kw.trim() === '') continue
         const concept = this.semanticMemory.findConceptByName(kw)
         if (concept) seedIds.push(concept.id)
       }
@@ -2157,7 +2157,7 @@ export class LocalBrain {
         // Extract relationships from the conversation to grow the graph
         const extracted = this.semanticMemory.extractRelationships(userMessage)
         for (const rel of extracted) {
-          if (!rel.source || !rel.target) continue
+          if (!rel.source?.trim() || !rel.target?.trim()) continue
           const src = this.semanticMemory.findConceptByName(rel.source)
             ?? (() => { const id = this.semanticMemory!.addConcept(rel.source, 'general'); return this.semanticMemory!.getConcept(id); })()
           const tgt = this.semanticMemory.findConceptByName(rel.target)
