@@ -1078,5 +1078,179 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(react, css, 'related-to', 0.5)
   memory.addRelation(php, html, 'used-with', 0.7)
 
+  // ── Kurdish Sorani Language — Semantic Concepts ──────────────────────────
+
+  // Core language concepts
+  const kurdishSorani = memory.addConcept('Kurdish Sorani', 'language')
+  const kurmanji = memory.addConcept('Kurmanji', 'language')
+  const soranAlphabet = memory.addConcept('Sorani Alphabet', 'language')
+  const soranGrammar = memory.addConcept('Sorani Grammar', 'language')
+  const soranVocabulary = memory.addConcept('Sorani Vocabulary', 'language')
+  const soranSemantics = memory.addConcept('Sorani Semantics', 'language')
+  const soranPhonology = memory.addConcept('Sorani Phonology', 'language')
+  const ezafe = memory.addConcept('Ezafe Construction', 'language')
+  const ergativity = memory.addConcept('Split Ergativity', 'language')
+  const soranVerbs = memory.addConcept('Sorani Verb System', 'language')
+  const soranCompounds = memory.addConcept('Sorani Compound Words', 'language')
+  const soranWriting = memory.addConcept('Sorani Writing System', 'language')
+
+  // Relationships: Kurdish dialect family
+  memory.addRelation(kurdishSorani, kurmanji, 'related-to', 0.85)
+  memory.addRelation(soranAlphabet, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranGrammar, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranVocabulary, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranSemantics, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranPhonology, kurdishSorani, 'part-of', 0.9)
+  memory.addRelation(soranWriting, kurdishSorani, 'part-of', 0.9)
+
+  // Grammar features
+  memory.addRelation(ezafe, soranGrammar, 'part-of', 0.9)
+  memory.addRelation(ergativity, soranGrammar, 'part-of', 0.85)
+  memory.addRelation(soranVerbs, soranGrammar, 'part-of', 0.9)
+
+  // Semantic features
+  memory.addRelation(soranCompounds, soranSemantics, 'part-of', 0.9)
+  memory.addRelation(soranCompounds, soranVocabulary, 'related-to', 0.8)
+  memory.addRelation(ezafe, soranSemantics, 'related-to', 0.7)
+  memory.addRelation(soranWriting, soranAlphabet, 'related-to', 0.9)
+
+  // ── Kurdish Sorani — Expanded Semantic Concepts ──────────────────────────
+
+  // Advanced grammar concepts
+  const soranPassive = memory.addConcept('Sorani Passive Voice', 'language')
+  const soranCausative = memory.addConcept('Sorani Causative', 'language')
+  const soranConditional = memory.addConcept('Sorani Conditional', 'language')
+  const soranModals = memory.addConcept('Sorani Modal Verbs', 'language')
+  const soranClitics = memory.addConcept('Sorani Clitics', 'language')
+  const soranNegation = memory.addConcept('Sorani Negation', 'language')
+  const soranAspect = memory.addConcept('Sorani Aspect System', 'language')
+  const soranWordOrder = memory.addConcept('Sorani Word Order', 'language')
+
+  // Deep semantic/linguistic concepts
+  const soranMorphology = memory.addConcept('Sorani Morphology', 'language')
+  const soranDerivation = memory.addConcept('Sorani Derivation', 'language')
+  const soranLoanwords = memory.addConcept('Sorani Loanwords', 'language')
+  const soranPragmatics = memory.addConcept('Sorani Pragmatics', 'language')
+  const soranDiscourse = memory.addConcept('Sorani Discourse Markers', 'language')
+  const soranEvidentiality = memory.addConcept('Sorani Evidentiality', 'language')
+  const soranMetaphor = memory.addConcept('Sorani Metaphor System', 'language')
+  const soranProverbs = memory.addConcept('Sorani Proverbs', 'language')
+  const soranPoetry = memory.addConcept('Sorani Poetry', 'language')
+  const soranKinship = memory.addConcept('Sorani Kinship System', 'language')
+  const soranRegisters = memory.addConcept('Sorani Registers', 'language')
+  const soranReduplication = memory.addConcept('Sorani Reduplication', 'language')
+  const soranDialects = memory.addConcept('Sorani Dialectal Variation', 'language')
+
+  // Advanced grammar → Grammar relations
+  memory.addRelation(soranPassive, soranVerbs, 'related-to', 0.9)
+  memory.addRelation(soranCausative, soranVerbs, 'related-to', 0.9)
+  memory.addRelation(soranConditional, soranGrammar, 'part-of', 0.85)
+  memory.addRelation(soranModals, soranVerbs, 'related-to', 0.85)
+  memory.addRelation(soranClitics, soranGrammar, 'part-of', 0.9)
+  memory.addRelation(soranNegation, soranGrammar, 'part-of', 0.85)
+  memory.addRelation(soranAspect, soranVerbs, 'related-to', 0.9)
+  memory.addRelation(soranWordOrder, soranGrammar, 'part-of', 0.9)
+  memory.addRelation(soranClitics, ergativity, 'related-to', 0.8)
+
+  // Deep linguistics → Kurdish Sorani relations
+  memory.addRelation(soranMorphology, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranDerivation, soranMorphology, 'part-of', 0.9)
+  memory.addRelation(soranLoanwords, soranVocabulary, 'part-of', 0.8)
+  memory.addRelation(soranPragmatics, soranSemantics, 'related-to', 0.85)
+  memory.addRelation(soranDiscourse, soranPragmatics, 'part-of', 0.85)
+  memory.addRelation(soranEvidentiality, soranGrammar, 'part-of', 0.8)
+  memory.addRelation(soranEvidentiality, soranPragmatics, 'related-to', 0.7)
+  memory.addRelation(soranMetaphor, soranSemantics, 'part-of', 0.9)
+  memory.addRelation(soranProverbs, soranSemantics, 'related-to', 0.8)
+  memory.addRelation(soranPoetry, kurdishSorani, 'related-to', 0.85)
+  memory.addRelation(soranKinship, soranVocabulary, 'part-of', 0.85)
+  memory.addRelation(soranRegisters, soranPragmatics, 'related-to', 0.8)
+  memory.addRelation(soranReduplication, soranMorphology, 'part-of', 0.85)
+  memory.addRelation(soranDialects, kurdishSorani, 'part-of', 0.8)
+  memory.addRelation(soranDialects, kurmanji, 'related-to', 0.7)
+  memory.addRelation(soranCompounds, soranMorphology, 'related-to', 0.85)
+
+  // ── Kurdish Sorani — Phase 3 Expanded Concepts ──────────────────────────
+
+  // Conversation & daily life concepts
+  const soranConversation = memory.addConcept('Sorani Conversation', 'language')
+  const soranShopping = memory.addConcept('Sorani Shopping Language', 'language')
+  const soranDining = memory.addConcept('Sorani Dining Language', 'language')
+
+  // Modern domain concepts
+  const soranTechnology = memory.addConcept('Sorani Technology Vocab', 'language')
+  const soranSocialMedia = memory.addConcept('Sorani Social Media', 'language')
+  const soranScience = memory.addConcept('Sorani Science Vocab', 'language')
+  const soranMedical = memory.addConcept('Sorani Medical Vocab', 'language')
+  const soranLegal = memory.addConcept('Sorani Legal Vocab', 'language')
+  const soranPolitical = memory.addConcept('Sorani Political Vocab', 'language')
+  const soranEducation = memory.addConcept('Sorani Education Vocab', 'language')
+  const soranAgriculture = memory.addConcept('Sorani Agriculture Vocab', 'language')
+  const soranCommerce = memory.addConcept('Sorani Commerce Vocab', 'language')
+
+  // Culture & arts concepts
+  const soranModernLit = memory.addConcept('Sorani Modern Literature', 'language')
+  const soranFolkTales = memory.addConcept('Sorani Folk Tales', 'language')
+  const soranMusic = memory.addConcept('Sorani Music', 'language')
+  const soranMedia = memory.addConcept('Sorani Media', 'language')
+  const soranFestivals = memory.addConcept('Sorani Festivals', 'language')
+  const soranClothing = memory.addConcept('Sorani Traditional Clothing', 'language')
+
+  // Advanced grammar concepts
+  const soranRelativeClauses = memory.addConcept('Sorani Relative Clauses', 'language')
+  const soranReportedSpeech = memory.addConcept('Sorani Reported Speech', 'language')
+  const soranSubjunctive = memory.addConcept('Sorani Subjunctive', 'language')
+
+  // Geography & history
+  const soranHistory = memory.addConcept('Kurdish History', 'language')
+  const soranGeography = memory.addConcept('Kurdistan Geography', 'language')
+  const soranTransportation = memory.addConcept('Sorani Transportation', 'language')
+  const soranSports = memory.addConcept('Sorani Sports', 'language')
+  const soranReligion = memory.addConcept('Sorani Religion', 'language')
+  const soranWeather = memory.addConcept('Sorani Weather', 'language')
+
+  // Conversation → Kurdish Sorani relations
+  memory.addRelation(soranConversation, kurdishSorani, 'part-of', 0.9)
+  memory.addRelation(soranShopping, soranConversation, 'part-of', 0.85)
+  memory.addRelation(soranDining, soranConversation, 'part-of', 0.85)
+
+  // Modern domains → Vocabulary relations
+  memory.addRelation(soranTechnology, soranVocabulary, 'part-of', 0.85)
+  memory.addRelation(soranSocialMedia, soranTechnology, 'related-to', 0.9)
+  memory.addRelation(soranScience, soranVocabulary, 'part-of', 0.85)
+  memory.addRelation(soranMedical, soranScience, 'related-to', 0.8)
+  memory.addRelation(soranMedical, soranVocabulary, 'part-of', 0.85)
+  memory.addRelation(soranLegal, soranVocabulary, 'part-of', 0.85)
+  memory.addRelation(soranPolitical, soranLegal, 'related-to', 0.8)
+  memory.addRelation(soranPolitical, kurdishSorani, 'related-to', 0.85)
+  memory.addRelation(soranEducation, soranVocabulary, 'part-of', 0.85)
+  memory.addRelation(soranAgriculture, soranVocabulary, 'part-of', 0.8)
+  memory.addRelation(soranCommerce, soranVocabulary, 'part-of', 0.85)
+
+  // Culture → Kurdish Sorani relations
+  memory.addRelation(soranModernLit, soranPoetry, 'related-to', 0.9)
+  memory.addRelation(soranModernLit, kurdishSorani, 'related-to', 0.85)
+  memory.addRelation(soranFolkTales, kurdishSorani, 'related-to', 0.85)
+  memory.addRelation(soranFolkTales, soranProverbs, 'related-to', 0.8)
+  memory.addRelation(soranMusic, kurdishSorani, 'related-to', 0.85)
+  memory.addRelation(soranMedia, kurdishSorani, 'related-to', 0.8)
+  memory.addRelation(soranFestivals, kurdishSorani, 'related-to', 0.9)
+  memory.addRelation(soranClothing, kurdishSorani, 'related-to', 0.8)
+  memory.addRelation(soranClothing, soranFestivals, 'related-to', 0.75)
+
+  // Advanced grammar → Grammar relations
+  memory.addRelation(soranRelativeClauses, soranGrammar, 'part-of', 0.9)
+  memory.addRelation(soranReportedSpeech, soranGrammar, 'part-of', 0.85)
+  memory.addRelation(soranSubjunctive, soranVerbs, 'related-to', 0.9)
+  memory.addRelation(soranSubjunctive, soranGrammar, 'part-of', 0.85)
+
+  // Geography/history → Kurdish relations
+  memory.addRelation(soranHistory, kurdishSorani, 'related-to', 0.9)
+  memory.addRelation(soranGeography, kurdishSorani, 'related-to', 0.85)
+  memory.addRelation(soranTransportation, soranVocabulary, 'part-of', 0.8)
+  memory.addRelation(soranSports, soranVocabulary, 'part-of', 0.8)
+  memory.addRelation(soranReligion, kurdishSorani, 'related-to', 0.85)
+  memory.addRelation(soranWeather, soranVocabulary, 'part-of', 0.8)
+
   return memory
 }

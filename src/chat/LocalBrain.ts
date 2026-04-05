@@ -125,6 +125,9 @@ import { CurriculumOptimizer } from './CurriculumOptimizer.js'
 import { ImageAnalyzer } from './ImageAnalyzer.js'
 import { DocumentAnalyzer } from './DocumentAnalyzer.js'
 
+// Document-grounded Q&A (Phase 12 — PdfExpert)
+import { PdfExpert } from './PdfExpert.js'
+
 // Decision quality & memory modules
 import { ConfidenceGate } from './ConfidenceGate.js'
 import type { ConfidenceSignal, GateDecision } from './ConfidenceGate.js'
@@ -1204,6 +1207,374 @@ function buildKnowledgeBase(): KnowledgeEntry[] {
   add('concepts', ['code generation pattern', 'template coding', 'scaffold', 'boilerplate generation'],
     'Semantic code generation patterns: 1) Template-based — fill placeholders in code templates (Handlebars, EJS), 2) AST manipulation — parse, transform, and regenerate code (jscodeshift, ts-morph), 3) Schema-driven — generate code from OpenAPI/GraphQL/Prisma schemas, 4) Pattern-based — match intent to code patterns (CRUD → repository + service + controller). Best practices: type-safe generation, format output (prettier), validate generated code compiles, generate tests alongside code. Tools: Plop.js, Hygen, GraphQL Code Generator, Prisma Client.', 1.2)
 
+  // ── Kurdish Sorani Language — Alphabet & Writing System ───────────────────
+
+  add('language', ['kurdish sorani', 'sorani', 'kurdish language', 'sorani kurdish', 'kurdish', 'کوردی', 'سۆرانی'],
+    'Kurdish Sorani (کوردیی سۆرانی) is the Central Kurdish dialect, one of the two main dialects of the Kurdish language (the other being Kurmanji/Northern Kurdish). Sorani is spoken by approximately 6-7 million people, primarily in the Kurdistan Region of Iraq (Erbil/هەولێر, Sulaymaniyah/سلێمانی) and western Iran (Sanandaj/سنە). It uses a modified Arabic/Persian script with 33 letters. Sorani is an Indo-European language belonging to the Northwestern Iranian branch. It is the official language of the Kurdistan Region alongside Arabic.', 1.4)
+
+  add('language', ['sorani alphabet', 'kurdish alphabet', 'kurdish letters', 'sorani letters', 'ئەلفبێی کوردی'],
+    'The Sorani Kurdish alphabet (ئەلفبێ) has 33 letters based on modified Arabic script. Consonants: ب (b), پ (p), ت (t), ج (j), چ (ch), ح (ḥ), خ (kh), د (d), ر (r), ڕ (rr — trilled r, unique to Kurdish), ز (z), ژ (zh), س (s), ش (sh), ع (ʿ), غ (gh), ف (f), ڤ (v — unique Kurdish letter), ق (q), ک (k), گ (g), ل (l), ڵ (ll — velarized l, unique to Kurdish), م (m), ن (n), ه‍ (h), و (w), ی (y). Vowels written explicitly: ئا (â), ئە (a), ئێ (ê), ئی (î), ئۆ (o), ئوو (û). Kurdish is written right-to-left.', 1.4)
+
+  add('language', ['sorani vowels', 'kurdish vowels', 'sorani diacritics', 'دەنگدار'],
+    'Sorani Kurdish vowels (دەنگداران) — unlike Arabic, Sorani writes ALL vowels explicitly: ئا (â — long "a" as in "father"), ئە (a — short "a" as in "hat"), ئێ (ê — like "ay" in "say"), ئی (î — like "ee" in "see"), ئۆ (o — like "o" in "more"), ئوو (û — like "oo" in "moon"). This makes Kurdish more phonetically transparent than Arabic or Persian. At the start of words, vowels are preceded by ئ (hamza/glottal stop). Mid-word: ا (â), ە (a), ێ (ê), ی (î), ۆ (o), وو (û).', 1.3)
+
+  // ── Kurdish Sorani — Grammar Fundamentals ─────────────────────────────────
+
+  add('language', ['sorani grammar', 'kurdish grammar', 'sorani sentence structure', 'ڕێزمانی کوردی'],
+    'Sorani Kurdish grammar basics: Word order is SOV (Subject-Object-Verb), e.g., "من نان دەخۆم" (min nan daxom — "I bread eat" = "I eat bread"). Kurdish is ergative in past tense: the agent takes oblique case. Key features: 1) No grammatical gender, 2) Definite article is suffix "-ەکە" (-aka), 3) Indefinite is suffix "-ێک" (-êk), 4) Adjectives follow nouns with "ی" (ezafe): "کتێبی باش" (ktêbî bash — "good book"), 5) Postpositions instead of prepositions in many cases, 6) Verb at end of sentence.', 1.4)
+
+  add('language', ['sorani pronouns', 'kurdish pronouns', 'ئاوەڵناوی کەسی'],
+    'Sorani Kurdish personal pronouns (جێناوی کەسی): من (min — I/me), تۆ (to — you/singular), ئەو (aw — he/she/it — no gender distinction!), ئێمە (êma — we), ئێوە (êwa — you/plural), ئەوان (awan — they). Possessive suffixes: -م (-m — my), -ت (-t — your), -ی (-î — his/her/its), -مان (-man — our), -تان (-tan — your/pl), -یان (-yan — their). Example: ماڵم (maḷm — my house), ماڵت (maḷt — your house), ماڵی (maḷî — his/her house). Kurdish uses ezafe (ی) to connect possessor and possessed.', 1.3)
+
+  add('language', ['sorani verbs', 'kurdish verbs', 'sorani conjugation', 'kurdish verb conjugation', 'کردار'],
+    'Sorani Kurdish verb system (کردار): Verbs conjugate for person, number, tense, and mood. Present stem + prefixes: دە- (da-) for present/habitual, نا- (na-) for negative. Example with خواردن (xwardin — to eat): دەخۆم (daxom — I eat), دەخۆیت (daxoyt — you eat), دەخوات (daxwat — he/she eats), دەخۆین (daxoyn — we eat), دەخۆن (daxon — you/pl eat), دەخۆن (daxon — they eat). Past tense uses past stem: خواردم (xwardim — I ate). Subjunctive prefix: بـ (bi-). Continuous: prefix دە- (da-). Future: دە- + present stem.', 1.4)
+
+  add('language', ['sorani tenses', 'kurdish tenses', 'sorani past tense', 'sorani present tense', 'sorani future tense'],
+    'Sorani Kurdish tense system: 1) PRESENT SIMPLE: دە + stem — "دەنووسم" (danûsim — I write). 2) PRESENT CONTINUOUS: same form, context-dependent. 3) PAST SIMPLE: past stem + person suffix — "نووسیم" (nûsîm — I wrote). 4) PAST CONTINUOUS: دە + past stem — "دەمنووسی" (damnûsî — I was writing). 5) PRESENT PERFECT: past participle + auxiliary — "نووسیومە" (nûsîuma — I have written). 6) FUTURE: دە + present — "دەنووسم" (context: I will write). 7) SUBJUNCTIVE: بـ + stem — "بنووسم" (binûsim — that I write). IMPERATIVE: stem alone — "بنووسە!" (binûsa! — Write!).', 1.3)
+
+  add('language', ['sorani ergativity', 'kurdish ergative', 'split ergativity', 'sorani past tense agreement'],
+    'Sorani Kurdish has SPLIT ERGATIVITY: In present tense, the subject controls verb agreement (nominative-accusative pattern). In past tense with transitive verbs, the AGENT takes oblique case and the PATIENT controls verb agreement (ergative-absolutive pattern). Example: Present: "من تۆ دەبینم" (min to dabînim — I see you) — verb agrees with "من" (I). Past: "من تۆم بینی" (min tom bînî — I saw you) — literally "I you-I saw" — the -م suffix on تۆ cross-references the agent. This split ergativity is a key typological feature of Kurdish and related Iranian languages.', 1.3)
+
+  add('language', ['sorani nouns', 'kurdish nouns', 'sorani plural', 'sorani definite', 'ناو'],
+    'Sorani Kurdish nouns (ناو): Plurals: add -ان (-an) or -ەکان (-akan for definite): کتێب → کتێبەکان (ktêbakan — the books). Definite suffix: -ەکە (-aka — singular), -ەکان (-akan — plural). Indefinite: -ێک (-êk — a/one). Examples: پیاو (pyaw — man), پیاوێک (pyawêk — a man), پیاوەکە (pyawaka — the man), پیاوەکان (pyawakan — the men/the men). Demonstratives: ئەم (am — this), ئەو (aw — that). No grammatical gender in Sorani — all nouns are genderless. Case: direct (subject) and oblique (object/possessor).', 1.3)
+
+  add('language', ['sorani adjectives', 'kurdish adjectives', 'sorani ezafe', 'ezafe', 'ئیزافە'],
+    'Sorani Kurdish adjectives & Ezafe construction: Adjectives follow the noun, connected by the EZAFE particle "ی" (î): ماڵی گەورە (maḷî gawra — big house), کچی جوان (kchî jwan — beautiful girl), ئاوی سارد (awî sard — cold water). Comparative: -تر (-tir): گەورەتر (gawratir — bigger). Superlative: -ترین (-tirîn): گەورەترین (gawratirîn — biggest). Ezafe chains: ماڵی گەورەی سپی (maḷî gawray spî — big white house). The ezafe system is one of the most distinctive features of Kurdish grammar, inherited from Old Iranian.', 1.3)
+
+  // ── Kurdish Sorani — Vocabulary & Common Words ────────────────────────────
+
+  add('language', ['sorani greetings', 'kurdish greetings', 'sorani hello', 'kurdish hello', 'سڵاو'],
+    'Kurdish Sorani greetings and basic phrases: سڵاو (slaw — hello/hi), چۆنیت؟ (chonît? — how are you?), باشم سوپاس (bashim supas — I\'m fine, thanks), سوپاس (supas — thank you), بەخێربێیت (baxêrbêyt — welcome), شەو باش (shaw bash — good night), ڕۆژ باش (roj bash — good morning/good day), خوا حافیز (xwa ḥafîz — goodbye), بەلێ (balê — yes), نەخێر (naxêr — no), تکایە (tikaya — please), ببوورە (bibûra — excuse me/sorry), لە کەرەمە (la karama — you\'re welcome).', 1.4)
+
+  add('language', ['sorani numbers', 'kurdish numbers', 'sorani counting', 'ژمارە'],
+    'Sorani Kurdish numbers (ژمارەکان): ١ یەک (yak — 1), ٢ دوو (dû — 2), ٣ سێ (sê — 3), ٤ چوار (chwar — 4), ٥ پێنج (pênj — 5), ٦ شەش (shash — 6), ٧ حەوت (hawt — 7), ٨ هەشت (hasht — 8), ٩ نۆ (no — 9), ١٠ دە (da — 10), ٢٠ بیست (bîst — 20), ٣٠ سی (sî — 30), ٤٠ چل (chil — 40), ٥٠ پەنجا (panja — 50), ١٠٠ سەد (sad — 100), ١٠٠٠ هەزار (hazar — 1000). Ordinals: یەکەم (yakam — first), دووەم (dûam — second), سێیەم (sêyam — third). Kurdish uses Eastern Arabic numerals: ٠١٢٣٤٥٦٧٨٩.', 1.3)
+
+  add('language', ['sorani family', 'kurdish family words', 'sorani family members', 'خێزان'],
+    'Sorani Kurdish family vocabulary (خێزان — xêzan — family): دایک (dayk — mother), باوک (bawk — father), برا (bra — brother), خوشک (xwshk — sister), کوڕ (kuṛ — son/boy), کچ (kch — daughter/girl), باپیر (bapîr — grandfather), داپیر (dapîr — grandmother), مام (mam — paternal uncle), خاڵ (xaḷ — maternal uncle), پور (pûr — paternal aunt), خاڵۆژن (xaḷojin — maternal aunt), هاوسەر (hawsar — spouse), مێرد (mêrd — husband), ژن (jin — wife/woman), منداڵ (mindaḷ — child).', 1.3)
+
+  add('language', ['sorani colors', 'kurdish colors', 'ڕەنگ'],
+    'Sorani Kurdish colors (ڕەنگەکان — rangakan): سوور (sûr — red), شین (shîn — blue/green — Kurdish traditionally uses one word for blue and green), زەرد (zard — yellow), سپی (spî — white), ڕەش (rash — black), پەمەیی (pamayî — orange), مۆر (mor — purple), قاوەیی (qawayî — brown), خۆڵەمێشی (xoḷamêshî — gray), گوڵی (guḷî — pink). Note: شین (shîn) covers both blue AND green in traditional usage; some speakers now distinguish: شینی ئاسمان (shînî asman — sky blue) vs سەوز (sawz — green, borrowed from Persian).', 1.2)
+
+  add('language', ['sorani body parts', 'kurdish body', 'sorani anatomy', 'ئەندامی جەستە'],
+    'Sorani Kurdish body parts (ئەندامی جەستە — andamî jasta): سەر (sar — head), چاو (chaw — eye), گوێ (gwê — ear), لووت (lût — nose), دەم (dam — mouth), ددان (ddan — tooth/teeth), زمان (zman — tongue/language), دەست (dast — hand/arm), پێ (pê — foot/leg), دڵ (diḷ — heart), ناو (naw — stomach/name), پشت (pisht — back), شان (shan — shoulder), ئەنگوست (angust — finger), سنگ (sing — chest), گەردن (gardin — neck), مێشک (mêshk — brain), قاچ (qach — leg).', 1.2)
+
+  add('language', ['sorani food', 'kurdish food', 'sorani cuisine', 'خواردن'],
+    'Sorani Kurdish food vocabulary (خواردنەوە — xwardinawa): نان (nan — bread — staple food), برنج (birnj — rice), گۆشت (gosht — meat), مریشک (mirishk — chicken), ماسی (masî — fish), سەوزە (sawza — vegetables), میوە (mîwa — fruit), شیر (shîr — milk), پەنیر (panîr — cheese), ماست (mast — yogurt), چا (cha — tea — very important!), ئاو (aw — water), شۆربا (shorba — soup), کەباب (kabab — kebab), دۆڵمە (doḷma — dolma/stuffed vegetables), کوبە (kuba — kubba). Kurdish cuisine is rich with grilled meats, rice dishes, and fresh herbs.', 1.2)
+
+  add('language', ['sorani time', 'kurdish time', 'sorani days', 'sorani months', 'ڕۆژانی هەفتە'],
+    'Sorani Kurdish time words: Days (ڕۆژانی هەفتە): شەممە (shamma — Saturday), یەکشەممە (yakshamma — Sunday), دووشەممە (dûshamma — Monday), سێشەممە (sêshamma — Tuesday), چوارشەممە (chwarshamma — Wednesday), پێنجشەممە (pênjshamma — Thursday), هەینی (haynî — Friday). Seasons: بەهار (bahar — spring), هاوین (hawîn — summer), پاییز (payîz — autumn), زستان (zistan — winter). Time: ئێستا (êsta — now), دوێنێ (dwênê — yesterday), سبەینێ (sbaynê — tomorrow), سەعات (saʿat — hour), خولەک (xulak — minute).', 1.3)
+
+  add('language', ['sorani nature', 'kurdish nature', 'sorani geography', 'سروشت'],
+    'Sorani Kurdish nature vocabulary (سروشت — sirûsht — nature): چیا (chya — mountain), دەریا (darya — sea/lake), ڕووبار (rûbar — river), دارستان (daristan — forest), دار (dar — tree), گوڵ (guḷ — flower), ئاسمان (asman — sky), خۆر (xor — sun), مانگ (mang — moon), ئەستێرە (astêra — star), بەفر (bafr — snow), باران (baran — rain), با (ba — wind), زەمین (zamîn — earth/ground), کێو (kêw — mountain/hill), بەرد (bard — stone/rock), خاک (xak — soil/earth). Kurdistan is known for its beautiful mountains: "کوردستان وڵاتی چیایە" (Kurdistan is the land of mountains).', 1.2)
+
+  // ── Kurdish Sorani — Sentence Construction & Semantics ────────────────────
+
+  add('language', ['sorani sentence', 'kurdish sentence', 'sorani word order', 'sorani SOV', 'ڕستە'],
+    'Sorani Kurdish sentence construction (ڕستە — rista): SOV word order. Simple sentence: SUBJECT + OBJECT + VERB. Examples: "من نان دەخۆم" (min nan daxom — I eat bread), "ئەو کتێب دەخوێنێتەوە" (aw ktêb daxwênêtawa — He/she reads a book), "ئێمە بۆ قوتابخانە دەچین" (êma bo qutabxana dachîn — We go to school). Questions: add "ئایا" (aya — question marker) or rising intonation: "تۆ کوردیت؟" (to kurdît? — Are you Kurdish?). Negation: prefix نا- (na-) or نە- (na-): "من نان ناخۆم" (min nan naxom — I don\'t eat bread).', 1.4)
+
+  add('language', ['sorani prepositions', 'kurdish prepositions', 'sorani postpositions', 'ئامراز'],
+    'Sorani Kurdish prepositions/postpositions: لە (la — in/at/from), بۆ (bo — for/to), لەگەڵ (lagaḷ — with), بەبێ (babê — without), لەسەر (lasar — on/about), لەژێر (lazhêr — under), لەپێش (lapêsh — before/in front of), لەدوای (ladway — after/behind), لەنێو (lanêw — inside/among), تا (ta — until), وەک (wak — like/as), لەبەر (labar — because of). Examples: "من لە ماڵ دام" (min la maḷ dam — I am at home), "بۆ تۆ" (bo to — for you), "لەگەڵ من" (lagaḷ min — with me).', 1.3)
+
+  add('language', ['sorani question words', 'kurdish questions', 'sorani interrogative', 'پرسیار'],
+    'Sorani Kurdish question words (وشەی پرسیار): کێ (kê — who), چی (chî — what), کوا (kwa — where), کەی (kay — when), چۆن (chon — how), بۆچی (bochî — why), چەند (chand — how many/how much), کام (kam — which). Examples: "ناوت چییە؟" (nawt chîya? — What is your name?), "لە کوێیت؟" (la kwêyt? — Where are you?), "کەی دێیت؟" (kay dêyt? — When will you come?), "بۆچی دواکەوتی؟" (bochî dwakawty? — Why are you late?), "چۆنیت؟" (chonît? — How are you?).', 1.3)
+
+  add('language', ['sorani common phrases', 'kurdish phrases', 'sorani conversation', 'لێدوان'],
+    'Essential Sorani Kurdish phrases for conversation: ناوم ... ە (nawm ... a — My name is ...), ناوت چییە؟ (nawt chîya? — What\'s your name?), زمانی کوردی دەزانیت؟ (zmanî kurdî dazanît? — Do you know Kurdish?), بەڵێ کەمێک (baḷê kamêk — Yes, a little), لە کوێوە دێیت؟ (la kwêwa dêyt? — Where are you from?), من ... م (min ... m — I am from ...), چەندە؟ (chanda? — How much does it cost?), یارمەتیم بدە (yarmatîm bda — Help me), تێناگەم (tênagam — I don\'t understand), هەڵە نییە (haḷa nîya — No problem).', 1.3)
+
+  // ── Kurdish Sorani — Semantic & Linguistic Features ───────────────────────
+
+  add('language', ['sorani semantics', 'kurdish semantics', 'sorani meaning', 'sorani linguistic features', 'واتاناسی'],
+    'Kurdish Sorani semantic features (واتاناسی — watasanî): 1) POLYSEMY: شین (shîn) means both "blue" AND "green" AND "mourning." Context determines meaning. 2) SEMANTIC FIELDS: rich vocabulary for mountains, valleys, seasons — reflecting Kurdish geography. 3) METAPHOR: دڵ (diḷ — heart) used extensively: دڵشاد (diḷshad — happy, lit. heart-happy), دڵتەنگ (diḷtang — sad, lit. heart-tight), دڵسۆز (diḷsoz — compassionate, lit. heart-burning). 4) COMPOUND WORDS: highly productive — دەستکرد (dastkird — handmade), سەرکردە (sarkida — leader, lit. head-doer). 5) HONORIFICS: خان (xan), بەگ (bag) — social respect markers.', 1.4)
+
+  add('language', ['sorani compound words', 'kurdish compounds', 'sorani word formation', 'وشەی لێکدراو'],
+    'Sorani Kurdish compound word formation (وشەی لێکدراو): Kurdish creates rich meanings by combining words: سەرشاری (sarshary — overjoyed, lit. head-flooding), دڵنیا (diḷnya — confident, lit. heart-settled), دەستبەسەر (dastbasar — powerful, lit. hand-on-head), چاودێری (chawdêrî — supervision, lit. eye-watching), سەرقاڵ (sarqaḷ — busy, lit. head-occupied), پشتگیری (pishtgîrî — support, lit. back-holding), دەستپێکردن (dastpêkirdin — to begin, lit. hand-foot-doing), سەرچاوە (sarchawa — source, lit. head-of-spring). This productive compounding is a key feature of Kurdish semantics.', 1.3)
+
+  add('language', ['sorani idioms', 'kurdish idioms', 'sorani expressions', 'ئیدیۆم'],
+    'Sorani Kurdish idioms and expressions: دەستت خۆش بێت (dastt xosh bêt — thank you, lit. "may your hand be happy"), چاوت ڕۆشن (chawt roshn — congratulations, lit. "your eye is bright"), سەرت سەلامەت (sart salamat — may you be safe, lit. "your head safe"), لە دڵمەوە (la diḷmawa — sincerely, lit. "from my heart"), بەر لە بۆنەکانتان (bar la bonakantand — before your nose/in your presence), خوا لە گەڵت بێت (xwa la gaḷt bêt — God be with you), دەست و پێت نەرم بێت (dast û pêt narm bêt — good luck, lit. "may your hands and feet be soft").', 1.2)
+
+  add('language', ['sorani phonology', 'kurdish sounds', 'sorani pronunciation', 'دەنگناسی'],
+    'Sorani Kurdish phonology (دەنگناسی — dangnasî): Unique sounds: ڕ (rr — retroflex/trilled r, contrasts with ر plain r), ڵ (ḷḷ — velarized/dark l, contrasts with ل plain l), ڤ (v — labiodental fricative). Pharyngeal sounds: ح (ḥ) and ع (ʿ) retained from Arabic loans. Kurdish has 8 vowels (more than Arabic\'s 3): a, â, e, ê, i, î, o, û. Stress is generally on the last syllable. Consonant clusters are common word-initially: "دوو" (dû), "بران" (bran). Aspiration is not phonemic. Voicing contrasts: p/b, t/d, k/g, ch/j, f/v, s/z, sh/zh.', 1.3)
+
+  add('language', ['sorani dialects', 'kurdish dialects', 'kurdish varieties', 'sorani vs kurmanji'],
+    'Kurdish dialect diversity: SORANI (Central Kurdish) — written in Arabic script, SOV, no gender, spoken in Iraqi Kurdistan & western Iran. KURMANJI (Northern Kurdish) — written in Latin script, SOV, has grammatical gender (m/f), spoken in Turkey, Syria, northern Iraq. HAWRAMI (Gorani) — archaic features, spoken in Iran-Iraq border. SOUTHERN KURDISH — spoken in Kermanshah, Iran. Key Sorani-Kurmanji differences: Sorani has no gender (Kurmanji: jin/mêr), Sorani uses Arabic script (Kurmanji: Latin), Sorani has more analytic structure, Kurmanji preserves more case distinctions. All dialects are mutually somewhat intelligible but have significant grammatical differences.', 1.3)
+
+  add('language', ['sorani history', 'kurdish language history', 'kurdish literature', 'مێژوو'],
+    'Kurdish Sorani language history: Kurdish is an Indo-European language from the Northwestern Iranian branch, related to Persian but distinct. Key literary figures: Ahmad Khani (17th century, wrote "Mem and Zin"), Nali (19th century poet), Haji Qadir Koyi (modernist poet), Abdullah Goran (father of modern Kurdish poetry), Sherko Bekas (contemporary). Sorani became a written standard in the early 20th century. The Sulaymaniyah dialect became the literary standard. Kurdish was suppressed under Iraqi Ba\'ath regime (Anfal campaign). After 1991, Sorani became official in Kurdistan Region. Today it has TV channels, newspapers, universities, and a growing digital presence.', 1.2)
+
+  add('language', ['learn sorani', 'learn kurdish', 'sorani for beginners', 'kurdish learning', 'فێربوون'],
+    'How to learn Sorani Kurdish: 1) ALPHABET: Master the 33-letter Arabic-based script — start with vowels (ئا ئە ئێ ئی ئۆ ئوو), then consonants. 2) BASIC PHRASES: Greetings (سڵاو، چۆنیت؟), numbers (یەک تا دە), pronouns (من، تۆ، ئەو). 3) GRAMMAR: SOV word order, ezafe (ی) construction, verb conjugation with prefixes (دە-، نا-، بـ-). 4) VOCABULARY: Family, food, nature, body parts — build from daily life. 5) PRACTICE: Listen to Kurdish music/TV (Rudaw, KurdSat), speak with native speakers. 6) SEMANTICS: Learn compound words (دڵشاد، سەرقاڵ) — they reveal Kurdish worldview. 7) WRITING: Practice right-to-left, pay attention to unique Kurdish letters: ڕ، ڵ، ڤ.', 1.4)
+
+  add('language', ['sorani verbs common', 'kurdish common verbs', 'sorani verb list', 'کرداری باو'],
+    'Common Sorani Kurdish verbs (کرداری باو): هاتن (hatin — to come), چوون (chûn — to go), بوون (bûn — to be/become), هەبوون (habûn — to have/exist), خواردن (xwardin — to eat), خواردنەوە (xwardinawa — to drink), نووستن (nûstin — to sleep), خەوتن (xawtin — to sleep/fall asleep), دانیشتن (danîshtin — to sit), ڕاوەستان (rawestan — to stand/stop), زانین (zanîn — to know), توانین (twanîn — to be able), ویستن (wistin — to want), نووسین (nûsîn — to write), خوێندنەوە (xwêndinawa — to read), دیتن (dîtin — to see), بیستن (bîstin — to hear), گوتن (gutin — to say/tell), کردن (kirdin — to do/make), دان (dan — to give).', 1.3)
+
+  add('language', ['sorani classroom', 'kurdish school', 'sorani education', 'قوتابخانە'],
+    'Sorani Kurdish classroom/education vocabulary: قوتابخانە (qutabxana — school), مامۆستا (mamosta — teacher — highly respected title), قوتابی (qutabî — student), وانە (wana — lesson), کتێب (ktêb — book), قەڵەم (qaḷam — pen), دەفتەر (daftar — notebook), پۆل (poḷ — class/grade), تاقیکردنەوە (taqîkirdinawa — exam), فێربوون (fêrbûn — to learn), فێرکردن (fêrkirdin — to teach), زانکۆ (zanko — university), خوێندن (xwêndin — to study/read), زانست (zanist — science/knowledge), زمان (zman — language). Kurdish has a strong oral tradition: "زانین هێز ە" (zanîn hêz a — Knowledge is power).', 1.2)
+
+  add('language', ['sorani emotions', 'kurdish emotions', 'sorani feelings', 'هەست'],
+    'Sorani Kurdish emotion words (هەست — hast — feeling/emotion): خۆش (xosh — happy/pleasant), خەمبار (xambâr — sad), تۆقیو (toqyw — angry), ترسان (tirsan — scared/afraid), حەز کردن (ḥaz kirdin — to love/like), ئەوین (awîn — romantic love), ئومێد (umêd — hope), بێزار (bêzar — bored/fed up), شەرمەزار (sharmazar — ashamed), پەشیمان (pashîman — regretful), شاد (shad — joyful), دڵشاد (diḷshad — heart-happy), دڵتەنگ (diḷtang — heart-tight = anxious/sad), دڵگەرم (diḷgarm — heart-warm = encouraged), بیرەوەری (bîrawarî — nostalgia/memory). Emotions in Kurdish often use دڵ (heart) compounds.', 1.3)
+
+  add('language', ['sorani politeness', 'kurdish respect', 'sorani honorifics', 'ڕێزداری'],
+    'Sorani Kurdish politeness & respect (ڕێزداری — rêzdarî): Kurdish culture values respect deeply. Address forms: خان (xan — Ms./Mrs.), بەرێز (barêz — Mr./respected), مامۆستا (mamosta — teacher/scholar — can be used as honorific), کاک (kak — Mr./brother — polite male address), خاتوو (xatû — Mrs./Lady). Formal "you": in Sorani, ئێوە (êwa) can be used for polite singular (like French "vous"). Respect phrases: سەرچاو (sarchaw — sir/at your service), فەرموو (farmû — please/go ahead — very common), دەستت خۆش (dastt xosh — bless your hands). Elders are addressed first, offered seats, and served tea first.', 1.2)
+
+  // ── Kurdish Sorani — Advanced Grammar ───────────────────────────────────
+
+  add('language', ['sorani passive', 'kurdish passive voice', 'sorani passive voice', 'کاری نەکردە'],
+    'Sorani Kurdish passive voice (کاری نەکردە): Formed by adding -را- (-ra-) or -ر- (-r-) infix to the verb stem + auxiliary. Examples: خواردن (xwardin — to eat) → خوراوە (xwrawa — was eaten), نووسین (nûsîn — to write) → نووسراوە (nûsrawa — was written), کردن (kirdin — to do) → کراوە (krawa — was done), کوشتن (kushtin — to kill) → کوژراوە (kuzhrawa — was killed). The agent is optionally expressed with لەلایەن (lalayen — by): "نامەکە لەلایەن من نووسراوە" (namaka lalayen min nûsrawa — The letter was written by me). Passive is less common than active in daily speech.', 1.3)
+
+  add('language', ['sorani causative', 'kurdish causative', 'sorani causative verb', 'کاری هۆکاری'],
+    'Sorani Kurdish causative verbs (کاری هۆکاری): Formed by adding -ێن- (-ên-) or -ان- (-an-) suffix to the stem. Examples: خواردن (xwardin — to eat) → خواردنەوە (xwardinawa — to feed/cause to eat), فێربوون (fêrbûn — to learn) → فێرکردن (fêrkirdin — to teach/cause to learn), نووستن (nûstin — to sleep) → نوساندن (nûsandin — to put to sleep), تێگەیشتن (têgayshtin — to understand) → تێگەیاندن (têgayandin — to explain/make understand), چوون (chûn — to go) → بردن (birdin — to take/cause to go). Causative adds agency: someone causes the action to happen.', 1.3)
+
+  add('language', ['sorani relative clause', 'kurdish relative clause', 'sorani subordinate', 'بڕگەی تایبەتمەندی'],
+    'Sorani Kurdish relative clauses (بڕگەی تایبەتمەندی): Formed with the relative marker "کە" (ka — that/which/who). Structure: NOUN + کە + CLAUSE. Examples: "پیاوەکەی کە هات" (pyawakay ka hat — the man who came), "کتێبەکەی کە خوێندمەوە" (ktêbakay ka xwêndimawa — the book that I read), "ماڵەکەی کە تێدا دەژیم" (maḷakay ka têda dazhîm — the house in which I live). "کە" is invariable — same form for subject, object, and oblique. Restrictive clauses immediately follow the noun. Non-restrictive uses a pause/comma.', 1.3)
+
+  add('language', ['sorani conditional', 'kurdish if clause', 'sorani if then', 'مەرج'],
+    'Sorani Kurdish conditionals (مەرج — marj): Real condition: "ئەگەر" (agar — if) + present/subjunctive: "ئەگەر بارانت ببارێت، ناچم" (agar barant bbarêt, nachim — If it rains, I won\'t go). Unreal/counterfactual: "ئەگەر" + past: "ئەگەر دەمزانی، دەمگوت" (agar damzanî, damgut — If I had known, I would have said). Wish: "خۆزگە" (xozga — I wish): "خۆزگە هاتبایت" (xozga hatbayt — I wish you had come). Temporal: "کاتێک" (katêk — when): "کاتێک گەیشت، دەستبکە" (katêk gaysht, dastbka — When you arrive, start). Concessive: "هەرچەندە" (harchand — although).', 1.3)
+
+  add('language', ['sorani modal verbs', 'kurdish modal', 'sorani can should must', 'کرداری مۆداڵ'],
+    'Sorani Kurdish modal verbs (کرداری مۆداڵ): ABILITY: توانین (twanîn — can/be able): "دەتوانم بنووسم" (datwanim binûsim — I can write). OBLIGATION: دەبێ/پێویستە (dabê/pêwista — must/should): "دەبێ بچم" (dabê bchim — I must go). DESIRE: ویستن (wistin — to want): "دەمەوێ بخوام" (damawê bxwam — I want to eat). PERMISSION: ئیجازە (îjaza — permission): "دەتوانم بچمە ژوور؟" (datwanim bchima zhûr? — May I go to the room?). PROBABILITY: لەوانەیە (lawanaya — maybe): "لەوانەیە ببارێت" (lawanaya bbarêt — It might rain). NECESSITY: پێویستە (pêwista — necessary): "پێویستە فێربیت" (pêwista fêrbît — You need to learn).', 1.3)
+
+  add('language', ['sorani adverbs', 'kurdish adverbs', 'sorani ئاوەڵکار', 'sorani time place manner'],
+    'Sorani Kurdish adverbs (ئاوەڵکار — awaḷkar): TIME: ئێستا (êsta — now), هەمیشە (hamîsha — always), هەرگیز (hargîz — never), زوو (zû — quickly/soon), درەنگ (drang — late), گاهێک (gahêk — sometimes). PLACE: ئێرە (êra — here), ئەوێ (awê — there), لەدەرەوە (ladarawa — outside), لەژوورەوە (lazhûrawa — inside). MANNER: باش (bash — well), خراپ (xrap — badly), بەخێرایی (baxêrayî — quickly), هێواش (hêwash — slowly/gently). DEGREE: زۆر (zor — very/much), کەم (kam — little), تەواو (tawaw — completely). Adverbs precede the verb: "زۆر باش دەزانم" (zor bash dazanim — I know very well).', 1.2)
+
+  add('language', ['sorani conjunctions', 'kurdish conjunctions', 'sorani linking words', 'بەستنەوە'],
+    'Sorani Kurdish conjunctions (بەستنەوە — bastnawa): COORDINATING: و (w/û — and), یان (yan — or), بەڵام (baḷam — but), نە...نە (na...na — neither...nor). SUBORDINATING: چونکە (chunka — because), کە (ka — that/when), بۆئەوەی (bo away — so that/in order to), هەرچەندە (harchand — although), پێش ئەوەی (pêsh away — before), دوای ئەوەی (dway away — after), لە کاتێکدا (la katêkda — while). CORRELATIVE: هەم...هەم (ham...ham — both...and), یان...یان (yan...yan — either...or). Examples: "هاتم و دانیشتم" (hatim û danîshtim — I came and sat), "بەڵام ناتوانم" (baḷam natwanim — but I can\'t).', 1.2)
+
+  add('language', ['sorani negation', 'kurdish negation', 'sorani negative', 'نەرێ'],
+    'Sorani Kurdish negation (نەرێ — narê): Present tense: replace دە- with نا-: "ناخۆم" (naxom — I don\'t eat), "نازانم" (nazanim — I don\'t know). Past tense: prefix نە-: "نەمخوارد" (namxward — I didn\'t eat). Subjunctive: prefix نە-: "نەخۆم" (naxom — that I don\'t eat). Imperative negative: prefix مە-: "مەچۆ!" (macho! — Don\'t go!). Existential negative: نییە (nîya — is not), نین (nîn — are not): "ئەو لێرە نییە" (aw lêra nîya — He/she is not here). Double negative emphatic: "هیچ نازانم" (hîch nazanim — I don\'t know anything at all).', 1.3)
+
+  add('language', ['sorani aspect', 'kurdish aspect', 'sorani progressive', 'sorani habitual', 'ئاسپێکت'],
+    'Sorani Kurdish verb aspect system: HABITUAL: prefix دە- indicates repeated/habitual action: "دەخۆم" (daxom — I eat [regularly]). PROGRESSIVE/CONTINUOUS: context distinguishes: "ئێستا دەخۆم" (êsta daxom — I am eating [right now]). PERFECTIVE: simple past without prefix: "خواردم" (xwardim — I ate [completed]). IMPERFECTIVE: past with دە-: "دەمخوارد" (damxward — I was eating/used to eat). PERFECT: past participle + copula: "خواردوومە" (xwardûma — I have eaten). PROSPECTIVE: implied by context + دە-: "سبەی دەچم" (sbay dachim — I\'m going tomorrow). Aspect interacts with tense to create nuanced meanings.', 1.3)
+
+  add('language', ['sorani clitic', 'kurdish clitic pronouns', 'sorani bound pronouns', 'کلیتیک'],
+    'Sorani Kurdish clitic pronoun system: Bound pronouns attach to verbs, prepositions, and nouns: -م (-m — me/my/I), -ت (-t — you/your), -ی (-î — him/her/his/her/its), -مان (-man — us/our/we), -تان (-tan — you/your/pl), -یان (-yan — them/their/they). Position: after the first stressed element. On verbs: "بینیم" (bînim — I saw [ergative: me-saw]), on prepositions: "لێم" (lêm — from me), "پێت" (pêt — to you), on nouns: "کتێبم" (ktêbim — my book). Clitic doubling: "من بینیم" (min bînim — I, I-saw). Clitics are fundamental to Kurdish syntax and ergativity.', 1.3)
+
+  add('language', ['sorani word order variations', 'kurdish topic focus', 'sorani focus', 'ڕیزبەندی وشە'],
+    'Sorani Kurdish word order and information structure: Base order is SOV but varies for emphasis. TOPIC-fronting: "کتێبەکە، خوێندمەوە" (ktêbaka, xwêndimawa — The book, I read it). FOCUS: new/contrastive info moves before verb: "من نان دەخۆم نەک برنج" (min nan daxom nak birnj — I eat BREAD not rice). WH-movement: question words move to pre-verbal position: "تۆ چی دەخۆیت؟" (to chî daxoyt? — What do you eat?). SCRAMBLING: free word order with clitics tracking relations: "نان من دەخۆم" or "من دەخۆم نان" both valid. Heavy NPs shift right.', 1.3)
+
+  // ── Kurdish Sorani — Advanced Vocabulary Domains ────────────────────────
+
+  add('language', ['sorani professions', 'kurdish jobs', 'sorani occupations', 'پیشە'],
+    'Sorani Kurdish professions (پیشە — pîsha): پزیشک (pzîshk — doctor), پەرستار (parstar — nurse), ئەندازیار (andazyar — engineer), وەکیل (wakîl — lawyer), مامۆستا (mamosta — teacher), حاکم (ḥakim — judge), ئەفسەر (afsar — officer), جوتیار (jutyar — farmer), تاجر (tajir — merchant), نانەوا (nanawa — baker), دەستکار (dastkar — craftsman/artisan), خاوەنکار (xawankar — employer), کرێکار (krêkar — worker/laborer), ژمێریار (zhmêryar — accountant), سەرباز (sarbaz — soldier), ڕۆژنامەنووس (rozhamanûs — journalist), هونەرمەند (hunarmand — artist), وەرزشوان (warzshwan — athlete).', 1.2)
+
+  add('language', ['sorani animals', 'kurdish animals', 'sorani animal names', 'ئاژەڵ'],
+    'Sorani Kurdish animal vocabulary (ئاژەڵ — azhaḷ — animal): سەگ (sag — dog), پشیلە (pshîla — cat), ئەسپ (asp — horse), مانگا (manga — cow), مەڕ (maṛ — sheep), بزن (bizin — goat), کەر (kar — donkey), هێشتر (hêshtir — camel), شێر (shêr — lion), ورچ (wurch — bear), گورگ (gurg — wolf), هەڵۆ (haḷo — eagle), کەوک (kawk — partridge), ماسی (masî — fish), مار (mar — snake), مێشوولە (mêshûla — bee), مەلەوانکە (malawanka — butterfly), کەلەشێر (kalashêr — ant), باخچە (bakhcha — garden snail). Kurdish has rich animal vocabulary reflecting pastoral culture.', 1.2)
+
+  add('language', ['sorani weather', 'kurdish weather', 'sorani climate', 'کەشوهەوا'],
+    'Sorani Kurdish weather vocabulary (کەشوهەوا — kashûhawa): باران (baran — rain), بەفر (bafr — snow), هەور (hawr — cloud), خۆر (xor — sun), تەم (tam — fog), ڕەشەبا (rashabا — storm), بروسکە (bruska — lightning), هەوری تریشقە (hawrî trîshqa — thunder), ساردی (sardî — cold weather), گەرمی (garmî — hot weather), شەپۆل (shapol — wave/breeze), بایەخ (bayax — wind strength), تەماشای (tamashay — observation). Expressions: "هەوا چۆنە؟" (hawa chona? — How is the weather?), "باران دەبارێت" (baran dabbarêt — It is raining), "بەفر دەبارێت" (bafr dabbarêt — It is snowing).', 1.2)
+
+  add('language', ['sorani travel', 'kurdish travel', 'sorani transportation', 'گەشتیاری'],
+    'Sorani Kurdish travel vocabulary (گەشتیاری — gashtiarî — travel): فڕۆکە (fṛoka — airplane), ئۆتۆمبێل (otombêl — car), پاس (pas — bus), شەمەندەفەر (shamandafar — train), کەشتی (kashtî — ship), بایسکل (bayskil — bicycle), فڕۆکەخانە (fṛokaxana — airport), وێستگە (wêstga — station), هوتێل (hutêl — hotel), پاسپۆرت (pasport — passport), بلیت (bilît — ticket), گەشتیار (gashtyar — tourist/traveler), ڕێگا (rêga — road/way), شەقام (shaqam — street), پرد (pird — bridge). Phrases: "بۆ کوێ دەچیت؟" (bo kwê dachît? — Where are you going?), "بلیتێکم دەوێت" (bilîtêkim dawêt — I need a ticket).', 1.2)
+
+  add('language', ['sorani health', 'kurdish health', 'sorani medical', 'تەندروستی'],
+    'Sorani Kurdish health vocabulary (تەندروستی — tandirustî — health): نەخۆش (naxosh — sick/patient), تەندروست (tandirust — healthy), ئازار (azar — pain), سەردێشە (sardêsha — headache), دڵ ئێش (diḷ êsh — heartache/stomachache), تاو (taw — fever), سەرماخوردن (sarmaxurdin — cold/flu), نەشتەرگەری (nashtargarî — surgery), دەرمان (darman — medicine), نەخۆشخانە (naxoshxana — hospital), پزیشک (pzîshk — doctor), ئێش (êsh — ache/pain). Phrases: "حاڵم باش نییە" (ḥaḷim bash nîya — I don\'t feel well), "ئازارم هەیە" (azarim haya — I have pain), "پزیشکم بۆ ببینم" (pzîshkim bo bbînim — I need to see a doctor).', 1.2)
+
+  add('language', ['sorani technology', 'kurdish technology', 'sorani computer', 'تەکنەلۆژیا'],
+    'Sorani Kurdish technology vocabulary (تەکنەلۆژیا — taknolojya): کۆمپیوتەر (kompyûtar — computer), مۆبایل (mobayl — mobile phone), ئینتەرنێت (intarnêt — internet), تەلەفزیۆن (talafzyon — television), لاپتۆپ (laptop — laptop), ئیمەیڵ (îmayḷ — email), وێبسایت (wêbsayt — website), تۆڕی کۆمەڵایەتی (toṛî komalaytî — social media), بەرنامە (barnama — program/app), داتا (data — data), هەکر (hakir — hacker), پاسوۆرد (paswôrd — password), وایفای (wayfay — WiFi). Many tech words are borrowed from English with Kurdish phonology applied. Kurdish digital presence is growing with Kurdish-language websites, apps, and social media.', 1.2)
+
+  add('language', ['sorani sports', 'kurdish sports', 'sorani games', 'وەرزش'],
+    'Sorani Kurdish sports vocabulary (وەرزش — warzish): تۆپی پێ (topî pê — football/soccer), باسکەتبۆڵ (baskatboḷ — basketball), وشتنی گوڵە (wishtinî guḷa — wrestling — very popular), هەڵپەڕین (haḷpaṛîn — jumping), ڕاکردن (rakirdin — running), مەلە (mala — swimming), یاری (yarî — game/play), تیم (tîm — team), یاریزان (yarîzan — player), ڕابەر (rabar — coach), بردنەوە (birdnawa — victory/winning), دۆڕاندن (doṛandin — losing), هاوتا (hawta — draw/tie), گۆڵ (goḷ — goal). Wrestling (زوورخانە — zûrxana) is a traditional Kurdish sport with ancient roots.', 1.2)
+
+  add('language', ['sorani music', 'kurdish music', 'sorani instruments', 'مۆسیقا'],
+    'Sorani Kurdish music vocabulary (مۆسیقا — mosîqa): گۆرانی (goranî — song), ئاوازە (awaza — melody/tune), دەنگ (dang — voice/sound), تەمبور (tambûr — tanbur — traditional long-necked lute), دەف (daf — frame drum — iconic Kurdish instrument), زورنا (zurna — zurna/oboe), بلوور (bulûr — flute), کەمانچە (kamancha — spike fiddle), گۆرانیبێژ (goranîbêzh — singer), هونەرمەند (hunarmand — artist/musician), ڕیتم (rîtm — rhythm), هەڵپەڕکێ (haḷpaṛkê — folk dance music), دەستە (dasta — ensemble). Kurdish music features emotional vocals, daf rhythms, and pentatonic scales. Famous artists: Nassar Razazi, Adnan Karim, Zakaria Abdulla.', 1.2)
+
+  add('language', ['sorani clothing', 'kurdish clothing', 'sorani traditional dress', 'جل'],
+    'Sorani Kurdish clothing vocabulary (جل — jil — clothes): جلوبەرگ (jilûbarg — clothing), کراس (kras — shirt), پانتۆڵ (pantoḷ — pants), پێڵاو (pêḷaw — shoes), کوڵاو (kuḷaw — hat/cap), شاڵ (shaḷ — shawl/waistband), ڕانک (rank — Kurdish traditional wide pants), کەلاو (kalaw — turban — traditional headwear), جلی کوردی (jilî kurdî — Kurdish traditional dress), چاکەت (chakat — jacket), قاپوت (qaput — coat), جلی ژنانە (jilî zhnana — women\'s dress), فیستان (fîstan — dress/gown). Traditional Kurdish dress is colorful and elaborate, with regional variations.', 1.2)
+
+  add('language', ['sorani house', 'kurdish furniture', 'sorani home', 'ماڵ'],
+    'Sorani Kurdish home and furniture vocabulary (ماڵ — maḷ — home/house): ژوور (zhûr — room), چێشتخانە (chêshtxana — kitchen), حەمام (ḥamam — bathroom), نووستنگا (nûstinga — bedroom), نیشتمانگا (nîshtimanga — living room), باخچە (bakhcha — garden), دەرگا (darga — door), پەنجەرە (panjara — window), کورسی (kursî — chair), مێز (mêz — table), جێگا (jêga — bed), فەرش (farsh — carpet — important in Kurdish homes), قاپ (qap — dish/plate), قاشوق (qashûq — spoon), چەقۆ (chaqo — knife). Kurdish homes traditionally feature floor seating with colorful carpets.', 1.2)
+
+  add('language', ['sorani shopping', 'kurdish market', 'sorani bazaar', 'بازاڕ'],
+    'Sorani Kurdish shopping vocabulary (بازاڕ — bazar — market/bazaar): بازاڕ (bazar — market), دوکان (dûkan — shop), کڕین (kṛîn — to buy), فرۆشتن (froshtin — to sell), نرخ (nirx — price), گران (gran — expensive), هەرزان (harzan — cheap), پارە (para — money), دینار (dînar — dinar — Iraqi currency), فرۆشیار (froshyar — seller), کڕیار (kṛyar — buyer), میزان (mîzan — scale/balance). Phrases: "چەندە؟" (chanda? — How much?), "زۆر گرانە" (zor grana — It\'s very expensive), "کەمی لێ بکە" (kamî lê bka — Give a discount), "دەمەوێت بکڕم" (damawêt bikṛim — I want to buy).', 1.2)
+
+  add('language', ['sorani directions', 'kurdish directions', 'sorani navigation', 'ئاڕاستە'],
+    'Sorani Kurdish directions vocabulary (ئاڕاستە — aṛasta — direction): ڕاست (rast — right), چەپ (chap — left), ڕاستەوخۆ (rastawxo — straight ahead), باکوور (bakûr — north), باشوور (bashûr — south), ڕۆژهەڵات (rozhhaḷat — east), ڕۆژئاوا (rozhawa — west), لای (lay — beside/near), دوور (dûr — far), نزیک (nizîk — near/close), نێوان (nêwan — between), هەموو (hamû — all/every). Phrases: "ببوورە، ڕێگا بۆ...?" (bibûra, rêga bo...? — Excuse me, the way to...?), "ڕاست بکە" (rast bka — Turn right), "چەپ بکە" (chap bka — Turn left), "ڕاستەوخۆ بچۆ" (rastawxo bcho — Go straight).', 1.2)
+
+  add('language', ['sorani city', 'kurdish city', 'sorani urban', 'شار'],
+    'Sorani Kurdish city/urban vocabulary (شار — shar — city): شار (shar — city), گوند (gund — village), شەقام (shaqam — street), مەیدان (maydan — square/plaza), بازاڕ (bazar — market), مزگەوت (mizgawt — mosque), کەنیسە (kanîsa — church), قوتابخانە (qutabxana — school), نەخۆشخانە (naxoshxana — hospital), پۆستخانە (postxana — post office), بانک (bank — bank), ڕێستۆران (rêstoran — restaurant), چایخانە (chayxana — tea house), پارک (park — park), پرد (pird — bridge), کۆڵان (koḷan — alley), دەروازە (darwaza — gate/entrance). Kurdish cities blend modern and traditional architecture.', 1.2)
+
+  add('language', ['sorani religion', 'kurdish religion', 'sorani faith', 'ئایین'],
+    'Sorani Kurdish religion vocabulary (ئایین — ayîn — religion): خوا (xwa — God), نوێژ (nwêzh — prayer), مزگەوت (mizgawt — mosque), قورئان (quran — Quran), ئیسلام (îslam — Islam), مەسیحی (masîḥî — Christian), ئێزیدی (êzîdî — Yezidi — significant Kurdish minority religion), زەردەشتی (zardashtî — Zoroastrian), ڕۆژوو (rozhû — fasting), عید (ʿîd — Eid/holiday), نەورۆز (nawroz — Newroz — Kurdish New Year, March 21), حەج (ḥaj — Hajj), حەرام (ḥaram — forbidden), حەلاڵ (ḥalaḷ — permitted). Kurds are religiously diverse: majority Muslim (Sunni), plus Yezidis, Christians, Yarsan, Zoroastrians.', 1.2)
+
+  // ── Kurdish Sorani — Deep Semantics & Linguistic Analysis ──────────────
+
+  add('language', ['sorani morphology', 'kurdish morphology', 'sorani word structure', 'مۆرفۆلۆژی'],
+    'Sorani Kurdish morphology (مۆرفۆلۆژی): Kurdish is moderately synthetic with rich agglutinative features. ROOT + PREFIX + SUFFIX structure. Verb morphology: PERSON prefixes (دە-/نا-/بـ-) + STEM + person suffixes (-م/-یت/-ات/-ین/-ن). Noun morphology: ROOT + DEFINITENESS (-ەکە/-ێک) + PLURAL (-ان/-ەکان) + CASE (oblique ی). Derivational morphology: -کار (-kar — doer: کار→کارکەر worker), -خانە (-xana — place: نان→نانەواخانە bakery), -ی (-î — abstract: ئازاد→ئازادی freedom), -انە (-ana — manner: ڕۆژ→ڕۆژانە daily). Morpheme order is fixed and predictable.', 1.4)
+
+  add('language', ['sorani derivation', 'kurdish word derivation', 'sorani prefix suffix', 'دروستکردنی وشە'],
+    'Sorani Kurdish word derivation (دروستکردنی وشە): PREFIXES: هەڵ- (haḷ- — up/away: هەڵگرتن — to pick up), دا- (da- — down: داگرتن — to download/close), ڕا- (ṛa- — away/forth: ڕاکردن — to run), تێ- (tê- — through: تێگەیشتن — to understand), هاو- (haw- — co/together: هاوکار — colleague). SUFFIXES: -دار (-dar — having: ئاودار — watery), -مەند (-mand — possessing: هونەرمەند — artistic/artist), -گەر (-gar — doer: کارگەر — worker), -ستان (-stan — land of: کوردستان — Kurdistan), -گا (-ga — place: خوێندنگا — school). Derivation is highly productive in Kurdish.', 1.3)
+
+  add('language', ['sorani loanwords', 'kurdish borrowing', 'sorani foreign words', 'وشەی دەرەکی'],
+    'Sorani Kurdish loanwords (وشەی دەرەکی — wushay darakî): ARABIC loans (largest source, religion/education/admin): کتێب (ktêb — book), مامۆستا (mamosta — teacher), حکومەت (ḥikumat — government), عەقڵ (ʿaqḷ — mind/reason). PERSIAN loans (culture/admin): باخچە (bakhcha — garden), فەرمان (farman — order/decree), شار (shar — city). TURKISH loans (military/food): ئۆردوو (ordû — army/camp), کەباب (kabab — kebab). ENGLISH loans (modern technology): کۆمپیوتەر (kompyûtar), ئینتەرنێت (intarnêt), مۆبایل (mobayl). Kurdish adapts loans to its phonology: "television" → تەلەفزیۆن, "hospital" → حەسپاخانە (from Arabic) or نەخۆشخانە (native).', 1.3)
+
+  add('language', ['sorani pragmatics', 'kurdish pragmatics', 'sorani speech acts', 'پراگماتیک'],
+    'Sorani Kurdish pragmatics (پراگماتیک): SPEECH ACTS: Requests use بـ- subjunctive softener: "بتوانیت یارمەتیم بدەیت؟" (bitwanît yarmatîm bdayt? — Could you help me?). INDIRECTNESS: Kurds prefer indirect requests — "ئاو نییە" (aw nîya — There is no water) implies "please bring water." HOSPITALITY scripts: Guest must refuse tea initially, host must insist 3 times. TURN-TAKING: Elders speak first. Topic shifts signaled by "باشە" (basha — okay/well). FACE-SAVING: Criticism softened with "ببوورە بەڵام..." (bibûra baḷam... — sorry but...). Compliments deflected: "قوربانت" (qurbant — your sacrifice/you\'re too kind).', 1.4)
+
+  add('language', ['sorani discourse markers', 'kurdish discourse', 'sorani connectors', 'گرێدەر'],
+    'Sorani Kurdish discourse markers (گرێدەر — grêdar): TOPIC SHIFT: باشە (basha — okay/well/anyway), خۆ (xo — well/so), دەی (day — so/then). ELABORATION: واتە (wata — that is/meaning), مەبەستم (mabastim — I mean). CONTRAST: بەڵام (baḷam — but/however), لەبری ئەوە (labrî awa — instead). CONSEQUENCE: بۆیە (boya — therefore), لەبەر ئەوە (labar awa — because of that). SEQUENCE: یەکەم (yakam — first), دواتر (dwatir — then/later), لە کۆتاییدا (la kotayîda — finally). HEDGING: بەلکو (balku — perhaps), لەوانەیە (lawanaya — maybe), بە ڕای من (ba ṛay min — in my opinion). EMPHASIS: ئەڵبەتتە (aḷbatta — of course), بەتایبەتی (bataybatî — especially).', 1.3)
+
+  add('language', ['sorani evidentiality', 'kurdish evidentiality', 'sorani reported speech', 'بەڵگەداری'],
+    'Sorani Kurdish evidentiality (بەڵگەداری — baḷgadarî): Kurdish distinguishes witnessed vs reported information. DIRECT EVIDENCE (witnessed): simple past: "ئەو هات" (aw hat — He/she came [I saw it]). REPORTED/HEARSAY: evidential particle "دەکا" or "وا دەڵێن" (wa daḷên — they say): "وا دەڵێن هاتووە" (wa daḷên hatûa — They say he has come). INFERENCE: "وا دیارە" (wa diyara — it appears that): "وا دیارە نەخۆشە" (wa diyara naxosha — It seems he\'s sick). MIRATIVE (surprise): "چ!" (ch! — what!): "ئەو هاتووە؟!" (aw hatûa?! — He came?! [surprised]). This system reflects Kurdish attention to information source and reliability.', 1.4)
+
+  add('language', ['sorani proverbs', 'kurdish proverbs', 'sorani wisdom', 'پەند'],
+    'Sorani Kurdish proverbs (پەند — pand — proverb/wisdom): "کەسێک بێ کتێب، وەک دارێک بێ بەرگ" (kasêk bê ktêb, wak darêk bê barg — A person without a book is like a tree without leaves). "زمان شمشێرە، وشە تیرە" (zman shimshêra, wusha tîra — Language is a sword, words are arrows). "دیوارەکان گوێیان هەیە" (dîwarakan gwêyan haya — Walls have ears). "دەست بە دەست بشۆ، دەست بە ڕوو بشۆ" (dast ba dast bsho, dast ba ṛû bsho — Wash hand with hand, hand washes face — i.e., cooperation). "چاوی ناشتە خەو نابینێت" (chawî nashta xaw nabînêt — The hungry eye sees no sleep). Proverbs are central to Kurdish oral tradition.', 1.3)
+
+  add('language', ['sorani poetry', 'kurdish poetry', 'sorani verse', 'شیعر'],
+    'Sorani Kurdish poetry (شیعر — shiʿir): Kurdish has a rich poetic tradition spanning centuries. Classical forms: قەسیدە (qasîda — ode), غەزەل (ghazal — lyric poem), ڕوبای (rûbay — quatrain). Modern free verse: شیعری ئازاد (shiʿrî azad). Key poets: ئەحمەدی خانی (Ahmad Khani, 1650-1707 — "مەم و زین"), نالی (Nali, 1797-1855 — romantic), حاجی قادری کۆیی (Haji Qadir Koyi, 1817-1897 — nationalist), عەبدوللا گۆران (Abdullah Goran, 1904-1962 — father of modern Kurdish poetry), شێرکۆ بێکەس (Sherko Bekas, 1940-2013 — contemporary master). Poetry themes: love (ئەوین), nature (سروشت), homeland (نیشتمان), freedom (ئازادی).', 1.3)
+
+  add('language', ['sorani metaphor', 'kurdish metaphor', 'sorani figurative', 'واتای مەجازی'],
+    'Sorani Kurdish metaphorical language (واتای مەجازی — watay majazî): HEART metaphors (دڵ — diḷ): دڵ بە دوای (diḷ ba dway — heart follows = desires), دڵ بڕین (diḷ biṛîn — heart cutting = heartbreak), دڵ دایین (diḷ dayîn — heart giving = falling in love), دڵ نەرم بوون (diḷ narm bûn — heart softening = becoming compassionate). HEAD metaphors (سەر — sar): سەری هەیە (sarî haya — has a head = is clever), بێ سەروبەری (bê sarûbarî — without head and direction = chaotic). NATURE metaphors: "وەک چیا نەلەرزێ" (wak chya nalarzê — unshakeable like a mountain), "وەک ڕووبار تێپەڕ" (wak rûbar têpaṛ — passes like a river = time). Metaphors reveal Kurdish cultural values.', 1.4)
+
+  add('language', ['sorani synonyms antonyms', 'kurdish synonym', 'sorani word relations', 'هاوواتا و دژواتا'],
+    'Sorani Kurdish synonyms and antonyms (هاوواتا و دژواتا): SYNONYMS (هاوواتا — hawwata): گەورە/مەزن (gawra/mazin — big), چوون/ڕۆیشتن (chûn/royshtin — to go), جوان/خۆشەویست (jwan/xoshawîst — beautiful), زمان/زاراوە (zman/zarawa — language/dialect). ANTONYMS (دژواتا — dizhwata): گەورە↔بچووک (gawra↔bchûk — big↔small), باش↔خراپ (bash↔xrap — good↔bad), گەرم↔سارد (garm↔sard — hot↔cold), زوو↔درەنگ (zû↔drang — early↔late), نزیک↔دوور (nizîk↔dûr — near↔far), کڕین↔فرۆشتن (kṛîn↔froshtin — buy↔sell), ڕاست↔چەپ (rast↔chap — right↔left). Understanding these pairs deepens vocabulary and semantic awareness.', 1.3)
+
+  add('language', ['sorani semantic fields', 'kurdish semantic domains', 'sorani lexical fields', 'بواری واتایی'],
+    'Sorani Kurdish semantic field analysis (بواری واتایی — buwarî watayî): MOUNTAIN DOMAIN: چیا (chya — mountain), شاخ (shakh — mountain range), دۆڵ (doḷ — valley), گەل (gal — ravine), بەرز (barz — high/tall), نزم (nizm — low), شەقام (shaqam — cliff path). WATER DOMAIN: ئاو (aw — water), ڕووبار (rûbar — river), چەم (cham — stream), کانی (kanî — spring), دەریا (darya — lake/sea), سەرچاوە (sarchawa — source/spring). KINSHIP TERMS differentiate paternal vs maternal: مام vs خاڵ (uncle), پور vs خاڵۆ (aunt). These semantic fields reflect Kurdish geography, culture, and social organization.', 1.3)
+
+  add('language', ['sorani onomatopoeia', 'kurdish sound words', 'sorani imitative words', 'وشەی دەنگلێنانەوە'],
+    'Sorani Kurdish onomatopoeia (وشەی دەنگلێنانەوە): تق تق (taq taq — knocking), شر شر (shir shir — flowing water), ڤز ڤز (viz viz — buzzing), قرچ قرچ (qirch qirch — crunching), پف پف (pif pif — puffing), ناڵین (naḷîn — moaning/groaning), زنگ زنگ (zing zing — ringing), گر گر (gir gir — growling/rumbling), شەق شەق (shaq shaq — cracking), تەق تەق (taq taq — shooting/popping). Kurdish uses sound symbolism productively: reduplication intensifies: "باران شر شر دەبارێت" (baran shir shir dabbarêt — rain pours down [with sound]). Sound words appear frequently in poetry and storytelling.', 1.2)
+
+  add('language', ['sorani honorific system', 'kurdish social register', 'sorani formal informal', 'ئاستی زمان'],
+    'Sorani Kurdish register and social language (ئاستی زمان — astî zman): FORMAL register: لەگەڵ ڕێزدا (lagaḷ rêzda — with respect), uses ئێوە (êwa — formal you), titles (بەرێز — barêz, خان — xan), complete verb forms. INFORMAL register: تۆ (to — informal you), shortened forms, slang, particle dropping. LITERARY/WRITTEN: complex sentences, Arabic/Persian loanwords, classical vocabulary. SPOKEN COLLOQUIAL: simplified grammar, English loanwords, regional variations. CODE-SWITCHING: Many speakers mix Kurdish with Arabic or English in daily speech. Register choice depends on: age of interlocutor, social setting, topic, relationship closeness. Elders always receive formal register.', 1.3)
+
+  add('language', ['sorani reduplication', 'kurdish reduplication', 'sorani repeated words', 'دووبارەکردنەوە'],
+    'Sorani Kurdish reduplication (دووبارەکردنەوە — dûbarakirdinawa): FULL REDUPLICATION: intensity/distribution — "هێواش هێواش" (hêwash hêwash — very slowly), "یەک یەک" (yak yak — one by one), "ڕۆژ ڕۆژ" (rozh rozh — day by day). PARTIAL REDUPLICATION: m-echo — creates "and similar things": چا مای (cha may — tea and such), نان مان (nan man — bread and such). ONOMATOPOEIC REDUPLICATION: "تق تق" (taq taq), "شر شر" (shir shir). VERBAL REDUPLICATION: repeated action: "چوو و هات" (chû û hat — went and came = paced back and forth). Reduplication is a productive morphological process expressing plurality, intensity, continuity, and approximation.', 1.3)
+
+  add('language', ['sorani numeral classifier', 'kurdish counting system', 'sorani numbers advanced', 'ژمارەی پێشکەوتوو'],
+    'Sorani Kurdish advanced number system: FRACTIONS: نیو (nîw — half), سێ یەکی (sê yakî — one third), چوارەکی (chwarakî — quarter). DECIMALS: خاڵ (xaḷ — point): "سێ خاڵ پێنج" (sê xaḷ pênj — 3.5). CLASSIFIERS: Kurdish uses measure words: دانە (dana — unit/piece), جووت (jût — pair), سەر (sar — head, for animals), گەلا (gala — bunch). ORDINALS: suffix -ەم (-am): یەکەم (yakam — first), دووەم (dûam — second). MULTIPLICATIVES: "جار" (jar — time): یەک جار (yak jar — once), دوو جار (dû jar — twice). DISTRIBUTIVE: هەر (har — each): هەر کەسێک (har kasêk — each person). Large numbers: ملیۆن (milyon — million), ملیار (milyar — billion).', 1.2)
+
+  add('language', ['sorani verb particles', 'kurdish phrasal verbs', 'sorani compound verbs', 'کرداری لێکدراو'],
+    'Sorani Kurdish verb particles and compound verbs (کرداری لێکدراو): DIRECTIONAL PARTICLES: هەڵ- (haḷ- — up): هەڵسان (haḷsan — to stand up), هەڵگرتن (haḷgirtin — to pick up). دا- (da- — down): دانیشتن (danîshtin — to sit down), داخستن (daxistin — to close). ڕا- (ṛa- — along/away): ڕاکردن (ṛakirdin — to run), ڕاگرتن (ṛagirtin — to stop). تێ- (tê- — into/through): تێگەیشتن (têgayshtin — to understand), تێکەڵ (têkaḷ — mixed). LIGHT VERB COMPOUNDS: noun + کردن (kirdin — to do): کار کردن (kar kirdin — to work), قسە کردن (qsa kirdin — to speak), یارمەتی دان (yarmatî dan — to help).', 1.3)
+
+  add('language', ['sorani spatial terms', 'kurdish spatial language', 'sorani location words', 'شوێن'],
+    'Sorani Kurdish spatial language: DEICTIC terms: ئێرە (êra — here), ئەوێ (awê — there), ئەم لاوە (am lawa — this side), ئەو لاوە (aw lawa — that side). INTRINSIC terms: ناو (naw — inside), دەرەوە (darawa — outside), سەر (sar — top/on), ژێر (zhêr — under/below), پشت (pisht — behind/back), بەردەم (bardam — front). RELATIVE terms: ڕاست (rast — right), چەپ (chap — left). SPATIAL POSTPOSITIONS: لەسەر (lasar — on), لەژێر (lazhêr — under), لەنێو (lanêw — among/in), لەپاڵ (lapaḷ — beside), لەدوای (ladway — behind). Kurdish spatial language uses body-part terms metaphorically: "سەر" (head) = top, "پێ" (foot) = bottom.', 1.3)
+
+  add('language', ['sorani kinship', 'kurdish family system', 'sorani extended family', 'خزم و کەس'],
+    'Sorani Kurdish kinship system (خزم و کەس — xizm û kas): Kurdish has elaborate kinship terms reflecting tribal social structure. PATERNAL vs MATERNAL distinction: مام (mam — paternal uncle) vs خاڵ (xaḷ — maternal uncle), پور (pûr — paternal aunt) vs خاڵۆ (xaḷo — maternal aunt). IN-LAWS: خەسوو (xasû — mother-in-law), خەزوور (xazûr — father-in-law), هێور (hêwir — brother-in-law), ژنبرا (zhinbra — sister-in-law). TRIBAL terms: هۆز (hoz — tribe/clan), تایفە (tayfa — extended family group), ئاخا (axa — tribal chief). GENERATIONAL: باپیر (bapîr — grandfather), باوباپیر (bawbapîr — great-grandfather). Kurdish kinship terms are more specific than English.', 1.3)
+
+  add('language', ['sorani politeness strategies', 'kurdish face', 'sorani social norms', 'نۆرمی کۆمەڵایەتی'],
+    'Sorani Kurdish advanced politeness strategies: POSITIVE POLITENESS: compliments (وا جوانە! — wa jwana! — How beautiful!), inclusion ("بیا ئێمەش بچین" — bya êmash bchîn — Let us also go), shared identity markers. NEGATIVE POLITENESS: indirectness, hedging ("ئەگەر بتوانیت..." — agar bitwanît... — if you could...), minimizing imposition. FACE-THREATENING acts mitigated by: pre-sequences ("شتێکت پێ بڵێم..." — shtêkt pê bḷêm... — let me tell you something...), apologies before requests ("ببوورە..." — bibûra...). HOSPITALITY rituals: offer→refuse→insist→accept (3-round protocol). LEAVE-TAKING requires multiple exchanges: "بڕۆ بە سەلامەت" → "خوات لەگەڵ" → "خوات پارێزێت".', 1.3)
+
+  add('language', ['sorani dialects detailed', 'kurdish regional varieties', 'sorani vs sulaymaniyah', 'زاراوەکان'],
+    'Sorani Kurdish dialectal variation (زاراوەکان — zarawakan): SULAYMANIYAH dialect: considered standard literary Sorani, "من" (min — I), open vowels, more Persian/Arabic loans. ERBIL/HAWLER dialect: "من" pronounced as "mn", shorter vowels, some Kurmanji influence, "ئەو" → "ئا" contraction. KIRKUK dialect: Arabic influence, some unique vocabulary. SANANDAJ (Iran) dialect: Persian influence, some archaic features preserved. Key differences: pronunciation of ڕ (rr) varies by region, vocabulary for common items differs (e.g., "tomato" = تەماتە/فرەنگی), intonation patterns vary. All dialects are mutually intelligible but show clear phonological and lexical differences.', 1.2)
+
+  add('language', ['sorani writing history', 'kurdish script evolution', 'sorani orthography', 'ئۆرتۆگرافی'],
+    'Sorani Kurdish orthography and script history: 1) Pre-20th century: oral tradition, some manuscripts in Arabic script. 2) 1920s: Taufiq Wahby standardized modified Arabic script for Sorani. 3) Key adaptations: Added ڤ (v), ڕ (rr), ڵ (ḷḷ), پ (p), چ (ch), ژ (zh), گ (g) — sounds absent in Arabic. 4) All vowels written explicitly (unlike Arabic) — makes Kurdish more phonetically transparent. 5) Latin-based "Hawar alphabet" used for Kurmanji (developed by Celadet Bedirxan, 1930s). 6) Debate continues: some advocate unified Latin script for all Kurdish dialects. 7) Current challenges: Unicode support, digital keyboard layouts, standardization across regions. Kurdish Wikipedia uses Sorani Arabic script.', 1.2)
+
+  // ── Kurdish Sorani — Conversation & Daily Dialogue ──────────────────────
+
+  add('language', ['sorani conversation phrases', 'kurdish daily dialogue', 'sorani speaking practice', 'وتووێژی ڕۆژانە'],
+    'Sorani Kurdish conversation and daily dialogue patterns: GREETINGS: ڕۆژ باش (rozh bash — good day), ئێوارە باش (êwara bash — good evening), شەو باش (shaw bash — good night). INTRODUCTIONS: ناوت چییە؟ (nawit chîya? — What is your name?), ناوم ... ە (nawim ...a — My name is...), خۆشحاڵم بە ناسینت (xoshḥaḷim ba nasînit — Nice to meet you). ASKING ABOUT WELLBEING: چۆنی؟ (chonî? — How are you?), باشم سوپاس (bashim supas — I am well, thanks), تۆ چۆنی؟ (to chonî? — And you?). FAREWELLS: خوات لەگەڵ (xwat lagaḷ — Goodbye, lit. God with you), بڕۆ بە سەلامەت (biṛo ba salamat — Go safely). SMALL TALK: ئەمڕۆ هەوا چۆنە؟ (amṛo hawa chona? — How is the weather today?), لەکوێ دەژیت؟ (la kwê dazhît? — Where do you live?).', 1.3)
+
+  add('language', ['sorani shopping dialogue', 'kurdish bazaar phrases', 'sorani market language', 'زمانی بازاڕ'],
+    'Sorani Kurdish shopping and bazaar dialogue: ASKING PRICE: ئەمە بە چەندە؟ (ama ba chanda? — How much is this?), نرخەکەی چەندە؟ (nirxakay chanda? — What is the price?). BARGAINING: زۆر گرانە! (zor grana! — Too expensive!), داشکانت بکە (dashkanit bka — Give me a discount), ئایا کەمتر ناکەیت؟ (aya kamtir nakayit? — Can you lower it?). BUYING: ئەمەم دەوێت (amam dawêt — I want this), دوو کیلۆ بدە (dû kîlo bda — Give me two kilos). PAYMENT: پارە (para — money), پشوو (pishû — change), پسوولە (pisûla — receipt). QUALITY: تازەیە؟ (tazaya? — Is it fresh?), جوانە (jwana — It is beautiful), باشە (basha — It is good).', 1.3)
+
+  add('language', ['sorani restaurant phrases', 'kurdish food ordering', 'sorani dining language', 'زمانی چێشتخانە'],
+    'Sorani Kurdish restaurant and dining language: ORDERING: لیستی خواردن (lîstî xwardin — menu), ئەم خواردنەم دەوێت (am xwardanam dawêt — I want this dish), ئاو بدە تکایە (aw bda tikaya — Water please). PREFERENCES: بەبێ گۆشت (babê gosht — without meat), تیژ (tîzh — spicy), شیرین (shîrîn — sweet), سوور (sûr — salty). COMPLIMENTS: زۆر بەتام بوو (zor batam bû — Very tasty), دەستت خۆش بێت (dastt xosh bêt — Bless your hands, to the cook). TRADITIONAL DISHES: دۆلمە (dolma), کوببە (kubba), بریانی (biryani), تەشریب (tashîrb), کەباب (kabab). DRINKS: چا (cha — tea), قاوە (qawa — coffee), دۆ (do — yogurt drink), شەربەت (sharbat — sherbet).', 1.3)
+
+  // ── Kurdish Sorani — Technology & Modern Vocabulary ─────────────────────
+
+  add('language', ['sorani technology words', 'kurdish tech vocabulary', 'sorani digital terms', 'وشەی تەکنەلۆژیا'],
+    'Sorani Kurdish technology and digital vocabulary: COMPUTING: کۆمپیوتەر (kompyûtar — computer), لاپتۆپ (laptôp — laptop), تەختەکلیل (taxtaklîl — keyboard), ماوس (maws — mouse), هارددیسک (hârdisk — hard disk), سکرین (skrîn — screen). INTERNET: ئینتەرنێت (întarnêt — internet), وێبسایت (wêbsayt — website), ئیمەیل (îmayil — email), سۆشیال میدیا (soshyal mîdya — social media), داونلۆد (dawnlod — download), ئەپلۆد (aplod — upload). PHONE: مۆبایل (mobayl — mobile), پەیام (payam — message), بانگ (bang — call), وێنە (wêna — photo), ڤیدیۆ (vîdyo — video). SOFTWARE: بەرنامە (barnama — program/app), نەرمەکاڵا (narmakâla — software), ڕەقەکاڵا (raqakâla — hardware).', 1.3)
+
+  add('language', ['sorani social media terms', 'kurdish internet slang', 'sorani online communication', 'ئاڵوگۆڕی ئۆنلاین'],
+    'Sorani Kurdish social media and online communication: PLATFORMS: فەیسبووک (faysbûk — Facebook), ئینستاگرام (înstagrâm — Instagram), تویتەر (twîtar — Twitter/X), یوتیوب (yûtûb — YouTube), تیکتۆک (tîktok — TikTok). ACTIONS: لایک (layk — like), شەیر (shayr — share), کۆمێنت (komênt — comment), فۆلۆو (folo — follow), بڵاوکردنەوە (biḷawkirdanawa — repost). CONTENT: پۆست (post — post), ستۆری (storî — story), ڕیلز (rîlz — reels), لایڤ (layv — live stream), هاشتاگ (hâshtâg — hashtag). MODERN KURDISH NEOLOGISMS: تۆڕی کۆمەڵایەتی (toṛî komalaytî — social network), بڵاوکەرەوە (biḷawkarawya — influencer).', 1.2)
+
+  // ── Kurdish Sorani — Science & Academic Vocabulary ──────────────────────
+
+  add('language', ['sorani science vocabulary', 'kurdish scientific terms', 'sorani academic words', 'وشەی زانستی'],
+    'Sorani Kurdish science and academic vocabulary: SCIENCES: زانست (zanist — science), فیزیا (fîzya — physics), کیمیا (kîmya — chemistry), بایۆلۆژی (bayolojî — biology), بیرکاری (bîrkarî — mathematics), ئەندازیاری (andazyarî — engineering). NATURE: ئەتۆم (atom — atom), مۆلیکیول (molîkyûl — molecule), هێز (hêz — force/energy), لەشبیر (lashbîr — cell), جینۆم (jînom — genome). RESEARCH: توێژینەوە (twêzhînawa — research), تاقیکردنەوە (taqîkirdanawa — experiment), ئەنجام (anjam — result), تیۆری (tyorî — theory), ڕاپۆرت (râport — report). ACADEMIC: زانکۆ (zankô — university), کۆلێج (kolêj — college), بەش (bash — department), پرۆفیسۆر (profîsor — professor), خوێندکار (xwêndkâr — student), بڕوانامە (birwânama — diploma/degree).', 1.3)
+
+  add('language', ['sorani medical terms', 'kurdish health vocabulary', 'sorani hospital words', 'وشەی پزیشکی'],
+    'Sorani Kurdish medical and health vocabulary: GENERAL: پزیشک (pizîshk — doctor), نەخۆشخانە (naxoshxâna — hospital), دەرمانخانە (darmanxâna — pharmacy), نەشتەرگەری (nashtargarî — surgery), تەندروستی (tandirustî — health). BODY PARTS: سەر (sar — head), دەست (dast — hand), پا (pa — foot/leg), چاو (chaw — eye), گوێ (gwê — ear), دڵ (diḷ — heart), سنگ (sing — chest), زگ (zig — stomach). SYMPTOMS: ئازار (azar — pain), تا (ta — fever), سەرئێشە (sarêsha — headache), کۆخ (kox — cough), هاتنەوەی مل (hâtinaway mil — vomiting). TREATMENT: دەرمان (darman — medicine), دەرزی (darzî — injection), قورس (qurs — pill/tablet), نەخۆشی (naxoshî — illness/disease).', 1.3)
+
+  // ── Kurdish Sorani — Law, Politics & Government ────────────────────────
+
+  add('language', ['sorani legal terms', 'kurdish law vocabulary', 'sorani court language', 'وشەی یاسایی'],
+    'Sorani Kurdish legal and judicial vocabulary: LEGAL SYSTEM: یاسا (yasa — law), دادگا (dadga — court), دادوەر (dadwar — judge), پارێزەر (parêzar — lawyer/attorney), بەڵگە (baḷga — evidence/document), ئاگاداری (agadarî — notification). CRIMES: تاوان (tawan — crime), دز (diz — theft), کوشتن (kushtin — murder), فێڵ (fêḷ — fraud). RIGHTS: مافی مرۆڤ (mafî mirov — human rights), ئازادی (azadî — freedom), دەنگدان (dangdan — voting), هەڵبژاردن (haḷbizhârdin — election), دەستوور (dastûr — constitution). PUNISHMENT: سزا (siza — punishment), زیندان (zîndan — prison), بڕیار (biryar — verdict/decision).', 1.3)
+
+  add('language', ['sorani political vocabulary', 'kurdish government terms', 'sorani parliament words', 'وشەی سیاسی'],
+    'Sorani Kurdish political and government vocabulary: GOVERNMENT: حکومەت (ḥikûmat — government), پەرلەمان (parlaman — parliament), وەزیر (wazîr — minister), سەرۆک (sarôk — president/leader), وەزارەت (wazarat — ministry). POLITICAL TERMS: سیاسەت (syasat — politics), پارت (part — party), دیمۆکراسی (dîmokrasî — democracy), هەڵبژاردن (haḷbizhârdin — election), ئۆپۆزسیۆن (opozîsyon — opposition), کۆمار (komar — republic). KURDISH-SPECIFIC: هەرێمی کوردستان (harêmî kurdistân — Kurdistan Region), پێشمەرگە (pêshmerga — Kurdish military forces, lit. "those who face death"), فیدرالی (fîdrâlî — federal).', 1.3)
+
+  // ── Kurdish Sorani — Education & Learning ──────────────────────────────
+
+  add('language', ['sorani education vocabulary', 'kurdish school terms', 'sorani learning words', 'وشەی پەروەردە'],
+    'Sorani Kurdish education and school vocabulary: LEVELS: قوتابخانە (qutabxâna — school), ئامادەیی (amadayî — high school), زانکۆ (zankô — university), ماستەر (mâstar — master\'s), دکتۆرا (diktora — doctorate). SUBJECTS: بیرکاری (bîrkarî — math), زمان (ziman — language), مێژوو (mêzhû — history), جوگرافیا (jugrafya — geography), وەرزش (warzish — sports), هونەر (hunar — art). SCHOOL LIFE: قوتابی (qutabî — student), مامۆستا (mamosta — teacher), وانە (wâna — lesson), تاقیکردنەوە (taqîkirdanawa — exam), نمرە (nimra — grade/mark), باڵاخانە (bâḷaxâna — classroom), کتێبخانە (ktêbxâna — library). ACTIONS: خوێندن (xwêndin — to study/read), نووسین (nûsîn — to write), فێربوون (fêrbûn — to learn).', 1.3)
+
+  // ── Kurdish Sorani — Agriculture & Rural Life ──────────────────────────
+
+  add('language', ['sorani agriculture vocabulary', 'kurdish farming terms', 'sorani rural vocabulary', 'وشەی کشتوکاڵ'],
+    'Sorani Kurdish agriculture and rural life vocabulary: FARMING: کشتوکاڵ (kishtukâḷ — agriculture), جوتیار (jutyar — farmer), کێڵگە (kêḷga — farm/field), چاندن (chândin — to plant/sow), دروێنە (dirwêna — harvest). CROPS: گەنم (ganim — wheat), برنج (birinj — rice), جۆ (jo — barley), تەمەن (taman — tobacco), پەنیر (panîr — cotton). ANIMALS: مانگا (manga — cow), مەڕ (maṛ — sheep), بزن (bizin — goat), ئەسپ (asp — horse), کەر (kar — donkey), مریشک (mirishk — chicken). TOOLS: جوت (jut — plow), داس (das — sickle), بێر (bêr — spade), تەور (tawr — axe). SEASONS: بەهار (bahâr — spring), هاوین (hâwîn — summer), پاییز (payîz — autumn), زستان (zistân — winter).', 1.3)
+
+  // ── Kurdish Sorani — Commerce & Economy ────────────────────────────────
+
+  add('language', ['sorani commerce vocabulary', 'kurdish business terms', 'sorani economy words', 'وشەی بازرگانی'],
+    'Sorani Kurdish commerce and economy vocabulary: BUSINESS: بازرگانی (bazirganî — commerce/trade), کۆمپانیا (kompanya — company), بانک (bank — bank), سەرمایە (sarmaya — capital), قازانج (qazanj — profit), زەرەر (zarar — loss). MONEY: پارە (para — money), دینار (dînar — dinar, Iraqi currency), دۆلار (dolâr — dollar), نرخ (nirx — price), داهات (dahat — income), خەرجی (xarjî — expense). TRADE: فرۆشتن (froshtin — to sell), کڕین (kiṛîn — to buy), هەناردە (hanarda — export), هاوردە (hâwirda — import), بازاڕ (bazâṛ — market/bazaar). EMPLOYMENT: کار (kar — work/job), مووچە (mûcha — salary), داماوی (damawî — vacation), خانەنشینی (xânanishînî — retirement).', 1.3)
+
+  // ── Kurdish Sorani — Literature & Folklore ─────────────────────────────
+
+  add('language', ['sorani modern literature', 'kurdish contemporary writers', 'sorani literary movements', 'ئەدەبی مۆدێرن'],
+    'Sorani Kurdish modern literature and literary movements: PIONEERS: شێرکۆ بێکەس (Sherko Bekas, 1940-2013) — greatest modern Kurdish poet, pioneer of free verse. عبدالله پەشێو (Abdullah Pashew, b. 1946) — "poet of love and homeland." بەختیار عەلی (Bakhtiar Ali, b. 1966) — leading Kurdish novelist. MOVEMENTS: ڕۆمانتیزم (romantîzm) in 1940s-50s, ڕیالیزم (ryalîzm) in 1960s-70s, مۆدێرنیزم (modêrnîzm) from 1980s. GENRES: شیعر (shiʿir — poetry), ڕۆمان (roman — novel), چیرۆک (chîrok — short story), شانۆ (shano — theater/drama), وتار (witar — essay). THEMES: ئازادی (azadî — freedom), نیشتمانپەروەری (nishtimânparwarî — patriotism), کۆچبەری (kochbarî — exile/diaspora).', 1.3)
+
+  add('language', ['sorani folk tales', 'kurdish mythology stories', 'sorani oral tradition', 'چیرۆکی گەلی'],
+    'Sorani Kurdish folk tales and oral tradition: FAMOUS TALES: مەم و زین (Mam û Zîn — Kurdish Romeo & Juliet, by Ahmad Khani, 1695), خەجە و سیامەند (Xaja û Syamand — tragic love story), زەمبیلفرۆش (zambîlfrosh — the basket seller). MYTHICAL FIGURES: کاوە ئاسنگەر (Kawa Asinagar — Kawa the Blacksmith, who defeated the tyrant Zahhak), ڕووستەم (Rûstam — hero from Shahnameh). STORY TYPES: چیرۆکی پەریان (chîrokî paryan — fairy tales), ئەفسانە (afsâna — legend/myth), مەتەڵ (mataḷ — fable/parable), گێڕانەوە (gêrranawa — narrative). STORYTELLING: چیرۆکبێژ (chîrokbêzh — storyteller), tradition of evening storytelling (شەوانە — shawâna).', 1.3)
+
+  // ── Kurdish Sorani — Music & Arts ──────────────────────────────────────
+
+  add('language', ['sorani music vocabulary', 'kurdish musical terms', 'sorani songs and instruments', 'مۆسیقا'],
+    'Sorani Kurdish music and musical vocabulary: INSTRUMENTS: تەنبوور (tanbûr — long-necked lute, central to Kurdish music), دەف (daf — frame drum), زورنا (zurna — double-reed instrument), دووزەلە (dûzala — double-flute), کەمانچە (kamâncha — bowed string). GENRES: گۆرانی (goranî — song), هەورامی (hawramî — Hawrami modal music), مەقام (maqam — modal system), لاوک (lawk — folk song), حەیران (ḥayrân — love song). ARTISTS: ناسر ڕەزازی (Nasir Razazi), حەسەن زیرەک (Hasan Zirak, "King of Kurdish Music"), شاهرام ناظری (Shahram Nazeri). EVENTS: دایرە (dayra — musical circle), هەڵپەڕکێ (haḷparkê — Kurdish dance, line dancing). MUSIC TERMS: دەنگ (dang — voice/tone), ئاواز (awaz — melody/song), ڕیتم (rîtm — rhythm).', 1.3)
+
+  // ── Kurdish Sorani — Media & Journalism ────────────────────────────────
+
+  add('language', ['sorani media vocabulary', 'kurdish journalism terms', 'sorani news language', 'وشەی میدیا'],
+    'Sorani Kurdish media and journalism vocabulary: MEDIA TYPES: ڕۆژنامە (rozhnâma — newspaper), گۆڤار (govâr — magazine), ڕادیۆ (râdyo — radio), تەلەڤزیۆن (talafizyon — television), میدیای دیجیتاڵ (mîdyay dîjîtâḷ — digital media). JOURNALISM: ڕۆژنامەوانی (rozhnâmawânî — journalism), وەرگێڕ (wargêṛ — translator), پەیامنێر (payâmnêr — reporter/correspondent), هەواڵ (hawâḷ — news), چاوپێکەوتن (châwpêkawtin — interview). CONTENT: بابەت (bâbat — topic/article), سەرنووس (sarnûs — headline), لێدوان (lêdwan — comment/statement), ڕاپرسی (rapsî — survey/poll). KEY OUTLETS: Kurdistan24, Rudaw, NRT — major Kurdish news networks. کوردسات (Kurdsat) — pioneering Kurdish satellite TV.', 1.2)
+
+  // ── Kurdish Sorani — Complex Grammar Constructions ─────────────────────
+
+  add('language', ['sorani relative clauses', 'kurdish relative pronoun', 'sorani subordinate clauses', 'ڕستەی لاوەکی'],
+    'Sorani Kurdish relative clauses and subordinate constructions: RELATIVE MARKER: کە (ka — that/which/who) is the universal relativizer. EXAMPLES: پیاوەکەی کە هات (pyawakay ka hat — the man who came), کتێبەکەی کە خوێندمەوە (ktêbakay ka xwêndimawa — the book that I read). HEADLESS RELATIVES: ئەوەی کە دەزانم (away ka dazanim — that which I know). CORRELATIVE: هەر ... کە (har ... ka — whoever/whatever). TEMPORAL CLAUSES: کاتێک کە (katêk ka — when), پێش ئەوەی کە (pêsh away ka — before), دوای ئەوەی کە (dway away ka — after). CAUSAL: چونکە (chûnka — because), لەبەر ئەوەی (labar away — because of). CONCESSIVE: هەرچەندە (harchanda — although).', 1.3)
+
+  add('language', ['sorani reported speech', 'kurdish indirect speech', 'sorani quotation grammar', 'قسەی ناڕاستەوخۆ'],
+    'Sorani Kurdish reported speech and quotation: DIRECT SPEECH uses وت/گوتی (wit/gutî — said): ئەو وتی "من دێم" (aw witî "min dêm" — He said "I am coming"). INDIRECT SPEECH uses کە (ka): ئەو وتی کە دێت (aw witî ka dêt — He said that he is coming). TENSE BACKSHIFT: present → past in indirect: "دەچم" → وتی کە دەچوو ("dachim" → witî ka dachû). REPORTING VERBS: وتن (witin — to say), پرسین (pirsîn — to ask), باسکردن (bâskirdin — to mention), وەڵامدانەوە (waḷâmdânawa — to reply). EMBEDDED QUESTIONS: پرسی کە کەی دێت (pirsî ka kay dêt — asked when [he] comes).', 1.3)
+
+  add('language', ['sorani subjunctive mood', 'kurdish subjunctive verb', 'sorani optative mood', 'بابەتی ئارەزوومەندی'],
+    'Sorani Kurdish subjunctive and optative moods: SUBJUNCTIVE FORMATION: prefix بـ (bi-) + present stem. USAGE: wishes (خوا بیەوێت — xwa biyawêt — God willing), requests (تکایە بیخوێنەوە — tikaya bixwênawa — Please read it), purpose clauses (بۆ ئەوەی بزانێت — bo away bizanêt — so that he knows). OPTATIVE: expresses wishes — بخوازم (bixwazim — I wish). AFTER MODAL VERBS: دەتوانم بچم (datwânim bichim — I can go), دەبێت بچیت (dabêt bichît — you must go). NEGATIVE SUBJUNCTIVE: نە + بـ → نەبچیت (nabichît — don\'t go). CONTRAST WITH INDICATIVE: دەچم (dachim — I go, indicative) vs بچم (bichim — that I go, subjunctive).', 1.3)
+
+  // ── Kurdish Sorani — Kurdish History & Geography ───────────────────────
+
+  add('language', ['sorani kurdish history', 'kurdistan history overview', 'kurdish people history', 'مێژووی کورد'],
+    'Kurdish history overview (مێژووی کورد — mêzhûy kurd): ANCIENT: Kurds are descendants of ancient Iranian peoples (Medes, 7th century BC). MEDIEVAL: Saladin (سەلاحەدین — Salaḥaddîn, 1137-1193), the great Kurdish sultan who founded the Ayyubid dynasty. Kurdish emirates (مـیرنشین — mîrnishîn) existed semi-autonomously for centuries. 1514: Battle of Chaldiran divided Kurdistan between Ottoman and Safavid empires. MODERN: 1920 Treaty of Sèvres promised Kurdish state (never implemented). 1946: Republic of Mahabad — short-lived Kurdish state in Iran. 1991: Kurdish uprising in Iraq → autonomy. 2003: Iraq War → Kurdistan Regional Government strengthened. Anfal genocide (1986-1989) and Halabja chemical attack (1988) are defining tragedies.', 1.4)
+
+  add('language', ['sorani kurdistan geography', 'kurdish homeland regions', 'sorani geography terms', 'جوگرافیای کوردستان'],
+    'Kurdistan geography (جوگرافیای کوردستان — jugrafyay kurdistân): Kurdistan spans parts of Iraq, Turkey, Iran, and Syria — approximately 500,000 km². IRAQI KURDISTAN: هەولێر (Hawlêr/Erbil — capital), سلێمانی (Silêmânî/Sulaymaniyah — cultural capital), دهۆک (Duhok), هەڵەبجە (Halabja), کەرکووک (Kirkuk — disputed). MOUNTAINS: زاگرۆس (Zagros range), قەندیل (Qandîl), ساکۆ (Sako), حاجی ئۆمەران (Haji Omaran — highest point ~3600m). RIVERS: زێی گەورە (Zêy Gawra/Greater Zab), زێی بچووک (Zêy Bichûk/Lesser Zab), سیروان (Sîrwân/Diyala). LAKES: دوکان (Dukan — reservoir), دەربەندیخان (Darbandîxan). CLIMATE: continental, hot summers, cold winters with heavy mountain snowfall.', 1.3)
+
+  // ── Kurdish Sorani — Kurdish Cultural Practices ────────────────────────
+
+  add('language', ['sorani newroz celebration', 'kurdish new year festival', 'sorani cultural festivals', 'نەورۆز'],
+    'Kurdish cultural festivals and celebrations: NEWROZ (نەورۆز — nawroz — Kurdish New Year, March 21): Most important Kurdish holiday. Celebrates spring equinox. Connected to Kawa the Blacksmith legend — symbolizes Kurdish resistance. Activities: lighting bonfires (ئاگر — agir), wearing traditional clothes (جل و بەرگی کوردی), dancing (هەڵپەڕکێ), picnics in nature. RAMADAN (ڕەمەزان): observed by Muslim Kurds. EID: جەژنی ڕەمەزان (jazhni ramazan — Eid al-Fitr), جەژنی قوربان (jazhni qurban — Eid al-Adha). WEDDING: (شای — shay) — multi-day celebrations with music, dance, elaborate ceremonies. هەڵپەڕکێ دەبن (haḷparkê dabin — they do Kurdish dance). MOURNING: سەرەخۆشی (saraxoshî — condolence visits).', 1.3)
+
+  add('language', ['sorani traditional clothing', 'kurdish national dress', 'sorani cultural dress', 'جل و بەرگی کوردی'],
+    'Sorani Kurdish traditional clothing (جل و بەرگی کوردی — jil û bargî kurdî): MEN\'S CLOTHING: شەرواڵ (sharwâḷ — baggy trousers), ڕانک (rânk — vest/jacket), چاکەت (châkat — jacket), پشتێن (pishtên — waistcoat), کەلاوی کوردی (kalawî kurdî — Kurdish turban), شاڵ (shâḷ — sash/cummerbund). WOMEN\'S CLOTHING: فستان (fistan — traditional dress, often colorful), کراس (kras — blouse), شاڵوار (shâḷwâr — trousers), پشتێنی ژنان (pishtênî zhinân — women\'s vest), sequined and embroidered fabrics. REGIONAL VARIATION: each region has distinct patterns and colors. OCCASIONS: traditional clothing worn especially for Newroz, weddings, and cultural events.', 1.2)
+
+  // ── Kurdish Sorani — Transportation & Directions ───────────────────────
+
+  add('language', ['sorani transportation words', 'kurdish direction vocabulary', 'sorani travel phrases', 'وشەی هاتووچۆ'],
+    'Sorani Kurdish transportation and directions vocabulary: VEHICLES: ئۆتۆمبێل (otombêl — car), پاس (pâs — bus), تەیارە (tayâra — airplane), قطار (qitâr — train), کەشتی (kashtî — ship), دووچەرخە (dûcharxa — bicycle), تەکسی (taksî — taxi). DIRECTIONS: ڕاست (râst — right), چەپ (chap — left), ڕاستەوخۆ (râstawxo — straight), پاشەوە (pâshawa — back), پێشەوە (pêshawa — forward). ASKING DIRECTIONS: ببوورە، ڕێگای ... لەکوێیە؟ (bibûra, rêgay ... lakwêya? — Excuse me, where is the way to...?), لێرەوە دوورە؟ (lêrawa dûra? — Is it far from here?). PLACES: وێستگە (wêstga — station), فڕۆکەخانە (fṛokaxâna — airport), گەراج (garâj — garage/bus station).', 1.3)
+
+  // ── Kurdish Sorani — Weather & Nature Extended ─────────────────────────
+
+  add('language', ['sorani weather expressions', 'kurdish weather phrases', 'sorani climate vocabulary', 'وشەی کەشوهەوا'],
+    'Sorani Kurdish weather and climate expressions: WEATHER: کەشوهەوا (kashuhawa — weather/climate), هەتاو (hataw — sun), بارانی (barânî — rainy), بەفر (bafr — snow), با (ba — wind), هەور (hawr — cloud), ڕەش (rash — storm). EXPRESSIONS: ئەمڕۆ هەوا گەرمە (amṛo hawa garma — Today is hot), سەرما خواردووم (sarma xwardûm — I caught a cold, lit. I ate the cold), باران دەبارێت (baran dabârêt — It is raining), بەفر دەبارێت (bafir dabârêt — It is snowing). SEASONS IN DETAIL: بەهاری کوردستان (baharî kurdistân — spring in Kurdistan) is celebrated. NATURAL PHENOMENA: تەرمیک (tarmîk — earthquake), لافاو (lafaw — flood), وشکەساڵی (wishkasaḷî — drought). KURDISH SAYING: "باران بەرەکەتە" (baran barakata — Rain is blessing).', 1.3)
+
+  // ── Kurdish Sorani — Sports & Recreation ───────────────────────────────
+
+  add('language', ['sorani sports vocabulary', 'kurdish athletic terms', 'sorani game words', 'وشەی وەرزشی'],
+    'Sorani Kurdish sports and recreation vocabulary: SPORTS: وەرزش (warzish — sport), تۆپی پێ (topî pê — football/soccer), باسکەتبۆڵ (bâskatboḷ — basketball), فۆلیبۆڵ (folîboḷ — volleyball), مەلەوانی (malawânî — swimming), بۆکس (boks — boxing). FOOTBALL: یاری (yarî — game/match), تاکە (tâka — goal), داوەر (dâwar — referee), تیم (tîm — team), یاریزان (yarîzan — player), وەرزشگا (warzishga — stadium). TRADITIONAL: زۆرخانە (zorxâna — traditional gymnasium), گوڵەبازی (gullabazî — wrestling), ئەسپ سواری (asp swârî — horse riding). RECREATION: پیاسە (pyâsa — stroll/walk), پارکی گەشتیاری (parkî gashtiyarî — tourist park), چیابانی (chyabânî — mountain hiking).', 1.2)
+
+  // ── Kurdish Sorani — Religion & Spirituality ───────────────────────────
+
+  add('language', ['sorani religion vocabulary', 'kurdish spiritual terms', 'sorani faith words', 'وشەی ئایینی'],
+    'Sorani Kurdish religion and spirituality vocabulary: ISLAM (majority): مزگەوت (mizgawt — mosque), نوێژ (nwêzh — prayer), ڕۆژوو (rozhû — fasting), حەج (ḥaj — pilgrimage), قورئان (qur\'ân — Quran), مەلا (malla — cleric/imam). OTHER FAITHS: ئێزیدی (êzîdî — Yazidi, ancient Kurdish religion), لالش (Lalish — Yazidi holy temple), کاکەیی (kakayî — Yarsanism/Ahl-e Haqq), مەسیحی (masîḥî — Christian), کەلیسا (kalîsa — church). CONCEPTS: خوا/خودا (xwa/xuda — God), باوەڕ (bâwaṛ — faith/belief), ڕووح (rûḥ — soul/spirit), بەهەشت (bahesht — paradise), دۆزەخ (dozax — hell). KURDISH SAYING: "خوا گەورەیە" (xwa gawraya — God is great).', 1.2)
+
   return entries
 }
 
@@ -2103,6 +2474,9 @@ export class LocalBrain {
   private imageAnalyzer: ImageAnalyzer | null = null
   private documentAnalyzer: DocumentAnalyzer | null = null
 
+  // Document-grounded Q&A (Phase 12 — PdfExpert)
+  private pdfExpert: PdfExpert | null = null
+
   // Decision quality & memory consolidation
   private confidenceGate: ConfidenceGate | null = null
   private memoryConsolidator: MemoryConsolidator | null = null
@@ -2223,6 +2597,9 @@ export class LocalBrain {
       // Phase 11 — Deep analysis modules
       this.imageAnalyzer = new ImageAnalyzer()
       this.documentAnalyzer = new DocumentAnalyzer()
+
+      // Phase 12 — Document-grounded Q&A
+      this.pdfExpert = new PdfExpert()
 
       // Decision quality & memory consolidation
       this.confidenceGate = new ConfidenceGate()
@@ -2787,6 +3164,17 @@ export class LocalBrain {
     const logicPattern = /\b(truth\s+table|valid|tautology|contradiction|syllogism|fallacy)\b/i
 
     return mathPattern.test(msg) || physicsPattern.test(msg) || linalgPattern.test(msg) || calculusPattern.test(msg) || logicPattern.test(msg)
+  }
+
+  /** Check if query is about Kurdish Sorani language. */
+  private isKurdishSoraniQuery(msg: string): boolean {
+    const kurdishPattern = /\b(kurdish|sorani|kurmanji|kurdistan|kurd|erbil|sulaymaniyah|hawler|silêmanî|kirkuk|sanandaj)\b/i
+    const scriptPattern = /[\u0626-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/ // Arabic/Kurdish script
+    const topicPattern = /\b(sorani\s+(alphabet|grammar|verb|noun|pronoun|adjective|vowel|consonant|phrase|word|sentence|number|greet|family|color|food|time|nature|emotion|idiom|phonolog|dialect|semantic|compound|ezafe|ergativ|passive|causative|conditional|modal|adverb|conjunction|negat|aspect|clitic|morpholog|derivat|loanword|pragmatic|discourse|evidential|metaphor|proverb|poetry|kinship|register|reduplicat|synonym|antonym|onomatop|profession|animal|weather|travel|health|technolog|sport|music|cloth|house|shop|direction|city|religion|bazaar|conversation|restaurant|shopping|social media|science|medical|legal|political|education|agriculture|commerce|literature|folk tale|relative clause|reported speech|subjunctive|geography|festival|newroz|transportation))\b/i
+    const learnPattern = /\b(learn\s+kurdish|learn\s+sorani|kurdish\s+(language|alphabet|grammar|vocabulary|phrase|word|writing|script|culture|poetry|music|proverb|idiom|history|geography|festival|clothing|food|politics|religion|literature|science|technology|media))\b/i
+    const translatePattern = /\b(in\s+kurdish|in\s+sorani|kurdish\s+for|sorani\s+for|translate.+kurdish|how\s+to\s+say.+kurdish)\b/i
+
+    return kurdishPattern.test(msg) || scriptPattern.test(msg) || topicPattern.test(msg) || learnPattern.test(msg) || translatePattern.test(msg)
   }
 
   /** Extract probable cause from a causal query. */
@@ -4280,6 +4668,9 @@ export class LocalBrain {
 
   /** Get the DocumentAnalyzer instance (null if intelligence modules are disabled). */
   getDocumentAnalyzer(): DocumentAnalyzer | null { return this.documentAnalyzer }
+
+  /** Get the PdfExpert instance (null if intelligence modules are disabled). */
+  getPdfExpert(): PdfExpert | null { return this.pdfExpert }
 
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
