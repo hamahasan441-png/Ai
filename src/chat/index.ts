@@ -1097,6 +1097,18 @@ export type {
 } from './ConfidenceGate.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// HYPOTHESIS ENGINE — Scientific reasoning through hypothesis generation
+// ══════════════════════════════════════════════════════════════════════════════
+export { HypothesisEngine, DEFAULT_HYPOTHESIS_ENGINE_CONFIG } from './HypothesisEngine.js'
+
+export type {
+  Evidence as HypothesisEvidence,
+  Hypothesis as EngineHypothesis,
+  HypothesisTestResult,
+  HypothesisEngineConfig,
+} from './HypothesisEngine.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // BRAIN CONTRACT — Input → Think → Tool → Verify → Output schema
 // ══════════════════════════════════════════════════════════════════════════════
 export {
