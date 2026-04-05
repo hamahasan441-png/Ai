@@ -1246,3 +1246,50 @@ export type {
   TranslationPair,
   TranslationCategory,
 } from './KurdishTranslationCorpus.js'
+
+// ── Kurdish Morphological Analyzer (Kurdish NLP) ──
+
+export { KurdishMorphologicalAnalyzer, DEFAULT_ANALYZER_CONFIG } from './KurdishMorphologicalAnalyzer.js'
+
+export type {
+  MorphemeAnalysis,
+  SpellingResult,
+  TransliterationResult,
+  KurdishMorphologicalAnalyzerConfig,
+} from './KurdishMorphologicalAnalyzer.js'
+
+// ── Kurdish Sentiment Analyzer (Based on Hrazhan/sentiment) ──
+
+export { KurdishSentimentAnalyzer, DEFAULT_SENTIMENT_CONFIG } from './KurdishSentimentAnalyzer.js'
+
+export type {
+  SentimentLabel,
+  SentimentResult as KurdishSentimentResult,
+  SentimentWord,
+  SentimentCorpusSample,
+  KurdishSentimentConfig,
+} from './KurdishSentimentAnalyzer.js'
+
+// ── Hypothesis Engine (Scientific Reasoning) ──
+
+export { HypothesisEngine, DEFAULT_HYPOTHESIS_ENGINE_CONFIG } from './HypothesisEngine.js'
+
+export type {
+  Evidence as HypothesisEngineEvidence,
+  Hypothesis as HypothesisEngineHypothesis,
+  HypothesisTestResult,
+  HypothesisEngineConfig,
+} from './HypothesisEngine.js'
+
+// ── Ethical Reasoner (Moral Analysis) ──
+
+export { EthicalReasoner, DEFAULT_ETHICAL_CONFIG } from './EthicalReasoner.js'
+
+export type {
+  EthicalFramework,
+  EthicalAnalysis,
+  FrameworkAssessment,
+  Stakeholder,
+  EthicalPrinciple,
+  EthicalReasonerConfig,
+} from './EthicalReasoner.js'
