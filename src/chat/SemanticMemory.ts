@@ -1336,5 +1336,99 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(shellcodeEncoder, badCharFinder, 'related-to', 0.85)
   memory.addRelation(ropChainGeneration, exploitMitigation, 'related-to', 0.85)
 
+  // ── Shells & Backdoors Concepts ──────────────────────────────────────────
+  const reverseShell = memory.addConcept('Reverse Shell', 'security')
+  const bindShell = memory.addConcept('Bind Shell', 'security')
+  const meterpreterBackdoor = memory.addConcept('Meterpreter-Style Backdoor', 'security')
+
+  // ── Windows Post-Exploitation Concepts ──────────────────────────────────
+  const windowsRegistryManip = memory.addConcept('Windows Registry Manipulation', 'security')
+  const tokenImpersonation = memory.addConcept('Token Impersonation', 'security')
+  const passwordDumping = memory.addConcept('Password Dumping from Memory', 'security')
+  const passTheHash = memory.addConcept('Pass-the-Hash Attack', 'security')
+  const mimikatzIntegration = memory.addConcept('Mimikatz Integration', 'security')
+
+  // ── Linux Post-Exploitation Concepts ────────────────────────────────────
+  const suidEnumeration = memory.addConcept('SUID GUID Enumeration', 'security')
+  const cronJobAbuse = memory.addConcept('Cron Job Abuse', 'security')
+
+  // ── Persistence & Exfiltration Concepts ─────────────────────────────────
+  const persistenceMechanism = memory.addConcept('Persistence Mechanism', 'security')
+  const dataExfiltration = memory.addConcept('Data Exfiltration', 'security')
+  const dnsExfiltration = memory.addConcept('DNS Exfiltration', 'security')
+  const icmpExfiltration = memory.addConcept('ICMP Exfiltration', 'security')
+
+  // ── Active Directory Attack Concepts ────────────────────────────────────
+  const kerberoasting = memory.addConcept('Kerberoasting', 'security')
+  const passTheTicket = memory.addConcept('Pass-the-Ticket', 'security')
+  const ldapEnumeration = memory.addConcept('LDAP Enumeration', 'security')
+  const bloodhoundCollection = memory.addConcept('BloodHound Data Collection', 'security')
+  const smbEnumeration = memory.addConcept('SMB Share Enumeration', 'security')
+
+  // ── Evasion & Anti-Forensics Concepts ───────────────────────────────────
+  const payloadObfuscation = memory.addConcept('Payload Obfuscation', 'security')
+  const processHollowing = memory.addConcept('Process Hollowing', 'security')
+  const dllInjection = memory.addConcept('DLL Injection', 'security')
+  const logClearing = memory.addConcept('Log Clearing Tampering', 'security')
+  const fileTimestomping = memory.addConcept('File Timestomping', 'security')
+  const polymorphicShellcodeGen = memory.addConcept('Polymorphic Shellcode Generation', 'security')
+  const base64XorEncoding = memory.addConcept('Base64 XOR Payload Encoding', 'security')
+
+  // Hierarchical relations — Shells & Backdoors
+  memory.addRelation(reverseShell, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(bindShell, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(meterpreterBackdoor, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(reverseShell, bindShell, 'related-to', 0.9)
+  memory.addRelation(meterpreterBackdoor, reverseShell, 'related-to', 0.85)
+
+  // Hierarchical relations — Windows Post-Exploitation
+  memory.addRelation(windowsRegistryManip, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(tokenImpersonation, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(passwordDumping, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(passTheHash, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(mimikatzIntegration, exploitDevelopment, 'part-of', 0.95)
+  memory.addRelation(passTheHash, passwordDumping, 'related-to', 0.9)
+  memory.addRelation(mimikatzIntegration, passwordDumping, 'related-to', 0.95)
+  memory.addRelation(windowsRegistryManip, persistenceMechanism, 'related-to', 0.85)
+  memory.addRelation(tokenImpersonation, mimikatzIntegration, 'related-to', 0.8)
+
+  // Hierarchical relations — Linux Post-Exploitation
+  memory.addRelation(suidEnumeration, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(cronJobAbuse, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(cronJobAbuse, persistenceMechanism, 'related-to', 0.85)
+
+  // Hierarchical relations — Persistence & Exfiltration
+  memory.addRelation(persistenceMechanism, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(dataExfiltration, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(dnsExfiltration, dataExfiltration, 'part-of', 0.95)
+  memory.addRelation(icmpExfiltration, dataExfiltration, 'part-of', 0.9)
+
+  // Hierarchical relations — Active Directory Attacks
+  memory.addRelation(kerberoasting, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(passTheTicket, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(ldapEnumeration, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(bloodhoundCollection, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(smbEnumeration, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(kerberoasting, passTheTicket, 'related-to', 0.85)
+  memory.addRelation(passTheTicket, mimikatzIntegration, 'related-to', 0.85)
+  memory.addRelation(passTheHash, passTheTicket, 'related-to', 0.85)
+  memory.addRelation(ldapEnumeration, bloodhoundCollection, 'related-to', 0.9)
+  memory.addRelation(smbEnumeration, bloodhoundCollection, 'related-to', 0.8)
+
+  // Hierarchical relations — Evasion & Anti-Forensics
+  memory.addRelation(payloadObfuscation, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(processHollowing, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(dllInjection, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(logClearing, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(fileTimestomping, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(polymorphicShellcodeGen, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(base64XorEncoding, exploitDevelopment, 'part-of', 0.85)
+  memory.addRelation(payloadObfuscation, shellcodeEncoder, 'related-to', 0.9)
+  memory.addRelation(polymorphicShellcodeGen, polymorphicShellcode, 'related-to', 0.95)
+  memory.addRelation(base64XorEncoding, shellcodeEncoder, 'related-to', 0.9)
+  memory.addRelation(processHollowing, dllInjection, 'related-to', 0.85)
+  memory.addRelation(logClearing, fileTimestomping, 'related-to', 0.9)
+  memory.addRelation(payloadObfuscation, polymorphicShellcodeGen, 'related-to', 0.85)
+
   return memory
 }
