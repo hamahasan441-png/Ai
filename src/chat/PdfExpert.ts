@@ -542,6 +542,7 @@ export class PdfExpert {
 
       if (relevance >= this.config.relevanceThreshold) {
         const quotedText = this.extractBestQuote(section.content, queryKeywords)
+          || section.title || '(no content)'
 
         citations.push({
           documentId: doc.id,
@@ -598,7 +599,11 @@ export class PdfExpert {
     const sentences = this.splitSentences(content)
 
     if (sentences.length === 0) {
-      return content.slice(0, this.config.maxQuoteLength).trim()
+      // Fallback to raw content when no sentences detected
+      const trimmed = content.trim()
+      return trimmed.length > 0
+        ? trimmed.slice(0, this.config.maxQuoteLength)
+        : ''
     }
 
     // Score each sentence by keyword matches
@@ -624,16 +629,20 @@ export class PdfExpert {
       totalLength += sentence.length + 1
     }
 
-    if (bestSentences.length === 0 && scored.length > 0) {
-      // Fallback: take first sentence
-      return scored[0]!.sentence.slice(0, this.config.maxQuoteLength)
+    if (bestSentences.length === 0) {
+      // Fallback: return first sentence
+      return sentences[0]!.slice(0, this.config.maxQuoteLength)
     }
 
     return bestSentences.join(' ').trim()
   }
 
   private extractBestSnippet(content: string, queryKeywords: string[]): string {
-    return this.extractBestQuote(content, queryKeywords).slice(0, 200)
+    if (!content || content.trim().length === 0) {
+      return queryKeywords.join(' ')
+    }
+    const quote = this.extractBestQuote(content, queryKeywords)
+    return (quote.length > 0 ? quote : content.trim()).slice(0, 200)
   }
 
   private buildAnswerFromCitations(question: string, citations: readonly DocumentCitation[]): string {
