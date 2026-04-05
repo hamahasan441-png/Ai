@@ -125,6 +125,16 @@ import { CurriculumOptimizer } from './CurriculumOptimizer.js'
 import { ImageAnalyzer } from './ImageAnalyzer.js'
 import { DocumentAnalyzer } from './DocumentAnalyzer.js'
 
+// Decision quality & memory modules
+import { ConfidenceGate } from './ConfidenceGate.js'
+import type { ConfidenceSignal, GateDecision } from './ConfidenceGate.js'
+import { MemoryConsolidator } from './MemoryConsolidator.js'
+import type { SessionTurn } from './MemoryConsolidator.js'
+
+// Token budget management
+import { TokenBudgetManager } from './TokenBudgetManager.js'
+import type { BudgetReport } from './TokenBudgetManager.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -161,6 +171,22 @@ export interface LocalBrainConfig {
   useTfIdf: boolean
   /** Enable intelligence modules: SemanticEngine, IntentEngine, ContextManager, ReasoningEngine, MetaCognition (default: true). */
   enableIntelligence: boolean
+
+  // ── Token Budget ──
+
+  /** Maximum tokens per session before pausing (default: 80000). */
+  maxSessionTokens: number
+  /** Fraction of budget at which to warn (0-1, default: 0.85). */
+  budgetWarningThreshold: number
+  /** Enable token budget tracking (default: true). */
+  enableBudgetTracking: boolean
+
+  // ── Auto-Learning v3 ──
+
+  /** How often to consolidate session memory into long-term (every N chat turns, default: 10). */
+  memoryConsolidationInterval: number
+  /** Enable auto-learning from conversations (default: true). */
+  enableAutoLearning: boolean
 }
 
 /** A single entry in the knowledge base. */
@@ -1844,6 +1870,18 @@ export class LocalBrain {
   private imageAnalyzer: ImageAnalyzer | null = null
   private documentAnalyzer: DocumentAnalyzer | null = null
 
+  // Decision quality & memory consolidation
+  private confidenceGate: ConfidenceGate | null = null
+  private memoryConsolidator: MemoryConsolidator | null = null
+  private chatTurnsSinceConsolidation = 0
+
+  // Token budget management
+  private tokenBudget: TokenBudgetManager
+
+  // Auto-learning: track last confidence for feedback-based learning signals
+  private lastConfidenceAssessment = 0.5
+  private lastGateDecision: GateDecision = 'respond'
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1858,9 +1896,21 @@ export class LocalBrain {
       minConfidence: config?.minConfidence ?? 0.1,
       useTfIdf: config?.useTfIdf ?? true,
       enableIntelligence: config?.enableIntelligence ?? true,
+      maxSessionTokens: config?.maxSessionTokens ?? 80_000,
+      budgetWarningThreshold: config?.budgetWarningThreshold ?? 0.85,
+      enableBudgetTracking: config?.enableBudgetTracking ?? true,
+      memoryConsolidationInterval: config?.memoryConsolidationInterval ?? 10,
+      enableAutoLearning: config?.enableAutoLearning ?? true,
     }
     this.knowledgeBase = buildKnowledgeBase()
     this.tfidfScorer = new TfIdfScorer()
+
+    // Initialize token budget manager
+    this.tokenBudget = new TokenBudgetManager({
+      maxSessionTokens: this.config.maxSessionTokens,
+      warningThreshold: this.config.budgetWarningThreshold,
+      enabled: this.config.enableBudgetTracking,
+    })
 
     // Initialize CodeMaster sub-modules
     this.codeAnalyzer = new CodeAnalyzer()
@@ -1940,6 +1990,10 @@ export class LocalBrain {
       // Phase 11 — Deep analysis modules
       this.imageAnalyzer = new ImageAnalyzer()
       this.documentAnalyzer = new DocumentAnalyzer()
+
+      // Decision quality & memory consolidation
+      this.confidenceGate = new ConfidenceGate()
+      this.memoryConsolidator = new MemoryConsolidator()
     }
 
     const now = new Date().toISOString()
@@ -1961,8 +2015,65 @@ export class LocalBrain {
   // ── Chat (same interface as AiBrain.chat) ──
 
   /** Chat with the local brain. Returns a response with simulated token usage. */
-  async chat(userMessage: string): Promise<{ text: string; usage: TokenUsage; durationMs: number }> {
+  async chat(userMessage: string): Promise<{
+    text: string
+    usage: TokenUsage
+    durationMs: number
+    budgetWarning?: boolean
+    budgetExhausted?: boolean
+    remainingTokens?: number
+    usagePercent?: number
+  }> {
     const start = Date.now()
+
+    // ── Budget: handle continuation commands ─────────────────────────────────
+    const lower = userMessage.trim().toLowerCase()
+    if (lower === 'continue') {
+      // If there are pending chunks from a truncated response, return next chunk
+      if (this.tokenBudget.hasPendingChunks()) {
+        const chunk = this.tokenBudget.getNextChunk()!
+        const inputTokens = Math.ceil(userMessage.length / 4)
+        const outputTokens = Math.ceil(chunk.length / 4)
+        this.tokenBudget.trackUsage({ inputTokens, outputTokens })
+        return {
+          text: chunk,
+          usage: { inputTokens, outputTokens, cacheReadTokens: 0, cacheCreationTokens: 0 },
+          durationMs: Date.now() - start,
+          ...this.getBudgetFields(),
+        }
+      }
+      // Otherwise extend the token budget
+      this.tokenBudget.extendBudget()
+      const msg = '✅ Token budget extended. You can continue chatting.'
+      return {
+        text: msg,
+        usage: { inputTokens: 2, outputTokens: Math.ceil(msg.length / 4), cacheReadTokens: 0, cacheCreationTokens: 0 },
+        durationMs: Date.now() - start,
+        ...this.getBudgetFields(),
+      }
+    }
+    if (lower === 'reset') {
+      this.tokenBudget.reset()
+      const msg = '🔄 Session reset. Token budget cleared. Ready to start fresh!'
+      return {
+        text: msg,
+        usage: { inputTokens: 1, outputTokens: Math.ceil(msg.length / 4), cacheReadTokens: 0, cacheCreationTokens: 0 },
+        durationMs: Date.now() - start,
+        ...this.getBudgetFields(),
+      }
+    }
+
+    // ── Budget: check if exhausted before proceeding ─────────────────────────
+    if (!this.tokenBudget.canContinue()) {
+      const msg = '🛑 Token budget reached. Type \'continue\' to extend the budget or \'reset\' to start a new session.'
+      return {
+        text: msg,
+        usage: { inputTokens: Math.ceil(userMessage.length / 4), outputTokens: Math.ceil(msg.length / 4), cacheReadTokens: 0, cacheCreationTokens: 0 },
+        durationMs: Date.now() - start,
+        ...this.getBudgetFields(),
+      }
+    }
+
     this.conversationHistory.push({ role: 'user', content: userMessage })
 
     // Apply confidence decay to unused patterns
@@ -2056,14 +2167,159 @@ export class LocalBrain {
       }
     }
 
-    // Generate response (uses TF-IDF if enabled)
-    const text = this.config.useTfIdf
+    // ── Smart Module Augmentation ─────────────────────────────────────────────
+    // Wire intelligence modules into the response pipeline based on intent
+    let smartAugmentation = ''
+
+    // ReasoningEngine: for complex multi-step queries
+    if (this.reasoningEngine && this.isComplexQuery(userMessage)) {
+      try {
+        const reasonResult = this.reasoningEngine.reason(userMessage)
+        if (reasonResult.confidence > 0.3 && reasonResult.steps.length > 0) {
+          const stepsText = reasonResult.steps.map((s, i) => `${i + 1}. ${s.content ?? s.conclusion ?? s.description ?? ''}`).join('\n')
+          if (stepsText.trim()) {
+            smartAugmentation += `\n\n**Reasoning:**\n${stepsText}`
+          }
+        }
+      } catch { /* non-critical — continue without reasoning */ }
+    }
+
+    // CausalReasoner: for "why" questions
+    if (this.causalReasoner && this.isCausalQuery(userMessage)) {
+      try {
+        const inference = this.causalReasoner.inferCausality(
+          this.extractCause(userMessage),
+          this.extractEffect(userMessage),
+        )
+        if (inference && inference.strength > 0.2) {
+          smartAugmentation += `\n\n**Causal Analysis:** ${inference.explanation ?? `Causal link strength: ${(inference.strength * 100).toFixed(0)}%`}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // PlanningEngine: for "how to" / planning queries
+    if (this.planningEngine && this.isPlanningQuery(userMessage)) {
+      try {
+        const plan = this.planningEngine.createPlan(userMessage)
+        if (plan && plan.steps.length > 0) {
+          const planText = plan.steps.map((s, i) => `${i + 1}. ${s.description ?? s.action ?? ''}`).join('\n')
+          if (planText.trim()) {
+            smartAugmentation += `\n\n**Plan:**\n${planText}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // CreativeEngine: for creative tasks (write, generate, create)
+    if (this.creativeEngine && this.isCreativeQuery(userMessage)) {
+      try {
+        const brainstorm = this.creativeEngine.brainstorm(userMessage)
+        if (brainstorm && brainstorm.ideas.length > 0) {
+          const bestIdea = brainstorm.bestIdea ?? brainstorm.ideas[0]
+          if (bestIdea) {
+            smartAugmentation += `\n\n**Creative Insight:** ${bestIdea.description ?? bestIdea.title ?? ''}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // AbstractionEngine: for concept explanation queries
+    if (this.abstractionEngine && this.isConceptQuery(userMessage)) {
+      try {
+        const concept = keywords.slice(0, 3).join(' ')
+        const generalized = this.abstractionEngine.generalize([concept])
+        if (generalized) {
+          const desc = typeof generalized === 'object' && 'description' in generalized
+            ? (generalized as { description?: string }).description
+            : null
+          if (desc) {
+            smartAugmentation += `\n\n**Concept:** ${desc}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // AnalogicalReasoner: for comparison/analogy queries
+    if (this.analogicalReasoner && this.isAnalogyQuery(userMessage)) {
+      try {
+        const analogy = this.analogicalReasoner.findAnalogy(keywords[0] ?? userMessage)
+        if (analogy && analogy.explanation) {
+          smartAugmentation += `\n\n**Analogy:** ${analogy.explanation}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // KnowledgeSynthesizer: combine multiple knowledge sources
+    if (this.knowledgeSynthesizer && knowledgeResults.length >= 2) {
+      try {
+        for (const kr of knowledgeResults.slice(0, 3)) {
+          this.knowledgeSynthesizer.addSource({
+            id: kr.entry.id,
+            name: kr.entry.category,
+            facts: [kr.entry.content],
+            reliability: Math.min(1, kr.score / 5),
+          })
+        }
+        const fused = this.knowledgeSynthesizer.fuseKnowledge()
+        if (fused.novelInsights.length > 0) {
+          const insight = fused.novelInsights[0]
+          const insightText = typeof insight === 'string' ? insight : (insight?.description ?? '')
+          if (insightText) {
+            smartAugmentation += `\n\n**Synthesized Insight:** ${insightText}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ── Generate base response (uses TF-IDF if enabled) ──────────────────────
+    let text = this.config.useTfIdf
       ? this.buildResponseWithTfIdf(intent, userMessage, knowledgeResults)
       : buildResponse(
           intent, userMessage, knowledgeResults,
           this.learnedPatterns, this.conversationHistory,
           this.config.creativity,
         )
+
+    // Append smart augmentation to base response
+    if (smartAugmentation) {
+      text += smartAugmentation
+    }
+
+    // ── ConfidenceGate: quality control ──────────────────────────────────────
+    let gateConfidence = 0.5
+    if (this.confidenceGate) {
+      const signals: ConfidenceSignal[] = [
+        {
+          source: 'knowledge-match',
+          score: knowledgeResults.length > 0 ? Math.min(1, knowledgeResults[0]!.score / 5) : 0.1,
+          weight: 0.4,
+          reason: knowledgeResults.length > 0 ? `Top KB match score: ${knowledgeResults[0]!.score}` : 'No KB matches',
+        },
+        {
+          source: 'pattern-match',
+          score: this.learnedPatterns.length > 0 ? 0.6 : 0.2,
+          weight: 0.3,
+          reason: `${this.learnedPatterns.length} learned patterns available`,
+        },
+        {
+          source: 'intent-clarity',
+          score: intent !== 'general' ? 0.8 : 0.3,
+          weight: 0.3,
+          reason: `Intent: ${intent}`,
+        },
+      ]
+
+      const gateResult = this.confidenceGate.evaluate(signals)
+      gateConfidence = gateResult.aggregateConfidence
+      this.lastGateDecision = gateResult.decision
+
+      if (gateResult.decision === 'abstain' && gateResult.abstainMessage) {
+        text = gateResult.abstainMessage
+      } else if (gateResult.decision === 'hedge' && gateResult.hedgePrefix) {
+        text = gateResult.hedgePrefix + text
+      }
+    }
+    this.lastConfidenceAssessment = gateConfidence
 
     // Update knowledge use counts
     for (const result of knowledgeResults) {
@@ -2093,20 +2349,55 @@ export class LocalBrain {
       this.topicModeler.addDocument(docId, `${userMessage} ${text}`)
     }
 
+    // ── Auto-Learning: reinforce patterns from successful KB matches ─────────
+    if (this.config.enableAutoLearning && this.config.learningEnabled) {
+      this.autoLearnFromConversation(userMessage, text, knowledgeResults, gateConfidence)
+    }
+
+    // ── Memory Consolidation: periodic transfer to long-term memory ──────────
+    this.chatTurnsSinceConsolidation++
+    if (this.memoryConsolidator && this.chatTurnsSinceConsolidation >= this.config.memoryConsolidationInterval) {
+      const recentTurns: SessionTurn[] = this.conversationHistory
+        .slice(-this.config.memoryConsolidationInterval * 2)
+        .map(m => ({
+          role: m.role as 'user' | 'assistant',
+          content: typeof m.content === 'string' ? m.content : '',
+          timestamp: Date.now(),
+        }))
+      this.memoryConsolidator.consolidate(recentTurns)
+      this.chatTurnsSinceConsolidation = 0
+    }
+
     this.conversationHistory.push({ role: 'assistant', content: text })
     this.stats.totalChats++
     this.stats.lastUsedAt = new Date().toISOString()
+
+    // ── Enforce maxResponseLength with chunking ──────────────────────────────
+    let finalText = text
+    if (text.length > this.config.maxResponseLength) {
+      finalText = this.tokenBudget.chunkResponse(text, this.config.maxResponseLength)
+    }
 
     const durationMs = Date.now() - start
 
     // Simulate token usage (approximate: ~4 chars per token)
     const inputTokens = Math.ceil(userMessage.length / 4)
-    const outputTokens = Math.ceil(text.length / 4)
+    const outputTokens = Math.ceil(finalText.length / 4)
+
+    // Track in budget manager
+    this.tokenBudget.trackUsage({ inputTokens, outputTokens })
+
+    // Append budget message if nearing limit
+    const budgetMsg = this.tokenBudget.getBudgetMessage()
+    if (budgetMsg) {
+      finalText += budgetMsg
+    }
 
     return {
-      text,
+      text: finalText,
       usage: { inputTokens, outputTokens, cacheReadTokens: 0, cacheCreationTokens: 0 },
       durationMs,
+      ...this.getBudgetFields(),
     }
   }
 
@@ -2211,6 +2502,143 @@ export class LocalBrain {
       // Prune below minimum confidence
       return pattern.confidence >= this.config.minConfidence
     })
+  }
+
+  // ── Smart Query Classifiers ──────────────────────────────────────────────────
+
+  /** Check if a query requires multi-step reasoning. */
+  private isComplexQuery(msg: string): boolean {
+    const lower = msg.toLowerCase()
+    return /\b(why|how|compare|difference|between|versus|vs|explain.+and|what.+if|analyze|evaluate|trade-?off)\b/.test(lower)
+      && msg.split(/\s+/).length > 5
+  }
+
+  /** Check if query asks about causation. */
+  private isCausalQuery(msg: string): boolean {
+    return /\b(why\s+(does|do|is|are|did|would|can|should)|what\s+causes?|because\s+of|reason\s+for|leads?\s+to|results?\s+in)\b/i.test(msg)
+  }
+
+  /** Check if query asks for a plan or steps. */
+  private isPlanningQuery(msg: string): boolean {
+    return /\b(how\s+(do|can|should|to|would)\s+i|steps?\s+(to|for)|plan\s+(to|for)|guide\s+(to|for|on)|walkthrough|tutorial)\b/i.test(msg)
+  }
+
+  /** Check if query asks for creative generation. */
+  private isCreativeQuery(msg: string): boolean {
+    return /\b(write\s+a|generate|create|compose|draft|brainstorm|imagine|design\s+a|come\s+up\s+with)\b/i.test(msg)
+  }
+
+  /** Check if query asks about a concept. */
+  private isConceptQuery(msg: string): boolean {
+    return /\b(what\s+is|explain|define|describe|meaning\s+of|concept\s+of)\b/i.test(msg)
+  }
+
+  /** Check if query asks for analogy/comparison. */
+  private isAnalogyQuery(msg: string): boolean {
+    return /\b(like|similar\s+to|analogy|compared?\s+to|resembles?|equivalent)\b/i.test(msg)
+  }
+
+  /** Extract probable cause from a causal query. */
+  private extractCause(msg: string): string {
+    const match = msg.match(/why\s+(?:does?|is|are|did|would|can)\s+(.+?)(?:\?|$)/i)
+    return match?.[1]?.trim() ?? msg.split(/\s+/).slice(0, 5).join(' ')
+  }
+
+  /** Extract probable effect from a causal query. */
+  private extractEffect(msg: string): string {
+    const match = msg.match(/(?:causes?|leads?\s+to|results?\s+in)\s+(.+?)(?:\?|$)/i)
+    return match?.[1]?.trim() ?? msg.split(/\s+/).slice(-5).join(' ')
+  }
+
+  // ── Auto-Learning Helpers ──────────────────────────────────────────────────
+
+  /**
+   * Auto-learn from conversation turns:
+   * - Reinforce patterns from high-scoring KB matches
+   * - Track rephrase signals (implicit negative feedback)
+   * - Trigger generalization after enough similar patterns
+   */
+  private autoLearnFromConversation(
+    userMessage: string,
+    response: string,
+    knowledgeResults: KnowledgeSearchResult[],
+    confidence: number,
+  ): void {
+    // Auto-reinforce from strong KB matches (only for non-trivial messages)
+    if (knowledgeResults.length > 0 && knowledgeResults[0]!.score >= 3 && userMessage.trim().split(/\s+/).length >= 3) {
+      this.learn(userMessage, response, 'reinforced')
+    }
+
+    // Detect rephrase: if user asks something very similar to a recent question,
+    // treat it as implicit "didn't understand" signal and slightly reduce confidence
+    if (this.conversationHistory.length >= 4) {
+      const prevUserMsgs = this.conversationHistory
+        .filter(m => m.role === 'user')
+        .slice(-3)
+        .map(m => typeof m.content === 'string' ? m.content : '')
+      const currentKw = new Set(extractKeywords(userMessage))
+      for (const prev of prevUserMsgs) {
+        if (prev === userMessage) continue
+        const prevKw = extractKeywords(prev)
+        const overlap = prevKw.filter(k => currentKw.has(k)).length
+        if (prevKw.length > 0 && overlap / prevKw.length > 0.7) {
+          // High keyword overlap → rephrase detected → reduce pattern confidence
+          const match = this.learnedPatterns.find(p => p.inputPattern.toLowerCase() === prev.toLowerCase())
+          if (match && match.confidence > 0.2) {
+            match.confidence = Math.max(0.1, match.confidence - 0.1)
+          }
+          break
+        }
+      }
+    }
+
+    // Auto-generalization: when enough similar patterns exist in a category
+    if (this.adaptiveLearner && this.learnedPatterns.length > 0) {
+      const categoryCounts = new Map<string, number>()
+      for (const p of this.learnedPatterns) {
+        categoryCounts.set(p.category, (categoryCounts.get(p.category) ?? 0) + 1)
+      }
+      for (const [category, count] of categoryCounts) {
+        if (count >= 5 && count % 5 === 0) {
+          // Trigger generalization for this category
+          try {
+            const examples = this.learnedPatterns
+              .filter(p => p.category === category)
+              .slice(0, 10)
+              .map(p => ({
+                input: p.inputPattern,
+                output: p.response,
+                label: p.category,
+              }))
+            this.adaptiveLearner.generalize(examples)
+          } catch { /* non-critical */ }
+        }
+      }
+    }
+  }
+
+  /** Get budget-related fields for the response. */
+  private getBudgetFields(): {
+    budgetWarning?: boolean
+    budgetExhausted?: boolean
+    remainingTokens?: number
+    usagePercent?: number
+  } {
+    if (!this.tokenBudget.enabled) return {}
+    const report = this.tokenBudget.getReport()
+    return {
+      budgetWarning: report.budgetWarning || undefined,
+      budgetExhausted: report.budgetExhausted || undefined,
+      remainingTokens: report.remainingTokens,
+      usagePercent: report.usagePercent,
+    }
+  }
+
+  // ── Token Budget API ──────────────────────────────────────────────────────
+
+  /** Get the current token budget report. */
+  getTokenBudget(): BudgetReport {
+    return this.tokenBudget.getReport()
   }
 
   // ── Code Writing (same interface as AiBrain.writeCode) ──
@@ -3325,9 +3753,48 @@ export class LocalBrain {
     if (correct) {
       // Reinforce this pattern
       this.learn(userInput, assistantResponse, 'reinforced')
+
+      // Confidence-based learning: if confidence was low but user says correct,
+      // slightly boost confidence of related patterns
+      if (this.lastConfidenceAssessment < 0.3) {
+        const match = this.learnedPatterns.find(
+          p => p.inputPattern.toLowerCase() === userInput.toLowerCase()
+        )
+        if (match) {
+          match.confidence = Math.min(1, match.confidence + 0.05)
+        }
+      }
+
+      // Record positive outcome in ConfidenceGate for calibration
+      if (this.confidenceGate) {
+        this.confidenceGate.recordOutcome(this.lastConfidenceAssessment, true, this.lastGateDecision)
+      }
     } else if (correction) {
       // Learn the correction with higher priority
       this.learn(userInput, correction, 'user-corrected')
+
+      // Wire AdaptiveLearner.learnFromMistake() — categorize the error
+      if (this.adaptiveLearner) {
+        try {
+          this.adaptiveLearner.learnFromMistake(assistantResponse, correction, userInput)
+        } catch { /* non-critical */ }
+      }
+
+      // Confidence-based learning: if confidence was high but user corrects,
+      // aggressively reduce confidence
+      if (this.lastConfidenceAssessment > 0.8) {
+        const match = this.learnedPatterns.find(
+          p => p.inputPattern.toLowerCase() === userInput.toLowerCase()
+        )
+        if (match) {
+          match.confidence = Math.max(0.1, match.confidence - 0.2)
+        }
+      }
+
+      // Record negative outcome in ConfidenceGate for calibration
+      if (this.confidenceGate) {
+        this.confidenceGate.recordOutcome(this.lastConfidenceAssessment, false, this.lastGateDecision)
+      }
     }
   }
 
