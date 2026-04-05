@@ -1078,5 +1078,41 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(react, css, 'related-to', 0.5)
   memory.addRelation(php, html, 'used-with', 0.7)
 
+  // ── Kurdish Sorani Language — Semantic Concepts ──────────────────────────
+
+  // Core language concepts
+  const kurdishSorani = memory.addConcept('Kurdish Sorani', 'language')
+  const kurmanji = memory.addConcept('Kurmanji', 'language')
+  const soranAlphabet = memory.addConcept('Sorani Alphabet', 'language')
+  const soranGrammar = memory.addConcept('Sorani Grammar', 'language')
+  const soranVocabulary = memory.addConcept('Sorani Vocabulary', 'language')
+  const soranSemantics = memory.addConcept('Sorani Semantics', 'language')
+  const soranPhonology = memory.addConcept('Sorani Phonology', 'language')
+  const ezafe = memory.addConcept('Ezafe Construction', 'language')
+  const ergativity = memory.addConcept('Split Ergativity', 'language')
+  const soranVerbs = memory.addConcept('Sorani Verb System', 'language')
+  const soranCompounds = memory.addConcept('Sorani Compound Words', 'language')
+  const soranWriting = memory.addConcept('Sorani Writing System', 'language')
+
+  // Relationships: Kurdish dialect family
+  memory.addRelation(kurdishSorani, kurmanji, 'related-to', 0.85)
+  memory.addRelation(soranAlphabet, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranGrammar, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranVocabulary, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranSemantics, kurdishSorani, 'part-of', 0.95)
+  memory.addRelation(soranPhonology, kurdishSorani, 'part-of', 0.9)
+  memory.addRelation(soranWriting, kurdishSorani, 'part-of', 0.9)
+
+  // Grammar features
+  memory.addRelation(ezafe, soranGrammar, 'part-of', 0.9)
+  memory.addRelation(ergativity, soranGrammar, 'part-of', 0.85)
+  memory.addRelation(soranVerbs, soranGrammar, 'part-of', 0.9)
+
+  // Semantic features
+  memory.addRelation(soranCompounds, soranSemantics, 'part-of', 0.9)
+  memory.addRelation(soranCompounds, soranVocabulary, 'related-to', 0.8)
+  memory.addRelation(ezafe, soranSemantics, 'related-to', 0.7)
+  memory.addRelation(soranWriting, soranAlphabet, 'related-to', 0.9)
+
   return memory
 }
