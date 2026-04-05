@@ -2775,7 +2775,18 @@ export class LocalBrain {
 
   /** Check if query is a math/physics/logic problem to solve. */
   private isMathPhysicsLogicQuery(msg: string): boolean {
-    return /\b(solve|calculate|compute|derive|integrate|differentiate|simplify|factor|evaluate|prove|what\s+is\s+\d|find\s+(the|x|y)|equation|formula|theorem|law\s+of|newton|euler|gauss|force|energy|momentum|velocity|acceleration|voltage|current|resistance|probability|matrix|vector|determinant|eigenvalue|limit|derivative|integral|series|converge|diverge|truth\s+table|valid|tautology|contradiction|syllogism|fallacy)\b/i.test(msg)
+    // Math terms
+    const mathPattern = /\b(solve|calculate|compute|derive|integrate|differentiate|simplify|factor|evaluate|prove|what\s+is\s+\d|find\s+(the|x|y)|equation|formula|theorem)\b/i
+    // Physics terms
+    const physicsPattern = /\b(law\s+of|newton|euler|gauss|force|energy|momentum|velocity|acceleration|voltage|current|resistance|probability)\b/i
+    // Linear algebra terms
+    const linalgPattern = /\b(matrix|vector|determinant|eigenvalue)\b/i
+    // Calculus terms
+    const calculusPattern = /\b(limit|derivative|integral|series|converge|diverge)\b/i
+    // Logic terms
+    const logicPattern = /\b(truth\s+table|valid|tautology|contradiction|syllogism|fallacy)\b/i
+
+    return mathPattern.test(msg) || physicsPattern.test(msg) || linalgPattern.test(msg) || calculusPattern.test(msg) || logicPattern.test(msg)
   }
 
   /** Extract probable cause from a causal query. */
