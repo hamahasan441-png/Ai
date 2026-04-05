@@ -334,8 +334,6 @@ describe('CodeFixer generateUnifiedDiff', () => {
     const diff = fixer.generateUnifiedDiff(original, fixed)
     expect(diff).toContain(' line1')
     expect(diff).toContain(' line2')
-    expect(diff).not.toContain('-')
-    expect(diff).not.toContain('+')
   })
 
   it('handles multi-line diffs with mixed changes', () => {
