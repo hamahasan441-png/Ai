@@ -1283,5 +1283,58 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(soranTranslationHistory, soranHistory, 'related-to', 0.85)
   memory.addRelation(soranTranslationHealth, soranVocabulary, 'related-to', 0.75)
 
+  // ── Exploit Development Concepts ──────────────────────────────────────────
+
+  const exploitDevelopment = memory.addConcept('Exploit Development', 'security')
+  const bufferOverflow = memory.addConcept('Buffer Overflow', 'security')
+  const stackBufferOverflow = memory.addConcept('Stack Buffer Overflow', 'security')
+  const heapOverflow = memory.addConcept('Heap Overflow', 'security')
+  const formatStringVuln = memory.addConcept('Format String Vulnerability', 'security')
+  const fuzzingFramework = memory.addConcept('Custom Fuzzing Framework', 'security')
+  const tcpFuzzing = memory.addConcept('TCP Fuzzing', 'security')
+  const udpFuzzing = memory.addConcept('UDP Fuzzing', 'security')
+  const fileFuzzing = memory.addConcept('File Fuzzing', 'security')
+  const apiFuzzing = memory.addConcept('API Fuzzing', 'security')
+  const ropChainGeneration = memory.addConcept('ROP Chain Generation', 'security')
+  const ropGadget = memory.addConcept('ROP Gadget', 'security')
+  const ret2libc = memory.addConcept('Return-to-libc', 'security')
+  const patternGenerator = memory.addConcept('Buffer Overflow Pattern Generator', 'security')
+  const deBruijnSequence = memory.addConcept('De Bruijn Sequence', 'security')
+  const shellcodeEncoder = memory.addConcept('Shellcode Encoder Decoder', 'security')
+  const xorEncoding = memory.addConcept('XOR Encoding', 'security')
+  const polymorphicShellcode = memory.addConcept('Polymorphic Shellcode', 'security')
+  const badCharFinder = memory.addConcept('Bad Character Finder', 'security')
+  const exploitMitigation = memory.addConcept('Exploit Mitigation Bypass', 'security')
+
+  // Hierarchical relations
+  memory.addRelation(bufferOverflow, exploitDevelopment, 'part-of', 0.95)
+  memory.addRelation(stackBufferOverflow, bufferOverflow, 'part-of', 0.95)
+  memory.addRelation(heapOverflow, bufferOverflow, 'part-of', 0.9)
+  memory.addRelation(formatStringVuln, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(fuzzingFramework, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(tcpFuzzing, fuzzingFramework, 'part-of', 0.9)
+  memory.addRelation(udpFuzzing, fuzzingFramework, 'part-of', 0.9)
+  memory.addRelation(fileFuzzing, fuzzingFramework, 'part-of', 0.9)
+  memory.addRelation(apiFuzzing, fuzzingFramework, 'part-of', 0.9)
+  memory.addRelation(ropChainGeneration, exploitDevelopment, 'part-of', 0.95)
+  memory.addRelation(ropGadget, ropChainGeneration, 'part-of', 0.95)
+  memory.addRelation(ret2libc, ropChainGeneration, 'part-of', 0.9)
+  memory.addRelation(patternGenerator, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(deBruijnSequence, patternGenerator, 'part-of', 0.95)
+  memory.addRelation(shellcodeEncoder, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(xorEncoding, shellcodeEncoder, 'part-of', 0.9)
+  memory.addRelation(polymorphicShellcode, shellcodeEncoder, 'part-of', 0.85)
+  memory.addRelation(badCharFinder, exploitDevelopment, 'part-of', 0.9)
+  memory.addRelation(exploitMitigation, exploitDevelopment, 'part-of', 0.9)
+
+  // Cross-relations
+  memory.addRelation(badCharFinder, shellcodeEncoder, 'related-to', 0.85)
+  memory.addRelation(patternGenerator, bufferOverflow, 'related-to', 0.9)
+  memory.addRelation(ropChainGeneration, bufferOverflow, 'related-to', 0.85)
+  memory.addRelation(formatStringVuln, exploitMitigation, 'related-to', 0.8)
+  memory.addRelation(fuzzingFramework, bufferOverflow, 'related-to', 0.8)
+  memory.addRelation(shellcodeEncoder, badCharFinder, 'related-to', 0.85)
+  memory.addRelation(ropChainGeneration, exploitMitigation, 'related-to', 0.85)
+
   return memory
 }
