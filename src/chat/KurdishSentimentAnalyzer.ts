@@ -4,7 +4,7 @@
  * ║                                                                            ║
  * ║  Lexicon-based sentiment analyzer for Kurdish Sorani text with support     ║
  * ║  for contextual negation, intensifiers, emoji analysis, and emotion        ║
- * ║  detection. Built around a curated lexicon of 150+ sentiment words.        ║
+ * ║  detection. Built around a curated lexicon of 145 sentiment words.         ║
  * ║                                                                            ║
  * ║    ✦ Weighted lexicon lookup with emotion categories                       ║
  * ║    ✦ Negation handling (نا, نە, هیچ) flips polarity                        ║
@@ -517,7 +517,7 @@ function clamp(value: number, min: number, max: number): number {
 /**
  * Kurdish Sorani sentiment analyzer.
  *
- * Uses a curated lexicon of 150+ sentiment words, emoji analysis, contextual
+ * Uses a curated lexicon of 145 sentiment words, emoji analysis, contextual
  * negation and intensifier handling, and emotion detection to classify Kurdish
  * text into positive / negative / neutral / mixed sentiment categories.
  *
