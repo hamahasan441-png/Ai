@@ -125,6 +125,16 @@ import { CurriculumOptimizer } from './CurriculumOptimizer.js'
 import { ImageAnalyzer } from './ImageAnalyzer.js'
 import { DocumentAnalyzer } from './DocumentAnalyzer.js'
 
+// Decision quality & memory modules
+import { ConfidenceGate } from './ConfidenceGate.js'
+import type { ConfidenceSignal, GateDecision } from './ConfidenceGate.js'
+import { MemoryConsolidator } from './MemoryConsolidator.js'
+import type { SessionTurn } from './MemoryConsolidator.js'
+
+// Token budget management
+import { TokenBudgetManager } from './TokenBudgetManager.js'
+import type { BudgetReport } from './TokenBudgetManager.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -161,6 +171,22 @@ export interface LocalBrainConfig {
   useTfIdf: boolean
   /** Enable intelligence modules: SemanticEngine, IntentEngine, ContextManager, ReasoningEngine, MetaCognition (default: true). */
   enableIntelligence: boolean
+
+  // ── Token Budget ──
+
+  /** Maximum tokens per session before pausing (default: 80000). */
+  maxSessionTokens: number
+  /** Fraction of budget at which to warn (0-1, default: 0.85). */
+  budgetWarningThreshold: number
+  /** Enable token budget tracking (default: true). */
+  enableBudgetTracking: boolean
+
+  // ── Auto-Learning v3 ──
+
+  /** How often to consolidate session memory into long-term (every N chat turns, default: 10). */
+  memoryConsolidationInterval: number
+  /** Enable auto-learning from conversations (default: true). */
+  enableAutoLearning: boolean
 }
 
 /** A single entry in the knowledge base. */
@@ -487,6 +513,239 @@ function buildKnowledgeBase(): KnowledgeEntry[] {
 
   add('math', ['fibonacci', 'recursive', 'recursion'],
     'Fibonacci sequence: each number is the sum of the two preceding ones (0, 1, 1, 2, 3, 5, 8, 13...). Recursive: O(2^n) — very slow. Memoized: O(n). Iterative: O(n) time, O(1) space — best. Dynamic programming transforms exponential recursion into linear iteration.', 1.1)
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // ║  MATHEMATICS — Comprehensive math knowledge base                          ║
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  // ── Algebra ──
+  add('math', ['algebra', 'variable', 'solve', 'equation', 'linear equation'],
+    'Algebra fundamentals: Variables represent unknown values. Linear equation: ax + b = 0 → x = -b/a. Systems of equations: substitution, elimination, or matrix methods. Quadratic: ax² + bx + c = 0 → x = (-b ± √(b²-4ac)) / 2a. Discriminant Δ = b²-4ac: Δ>0 → 2 real roots, Δ=0 → 1 repeated root, Δ<0 → 2 complex roots. Factoring: find factors such that a·c = product, a+c = sum. Polynomial long division and synthetic division for higher degrees.', 1.3)
+
+  add('math', ['polynomial', 'degree', 'factor', 'root', 'zero'],
+    'Polynomials: f(x) = aₙxⁿ + aₙ₋₁xⁿ⁻¹ + ... + a₁x + a₀. Degree n has at most n real roots. Fundamental Theorem of Algebra: degree n polynomial has exactly n complex roots (counting multiplicity). Factor theorem: (x-a) is a factor iff f(a)=0. Rational root theorem: possible rational roots are ±(factors of a₀)/(factors of aₙ). Vieta\'s formulas: sum of roots = -aₙ₋₁/aₙ, product of roots = (-1)ⁿa₀/aₙ. Descartes\' rule of signs counts possible positive/negative real roots.', 1.2)
+
+  add('math', ['exponent', 'logarithm', 'log', 'power', 'exponential'],
+    'Exponents and logarithms: aᵐ · aⁿ = aᵐ⁺ⁿ, (aᵐ)ⁿ = aᵐⁿ, a⁰ = 1, a⁻ⁿ = 1/aⁿ. Logarithms: log_a(x) = y ↔ aʸ = x. Properties: log(ab) = log(a)+log(b), log(a/b) = log(a)-log(b), log(aⁿ) = n·log(a). Change of base: log_a(x) = ln(x)/ln(a). Natural log: ln(e) = 1. Exponential growth: N(t) = N₀·eᵏᵗ. Half-life: t½ = ln(2)/k. e ≈ 2.71828... is the base of natural logarithms.', 1.2)
+
+  add('math', ['inequality', 'absolute value', 'interval'],
+    'Inequalities: When multiplying/dividing by a negative number, flip the sign. |x| < a means -a < x < a. |x| > a means x < -a or x > a. Solving quadratic inequalities: factor, find roots, test intervals. Triangle inequality: |a+b| ≤ |a|+|b|. AM-GM inequality: (a+b)/2 ≥ √(ab) for a,b ≥ 0. Cauchy-Schwarz: (Σaᵢbᵢ)² ≤ (Σaᵢ²)(Σbᵢ²). Interval notation: [a,b] closed, (a,b) open, [a,b) half-open.', 1.1)
+
+  add('math', ['complex number', 'imaginary', 'complex', 'i squared'],
+    'Complex numbers: z = a + bi where i² = -1. Modulus: |z| = √(a²+b²). Conjugate: z̄ = a - bi. Polar form: z = r(cosθ + i·sinθ) = r·e^(iθ). De Moivre\'s theorem: (r·e^(iθ))ⁿ = rⁿ·e^(inθ). Euler\'s formula: e^(iπ) + 1 = 0 (most beautiful equation). Roots of unity: the n-th roots of 1 are e^(2πik/n) for k=0,1,...,n-1, equally spaced on the unit circle. Fundamental theorem: every polynomial equation has a solution in ℂ.', 1.2)
+
+  add('math', ['matrix', 'matrices', 'determinant', 'inverse matrix', 'eigenvalue'],
+    'Linear algebra — Matrices: m×n array of numbers. Operations: addition, scalar multiplication, matrix multiplication (AB ≠ BA generally). Determinant: det(A) = ad-bc for 2×2. Inverse: A⁻¹ exists iff det(A) ≠ 0; A·A⁻¹ = I. Eigenvalues λ: det(A - λI) = 0. Eigenvectors v: Av = λv. Trace: tr(A) = sum of diagonal = sum of eigenvalues. Rank: number of linearly independent rows/columns. Applications: systems of equations, transformations, data science (PCA), quantum mechanics.', 1.3)
+
+  add('math', ['vector', 'dot product', 'cross product', 'vector space', 'linear algebra'],
+    'Vectors and linear algebra: Vector = magnitude + direction. Dot product: a·b = |a||b|cosθ = a₁b₁+a₂b₂+a₃b₃. Cross product: a×b = |a||b|sinθ n̂ (perpendicular to both). Properties: dot product → scalar (projections, work), cross product → vector (torque, area). Vector space: closed under addition and scalar multiplication. Basis: minimal spanning set. Dimension = number of basis vectors. Linear independence: no vector is a combination of others. Gram-Schmidt: orthogonalize a basis. Subspace, span, null space, column space.', 1.3)
+
+  add('math', ['linear transformation', 'basis', 'dimension', 'rank', 'null space'],
+    'Linear transformations: T(αu + βv) = αT(u) + βT(v). Represented by matrices. Kernel (null space): {v : T(v) = 0}. Image (range): {T(v) : v in domain}. Rank-nullity theorem: dim(kernel) + dim(image) = dim(domain). Change of basis: [T]_B\' = P⁻¹[T]_B P. Diagonalization: A = PDP⁻¹ where D = diagonal of eigenvalues, P = eigenvector matrix. Singular Value Decomposition: A = UΣVᵀ (any matrix). Applications: rotations, reflections, projections, data compression.', 1.2)
+
+  // ── Calculus ──
+  add('math', ['derivative', 'differentiation', 'calculus', 'rate of change'],
+    'Calculus — Derivatives: f\'(x) = lim[h→0] (f(x+h)-f(x))/h = instantaneous rate of change. Rules: d/dx[xⁿ] = nxⁿ⁻¹, d/dx[sin x] = cos x, d/dx[eˣ] = eˣ, d/dx[ln x] = 1/x. Chain rule: d/dx[f(g(x))] = f\'(g(x))·g\'(x). Product rule: (fg)\' = f\'g + fg\'. Quotient rule: (f/g)\' = (f\'g - fg\')/g². Applications: velocity = dx/dt, acceleration = dv/dt, optimization (set f\'=0), related rates, tangent lines.', 1.3)
+
+  add('math', ['integral', 'integration', 'antiderivative', 'area under curve'],
+    'Calculus — Integration: ∫f(x)dx = F(x) + C where F\'(x) = f(x). Fundamental Theorem: ∫ₐᵇ f(x)dx = F(b) - F(a). Common: ∫xⁿdx = xⁿ⁺¹/(n+1), ∫eˣdx = eˣ, ∫sin(x)dx = -cos(x), ∫1/x dx = ln|x|. Techniques: substitution (u-sub), integration by parts (∫udv = uv - ∫vdu), partial fractions, trigonometric substitution. Applications: area between curves, volume of revolution (disk/shell method), arc length, work, center of mass.', 1.3)
+
+  add('math', ['limit', 'continuity', 'epsilon delta', 'convergence'],
+    'Limits and continuity: lim[x→a] f(x) = L means f(x) gets arbitrarily close to L as x approaches a. L\'Hôpital\'s rule: if 0/0 or ∞/∞, then lim f/g = lim f\'/g\'. ε-δ definition: ∀ε>0, ∃δ>0 such that |x-a|<δ → |f(x)-L|<ε. Continuous: lim[x→a] f(x) = f(a). Intermediate Value Theorem: if f continuous on [a,b] and f(a)<k<f(b), ∃c with f(c)=k. Squeeze theorem: if g≤f≤h and lim g = lim h = L, then lim f = L.', 1.2)
+
+  add('math', ['series', 'sequence', 'convergence', 'taylor', 'power series'],
+    'Sequences and series: Arithmetic: aₙ = a₁ + (n-1)d, sum = n(a₁+aₙ)/2. Geometric: aₙ = a₁rⁿ⁻¹, sum = a₁(1-rⁿ)/(1-r), infinite sum = a₁/(1-r) if |r|<1. Convergence tests: ratio test (lim|aₙ₊₁/aₙ|), root test, comparison, integral test. Taylor series: f(x) = Σf⁽ⁿ⁾(a)(x-a)ⁿ/n!. Common: eˣ = Σxⁿ/n!, sin(x) = Σ(-1)ⁿx²ⁿ⁺¹/(2n+1)!, cos(x) = Σ(-1)ⁿx²ⁿ/(2n)!, 1/(1-x) = Σxⁿ. Maclaurin series: Taylor at a=0.', 1.2)
+
+  add('math', ['differential equation', 'ode', 'pde', 'diffeq'],
+    'Differential equations: ODE involves derivatives of one variable. First-order separable: dy/dx = f(x)g(y) → ∫dy/g(y) = ∫f(x)dx. Linear first-order: y\' + P(x)y = Q(x), integrating factor μ = e^(∫P dx). Second-order constant coefficients: ay\'\' + by\' + cy = 0, characteristic equation ar² + br + c = 0. Homogeneous solutions: e^(rx), xe^(rx), or e^(αx)(cos βx, sin βx). PDE: heat equation uₜ = k·uₓₓ, wave equation uₜₜ = c²uₓₓ, Laplace equation ∇²u = 0. Methods: separation of variables, Fourier series.', 1.3)
+
+  add('math', ['multivariable calculus', 'partial derivative', 'gradient', 'divergence', 'curl'],
+    'Multivariable calculus: Partial derivatives: ∂f/∂x holds other variables constant. Gradient: ∇f = (∂f/∂x, ∂f/∂y, ∂f/∂z) — direction of steepest ascent. Divergence: ∇·F = ∂F₁/∂x + ∂F₂/∂y + ∂F₃/∂z (measures source/sink). Curl: ∇×F (measures rotation). Multiple integrals: ∬f dA (area), ∭f dV (volume). Green\'s theorem: ∮F·dr = ∬(∂Q/∂x - ∂P/∂y)dA. Stokes\' theorem: ∮F·dr = ∬(∇×F)·dS. Divergence theorem: ∯F·dS = ∭∇·F dV.', 1.2)
+
+  // ── Geometry & Trigonometry ──
+  add('math', ['geometry', 'triangle', 'circle', 'area', 'perimeter', 'volume'],
+    'Geometry essentials: Triangle area = ½bh = ½ab·sinC. Circle: A = πr², C = 2πr. Sphere: V = 4πr³/3, SA = 4πr². Cylinder: V = πr²h. Cone: V = πr²h/3. Pythagorean theorem: a² + b² = c². Similar triangles: corresponding angles equal, sides proportional. Congruence: SSS, SAS, ASA, AAS. Triangle inequality: sum of any two sides > third side. Sum of interior angles of polygon = (n-2)·180°. Regular polygon: each angle = (n-2)·180°/n.', 1.2)
+
+  add('math', ['trigonometry', 'sine', 'cosine', 'tangent', 'sin', 'cos', 'tan', 'trig'],
+    'Trigonometry: sin θ = opposite/hypotenuse, cos θ = adjacent/hypotenuse, tan θ = sin/cos. Unit circle: sin²θ + cos²θ = 1. Key values: sin(0)=0, sin(30°)=½, sin(45°)=√2/2, sin(60°)=√3/2, sin(90°)=1. Double angle: sin(2θ) = 2sinθcosθ, cos(2θ) = cos²θ - sin²θ. Law of sines: a/sinA = b/sinB = c/sinC. Law of cosines: c² = a² + b² - 2ab·cosC. Inverse functions: arcsin, arccos, arctan. Radians: π rad = 180°. Identities: tan²θ + 1 = sec²θ, 1 + cot²θ = csc²θ.', 1.3)
+
+  add('math', ['coordinate geometry', 'analytic geometry', 'distance', 'midpoint', 'slope'],
+    'Coordinate/analytic geometry: Distance = √((x₂-x₁)² + (y₂-y₁)²). Midpoint = ((x₁+x₂)/2, (y₁+y₂)/2). Slope = (y₂-y₁)/(x₂-x₁). Line: y = mx + b or ax + by + c = 0. Parallel lines: same slope. Perpendicular: slopes multiply to -1. Circle: (x-h)² + (y-k)² = r². Ellipse: x²/a² + y²/b² = 1. Hyperbola: x²/a² - y²/b² = 1. Parabola: y = ax² + bx + c, focus-directrix form. Distance from point to line: |ax₀+by₀+c|/√(a²+b²).', 1.1)
+
+  // ── Statistics & Probability ──
+  add('math', ['statistics', 'mean', 'median', 'standard deviation', 'variance'],
+    'Statistics: Mean (average) = Σxᵢ/n. Median = middle value (sorted). Mode = most frequent. Variance σ² = Σ(xᵢ-μ)²/n. Standard deviation σ = √variance. For samples: use n-1 (Bessel\'s correction). Normal distribution: 68% within 1σ, 95% within 2σ, 99.7% within 3σ. Z-score: z = (x-μ)/σ. Correlation: r = Σ(xᵢ-x̄)(yᵢ-ȳ) / √(Σ(xᵢ-x̄)²·Σ(yᵢ-ȳ)²), range [-1,1]. Regression: y = β₀ + β₁x where β₁ = r·(σy/σx).', 1.3)
+
+  add('math', ['probability', 'bayes', 'conditional', 'random variable', 'distribution'],
+    'Probability: P(A) = favorable outcomes / total outcomes, range [0,1]. P(A∪B) = P(A) + P(B) - P(A∩B). P(A|B) = P(A∩B)/P(B). Independent: P(A∩B) = P(A)·P(B). Bayes\' theorem: P(A|B) = P(B|A)·P(A)/P(B). Binomial: P(k successes in n trials) = C(n,k)·pᵏ(1-p)ⁿ⁻ᵏ. Expected value: E[X] = Σxᵢ·P(xᵢ). Poisson: P(k) = λᵏe⁻λ/k!. Normal distribution: bell curve, defined by μ and σ. Central Limit Theorem: sample means → normal as n→∞.', 1.3)
+
+  add('math', ['combinatorics', 'permutation', 'combination', 'counting'],
+    'Combinatorics: Permutations (order matters): P(n,r) = n!/(n-r)!. Combinations (order doesn\'t): C(n,r) = n!/(r!(n-r)!). Factorial: n! = n·(n-1)·...·1, 0!=1. Multiplication principle: if task A has m ways and B has n ways → m·n total. Addition principle: if A or B, m+n ways (if disjoint). Pigeonhole principle: if n items in m boxes and n>m, some box has ≥2 items. Stars and bars: distributing n identical items into k bins = C(n+k-1,k-1). Inclusion-exclusion: |A∪B∪C| = |A|+|B|+|C|-|A∩B|-|A∩C|-|B∩C|+|A∩B∩C|.', 1.2)
+
+  // ── Number Theory ──
+  add('math', ['number theory', 'prime', 'divisibility', 'modular arithmetic', 'gcd'],
+    'Number theory: Prime numbers have exactly 2 divisors (1 and itself). Fundamental Theorem of Arithmetic: every integer > 1 has a unique prime factorization. GCD (Euclidean algorithm): gcd(a,b) = gcd(b, a mod b). LCM: lcm(a,b) = |a·b|/gcd(a,b). Modular arithmetic: a ≡ b (mod n) means n|(a-b). Fermat\'s little theorem: aᵖ⁻¹ ≡ 1 (mod p) for prime p. Euler\'s totient: φ(n) = count of integers ≤ n coprime to n. Chinese Remainder Theorem: system of congruences with coprime moduli has unique solution. Prime testing: trial division, Miller-Rabin.', 1.2)
+
+  add('math', ['number system', 'integer', 'rational', 'irrational', 'real number'],
+    'Number systems: ℕ (naturals: 0,1,2,...) ⊂ ℤ (integers: ...,-2,-1,0,1,2,...) ⊂ ℚ (rationals: p/q) ⊂ ℝ (reals) ⊂ ℂ (complex: a+bi). Irrational numbers: √2, π, e — cannot be expressed as p/q. Proof √2 is irrational: assume √2 = p/q in lowest terms → 2q² = p² → p is even → p=2k → 2q² = 4k² → q² = 2k² → q is even. Contradiction (both even, not lowest terms). Cardinality: |ℕ| = |ℤ| = |ℚ| = ℵ₀ (countably infinite), |ℝ| = 2^ℵ₀ (uncountably infinite, by Cantor\'s diagonal argument).', 1.2)
+
+  // ── Discrete Math ──
+  add('math', ['graph theory', 'graph', 'vertex', 'edge', 'tree', 'network'],
+    'Graph theory: G = (V, E) — vertices and edges. Types: directed/undirected, weighted/unweighted, cyclic/acyclic. Degree of vertex = number of edges. Handshaking lemma: Σdeg(v) = 2|E|. Tree: connected acyclic graph with n-1 edges. Euler path: visits every edge once (exists iff 0 or 2 odd-degree vertices). Hamilton path: visits every vertex once (NP-complete to find). Planar graph: can be drawn without edge crossings (Euler\'s formula: V-E+F=2). Coloring: chromatic number = minimum colors so no adjacent vertices share color.', 1.2)
+
+  add('math', ['set theory', 'set', 'union', 'intersection', 'subset', 'cardinality'],
+    'Set theory: Collection of distinct elements. Notation: A = {1,2,3}. Operations: union (A∪B), intersection (A∩B), difference (A\\B), complement (Aᶜ). Subset: A⊆B if every element of A is in B. Empty set ∅ is subset of every set. Power set P(A) = set of all subsets, |P(A)| = 2^|A|. De Morgan\'s laws: (A∪B)ᶜ = Aᶜ∩Bᶜ, (A∩B)ᶜ = Aᶜ∪Bᶜ. Cartesian product: A×B = {(a,b) : a∈A, b∈B}. Functions: injection (1-to-1), surjection (onto), bijection (both). Cantor\'s theorem: |A| < |P(A)| for any set A.', 1.2)
+
+  add('math', ['mathematical induction', 'induction', 'proof by induction'],
+    'Mathematical induction: Prove statement P(n) for all n ≥ base. Step 1 (base case): verify P(base) is true. Step 2 (inductive step): assume P(k) is true (inductive hypothesis), prove P(k+1). Conclusion: P(n) holds for all n ≥ base. Strong induction: assume P(j) for all base ≤ j ≤ k, prove P(k+1). Example: prove Σᵢ₌₁ⁿ i = n(n+1)/2. Base: n=1 → 1 = 1·2/2 ✓. Inductive step: assume Σᵢ₌₁ᵏ i = k(k+1)/2, then Σᵢ₌₁ᵏ⁺¹ i = k(k+1)/2 + (k+1) = (k+1)(k+2)/2 ✓.', 1.3)
+
+  // ── Advanced Math Topics ──
+  add('math', ['abstract algebra', 'group', 'ring', 'field', 'algebraic structure'],
+    'Abstract algebra: Group (G,·): closure, associativity, identity, inverses. Abelian group: also commutative. Examples: (ℤ,+), (ℤₙ,+), symmetry groups. Ring: two operations (+,·) where (R,+) is abelian group and · is associative with distribution. Field: commutative ring where every non-zero element has multiplicative inverse. Examples: ℚ, ℝ, ℂ, ℤₚ (p prime). Lagrange\'s theorem: order of subgroup divides order of group. Isomorphism: structure-preserving bijection. Homomorphism: preserves operations.', 1.1)
+
+  add('math', ['topology', 'continuous function', 'open set', 'metric space'],
+    'Topology: Study of properties preserved under continuous deformations. Open set: for every point, there\'s a small ball entirely contained. Topological space: set X with collection of open sets (includes ∅ and X, closed under union and finite intersection). Metric space: set with distance function d(x,y) satisfying d≥0, d(x,y)=0↔x=y, symmetry, triangle inequality. Continuous function: preimage of every open set is open. Homeomorphism: continuous bijection with continuous inverse. Famous: coffee mug ≅ donut (genus 1 surface). Compactness, connectedness, Hausdorff property.', 1.0)
+
+  add('math', ['fourier', 'fourier transform', 'frequency', 'spectral', 'signal'],
+    'Fourier analysis: Any periodic function can be decomposed into sum of sines and cosines. Fourier series: f(x) = a₀/2 + Σ(aₙcos(nx) + bₙsin(nx)). Fourier transform: F(ω) = ∫f(t)e^(-iωt)dt — converts time domain to frequency domain. Inverse: f(t) = (1/2π)∫F(ω)e^(iωt)dω. DFT (Discrete): for sampled signals, O(N²). FFT: O(N log N) — one of most important algorithms. Applications: signal processing, image compression (JPEG), audio (MP3), solving PDEs, quantum mechanics, spectroscopy.', 1.2)
+
+  add('math', ['optimization', 'maximize', 'minimize', 'constraint', 'lagrange multiplier'],
+    'Optimization: Find maxima/minima. Unconstrained: set gradient ∇f = 0, check second derivative (Hessian). Constrained: Lagrange multipliers — optimize f(x,y) subject to g(x,y)=0 → ∇f = λ∇g. Linear programming: optimize linear function subject to linear constraints (simplex method). Convex optimization: local minimum = global minimum. Gradient descent: x_{n+1} = xₙ - α∇f(xₙ). Newton\'s method: x_{n+1} = xₙ - f(xₙ)/f\'(xₙ). KKT conditions generalize Lagrange to inequality constraints.', 1.2)
+
+  add('math', ['numerical methods', 'approximation', 'numerical analysis', 'interpolation'],
+    'Numerical methods: Newton\'s method for root finding: xₙ₊₁ = xₙ - f(xₙ)/f\'(xₙ), quadratic convergence. Bisection method: guaranteed but slow (linear). Numerical integration: Trapezoidal rule, Simpson\'s rule (parabolic), Gaussian quadrature. Euler\'s method for ODEs: yₙ₊₁ = yₙ + h·f(xₙ,yₙ). Runge-Kutta (RK4): 4th order accuracy. Interpolation: Lagrange, Newton, spline. Linear systems: Gaussian elimination O(n³), LU decomposition, iterative (Jacobi, Gauss-Seidel). Floating point: IEEE 754, machine epsilon ≈ 2.2×10⁻¹⁶ (double).', 1.1)
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // ║  PHYSICS — Comprehensive physics knowledge base                           ║
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  // ── Classical Mechanics ──
+  add('physics', ['physics', 'newton', 'force', 'motion', 'mechanics', 'law of motion'],
+    'Classical mechanics — Newton\'s Laws: 1st Law (inertia): object at rest stays at rest, object in motion stays in motion unless acted on by net force. 2nd Law: F = ma (force = mass × acceleration). 3rd Law: every action has an equal and opposite reaction. Weight: W = mg (g ≈ 9.81 m/s²). Friction: f = μN (coefficient × normal force). Free body diagrams: draw all forces on object, apply F_net = ma in each direction. Units: force in Newtons (N = kg·m/s²).', 1.4)
+
+  add('physics', ['velocity', 'acceleration', 'kinematics', 'projectile', 'displacement'],
+    'Kinematics (motion without forces): v = v₀ + at, x = x₀ + v₀t + ½at², v² = v₀² + 2a(x-x₀). Average velocity = Δx/Δt. Instantaneous velocity = dx/dt. Projectile motion: horizontal (vₓ = constant) + vertical (aᵧ = -g). Range = v₀²sin(2θ)/g. Maximum height = v₀²sin²θ/(2g). Time of flight = 2v₀sinθ/g. Optimal launch angle for max range = 45°. Circular motion: a_c = v²/r (centripetal), F_c = mv²/r.', 1.3)
+
+  add('physics', ['energy', 'work', 'power', 'kinetic energy', 'potential energy', 'conservation of energy'],
+    'Energy and work: Work W = F·d·cosθ (force × displacement × angle between). Kinetic energy: KE = ½mv². Potential energy: PE = mgh (gravitational), PE = ½kx² (elastic/spring). Conservation of energy: E_total = KE + PE = constant (no friction). Work-energy theorem: W_net = ΔKE. Power = W/t = F·v. Units: energy in Joules (J = N·m), power in Watts (W = J/s). Efficiency = useful energy out / total energy in. 1 calorie = 4.184 J. 1 kWh = 3.6×10⁶ J.', 1.3)
+
+  add('physics', ['momentum', 'impulse', 'collision', 'conservation of momentum'],
+    'Momentum: p = mv (mass × velocity). Impulse: J = FΔt = Δp. Newton\'s 2nd law: F = dp/dt. Conservation of momentum: in isolated system, Σp_before = Σp_after. Elastic collision: both momentum and KE conserved → v₁\' = (m₁-m₂)v₁/(m₁+m₂) + 2m₂v₂/(m₁+m₂). Inelastic collision: momentum conserved, KE not (some lost to deformation/heat). Perfectly inelastic: objects stick together → m₁v₁ + m₂v₂ = (m₁+m₂)v\'. Center of mass: x_cm = Σmᵢxᵢ/Σmᵢ.', 1.2)
+
+  add('physics', ['rotation', 'torque', 'angular momentum', 'moment of inertia'],
+    'Rotational mechanics: Angular velocity ω = dθ/dt. Angular acceleration α = dω/dt. Torque τ = r × F = Iα. Moment of inertia I = Σmᵢrᵢ² (resistance to angular acceleration). Common: solid sphere I = 2mr²/5, solid cylinder I = mr²/2, thin rod (center) I = ml²/12. Angular momentum L = Iω, conserved when no net torque (ice skater pulls arms in → spins faster). Rotational KE = ½Iω². Rolling without slipping: v = ωr. Parallel axis theorem: I = I_cm + md².', 1.2)
+
+  add('physics', ['gravity', 'gravitational', 'orbit', 'kepler', 'satellite'],
+    'Gravitation: Newton\'s law: F = Gm₁m₂/r² where G = 6.674×10⁻¹¹ N·m²/kg². Gravitational field: g = GM/r². Gravitational PE: U = -GMm/r. Escape velocity: v_esc = √(2GM/r) ≈ 11.2 km/s for Earth. Kepler\'s laws: 1) Orbits are ellipses with Sun at focus, 2) Equal areas swept in equal times, 3) T² ∝ a³ (period² ∝ semi-major axis³). Orbital velocity: v = √(GM/r). Geostationary orbit: T = 24h → r ≈ 42,164 km from Earth\'s center.', 1.2)
+
+  add('physics', ['oscillation', 'spring', 'simple harmonic', 'pendulum', 'shm'],
+    'Simple harmonic motion (SHM): x(t) = A·cos(ωt + φ). Restoring force: F = -kx (Hooke\'s law). Angular frequency: ω = √(k/m) for spring, ω = √(g/L) for pendulum. Period: T = 2π/ω. Frequency: f = 1/T. Energy: E = ½kA² (oscillates between KE and PE). Damped oscillation: x(t) = Ae^(-γt)cos(ω\'t), where ω\' = √(ω²-γ²). Resonance: driving frequency = natural frequency → maximum amplitude. Applications: clocks, springs, musical instruments, bridges.', 1.2)
+
+  // ── Thermodynamics ──
+  add('physics', ['thermodynamics', 'heat', 'temperature', 'entropy', 'law of thermodynamics'],
+    'Thermodynamics: 0th Law: if A and B are in thermal equilibrium with C, then A and B are in equilibrium. 1st Law: ΔU = Q - W (energy conservation — internal energy change = heat added minus work done). 2nd Law: entropy of isolated system never decreases; heat flows hot→cold; no perfect engine. 3rd Law: entropy approaches zero as temperature approaches absolute zero. Temperature scales: K = °C + 273.15. Heat transfer: conduction (Q/t = kA·ΔT/L), convection, radiation (P = σεAT⁴). Specific heat: Q = mcΔT.', 1.3)
+
+  add('physics', ['ideal gas', 'gas law', 'pressure', 'boyle', 'charles'],
+    'Gas laws: Ideal gas law: PV = nRT (P=pressure, V=volume, n=moles, R=8.314 J/(mol·K), T=temperature in K). Boyle\'s law: PV = constant (at constant T). Charles\'s law: V/T = constant (at constant P). Avogadro: V/n = constant (at constant T,P). Combined: PV/T = constant. Kinetic theory: P = nMv²_rms/(3V), KE_avg = 3kT/2 where k = 1.381×10⁻²³ J/K (Boltzmann). Root mean square speed: v_rms = √(3RT/M). Real gases: van der Waals (P + a/V²)(V - b) = RT.', 1.2)
+
+  add('physics', ['heat engine', 'carnot', 'efficiency', 'refrigerator'],
+    'Heat engines and Carnot cycle: Engine converts heat to work. Efficiency η = W/Q_H = 1 - Q_C/Q_H. Carnot efficiency (maximum possible): η_Carnot = 1 - T_C/T_H (temperatures in Kelvin). No real engine can exceed Carnot efficiency. Refrigerator/heat pump: COP_refrigerator = Q_C/W = T_C/(T_H - T_C). Entropy: S = Q_rev/T. ΔS_universe ≥ 0 (2nd law). Processes: isothermal (ΔT=0), adiabatic (Q=0, PVᵞ=const), isobaric (ΔP=0), isochoric (ΔV=0).', 1.1)
+
+  // ── Electromagnetism ──
+  add('physics', ['electricity', 'charge', 'coulomb', 'electric field', 'electrostatics'],
+    'Electrostatics: Coulomb\'s law: F = kq₁q₂/r² where k = 8.99×10⁹ N·m²/C². Like charges repel, opposites attract. Electric field: E = F/q = kQ/r² (points away from positive). Electric potential: V = kQ/r. Potential energy: U = kq₁q₂/r. Gauss\'s law: ∮E·dA = Q_enc/ε₀ (electric flux through closed surface = enclosed charge / ε₀). Capacitor: C = Q/V. Parallel plates: C = ε₀A/d. Energy stored: U = ½CV² = ½QV. Elementary charge: e = 1.602×10⁻¹⁹ C.', 1.3)
+
+  add('physics', ['circuit', 'resistor', 'ohm', 'current', 'voltage', 'resistance'],
+    'Electric circuits: Ohm\'s law: V = IR (voltage = current × resistance). Power: P = IV = I²R = V²/R. Resistors in series: R_total = R₁ + R₂ + ... (current same, voltage adds). Resistors in parallel: 1/R_total = 1/R₁ + 1/R₂ + ... (voltage same, current adds). Kirchhoff\'s laws: 1) Junction rule — current in = current out, 2) Loop rule — sum of voltage changes around loop = 0. Capacitors: series → 1/C_total = 1/C₁ + 1/C₂, parallel → C_total = C₁ + C₂. RC circuit: τ = RC (time constant).', 1.3)
+
+  add('physics', ['magnetism', 'magnetic field', 'magnetic force', 'electromagnetic', 'faraday'],
+    'Magnetism and electromagnetic induction: Magnetic force on moving charge: F = qv × B. Force on current-carrying wire: F = IL × B. Biot-Savart law: dB = (μ₀/4π)(Idl × r̂)/r². Ampère\'s law: ∮B·dl = μ₀I_enc. Solenoid: B = μ₀nI. Faraday\'s law: EMF = -dΦ_B/dt (changing magnetic flux induces voltage). Lenz\'s law: induced current opposes the change. Inductance: L = Φ_B/I. RL circuit: τ = L/R. Electromagnetic waves: c = 1/√(μ₀ε₀) = 3×10⁸ m/s. Maxwell\'s equations unify E&M.', 1.3)
+
+  add('physics', ['maxwell', 'electromagnetic wave', 'light speed', 'spectrum'],
+    'Maxwell\'s equations (differential form): 1) ∇·E = ρ/ε₀ (Gauss — charges create E fields), 2) ∇·B = 0 (no magnetic monopoles), 3) ∇×E = -∂B/∂t (Faraday — changing B creates E), 4) ∇×B = μ₀J + μ₀ε₀∂E/∂t (Ampère-Maxwell — current and changing E create B). Electromagnetic spectrum (by wavelength): radio > microwave > infrared > visible (ROYGBIV) > ultraviolet > X-ray > gamma. All EM waves travel at c = 3×10⁸ m/s in vacuum. E = hf (photon energy).', 1.2)
+
+  // ── Waves & Optics ──
+  add('physics', ['wave', 'wavelength', 'frequency', 'amplitude', 'sound', 'standing wave'],
+    'Waves: v = fλ (speed = frequency × wavelength). Types: transverse (perpendicular displacement — light, string) and longitudinal (parallel — sound, compression). Superposition: waves add algebraically. Interference: constructive (in phase, amplitudes add) vs destructive (out of phase, cancel). Standing waves: nodes (no motion) and antinodes (max motion). Harmonics: fₙ = n·f₁. Sound: v ≈ 343 m/s in air. Doppler effect: f\' = f(v±v_observer)/(v∓v_source). Decibels: β = 10·log₁₀(I/I₀) where I₀ = 10⁻¹² W/m².', 1.2)
+
+  add('physics', ['optics', 'lens', 'mirror', 'refraction', 'reflection', 'snell'],
+    'Optics: Reflection: angle of incidence = angle of reflection. Refraction — Snell\'s law: n₁sinθ₁ = n₂sinθ₂. Total internal reflection: when θ > θ_critical = arcsin(n₂/n₁). Thin lens equation: 1/f = 1/d_o + 1/d_i. Magnification: M = -d_i/d_o = h_i/h_o. Converging lens (convex): f > 0, diverging (concave): f < 0. Mirror equation: same formula. Diffraction: light bends around obstacles. Double slit: d·sinθ = mλ (bright fringes). Single slit: a·sinθ = mλ (dark fringes). Polarization: filter orientation.', 1.2)
+
+  // ── Modern Physics ──
+  add('physics', ['quantum', 'quantum mechanics', 'wave function', 'schrodinger', 'uncertainty'],
+    'Quantum mechanics: Wave-particle duality — matter exhibits both wave and particle properties. De Broglie wavelength: λ = h/p = h/(mv). Heisenberg uncertainty principle: ΔxΔp ≥ ℏ/2 (cannot simultaneously know exact position and momentum). Schrödinger equation: iℏ∂ψ/∂t = Ĥψ. |ψ|² = probability density. Quantization: energy levels are discrete (E_n = -13.6/n² eV for hydrogen). Quantum numbers: n (principal), l (angular), mₗ (magnetic), mₛ (spin ±½). Pauli exclusion: no two fermions share all quantum numbers.', 1.3)
+
+  add('physics', ['relativity', 'einstein', 'special relativity', 'general relativity', 'spacetime'],
+    'Relativity — Special (1905): Speed of light c is constant for all observers. Time dilation: Δt = γΔt₀ where γ = 1/√(1-v²/c²). Length contraction: L = L₀/γ. Mass-energy equivalence: E = mc² (rest energy), E² = (pc)² + (mc²)². Nothing with mass can reach c. General (1915): gravity = curvature of spacetime caused by mass-energy. Gravitational time dilation: clocks run slower in stronger gravity. Predictions: gravitational lensing, black holes, gravitational waves (detected 2015 by LIGO), GPS satellites must account for both effects.', 1.3)
+
+  add('physics', ['atom', 'atomic', 'electron', 'proton', 'neutron', 'nucleus', 'radioactive'],
+    'Atomic and nuclear physics: Atom = nucleus (protons + neutrons) + electrons. Atomic number Z = protons, mass number A = protons + neutrons. Isotopes: same Z, different A. Bohr model: electrons orbit in quantized levels, E_n = -13.6Z²/n² eV. Radioactive decay: α (⁴He nucleus), β⁻ (electron + antineutrino), β⁺ (positron + neutrino), γ (photon). Half-life: N(t) = N₀·(½)^(t/t½). Nuclear binding energy: E = Δmc². Fission: heavy nuclei split (uranium, plutonium — nuclear power). Fusion: light nuclei merge (hydrogen → helium — Sun\'s energy, future power).', 1.2)
+
+  add('physics', ['standard model', 'particle', 'quark', 'lepton', 'boson', 'higgs'],
+    'Standard Model of particle physics: Matter particles (fermions): 6 quarks (up, down, charm, strange, top, bottom) and 6 leptons (electron, muon, tau + their neutrinos). Force carriers (bosons): photon (electromagnetic), W±/Z⁰ (weak nuclear — radioactive decay), gluons (strong nuclear — holds quarks together), Higgs boson (gives mass via Higgs field, discovered 2012). Proton = uud, Neutron = udd. Antimatter: every particle has an antiparticle. Quarks are confined (never found alone). Four fundamental forces: gravity, electromagnetism, weak, strong.', 1.2)
+
+  add('physics', ['fluid', 'pressure', 'buoyancy', 'bernoulli', 'fluid dynamics'],
+    'Fluid mechanics: Pressure = F/A (Pa = N/m²). Atmospheric: 101,325 Pa = 1 atm. Hydrostatic pressure: P = P₀ + ρgh. Pascal\'s principle: pressure applied to enclosed fluid transmits equally everywhere. Archimedes\' principle: buoyant force = weight of displaced fluid (F_b = ρ_fluid·g·V_displaced). Object floats if ρ_object < ρ_fluid. Continuity equation: A₁v₁ = A₂v₂ (flow rate conserved). Bernoulli\'s equation: P + ½ρv² + ρgh = constant (energy conservation for fluids). Reynolds number: Re = ρvL/μ (laminar < 2300 < turbulent).', 1.2)
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // ║  LOGIC — Comprehensive logic and reasoning knowledge base                 ║
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  // ── Propositional Logic ──
+  add('logic', ['logic', 'proposition', 'truth table', 'propositional', 'logical operator'],
+    'Propositional logic: Propositions are statements that are true or false. Connectives: AND (∧, conjunction), OR (∨, disjunction), NOT (¬, negation), IF-THEN (→, implication), IFF (↔, biconditional). Truth tables: p→q is false only when p=T and q=F. Tautology: always true (e.g., p∨¬p). Contradiction: always false (e.g., p∧¬p). Contingency: sometimes true. Logical equivalence: p→q ≡ ¬p∨q. Contrapositive: p→q ≡ ¬q→¬p. De Morgan: ¬(p∧q) ≡ ¬p∨¬q, ¬(p∨q) ≡ ¬p∧¬q.', 1.3)
+
+  add('logic', ['predicate logic', 'quantifier', 'universal', 'existential', 'for all', 'there exists'],
+    'Predicate logic: Extends propositional logic with variables and quantifiers. Universal quantifier ∀: "for all x, P(x)" — true if P holds for every x. Existential quantifier ∃: "there exists x such that P(x)" — true if P holds for at least one x. Negation: ¬∀x P(x) ≡ ∃x ¬P(x), ¬∃x P(x) ≡ ∀x ¬P(x). Nested quantifiers: ∀x∃y P(x,y) ≠ ∃y∀x P(x,y) (order matters!). Free vs bound variables. Domain of discourse: the universe of values x can take. First-order logic: quantify over individuals. Second-order: quantify over predicates.', 1.2)
+
+  add('logic', ['boolean algebra', 'boolean', 'logic gate', 'and gate', 'or gate', 'nand', 'xor'],
+    'Boolean algebra: Values: 0 (false) and 1 (true). Operations: AND (·), OR (+), NOT (\'). Laws: identity (a·1=a, a+0=a), null (a·0=0, a+1=1), idempotent (a·a=a, a+a=a), complement (a·a\'=0, a+a\'=1), commutative, associative, distributive, De Morgan (a·b)\' = a\'+b\', (a+b)\' = a\'·b\'. Logic gates: AND, OR, NOT, NAND (universal), NOR (universal), XOR (exclusive or), XNOR. NAND is functionally complete — any circuit can be built from NANDs alone. Karnaugh maps: simplify boolean expressions visually.', 1.3)
+
+  add('logic', ['logical fallacy', 'fallacy', 'invalid argument', 'cognitive bias'],
+    'Logical fallacies — Formal: affirming the consequent (if p→q and q, concluding p), denying the antecedent (if p→q and ¬p, concluding ¬q). Informal: ad hominem (attack person not argument), straw man (misrepresent argument), false dichotomy (only two options), slippery slope (chain of unlikely consequences), appeal to authority, appeal to emotion, circular reasoning (begging the question), hasty generalization (small sample), red herring (irrelevant distraction), tu quoque (you too), bandwagon, post hoc ergo propter hoc (after therefore because of).', 1.3)
+
+  // ── Proof Techniques ──
+  add('logic', ['proof', 'direct proof', 'contradiction', 'contrapositive', 'proof technique'],
+    'Proof techniques: 1) Direct proof: assume premises, derive conclusion through logical steps. 2) Proof by contradiction: assume negation of conclusion, derive a contradiction. 3) Proof by contrapositive: prove ¬q→¬p instead of p→q. 4) Proof by cases: split into exhaustive cases, prove each. 5) Mathematical induction: prove base case, then prove n→n+1. 6) Existence proof: constructive (show example) or non-constructive (show non-existence leads to contradiction). 7) Uniqueness proof: show existence, then assume two solutions and prove they\'re equal. 8) Disproof by counterexample.', 1.3)
+
+  add('logic', ['deduction', 'deductive reasoning', 'syllogism', 'modus ponens', 'modus tollens'],
+    'Deductive reasoning: guaranteed conclusions from premises. Modus ponens: if p→q and p, then q. Modus tollens: if p→q and ¬q, then ¬p. Hypothetical syllogism: if p→q and q→r, then p→r. Disjunctive syllogism: if p∨q and ¬p, then q. Resolution: (p∨q) ∧ (¬p∨r) → (q∨r). Universal instantiation: ∀x P(x) → P(a). Existential instantiation: ∃x P(x) → P(c) for some c. Valid argument: if all premises true, conclusion must be true. Sound argument: valid + premises are actually true.', 1.2)
+
+  add('logic', ['inductive reasoning', 'abductive reasoning', 'analogy reasoning'],
+    'Types of reasoning: 1) Deductive: general → specific, guaranteed (All men are mortal. Socrates is a man. Therefore Socrates is mortal). 2) Inductive: specific → general, probable (Every swan I\'ve seen is white, therefore all swans are white — can be wrong!). Strong induction: large/varied sample, conclusion not too broad. 3) Abductive: best explanation (The lawn is wet. Best explanation: it rained). Used in science/diagnosis. 4) Analogical: if A is similar to B in known ways, A may be similar in unknown ways. Strength depends on relevance of similarities.', 1.3)
+
+  // ── Formal Systems & Computability ──
+  add('logic', ['formal system', 'axiom', 'theorem', 'godel', 'incompleteness'],
+    'Formal systems and Gödel: A formal system has axioms (assumed truths), rules of inference (valid deductions), and theorems (derived truths). Gödel\'s First Incompleteness Theorem (1931): any consistent formal system powerful enough to describe natural number arithmetic contains true statements that cannot be proved within the system. Second Incompleteness Theorem: such a system cannot prove its own consistency. Implications: mathematics cannot be fully formalized; there will always be undecidable statements. Halting problem (Turing): no algorithm can decide if arbitrary programs halt — closely related.', 1.2)
+
+  add('logic', ['turing machine', 'computability', 'halting problem', 'decidable', 'algorithm'],
+    'Computability theory: Turing machine — abstract model of computation with infinite tape, read/write head, and finite state control. Church-Turing thesis: any computable function can be computed by a Turing machine. Decidable problem: an algorithm can always give yes/no answer. Semi-decidable: algorithm says yes if true, may loop forever if false. Undecidable: no algorithm can decide all instances (e.g., halting problem). Complexity classes: P (polynomial time), NP (verifiable in polynomial time), NP-complete (hardest in NP). P vs NP: open millennium problem — does P = NP?', 1.2)
+
+  add('logic', ['modal logic', 'necessity', 'possibility', 'temporal logic'],
+    'Modal logic: Extends classical logic with modalities. □p = "necessarily p" (true in all possible worlds). ◇p = "possibly p" (true in some possible world). Axioms: K (□(p→q) → (□p→□q)), T (□p→p), 4 (□p→□□p), 5 (◇p→□◇p). Temporal logic: □ becomes "always" (G), ◇ becomes "eventually" (F). LTL (Linear Temporal Logic): F, G, X (next), U (until). CTL: adds path quantifiers A (all paths), E (some path). Applications: program verification, AI reasoning, philosophy, legal reasoning, database query languages.', 1.0)
+
+  // ── Critical Thinking & Problem Solving ──
+  add('logic', ['critical thinking', 'argument', 'premise', 'conclusion', 'valid', 'sound'],
+    'Critical thinking framework: 1) Identify the claim/conclusion. 2) Identify premises/evidence. 3) Check if premises support conclusion (validity). 4) Check if premises are actually true (soundness). 5) Look for hidden assumptions. 6) Consider alternative explanations. 7) Evaluate evidence quality and source reliability. 8) Check for logical fallacies. 9) Consider counterarguments. Argument types: deductive (guaranteed), inductive (probable), abductive (best explanation). Strong arguments: valid/strong logic + true/well-supported premises + relevant evidence + no fallacies.', 1.3)
+
+  add('logic', ['problem solving', 'heuristic', 'strategy', 'systematic', 'decomposition'],
+    'Problem-solving strategies: 1) Understand the problem — what is given? What is unknown? What are constraints? 2) Devise a plan — look for patterns, work backwards, draw diagrams, simplify, divide into sub-problems. 3) Execute the plan — work carefully, check each step. 4) Look back — verify answer, consider alternatives, generalize. Heuristics: means-ends analysis (reduce difference between current and goal state), analogical transfer (solve similar known problem), constraint satisfaction, generate-and-test, hill climbing. Polya\'s "How to Solve It" framework.', 1.3)
+
+  add('logic', ['dimensional analysis', 'unit conversion', 'unit analysis', 'scientific notation'],
+    'Dimensional analysis: Use units to check equations and convert between systems. All terms in an equation must have the same dimensions. Example: F = ma → [kg·m/s²] = [kg]·[m/s²] ✓. Unit conversion: multiply by conversion factors (fractions equal to 1). Example: 60 mph × (1609 m/mile) × (1 hr/3600 s) = 26.8 m/s. SI prefixes: pico (10⁻¹²), nano (10⁻⁹), micro (10⁻⁶), milli (10⁻³), kilo (10³), mega (10⁶), giga (10⁹), tera (10¹²). Scientific notation: 3.0×10⁸ m/s. Significant figures: precision of measurement.', 1.2)
+
+  add('logic', ['scientific method', 'hypothesis', 'experiment', 'theory', 'scientific'],
+    'Scientific method: 1) Observation — notice a phenomenon. 2) Question — what, why, how? 3) Hypothesis — testable prediction. 4) Experiment — controlled test (independent/dependent/control variables). 5) Analysis — collect data, statistical tests. 6) Conclusion — does data support hypothesis? 7) Peer review and replication. Key principles: falsifiability (must be possible to disprove), reproducibility, control groups, double-blind studies, statistical significance (p < 0.05). Theory vs hypothesis: theory is well-tested, broad explanatory framework. Law: describes what happens. Theory: explains why.', 1.3)
+
+  // ── Mathematical Logic for CS ──
+  add('logic', ['lambda calculus', 'church encoding', 'functional programming', 'church'],
+    'Lambda calculus: Formal system for computation using function abstraction and application. Syntax: variable x, abstraction λx.M, application (M N). Church encoding: booleans — TRUE = λx.λy.x, FALSE = λx.λy.y. Numbers: 0 = λf.λx.x, 1 = λf.λx.f(x), 2 = λf.λx.f(f(x)). SUCC = λn.λf.λx.f(n f x). Y combinator: Y = λf.(λx.f(x x))(λx.f(x x)) — enables recursion. Church-Turing thesis: lambda calculus ≡ Turing machine in computational power. Foundation of functional programming (Haskell, Lisp, ML).', 1.1)
+
+  add('logic', ['type theory', 'curry howard', 'types as propositions', 'dependent type'],
+    'Type theory and Curry-Howard correspondence: Types = Propositions, Programs = Proofs. If you can write a program of type A→B, you\'ve proved that A implies B. Product types (A×B) = AND (conjunction). Sum types (A+B) = OR (disjunction). Function types (A→B) = implication. Void type = falsehood. Unit type = truth. Dependent types: types that depend on values — enables expressing precise specifications in the type system. Used in: Coq, Agda, Idris, Lean. Martin-Löf type theory: constructive foundations of mathematics. Homotopy type theory (HoTT): connects type theory with topology.', 1.0)
+
+  add('logic', ['automata', 'finite state', 'regular expression', 'context free', 'pushdown'],
+    'Automata theory (Chomsky hierarchy): Type 3 — Regular languages: finite automata (DFA/NFA), regular expressions. Pumping lemma proves non-regularity. Type 2 — Context-free: pushdown automata (PDA), context-free grammars (programming languages, XML). CYK algorithm parses in O(n³). Type 1 — Context-sensitive: linear-bounded automata. Type 0 — Recursively enumerable: Turing machines. Each level strictly more powerful than the one below. Applications: compilers (lexing = regex, parsing = CFG), protocol verification, text processing, bioinformatics.', 1.1)
 
   // ── Architecture ──
   add('architecture', ['architecture', 'microservice', 'monolith', 'system design'],
@@ -1844,6 +2103,18 @@ export class LocalBrain {
   private imageAnalyzer: ImageAnalyzer | null = null
   private documentAnalyzer: DocumentAnalyzer | null = null
 
+  // Decision quality & memory consolidation
+  private confidenceGate: ConfidenceGate | null = null
+  private memoryConsolidator: MemoryConsolidator | null = null
+  private chatTurnsSinceConsolidation = 0
+
+  // Token budget management
+  private tokenBudget: TokenBudgetManager
+
+  // Auto-learning: track last confidence for feedback-based learning signals
+  private lastConfidenceAssessment = 0.5
+  private lastGateDecision: GateDecision = 'respond'
+
   constructor(config?: Partial<LocalBrainConfig>) {
     this.config = {
       model: config?.model ?? 'local-brain-v2',
@@ -1858,9 +2129,21 @@ export class LocalBrain {
       minConfidence: config?.minConfidence ?? 0.1,
       useTfIdf: config?.useTfIdf ?? true,
       enableIntelligence: config?.enableIntelligence ?? true,
+      maxSessionTokens: config?.maxSessionTokens ?? 80_000,
+      budgetWarningThreshold: config?.budgetWarningThreshold ?? 0.85,
+      enableBudgetTracking: config?.enableBudgetTracking ?? true,
+      memoryConsolidationInterval: config?.memoryConsolidationInterval ?? 10,
+      enableAutoLearning: config?.enableAutoLearning ?? true,
     }
     this.knowledgeBase = buildKnowledgeBase()
     this.tfidfScorer = new TfIdfScorer()
+
+    // Initialize token budget manager
+    this.tokenBudget = new TokenBudgetManager({
+      maxSessionTokens: this.config.maxSessionTokens,
+      warningThreshold: this.config.budgetWarningThreshold,
+      enabled: this.config.enableBudgetTracking,
+    })
 
     // Initialize CodeMaster sub-modules
     this.codeAnalyzer = new CodeAnalyzer()
@@ -1940,6 +2223,10 @@ export class LocalBrain {
       // Phase 11 — Deep analysis modules
       this.imageAnalyzer = new ImageAnalyzer()
       this.documentAnalyzer = new DocumentAnalyzer()
+
+      // Decision quality & memory consolidation
+      this.confidenceGate = new ConfidenceGate()
+      this.memoryConsolidator = new MemoryConsolidator()
     }
 
     const now = new Date().toISOString()
@@ -1961,8 +2248,65 @@ export class LocalBrain {
   // ── Chat (same interface as AiBrain.chat) ──
 
   /** Chat with the local brain. Returns a response with simulated token usage. */
-  async chat(userMessage: string): Promise<{ text: string; usage: TokenUsage; durationMs: number }> {
+  async chat(userMessage: string): Promise<{
+    text: string
+    usage: TokenUsage
+    durationMs: number
+    budgetWarning?: boolean
+    budgetExhausted?: boolean
+    remainingTokens?: number
+    usagePercent?: number
+  }> {
     const start = Date.now()
+
+    // ── Budget: handle continuation commands ─────────────────────────────────
+    const lower = userMessage.trim().toLowerCase()
+    if (lower === 'continue') {
+      // If there are pending chunks from a truncated response, return next chunk
+      if (this.tokenBudget.hasPendingChunks()) {
+        const chunk = this.tokenBudget.getNextChunk()!
+        const inputTokens = Math.ceil(userMessage.length / 4)
+        const outputTokens = Math.ceil(chunk.length / 4)
+        this.tokenBudget.trackUsage({ inputTokens, outputTokens })
+        return {
+          text: chunk,
+          usage: { inputTokens, outputTokens, cacheReadTokens: 0, cacheCreationTokens: 0 },
+          durationMs: Date.now() - start,
+          ...this.getBudgetFields(),
+        }
+      }
+      // Otherwise extend the token budget
+      this.tokenBudget.extendBudget()
+      const msg = '✅ Token budget extended. You can continue chatting.'
+      return {
+        text: msg,
+        usage: { inputTokens: 2, outputTokens: Math.ceil(msg.length / 4), cacheReadTokens: 0, cacheCreationTokens: 0 },
+        durationMs: Date.now() - start,
+        ...this.getBudgetFields(),
+      }
+    }
+    if (lower === 'reset') {
+      this.tokenBudget.reset()
+      const msg = '🔄 Session reset. Token budget cleared. Ready to start fresh!'
+      return {
+        text: msg,
+        usage: { inputTokens: 1, outputTokens: Math.ceil(msg.length / 4), cacheReadTokens: 0, cacheCreationTokens: 0 },
+        durationMs: Date.now() - start,
+        ...this.getBudgetFields(),
+      }
+    }
+
+    // ── Budget: check if exhausted before proceeding ─────────────────────────
+    if (!this.tokenBudget.canContinue()) {
+      const msg = '🛑 Token budget reached. Type \'continue\' to extend the budget or \'reset\' to start a new session.'
+      return {
+        text: msg,
+        usage: { inputTokens: Math.ceil(userMessage.length / 4), outputTokens: Math.ceil(msg.length / 4), cacheReadTokens: 0, cacheCreationTokens: 0 },
+        durationMs: Date.now() - start,
+        ...this.getBudgetFields(),
+      }
+    }
+
     this.conversationHistory.push({ role: 'user', content: userMessage })
 
     // Apply confidence decay to unused patterns
@@ -2036,6 +2380,7 @@ export class LocalBrain {
       // Find concepts matching the user's keywords via spreading activation
       const seedIds: string[] = []
       for (const kw of keywords.slice(0, 5)) {
+        if (!kw || kw.trim() === '') continue
         const concept = this.semanticMemory.findConceptByName(kw)
         if (concept) seedIds.push(concept.id)
       }
@@ -2045,6 +2390,7 @@ export class LocalBrain {
         // Extract relationships from the conversation to grow the graph
         const extracted = this.semanticMemory.extractRelationships(userMessage)
         for (const rel of extracted) {
+          if (!rel.source?.trim() || !rel.target?.trim()) continue
           const src = this.semanticMemory.findConceptByName(rel.source)
             ?? (() => { const id = this.semanticMemory!.addConcept(rel.source, 'general'); return this.semanticMemory!.getConcept(id); })()
           const tgt = this.semanticMemory.findConceptByName(rel.target)
@@ -2056,14 +2402,159 @@ export class LocalBrain {
       }
     }
 
-    // Generate response (uses TF-IDF if enabled)
-    const text = this.config.useTfIdf
+    // ── Smart Module Augmentation ─────────────────────────────────────────────
+    // Wire intelligence modules into the response pipeline based on intent
+    let smartAugmentation = ''
+
+    // ReasoningEngine: for complex multi-step queries AND math/physics/logic problems
+    if (this.reasoningEngine && (this.isComplexQuery(userMessage) || this.isMathPhysicsLogicQuery(userMessage))) {
+      try {
+        const reasonResult = this.reasoningEngine.reason(userMessage)
+        if (reasonResult.confidence > 0.3 && reasonResult.steps.length > 0) {
+          const stepsText = reasonResult.steps.map((s, i) => `${i + 1}. ${s.content ?? s.conclusion ?? s.description ?? ''}`).join('\n')
+          if (stepsText.trim()) {
+            smartAugmentation += `\n\n**Reasoning:**\n${stepsText}`
+          }
+        }
+      } catch { /* non-critical — continue without reasoning */ }
+    }
+
+    // CausalReasoner: for "why" questions
+    if (this.causalReasoner && this.isCausalQuery(userMessage)) {
+      try {
+        const inference = this.causalReasoner.inferCausality(
+          this.extractCause(userMessage),
+          this.extractEffect(userMessage),
+        )
+        if (inference && inference.strength > 0.2) {
+          smartAugmentation += `\n\n**Causal Analysis:** ${inference.explanation ?? `Causal link strength: ${(inference.strength * 100).toFixed(0)}%`}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // PlanningEngine: for "how to" / planning queries
+    if (this.planningEngine && this.isPlanningQuery(userMessage)) {
+      try {
+        const plan = this.planningEngine.createPlan(userMessage)
+        if (plan && plan.steps.length > 0) {
+          const planText = plan.steps.map((s, i) => `${i + 1}. ${s.description ?? s.action ?? ''}`).join('\n')
+          if (planText.trim()) {
+            smartAugmentation += `\n\n**Plan:**\n${planText}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // CreativeEngine: for creative tasks (write, generate, create)
+    if (this.creativeEngine && this.isCreativeQuery(userMessage)) {
+      try {
+        const brainstorm = this.creativeEngine.brainstorm(userMessage)
+        if (brainstorm && brainstorm.ideas.length > 0) {
+          const bestIdea = brainstorm.bestIdea ?? brainstorm.ideas[0]
+          if (bestIdea) {
+            smartAugmentation += `\n\n**Creative Insight:** ${bestIdea.description ?? bestIdea.title ?? ''}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // AbstractionEngine: for concept explanation queries
+    if (this.abstractionEngine && this.isConceptQuery(userMessage)) {
+      try {
+        const concept = keywords.slice(0, 3).join(' ')
+        const generalized = this.abstractionEngine.generalize([concept])
+        if (generalized) {
+          const desc = typeof generalized === 'object' && 'description' in generalized
+            ? (generalized as { description?: string }).description
+            : null
+          if (desc) {
+            smartAugmentation += `\n\n**Concept:** ${desc}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // AnalogicalReasoner: for comparison/analogy queries
+    if (this.analogicalReasoner && this.isAnalogyQuery(userMessage)) {
+      try {
+        const analogy = this.analogicalReasoner.findAnalogy(keywords[0] ?? userMessage)
+        if (analogy && analogy.explanation) {
+          smartAugmentation += `\n\n**Analogy:** ${analogy.explanation}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // KnowledgeSynthesizer: combine multiple knowledge sources
+    if (this.knowledgeSynthesizer && knowledgeResults.length >= 2) {
+      try {
+        for (const kr of knowledgeResults.slice(0, 3)) {
+          this.knowledgeSynthesizer.addSource({
+            id: kr.entry.id,
+            name: kr.entry.category,
+            facts: [kr.entry.content],
+            reliability: Math.min(1, kr.score / 5),
+          })
+        }
+        const fused = this.knowledgeSynthesizer.fuseKnowledge()
+        if (fused.novelInsights.length > 0) {
+          const insight = fused.novelInsights[0]
+          const insightText = typeof insight === 'string' ? insight : (insight?.description ?? '')
+          if (insightText) {
+            smartAugmentation += `\n\n**Synthesized Insight:** ${insightText}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ── Generate base response (uses TF-IDF if enabled) ──────────────────────
+    let text = this.config.useTfIdf
       ? this.buildResponseWithTfIdf(intent, userMessage, knowledgeResults)
       : buildResponse(
           intent, userMessage, knowledgeResults,
           this.learnedPatterns, this.conversationHistory,
           this.config.creativity,
         )
+
+    // Append smart augmentation to base response
+    if (smartAugmentation) {
+      text += smartAugmentation
+    }
+
+    // ── ConfidenceGate: quality control ──────────────────────────────────────
+    let gateConfidence = 0.5
+    if (this.confidenceGate) {
+      const signals: ConfidenceSignal[] = [
+        {
+          source: 'knowledge-match',
+          score: knowledgeResults.length > 0 ? Math.min(1, knowledgeResults[0]!.score / 5) : 0.1,
+          weight: 0.4,
+          reason: knowledgeResults.length > 0 ? `Top KB match score: ${knowledgeResults[0]!.score}` : 'No KB matches',
+        },
+        {
+          source: 'pattern-match',
+          score: this.learnedPatterns.length > 0 ? 0.6 : 0.2,
+          weight: 0.3,
+          reason: `${this.learnedPatterns.length} learned patterns available`,
+        },
+        {
+          source: 'intent-clarity',
+          score: intent !== 'general' ? 0.8 : 0.3,
+          weight: 0.3,
+          reason: `Intent: ${intent}`,
+        },
+      ]
+
+      const gateResult = this.confidenceGate.evaluate(signals)
+      gateConfidence = gateResult.aggregateConfidence
+      this.lastGateDecision = gateResult.decision
+
+      if (gateResult.decision === 'abstain' && gateResult.abstainMessage) {
+        text = gateResult.abstainMessage
+      } else if (gateResult.decision === 'hedge' && gateResult.hedgePrefix) {
+        text = gateResult.hedgePrefix + text
+      }
+    }
+    this.lastConfidenceAssessment = gateConfidence
 
     // Update knowledge use counts
     for (const result of knowledgeResults) {
@@ -2093,20 +2584,55 @@ export class LocalBrain {
       this.topicModeler.addDocument(docId, `${userMessage} ${text}`)
     }
 
+    // ── Auto-Learning: reinforce patterns from successful KB matches ─────────
+    if (this.config.enableAutoLearning && this.config.learningEnabled) {
+      this.autoLearnFromConversation(userMessage, text, knowledgeResults, gateConfidence)
+    }
+
+    // ── Memory Consolidation: periodic transfer to long-term memory ──────────
+    this.chatTurnsSinceConsolidation++
+    if (this.memoryConsolidator && this.chatTurnsSinceConsolidation >= this.config.memoryConsolidationInterval) {
+      const recentTurns: SessionTurn[] = this.conversationHistory
+        .slice(-this.config.memoryConsolidationInterval * 2)
+        .map(m => ({
+          role: m.role as 'user' | 'assistant',
+          content: typeof m.content === 'string' ? m.content : '',
+          timestamp: Date.now(),
+        }))
+      this.memoryConsolidator.consolidate(recentTurns)
+      this.chatTurnsSinceConsolidation = 0
+    }
+
     this.conversationHistory.push({ role: 'assistant', content: text })
     this.stats.totalChats++
     this.stats.lastUsedAt = new Date().toISOString()
+
+    // ── Enforce maxResponseLength with chunking ──────────────────────────────
+    let finalText = text
+    if (text.length > this.config.maxResponseLength) {
+      finalText = this.tokenBudget.chunkResponse(text, this.config.maxResponseLength)
+    }
 
     const durationMs = Date.now() - start
 
     // Simulate token usage (approximate: ~4 chars per token)
     const inputTokens = Math.ceil(userMessage.length / 4)
-    const outputTokens = Math.ceil(text.length / 4)
+    const outputTokens = Math.ceil(finalText.length / 4)
+
+    // Track in budget manager
+    this.tokenBudget.trackUsage({ inputTokens, outputTokens })
+
+    // Append budget message if nearing limit
+    const budgetMsg = this.tokenBudget.getBudgetMessage()
+    if (budgetMsg) {
+      finalText += budgetMsg
+    }
 
     return {
-      text,
+      text: finalText,
       usage: { inputTokens, outputTokens, cacheReadTokens: 0, cacheCreationTokens: 0 },
       durationMs,
+      ...this.getBudgetFields(),
     }
   }
 
@@ -2211,6 +2737,159 @@ export class LocalBrain {
       // Prune below minimum confidence
       return pattern.confidence >= this.config.minConfidence
     })
+  }
+
+  // ── Smart Query Classifiers ──────────────────────────────────────────────────
+
+  /** Check if a query requires multi-step reasoning. */
+  private isComplexQuery(msg: string): boolean {
+    const lower = msg.toLowerCase()
+    return /\b(why|how|compare|difference|between|versus|vs|explain.+and|what.+if|analyze|evaluate|trade-?off|prove|derive|calculate|solve|compute|what happens when|relationship between)\b/.test(lower)
+      && msg.split(/\s+/).length > 5
+  }
+
+  /** Check if query asks about causation. */
+  private isCausalQuery(msg: string): boolean {
+    return /\b(why\s+(does|do|is|are|did|would|can|should)|what\s+causes?|because\s+of|reason\s+for|leads?\s+to|results?\s+in|what\s+happens\s+(when|if)|what\s+is\s+the\s+effect)\b/i.test(msg)
+  }
+
+  /** Check if query asks for a plan or steps. */
+  private isPlanningQuery(msg: string): boolean {
+    return /\b(how\s+(do|can|should|to|would)\s+i|steps?\s+(to|for)|plan\s+(to|for)|guide\s+(to|for|on)|walkthrough|tutorial|how\s+to\s+(solve|prove|calculate|derive|integrate|differentiate))\b/i.test(msg)
+  }
+
+  /** Check if query asks for creative generation. */
+  private isCreativeQuery(msg: string): boolean {
+    return /\b(write\s+a|generate|create|compose|draft|brainstorm|imagine|design\s+a|come\s+up\s+with)\b/i.test(msg)
+  }
+
+  /** Check if query asks about a concept. */
+  private isConceptQuery(msg: string): boolean {
+    return /\b(what\s+is|explain|define|describe|meaning\s+of|concept\s+of|what\s+are|what\s+does.+mean|difference\s+between|how\s+does.+work)\b/i.test(msg)
+  }
+
+  /** Check if query asks for analogy/comparison. */
+  private isAnalogyQuery(msg: string): boolean {
+    return /\b(like|similar\s+to|analogy|compared?\s+to|resembles?|equivalent|is.+the\s+same\s+as)\b/i.test(msg)
+  }
+
+  /** Check if query is a math/physics/logic problem to solve. */
+  private isMathPhysicsLogicQuery(msg: string): boolean {
+    // Math terms
+    const mathPattern = /\b(solve|calculate|compute|derive|integrate|differentiate|simplify|factor|evaluate|prove|what\s+is\s+\d|find\s+(the|x|y)|equation|formula|theorem)\b/i
+    // Physics terms
+    const physicsPattern = /\b(law\s+of|newton|euler|gauss|force|energy|momentum|velocity|acceleration|voltage|current|resistance|probability)\b/i
+    // Linear algebra terms
+    const linalgPattern = /\b(matrix|vector|determinant|eigenvalue)\b/i
+    // Calculus terms
+    const calculusPattern = /\b(limit|derivative|integral|series|converge|diverge)\b/i
+    // Logic terms
+    const logicPattern = /\b(truth\s+table|valid|tautology|contradiction|syllogism|fallacy)\b/i
+
+    return mathPattern.test(msg) || physicsPattern.test(msg) || linalgPattern.test(msg) || calculusPattern.test(msg) || logicPattern.test(msg)
+  }
+
+  /** Extract probable cause from a causal query. */
+  private extractCause(msg: string): string {
+    const match = msg.match(/why\s+(?:does?|is|are|did|would|can)\s+(.+?)(?:\?|$)/i)
+    return match?.[1]?.trim() ?? msg.split(/\s+/).slice(0, 5).join(' ')
+  }
+
+  /** Extract probable effect from a causal query. */
+  private extractEffect(msg: string): string {
+    const match = msg.match(/(?:causes?|leads?\s+to|results?\s+in)\s+(.+?)(?:\?|$)/i)
+    return match?.[1]?.trim() ?? msg.split(/\s+/).slice(-5).join(' ')
+  }
+
+  // ── Auto-Learning Helpers ──────────────────────────────────────────────────
+
+  /**
+   * Auto-learn from conversation turns:
+   * - Reinforce patterns from high-scoring KB matches
+   * - Track rephrase signals (implicit negative feedback)
+   * - Trigger generalization after enough similar patterns
+   */
+  private autoLearnFromConversation(
+    userMessage: string,
+    response: string,
+    knowledgeResults: KnowledgeSearchResult[],
+    confidence: number,
+  ): void {
+    // Auto-reinforce from strong KB matches (only for non-trivial messages)
+    if (knowledgeResults.length > 0 && knowledgeResults[0]!.score >= 3 && userMessage.trim().split(/\s+/).length >= 3) {
+      this.learn(userMessage, response, 'reinforced')
+    }
+
+    // Detect rephrase: if user asks something very similar to a recent question,
+    // treat it as implicit "didn't understand" signal and slightly reduce confidence
+    if (this.conversationHistory.length >= 4) {
+      const prevUserMsgs = this.conversationHistory
+        .filter(m => m.role === 'user')
+        .slice(-3)
+        .map(m => typeof m.content === 'string' ? m.content : '')
+      const currentKw = new Set(extractKeywords(userMessage))
+      for (const prev of prevUserMsgs) {
+        if (prev === userMessage) continue
+        const prevKw = extractKeywords(prev)
+        const overlap = prevKw.filter(k => currentKw.has(k)).length
+        if (prevKw.length > 0 && overlap / prevKw.length > 0.7) {
+          // High keyword overlap → rephrase detected → reduce pattern confidence
+          const match = this.learnedPatterns.find(p => p.inputPattern.toLowerCase() === prev.toLowerCase())
+          if (match && match.confidence > 0.2) {
+            match.confidence = Math.max(0.1, match.confidence - 0.1)
+          }
+          break
+        }
+      }
+    }
+
+    // Auto-generalization: when enough similar patterns exist in a category
+    if (this.adaptiveLearner && this.learnedPatterns.length > 0) {
+      const categoryCounts = new Map<string, number>()
+      for (const p of this.learnedPatterns) {
+        categoryCounts.set(p.category, (categoryCounts.get(p.category) ?? 0) + 1)
+      }
+      for (const [category, count] of categoryCounts) {
+        if (count >= 5 && count % 5 === 0) {
+          // Trigger generalization for this category
+          try {
+            const examples = this.learnedPatterns
+              .filter(p => p.category === category)
+              .slice(0, 10)
+              .map(p => ({
+                input: p.inputPattern,
+                output: p.response,
+                label: p.category,
+              }))
+            this.adaptiveLearner.generalize(examples)
+          } catch { /* non-critical */ }
+        }
+      }
+    }
+  }
+
+  /** Get budget-related fields for the response. */
+  private getBudgetFields(): {
+    budgetWarning?: boolean
+    budgetExhausted?: boolean
+    remainingTokens?: number
+    usagePercent?: number
+  } {
+    if (!this.tokenBudget.enabled) return {}
+    const report = this.tokenBudget.getReport()
+    return {
+      budgetWarning: report.budgetWarning || undefined,
+      budgetExhausted: report.budgetExhausted || undefined,
+      remainingTokens: report.remainingTokens,
+      usagePercent: report.usagePercent,
+    }
+  }
+
+  // ── Token Budget API ──────────────────────────────────────────────────────
+
+  /** Get the current token budget report. */
+  getTokenBudget(): BudgetReport {
+    return this.tokenBudget.getReport()
   }
 
   // ── Code Writing (same interface as AiBrain.writeCode) ──
@@ -3325,9 +4004,48 @@ export class LocalBrain {
     if (correct) {
       // Reinforce this pattern
       this.learn(userInput, assistantResponse, 'reinforced')
+
+      // Confidence-based learning: if confidence was low but user says correct,
+      // slightly boost confidence of related patterns
+      if (this.lastConfidenceAssessment < 0.3) {
+        const match = this.learnedPatterns.find(
+          p => p.inputPattern.toLowerCase() === userInput.toLowerCase()
+        )
+        if (match) {
+          match.confidence = Math.min(1, match.confidence + 0.05)
+        }
+      }
+
+      // Record positive outcome in ConfidenceGate for calibration
+      if (this.confidenceGate) {
+        this.confidenceGate.recordOutcome(this.lastConfidenceAssessment, true, this.lastGateDecision)
+      }
     } else if (correction) {
       // Learn the correction with higher priority
       this.learn(userInput, correction, 'user-corrected')
+
+      // Wire AdaptiveLearner.learnFromMistake() — categorize the error
+      if (this.adaptiveLearner) {
+        try {
+          this.adaptiveLearner.learnFromMistake(assistantResponse, correction, userInput)
+        } catch { /* non-critical */ }
+      }
+
+      // Confidence-based learning: if confidence was high but user corrects,
+      // aggressively reduce confidence
+      if (this.lastConfidenceAssessment > 0.8) {
+        const match = this.learnedPatterns.find(
+          p => p.inputPattern.toLowerCase() === userInput.toLowerCase()
+        )
+        if (match) {
+          match.confidence = Math.max(0.1, match.confidence - 0.2)
+        }
+      }
+
+      // Record negative outcome in ConfidenceGate for calibration
+      if (this.confidenceGate) {
+        this.confidenceGate.recordOutcome(this.lastConfidenceAssessment, false, this.lastGateDecision)
+      }
     }
   }
 
