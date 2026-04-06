@@ -147,6 +147,10 @@ import { KurdishTranslationCorpus } from './KurdishTranslationCorpus.js'
 // New intelligence modules
 import { HypothesisEngine } from './HypothesisEngine.js'
 import { EthicalReasoner } from './EthicalReasoner.js'
+import { CoreferenceResolver } from './CoreferenceResolver.js'
+import { LanguageDetector } from './LanguageDetector.js'
+import { DialogueActRecognizer } from './DialogueActRecognizer.js'
+import { QueryDecomposer } from './QueryDecomposer.js'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -3600,6 +3604,10 @@ export class LocalBrain {
   // New intelligence modules
   private hypothesisEngine: HypothesisEngine | null = null
   private ethicalReasoner: EthicalReasoner | null = null
+  private coreferenceResolver: CoreferenceResolver | null = null
+  private languageDetector: LanguageDetector | null = null
+  private dialogueActRecognizer: DialogueActRecognizer | null = null
+  private queryDecomposer: QueryDecomposer | null = null
 
   // Token budget management
   private tokenBudget: TokenBudgetManager
@@ -3732,6 +3740,10 @@ export class LocalBrain {
       // New intelligence modules
       this.hypothesisEngine = new HypothesisEngine()
       this.ethicalReasoner = new EthicalReasoner()
+      this.coreferenceResolver = new CoreferenceResolver()
+      this.languageDetector = new LanguageDetector()
+      this.dialogueActRecognizer = new DialogueActRecognizer()
+      this.queryDecomposer = new QueryDecomposer()
     }
 
     const now = new Date().toISOString()
@@ -4078,6 +4090,51 @@ export class LocalBrain {
         const beat = this.narrativeEngine.generateStoryBeat(userMessage)
         if (beat && beat.text) {
           smartAugmentation += `\n\n**Narrative:** ${beat.text}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // CoreferenceResolver: resolve pronouns from conversation history
+    if (this.coreferenceResolver && this.conversationHistory.length > 1) {
+      try {
+        const history = this.conversationHistory.slice(-10).map(h => ({ role: h.role, content: h.content }))
+        const corefResult = this.coreferenceResolver.resolve(userMessage, history)
+        if (corefResult.replacements.length > 0 && corefResult.confidence > 0.5) {
+          const topReplacement = corefResult.replacements[0]
+          if (topReplacement) {
+            smartAugmentation += `\n\n**Context Resolution:** "${topReplacement.pronoun}" refers to "${topReplacement.referent}"`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // LanguageDetector: detect input language
+    if (this.languageDetector) {
+      try {
+        const langResult = this.languageDetector.detect(userMessage)
+        if (langResult.language !== 'en' && langResult.confidence > 0.6) {
+          smartAugmentation += `\n\n**Language Detected:** ${langResult.language} (confidence: ${(langResult.confidence * 100).toFixed(0)}%)`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // DialogueActRecognizer: classify user utterance type
+    if (this.dialogueActRecognizer) {
+      try {
+        const actResult = this.dialogueActRecognizer.recognize(userMessage)
+        if (actResult.confidence > 0.7 && actResult.act !== 'question') {
+          smartAugmentation += `\n\n**Dialogue Act:** ${actResult.act}${actResult.subType ? ` (${actResult.subType})` : ''}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // QueryDecomposer: decompose complex questions
+    if (this.queryDecomposer) {
+      try {
+        const decomposition = this.queryDecomposer.decompose(userMessage)
+        if (decomposition.isComplex && decomposition.subQuestions.length > 1) {
+          const subQList = decomposition.subQuestions.map(sq => `• ${sq.question}`).join('\n')
+          smartAugmentation += `\n\n**Query Decomposition** (${decomposition.strategy}):\n${subQList}`
         }
       } catch { /* non-critical */ }
     }
