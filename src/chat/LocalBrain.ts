@@ -168,6 +168,8 @@ import { EmotionalIntelligence } from './EmotionalIntelligence.js'
 import { ContextualMemoryEngine } from './ContextualMemoryEngine.js'
 import { LogicalProofEngine } from './LogicalProofEngine.js'
 import { CreativeProblemSolver } from './CreativeProblemSolver.js'
+import { AdvancedSearchEngine } from './AdvancedSearchEngine.js'
+import type { SearchWithThinkingResult } from './AdvancedSearchEngine.js'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -3642,6 +3644,7 @@ export class LocalBrain {
   private contextualMemoryEngine: ContextualMemoryEngine | null = null
   private logicalProofEngine: LogicalProofEngine | null = null
   private creativeProblemSolver: CreativeProblemSolver | null = null
+  private advancedSearchEngine: AdvancedSearchEngine | null = null
 
   // Token budget management
   private tokenBudget: TokenBudgetManager
@@ -3795,6 +3798,20 @@ export class LocalBrain {
       this.contextualMemoryEngine = new ContextualMemoryEngine()
       this.logicalProofEngine = new LogicalProofEngine()
       this.creativeProblemSolver = new CreativeProblemSolver()
+
+      // Advanced Search Engine: multi-strategy search with thinking
+      this.advancedSearchEngine = new AdvancedSearchEngine()
+      // Index the knowledge base for advanced search
+      this.advancedSearchEngine.indexDocuments(
+        this.knowledgeBase.map(entry => ({
+          id: entry.id,
+          title: entry.category,
+          content: entry.content,
+          keywords: entry.keywords,
+          domain: entry.category,
+          weight: entry.weight,
+        }))
+      )
     }
 
     const now = new Date().toISOString()
@@ -4369,6 +4386,36 @@ export class LocalBrain {
           const ideas = this.creativeProblemSolver.brainstorm(userMessage, 3)
           if (ideas.length > 0) {
             smartAugmentation += `\n\n**💡 Creative Angles:**\n${ideas.map((idea, i) => `${i + 1}. ${idea}`).join('\n')}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // AdvancedSearchEngine: multi-strategy search with thinking for search/find queries
+    if (this.advancedSearchEngine) {
+      try {
+        const lowerMsg = userMessage.toLowerCase()
+        if (lowerMsg.includes('search') || lowerMsg.includes('find') ||
+            lowerMsg.includes('look up') || lowerMsg.includes('lookup') ||
+            intent === 'search') {
+          // Feed conversation context to the search engine
+          this.advancedSearchEngine.addConversationContext(userMessage)
+          // Feed semantic graph nodes if available
+          if (this.semanticMemory) {
+            const concepts = this.semanticMemory.getConceptsByDomain('programming')
+            for (const concept of concepts.slice(0, 50)) {
+              this.advancedSearchEngine.addGraphNode(concept.id, concept.name, concept.domain)
+            }
+          }
+          const searchResult = this.advancedSearchEngine.searchWithThinking(userMessage)
+          if (searchResult.results.length > 0) {
+            const thinkingReport = searchResult.thinkingSteps
+              .map(s => `${s.step}. [${s.strategy}] ${s.thought} — ${s.detail}`)
+              .join('\n')
+            const topResults = searchResult.results.slice(0, 3)
+              .map((r, i) => `${i + 1}. **${r.title}** (${(r.score * 100).toFixed(0)}% relevance): ${r.content.slice(0, 150)}${r.content.length > 150 ? '...' : ''}`)
+              .join('\n')
+            smartAugmentation += `\n\n**🔍 Advanced Search (${searchResult.strategiesUsed.length} strategies, ${(searchResult.confidence * 100).toFixed(0)}% confidence):**\n\n*Thinking process:*\n${thinkingReport}\n\n*Top results:*\n${topResults}`
           }
         }
       } catch { /* non-critical */ }
@@ -6643,6 +6690,20 @@ export class LocalBrain {
 
   /** Get the PdfExpert instance (null if intelligence modules are disabled). */
   getPdfExpert(): PdfExpert | null { return this.pdfExpert }
+
+  /** Get the AdvancedSearchEngine instance (null if intelligence modules are disabled). */
+  getAdvancedSearchEngine(): AdvancedSearchEngine | null { return this.advancedSearchEngine }
+
+  /**
+   * Perform an advanced multi-strategy search with transparent thinking steps.
+   * Combines keyword, fuzzy, synonym, semantic, graph, decomposition, contextual,
+   * and cross-domain search strategies. Returns a fully explained result set with
+   * chain-of-thought reasoning.
+   */
+  async searchWithThinking(query: string): Promise<SearchWithThinkingResult | null> {
+    if (!this.advancedSearchEngine) return null
+    return this.advancedSearchEngine.searchWithThinking(query)
+  }
 
   /** Check if intelligence modules are enabled. */
   isIntelligenceEnabled(): boolean { return this.config.enableIntelligence }
