@@ -4421,6 +4421,9 @@ export class LocalBrain {
           }
           const searchResult = this.advancedSearchEngine.searchWithThinking(userMessage)
           if (searchResult.results.length > 0) {
+            // Learn from search results so the brain gets smarter over time
+            this.learnFromSearchResults(userMessage, searchResult)
+
             const thinkingReport = searchResult.thinkingSteps
               .map(s => `${s.step}. [${s.strategy}] ${s.thought} — ${s.detail}`)
               .join('\n')
@@ -5753,6 +5756,22 @@ export class LocalBrain {
       output: `Found ${knowledgeResults.length} relevant knowledge entries`,
     })
 
+    // Step 2b: Advanced search with thinking — learn from results
+    if (this.advancedSearchEngine) {
+      try {
+        const searchResult = this.advancedSearchEngine.searchWithThinking(question)
+        if (searchResult.results.length > 0) {
+          // Learn from search results to grow the brain's knowledge
+          this.learnFromSearchResults(question, searchResult)
+          steps.push({
+            type: 'plan',
+            description: 'Advanced search with thinking — learning from results',
+            output: `Searched with ${searchResult.strategiesUsed.length} strategies (${(searchResult.confidence * 100).toFixed(0)}% confidence). Found ${searchResult.results.length} results. Learned top ${Math.min(searchResult.results.length, 5)} into knowledge base.`,
+          })
+        }
+      } catch { /* non-critical */ }
+    }
+
     // Step 3: Generate initial answer
     let answer = buildResponse(intent, question, knowledgeResults, this.learnedPatterns, this.conversationHistory, this.config.creativity)
     steps.push({
@@ -6383,6 +6402,113 @@ export class LocalBrain {
   }
 
   /**
+   * Learn from search results — extract top results and store them as patterns
+   * and knowledge entries so the brain gets smarter over time from searching.
+   *
+   * For each high-confidence result:
+   *  1. Learn a pattern mapping the query → result content (for future recall)
+   *  2. Add the result as a knowledge entry (for knowledge base search)
+   *  3. Re-index the new knowledge into the search engine's document index
+   *  4. Grow the semantic memory graph with discovered concepts and relations
+   */
+  private learnFromSearchResults(
+    query: string,
+    searchResult: SearchWithThinkingResult,
+  ): void {
+    if (!this.config.learningEnabled) return
+    if (searchResult.results.length === 0) return
+
+    const learnedIds: string[] = []
+
+    // Learn from top results that meet the confidence threshold
+    const topResults = searchResult.results.slice(0, 5)
+    for (const result of topResults) {
+      // Only learn from results with meaningful relevance
+      if (result.score < 0.15) continue
+
+      // 1. Learn as a conversational pattern (query → answer)
+      const patternInput = query.trim()
+      const patternResponse = result.content.slice(0, 500)
+      const category = result.matchedBy.length > 2 ? 'reinforced' : 'learned'
+      this.learn(patternInput, patternResponse, category)
+
+      // 2. Add as knowledge entry if it's novel (not already in KB)
+      const resultKeywords = result.matchedTerms.slice(0, 10)
+      const alreadyInKB = this.knowledgeBase.some(entry =>
+        entry.id === result.id ||
+        (entry.content === result.content && entry.category === (result.domain ?? 'search-learned'))
+      )
+      if (!alreadyInKB && result.content.length > 20) {
+        const entryId = `search-learned-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+        this.knowledgeBase.push({
+          id: entryId,
+          category: result.domain ?? 'search-learned',
+          keywords: resultKeywords,
+          content: result.content,
+          useCount: 1,
+          weight: Math.max(0.5, result.score),
+          source: 'learned',
+        })
+        learnedIds.push(entryId)
+        this.stats.knowledgeEntriesAdded++
+      }
+
+      // 3. Grow semantic memory graph with discovered concepts
+      if (this.semanticMemory && resultKeywords.length >= 2) {
+        try {
+          for (const term of resultKeywords.slice(0, 5)) {
+            if (!term || term.trim().length < 2) continue
+            const existing = this.semanticMemory.findConceptByName(term)
+            if (!existing) {
+              this.semanticMemory.addConcept(term, result.domain ?? 'search-learned')
+            }
+          }
+          // Link the first keyword to subsequent ones as 'related-to'
+          const firstConcept = this.semanticMemory.findConceptByName(resultKeywords[0]!)
+          if (firstConcept) {
+            for (const term of resultKeywords.slice(1, 4)) {
+              const linked = this.semanticMemory.findConceptByName(term)
+              if (linked && linked.id !== firstConcept.id) {
+                this.semanticMemory.addRelation(
+                  firstConcept.id, linked.id, 'related-to',
+                  Math.min(1, result.score + 0.2),
+                )
+              }
+            }
+          }
+        } catch { /* non-critical — don't break learning on graph errors */ }
+      }
+    }
+
+    // 4. Re-index newly learned knowledge into the search engine so future
+    //    searches can find what was previously learned
+    if (this.advancedSearchEngine && learnedIds.length > 0) {
+      const newDocs = learnedIds
+        .map(id => this.knowledgeBase.find(e => e.id === id))
+        .filter((e): e is KnowledgeEntry => e != null)
+        .map(entry => ({
+          id: entry.id,
+          title: entry.category,
+          content: entry.content,
+          keywords: entry.keywords,
+          domain: entry.category,
+          weight: entry.weight,
+        }))
+      if (newDocs.length > 0) {
+        this.advancedSearchEngine.indexDocuments(newDocs)
+      }
+    }
+
+    // Track learning stats
+    this.stats.totalLearnings += learnedIds.length
+    this.learningsSinceLastSave += learnedIds.length
+    if (this.config.autoSavePath &&
+        this.learningsSinceLastSave >= this.config.autoSaveInterval) {
+      this.autoSave()
+    }
+  }
+
+  /**
    * Add new knowledge to the brain's knowledge base.
    * The brain will use this knowledge in future conversations.
    */
@@ -6711,10 +6837,16 @@ export class LocalBrain {
    * Combines keyword, fuzzy, synonym, semantic, graph, decomposition, contextual,
    * and cross-domain search strategies. Returns a fully explained result set with
    * chain-of-thought reasoning.
+   *
+   * The brain also learns from search results — top results are stored as patterns
+   * and knowledge entries so future queries benefit from previous searches.
    */
   async searchWithThinking(query: string): Promise<SearchWithThinkingResult | null> {
     if (!this.advancedSearchEngine) return null
-    return this.advancedSearchEngine.searchWithThinking(query)
+    const result = this.advancedSearchEngine.searchWithThinking(query)
+    // Learn from search results so the brain gets smarter over time
+    this.learnFromSearchResults(query, result)
+    return result
   }
 
   /** Check if intelligence modules are enabled. */
