@@ -2187,6 +2187,120 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('quantum_computing', ['post-quantum cryptography lattice based', 'quantum resistant encryption algorithm', 'pqc nist standardization kyber dilithium'],
     'Post-quantum cryptography (PQC): Cryptographic algorithms resistant to quantum computers. NIST PQC standards (2024): ML-KEM/Kyber (key encapsulation, lattice-based), ML-DSA/Dilithium (digital signature, lattice-based), SLH-DSA/SPHINCS+ (signature, hash-based, conservative). Lattice-based: Learning With Errors (LWE), Ring-LWE — hard problems even for quantum computers. Hash-based signatures: XMSS, LMS (stateful). Code-based: Classic McEliece (key encapsulation, large keys). Migration: crypto agility, hybrid classical+PQC modes (X25519+Kyber), inventory cryptographic assets. Timeline: start migration now, "harvest now, decrypt later" threat from adversaries collecting encrypted traffic.', 0.85)
 
+  // ── Embedded Systems & IoT ──────────────────────────────────────────────────
+  add('embedded_iot', ['embedded systems microcontroller firmware', 'arduino esp32 stm32 programming', 'rtos real-time operating system embedded'],
+    'Embedded systems programming: Microcontrollers (MCU) — Arduino (ATmega328P, AVR), ESP32 (dual-core Xtensa, WiFi/BLE), STM32 (ARM Cortex-M, industrial), Raspberry Pi Pico (RP2040, dual M0+). Programming: bare-metal C/C++, register-level access, memory-mapped I/O, interrupt service routines (ISR). RTOS: FreeRTOS (tasks, queues, semaphores, mutexes), Zephyr (device tree, Kconfig), RIOT OS. Development: cross-compilation toolchains (arm-none-eabi-gcc), JTAG/SWD debugging, logic analyzers. Boot process: bootloader → firmware → main loop.', 0.9)
+
+  add('embedded_iot', ['iot internet of things mqtt coap protocol', 'smart home sensor actuator gateway', 'iot edge computing fog architecture'],
+    'IoT (Internet of Things): Communication protocols — MQTT (pub/sub, QoS levels 0/1/2, broker: Mosquitto, HiveMQ), CoAP (constrained REST, UDP-based), BLE (Bluetooth Low Energy, GATT profiles), Zigbee (mesh, 802.15.4), LoRaWAN (long-range, low-power, chirp spread spectrum). Architecture: sensor → gateway → cloud. Edge computing: process data locally, reduce latency, TinyML (TensorFlow Lite Micro). Platforms: AWS IoT Core, Azure IoT Hub, Google Cloud IoT. Security: device identity (X.509 certs), secure boot, OTA updates, firmware signing.', 0.85)
+
+  add('embedded_iot', ['gpio spi i2c uart peripheral interface', 'serial communication bus protocol embedded', 'adc dac pwm analog digital conversion'],
+    'Embedded peripheral interfaces: GPIO (General Purpose I/O, digital read/write, pull-up/pull-down resistors). Communication buses — SPI (Serial Peripheral Interface: MOSI, MISO, SCLK, CS, full-duplex, fast), I2C (Inter-Integrated Circuit: SDA, SCL, multi-device addressing, 7-bit/10-bit), UART (Universal Asynchronous: TX, RX, baud rate, RS-232/TTL). Analog: ADC (Analog-to-Digital Converter, resolution bits, sampling rate), DAC (Digital-to-Analog), PWM (Pulse Width Modulation, duty cycle, motor control, LED dimming). DMA (Direct Memory Access) for efficient data transfer.', 0.85)
+
+  add('embedded_iot', ['embedded linux yocto buildroot kernel', 'device driver kernel module development', 'arm cortex embedded processor architecture'],
+    'Embedded Linux: Build systems — Yocto Project (BitBake recipes, layers, meta-layers, custom distros), Buildroot (menuconfig, minimal rootfs), OpenWrt (router/networking). Kernel: device tree (DTS/DTB, hardware description), kernel modules (insmod/modprobe), character/block/network device drivers, /dev/ device nodes, ioctl interface. Cross-compilation: toolchains, sysroot, QEMU emulation. ARM architecture: Cortex-M (microcontroller, bare-metal), Cortex-A (application, Linux-capable), Cortex-R (real-time). Boot: U-Boot → kernel → init → rootfs.', 0.85)
+
+  add('embedded_iot', ['power management battery optimization embedded', 'low power sleep mode energy harvesting', 'pcb design schematic layout embedded hardware'],
+    'Embedded power & hardware: Power management — sleep modes (deep sleep, light sleep, hibernation), wake sources (timer, GPIO, RTC), power gating, voltage regulators (LDO, buck/boost). Battery: LiPo charging (TP4056), fuel gauge (MAX17048), energy harvesting (solar, piezoelectric, thermoelectric). PCB design: schematic capture (KiCad, Altium), PCB layout (traces, vias, ground planes, impedance matching), SMD vs through-hole. Signal integrity: decoupling capacitors, proper grounding, EMI/EMC compliance. Manufacturing: Gerber files, BOM, pick-and-place, reflow soldering.', 0.8)
+
+  add('embedded_iot', ['tinyml machine learning microcontroller inference', 'edge ai neural network embedded deployment', 'tensorflow lite micro embedded ml model'],
+    'TinyML & Edge AI: Running ML models on microcontrollers. TensorFlow Lite Micro (TFLM): model conversion (TF → TFLite → quantized INT8), interpreter on MCU, arena memory allocation. Edge Impulse: data collection, training, deployment to MCU. Applications: keyword spotting, gesture recognition, anomaly detection, predictive maintenance. Hardware: ARM Cortex-M with CMSIS-NN, ESP32-S3 (vector extensions), dedicated NPUs (Coral Edge TPU, Intel Movidius). Constraints: <256KB RAM, <1MB flash, milliwatt power budget. Optimization: quantization (INT8, binary), pruning, knowledge distillation.', 0.8)
+
+  // ── Natural Language Processing ────────────────────────────────────────────
+  add('nlp_processing', ['nlp tokenization word embedding representation', 'word2vec glove fasttext word embeddings', 'bert transformer language model pretraining'],
+    'NLP fundamentals: Tokenization — word-level, subword (BPE: Byte Pair Encoding, WordPiece, SentencePiece, Unigram), character-level. Word embeddings: Word2Vec (CBOW, Skip-gram, negative sampling), GloVe (global co-occurrence matrix), FastText (subword n-grams, OOV handling). Contextual embeddings: ELMo (bidirectional LSTM), BERT (bidirectional transformer, MLM + NSP pretraining, [CLS] token, fine-tuning), GPT (autoregressive, causal LM). Sentence embeddings: Sentence-BERT, Universal Sentence Encoder. Embedding dimensions: 768 (BERT-base), 1024 (BERT-large).', 0.9)
+
+  add('nlp_processing', ['named entity recognition ner sequence labeling', 'pos tagging dependency parsing syntax', 'text classification sentiment topic modeling'],
+    'NLP tasks: Named Entity Recognition (NER) — identify entities (PERSON, ORG, LOC, DATE), BIO/BILOU tagging, SpaCy NER, Hugging Face token classification. POS tagging: part-of-speech (noun, verb, adjective), Universal Dependencies. Dependency parsing: syntactic tree, head-dependent relations, constituency parsing (CFG). Text classification: sentiment analysis, topic classification, intent detection. Approaches: rule-based → statistical (CRF, HMM) → neural (BiLSTM-CRF, BERT fine-tuning). Evaluation: precision, recall, F1-score, entity-level vs token-level metrics.', 0.9)
+
+  add('nlp_processing', ['machine translation seq2seq attention mechanism', 'encoder decoder neural machine translation', 'multilingual translation cross-lingual transfer'],
+    'Machine translation: Seq2seq (encoder-decoder, attention mechanism — Bahdanau additive, Luong multiplicative). Transformer architecture (self-attention, multi-head attention, positional encoding). Neural MT: beam search decoding, BLEU score evaluation. Multilingual models: mBERT, XLM-R (cross-lingual representations), NLLB (No Language Left Behind, 200+ languages). Translation memory, terminology management. Low-resource MT: back-translation, data augmentation, transfer learning from high-resource languages. Evaluation: BLEU, METEOR, chrF, human evaluation (adequacy, fluency).', 0.85)
+
+  add('nlp_processing', ['text generation language model gpt llm', 'prompt engineering chain of thought reasoning', 'rag retrieval augmented generation knowledge'],
+    'Text generation & LLMs: Language models — GPT (autoregressive, next-token prediction), instruction tuning (InstructGPT, RLHF), chat models. Prompt engineering: zero-shot, few-shot, chain-of-thought (CoT), self-consistency, tree-of-thought. RAG (Retrieval-Augmented Generation): retrieve relevant documents → augment prompt → generate. Vector databases for RAG: Pinecone, Weaviate, ChromaDB, pgvector. Fine-tuning: LoRA (Low-Rank Adaptation), QLoRA, PEFT. Inference: KV-cache, speculative decoding, vLLM. Safety: guardrails, content filtering, constitutional AI.', 0.9)
+
+  add('nlp_processing', ['spacy huggingface nltk nlp library toolkit', 'nlp pipeline preprocessing lemmatization', 'information extraction relation extraction nlp'],
+    'NLP tools & libraries: SpaCy (industrial NLP, pipelines, tokenizer → tagger → parser → NER), Hugging Face Transformers (model hub, pipeline API, Trainer), NLTK (academic, corpora, tokenizers). Preprocessing: lowercasing, stopword removal, stemming (Porter, Snowball), lemmatization (WordNet), regex cleaning. Information extraction: relation extraction (subject-relation-object triples), event extraction, coreference resolution, open IE. Document processing: summarization (extractive: TextRank; abstractive: BART, T5), question answering (extractive span, generative).', 0.85)
+
+  add('nlp_processing', ['speech recognition asr text to speech synthesis', 'audio processing whisper speech model', 'voice assistant conversational ai dialogue system'],
+    'Speech & conversational AI: ASR (Automatic Speech Recognition) — Whisper (OpenAI, multilingual), wav2vec 2.0, DeepSpeech. Pipeline: audio → feature extraction (MFCC, mel spectrogram) → acoustic model → language model → text. TTS (Text-to-Speech): Tacotron, WaveNet, VITS, Bark, Coqui TTS. Voice cloning: few-shot speaker adaptation. Dialogue systems: task-oriented (slot filling, dialogue state tracking), open-domain (chitchat). Frameworks: Rasa (NLU + dialogue management), Dialogflow, Amazon Lex. Evaluation: WER (Word Error Rate), MOS (Mean Opinion Score).', 0.8)
+
+  // ── UI/UX Design Systems ───────────────────────────────────────────────────
+  add('uiux_design', ['design system component library style guide', 'atomic design methodology pattern library', 'storybook component documentation visual testing'],
+    'Design systems: Organized collection of reusable components, patterns, and guidelines. Atomic Design (Brad Frost): atoms → molecules → organisms → templates → pages. Component library: buttons, inputs, modals, cards, navigation. Design tokens: colors, typography, spacing, shadows — stored as JSON/YAML, consumed by CSS/JS. Popular systems: Material Design (Google), Ant Design, Chakra UI, Radix. Tools: Storybook (component documentation, visual testing, addons), Figma (design handoff, auto-layout, variants), Style Dictionary (token transformation). Versioning: semver for breaking changes.', 0.9)
+
+  add('uiux_design', ['accessibility wcag aria screen reader a11y', 'web accessibility guidelines compliance audit', 'inclusive design universal usability principles'],
+    'Web accessibility (a11y): WCAG 2.1 guidelines — four principles: Perceivable, Operable, Understandable, Robust (POUR). Levels: A (minimum), AA (standard target), AAA (enhanced). ARIA: roles (button, dialog, alert), states (aria-expanded, aria-selected), properties (aria-label, aria-describedby), live regions (aria-live). Semantic HTML: <nav>, <main>, <article>, <button>. Keyboard navigation: focus management, tab order, skip links. Color contrast: 4.5:1 (normal text), 3:1 (large text). Testing: axe-core, Lighthouse, NVDA/VoiceOver screen readers, WAVE tool.', 0.9)
+
+  add('uiux_design', ['responsive design media query mobile first', 'css grid flexbox layout responsive breakpoint', 'adaptive layout fluid typography container query'],
+    'Responsive design: Mobile-first approach — design for small screens, progressively enhance. CSS techniques: Flexbox (1D layout, justify-content, align-items), CSS Grid (2D layout, grid-template-columns, fr units, minmax()), Container Queries (@container, component-level responsiveness). Media queries: @media (min-width: 768px), breakpoints (mobile: 320px, tablet: 768px, desktop: 1024px, wide: 1440px). Fluid typography: clamp(1rem, 2.5vw, 2rem). Responsive images: srcset, sizes, <picture> element, art direction. Testing: Chrome DevTools device toolbar, BrowserStack.', 0.85)
+
+  add('uiux_design', ['user research usability testing wireframe', 'ux research method interview survey prototype', 'user journey persona information architecture'],
+    'UX research & design: User research methods — interviews (structured, semi-structured), surveys, contextual inquiry, card sorting (open/closed), tree testing. Personas: fictional user archetypes with goals, pain points, behaviors. User journey mapping: awareness → consideration → acquisition → retention → advocacy. Information architecture: site maps, navigation patterns, labeling systems. Wireframing: low-fidelity (sketches, Balsamiq) → high-fidelity (Figma, Sketch). Prototyping: clickable prototypes, InVision, Framer. Usability testing: task-based, think-aloud protocol, SUS (System Usability Scale), A/B testing.', 0.85)
+
+  add('uiux_design', ['color theory typography visual design ui', 'ui design principles hierarchy whitespace', 'motion design animation micro-interaction'],
+    'Visual design principles: Color theory — color wheel (complementary, analogous, triadic), HSL model, 60-30-10 rule, accessible palettes. Typography: typeface selection (serif, sans-serif, monospace), type scale (modular scale, 1.25 ratio), line-height (1.5 for body), measure (45-75 characters). Visual hierarchy: size, color, contrast, position, whitespace. Gestalt principles: proximity, similarity, closure, continuity. Whitespace: padding, margins, breathing room. Motion design: micro-interactions (hover, click feedback), transitions (easing: ease-in-out), loading states, skeleton screens. Tools: Figma, Adobe XD, Framer.', 0.85)
+
+  add('uiux_design', ['design handoff figma developer collaboration', 'css custom properties design token theming', 'dark mode theme switching ui implementation'],
+    'Design-to-development workflow: Design handoff — Figma Dev Mode (inspect, export assets, copy CSS), Zeplin. Design tokens: CSS custom properties (--color-primary: #0066ff), JSON → CSS/SCSS/JS transformation (Style Dictionary, Theo). Theming: light/dark mode (prefers-color-scheme media query, CSS custom properties swap, system preference detection). Component API design: props, variants, compound components, render props. Responsive typography: fluid type scales. Icon systems: SVG sprites, icon fonts, React icon components. CSS-in-JS: styled-components, Emotion, CSS Modules, Tailwind CSS utility classes.', 0.8)
+
+  // ── Computer Networking & Protocols ────────────────────────────────────────
+  add('networking_protocols', ['tcp ip protocol stack osi model layers', 'network layer routing ip addressing subnet', 'transport layer tcp udp protocol connection'],
+    'Networking fundamentals: OSI model (7 layers: Physical, Data Link, Network, Transport, Session, Presentation, Application). TCP/IP model (4 layers: Network Access, Internet, Transport, Application). IP addressing: IPv4 (32-bit, dotted decimal, CIDR notation /24), IPv6 (128-bit, hex, link-local fe80::). Subnetting: network address, broadcast, host range, VLSM. TCP: 3-way handshake (SYN, SYN-ACK, ACK), reliable delivery, flow control (sliding window), congestion control (slow start, AIMD). UDP: connectionless, low-latency, best for streaming/gaming/DNS. Ports: well-known (0-1023), registered (1024-49151), ephemeral.', 0.9)
+
+  add('networking_protocols', ['dns domain name system resolution record', 'http https tls ssl web protocol', 'websocket server-sent events real-time protocol'],
+    'Application layer protocols: DNS — recursive/iterative resolution, record types (A, AAAA, CNAME, MX, TXT, NS, SOA), DNS caching (TTL), DNSSEC, DNS over HTTPS (DoH), DNS over TLS (DoT). HTTP: methods (GET, POST, PUT, DELETE, PATCH), status codes (2xx success, 3xx redirect, 4xx client error, 5xx server error), headers, cookies, HTTP/2 (multiplexing, server push, HPACK), HTTP/3 (QUIC, UDP-based). TLS 1.3: handshake (1-RTT), cipher suites, certificates (X.509), Let\'s Encrypt. WebSockets: full-duplex, upgrade handshake, ws:// / wss://. SSE: server-sent events, EventSource API.', 0.9)
+
+  add('networking_protocols', ['bgp routing protocol autonomous system', 'ospf rip routing interior gateway protocol', 'network switching vlan spanning tree bridge'],
+    'Routing & switching: Routing protocols — BGP (Border Gateway Protocol, inter-AS, path-vector, AS-PATH), OSPF (Open Shortest Path First, link-state, Dijkstra, areas), RIP (distance-vector, hop count, max 15). Switching: MAC address table, VLANs (802.1Q tagging, trunk/access ports), STP (Spanning Tree Protocol, root bridge, port states). Layer 3 switching: inter-VLAN routing, router-on-a-stick. SDN (Software-Defined Networking): control plane separation, OpenFlow. Network address translation: SNAT, DNAT, PAT. Firewall: stateful inspection, ACLs, zones.', 0.85)
+
+  add('networking_protocols', ['network troubleshooting wireshark tcpdump', 'packet capture analysis network diagnostics', 'ping traceroute netstat network debugging tools'],
+    'Network diagnostics & troubleshooting: Packet capture — Wireshark (GUI, display/capture filters, protocol dissectors, follow TCP stream), tcpdump (CLI, BPF filters, pcap files). Diagnostics: ping (ICMP echo, RTT, TTL), traceroute/tracert (hop-by-hop path, TTL decrement), nslookup/dig (DNS queries), netstat/ss (socket statistics, listening ports), curl (HTTP testing, headers, timing). Network performance: iperf3 (bandwidth testing), mtr (continuous traceroute), pathping. Troubleshooting methodology: OSI model bottom-up, check physical → link → network → transport → application layers systematically.', 0.85)
+
+  add('networking_protocols', ['vpn tunneling ipsec wireguard openvpn', 'network security firewall ids ips detection', 'zero trust network access sase architecture'],
+    'Network security & VPN: VPN technologies — IPSec (tunnel/transport mode, IKEv2, ESP/AH), WireGuard (modern, fast, Curve25519, ChaCha20), OpenVPN (SSL/TLS-based, UDP/TCP). Network security: firewalls (pfSense, iptables/nftables, cloud security groups), IDS/IPS (Snort, Suricata — signature + anomaly detection), WAF (web application firewall, OWASP CRS). Zero Trust: "never trust, always verify", micro-segmentation, identity-based access, SASE (Secure Access Service Edge), BeyondCorp model. DDoS protection: rate limiting, CDN absorption, Cloudflare/AWS Shield.', 0.85)
+
+  add('networking_protocols', ['load balancer reverse proxy nginx haproxy', 'cdn content delivery network caching edge', 'service mesh envoy istio sidecar proxy'],
+    'Network infrastructure: Load balancers — Layer 4 (TCP/UDP, fast), Layer 7 (HTTP, content-based routing), algorithms (round-robin, least-connections, IP-hash, weighted). Reverse proxy: Nginx, HAProxy, Traefik, Caddy — SSL termination, caching, compression, rate limiting. CDN: edge caching (Cloudflare, Akamai, CloudFront), cache-control headers, cache invalidation, origin shielding. Service mesh: Istio (Envoy sidecar proxy, traffic management, mTLS, observability), Linkerd (lightweight), Consul Connect. Patterns: circuit breaker, retry, timeout, load shedding.', 0.85)
+
+  // ── Functional Programming ─────────────────────────────────────────────────
+  add('functional_programming', ['functional programming pure function immutability', 'higher order function first class function', 'map filter reduce functional composition'],
+    'Functional programming fundamentals: Pure functions (same input → same output, no side effects), immutability (don\'t mutate data, create new copies), first-class functions (functions as values, arguments, return values). Higher-order functions: map (transform each element), filter (select elements), reduce/fold (aggregate to single value). Function composition: pipe/compose (f ∘ g)(x) = f(g(x)). Referential transparency: expression can be replaced by its value. Declarative style: describe what, not how. Benefits: easier testing, predictable behavior, parallelism-friendly, fewer bugs from shared mutable state.', 0.9)
+
+  add('functional_programming', ['monad functor applicative type class', 'maybe either option result error handling', 'functional algebraic data type pattern matching'],
+    'Algebraic types & monads: Algebraic Data Types (ADT) — Sum types (Either, Result, enum variants), Product types (tuples, records). Pattern matching: exhaustive case analysis, destructuring. Functor: mappable container (fmap/map). Applicative: apply wrapped functions to wrapped values. Monad: flatMap/bind (>>=), chain computations that may fail. Common monads: Maybe/Option (nullable values), Either/Result (error handling without exceptions), IO (side effects), List (non-determinism), Promise/Future (async). Monad laws: left identity, right identity, associativity. Do-notation / for-comprehension syntactic sugar.', 0.9)
+
+  add('functional_programming', ['haskell type system lazy evaluation typeclass', 'haskell monad io pure functional language', 'ghc haskell compiler cabal stack package'],
+    'Haskell: Purely functional, statically typed, lazy evaluation. Type system: Hindley-Milner type inference, type classes (Eq, Ord, Show, Functor, Monad), parametric polymorphism, GADTs, type families. Lazy evaluation: thunks, evaluated only when needed, infinite data structures (take 10 [1..]). IO Monad: sequencing side effects in pure language. Pattern matching: function definitions, guards, where/let bindings. GHC (Glasgow Haskell Compiler): optimizing compiler, STG machine. Package management: Cabal, Stack, Hackage. Notable libraries: lens, servant, pandoc, xmonad.', 0.85)
+
+  add('functional_programming', ['rust ownership borrow checker lifetime safety', 'rust trait generic zero cost abstraction', 'rust pattern matching enum result option'],
+    'Rust functional features: Ownership system — move semantics, borrowing (&T immutable, &mut T mutable), lifetimes (\'a annotations), no garbage collector. Traits (similar to type classes): Iterator, From/Into, Display, Clone. Enums as ADTs: Option<T> (Some/None), Result<T, E> (Ok/Err). Pattern matching: match expressions, if let, while let, destructuring. Iterators: .map(), .filter(), .fold(), .collect(), lazy evaluation chains, zero-cost abstractions. Closures: |x| x + 1, Fn/FnMut/FnOnce traits. Error handling: ? operator for Result propagation, no exceptions. Cargo: package manager + build system.', 0.9)
+
+  add('functional_programming', ['scala functional object oriented jvm', 'elixir erlang otp actor concurrency', 'clojure lisp jvm immutable persistent data'],
+    'Functional languages on platforms: Scala — hybrid OOP+FP on JVM, case classes, pattern matching, for-comprehensions, Cats/ZIO effect systems, Akka actors. Elixir — dynamic, BEAM VM (Erlang), OTP (supervisors, GenServer), pattern matching, pipe operator |>, Phoenix framework, LiveView. Clojure — Lisp on JVM, persistent immutable data structures (vector, map, set), REPL-driven development, macros, core.async (CSP channels), ClojureScript (JS target). F# — functional-first on .NET, type providers, computation expressions, pattern matching, Fable (JS compilation).', 0.85)
+
+  add('functional_programming', ['reactive programming rxjs observable stream', 'functional reactive event stream operator', 'signal effect reactivity state management fp'],
+    'Functional reactive programming (FRP): Reactive streams — Observable (push-based sequences), operators (map, filter, merge, switchMap, debounce, throttle, scan). RxJS (JavaScript), RxJava, Reactor (Spring). Marble diagrams: visualize stream transformations. Backpressure: handle fast producer / slow consumer. Signals (fine-grained reactivity): SolidJS signals, Angular signals, Preact signals — reactive primitives with automatic dependency tracking. Effect systems: ZIO (Scala), cats-effect, Haskell IO monad — type-safe side effect management. Event sourcing + CQRS: functional approach to state management, immutable event log.', 0.85)
+
+  // ── Robotics & Automation ──────────────────────────────────────────────────
+  add('robotics_automation', ['ros robot operating system navigation', 'robot programming ros2 node topic service', 'autonomous robot slam mapping localization'],
+    'Robot Operating System (ROS): ROS 2 (DDS middleware, real-time capable, security). Core concepts: nodes (processes), topics (pub/sub messaging), services (request/response), actions (long-running tasks with feedback). Tools: rviz2 (3D visualization), Gazebo (simulation, physics engine), rqt (GUI plugins). Navigation: Nav2 stack — costmap (static + dynamic obstacles), path planning (Dijkstra, A*, navfn), local planner (DWB), recovery behaviors. SLAM: Simultaneous Localization And Mapping — gmapping, cartographer, ORB-SLAM. Transform tree (tf2): coordinate frame management.', 0.9)
+
+  add('robotics_automation', ['robot kinematics dynamics motion planning', 'forward inverse kinematics robotic arm joint', 'trajectory planning path optimization robotics'],
+    'Robot kinematics & dynamics: Forward kinematics — joint angles → end-effector position (DH parameters, transformation matrices). Inverse kinematics — target position → joint angles (analytical, numerical: Jacobian, gradient descent). Dynamics: Newton-Euler, Lagrangian mechanics, torque computation. Motion planning: configuration space (C-space), RRT (Rapidly-exploring Random Trees), PRM (Probabilistic Roadmap), OMPL library. Trajectory planning: joint space vs Cartesian space, velocity/acceleration profiles (trapezoidal, S-curve). MoveIt 2: motion planning framework for ROS 2, collision checking, grasp planning.', 0.85)
+
+  add('robotics_automation', ['computer vision robot perception lidar', 'sensor fusion camera depth point cloud', 'object detection recognition robot vision'],
+    'Robot perception: Computer vision — OpenCV (image processing, feature detection, calibration), YOLO/SSD (real-time object detection), semantic segmentation (DeepLab, Mask R-CNN). Depth sensing: stereo cameras, structured light (RealSense), ToF (Time-of-Flight), LiDAR (2D: RPLiDAR, 3D: Velodyne, Ouster). Point cloud processing: PCL (Point Cloud Library), voxel grid filtering, plane segmentation, clustering. Sensor fusion: Kalman filter (EKF, UKF), particle filter, IMU + GPS + vision fusion. Calibration: camera intrinsics/extrinsics, LiDAR-camera calibration.', 0.85)
+
+  add('robotics_automation', ['industrial automation plc scada control', 'plc ladder logic structured text programming', 'industrial robot fanuc kuka abb programming'],
+    'Industrial automation: PLC (Programmable Logic Controller) — ladder logic, structured text (IEC 61131-3), function block diagram. SCADA (Supervisory Control and Data Acquisition): HMI, data historian, alarm management. Industrial robots: FANUC (KAREL language), KUKA (KRL), ABB (RAPID), Universal Robots (UR script, cobot). Communication: Modbus (RTU/TCP), OPC UA (unified architecture, pub/sub), EtherNet/IP, PROFINET. Industry 4.0: digital twin, predictive maintenance, MES (Manufacturing Execution System). Safety: SIL levels, safety PLCs, light curtains, emergency stops.', 0.85)
+
+  add('robotics_automation', ['drone uav autonomous flight control', 'quadcopter ardupilot px4 flight controller', 'drone programming mavlink mission planning'],
+    'Drone & UAV systems: Flight controllers — ArduPilot (open-source, multi-vehicle), PX4 (modular, UORB messaging), Betaflight (racing). Platforms: Pixhawk (hardware), DJI (commercial), custom builds. Communication: MAVLink protocol (telemetry, commands), RC (radio control, SBUS/PPM), 4G/5G links. Autonomous flight: waypoint navigation, GPS-denied (optical flow, visual-inertial odometry), obstacle avoidance. Sensors: IMU (accelerometer + gyroscope), barometer, magnetometer, GPS, downward-facing distance sensor. Flight modes: stabilize, altitude hold, loiter, auto, guided. Regulations: FAA Part 107, EASA, remote ID.', 0.8)
+
+  add('robotics_automation', ['robot simulation gazebo webots virtual', 'digital twin simulation physics engine', 'sim to real transfer domain randomization'],
+    'Robot simulation: Gazebo (ROS integration, SDF world files, physics: ODE/Bullet/DART, sensor plugins). Webots (cross-platform, built-in robot models, controller API). Isaac Sim (NVIDIA, GPU-accelerated, photorealistic, Isaac SDK). MuJoCo (fast contact dynamics, DeepMind). Digital twin: virtual replica of physical robot, real-time synchronization. Sim-to-real transfer: domain randomization (vary textures, lighting, physics parameters during training), system identification, fine-tuning on real data. Physics engines: rigid body dynamics, collision detection, friction models. URDF/SDF: robot model description formats (links, joints, inertias, collisions).', 0.8)
+
   return entries
 }
 
@@ -4004,6 +4118,54 @@ export class LocalBrain {
     const algorithmPattern = /\b(shor\s+algorithm|grover\s+(algorithm|search)|quantum\s+(fourier|phase\s+estimation|approximate\s+optimiz|variational|error\s+correction|noise\s+mitigation))\b/i
     const toolPattern = /\b(qiskit\s+(quantum|circuit|aer)|cirq\s+(quantum|google)|pennylane\s+(quantum|ml)|post-?quantum\s+cryptograph|quantum\s+resistant\s+(encryption|algorithm)|pqc\s+(nist|kyber|dilithium))\b/i
     return fundamentalPattern.test(msg) || algorithmPattern.test(msg) || toolPattern.test(msg)
+  }
+
+  /** Check if query is about embedded systems or IoT. */
+  private isEmbeddedIoTQuery(msg: string): boolean {
+    const hardwarePattern = /\b(arduino\s+(uno|mega|nano|esp|programming)|esp32\s+(wifi|ble|programming|mqtt)|stm32\s+(hal|arm|cortex|programming)|raspberry\s+pi\s+(pico|gpio|embedded))\b/i
+    const protocolPattern = /\b(mqtt\s+(broker|pub.?sub|topic|qos)|i2c\s+(bus|address|sda|scl)|spi\s+(bus|mosi|miso|clock)|uart\s+(serial|baud|rx|tx))\b/i
+    const embeddedPattern = /\b(rtos\s+(freertos|zephyr|task|queue)|embedded\s+(linux|system|firmware|programming)|tinyml\s+(model|inference|microcontroller)|iot\s+(sensor|gateway|edge|protocol|device))\b/i
+    return hardwarePattern.test(msg) || protocolPattern.test(msg) || embeddedPattern.test(msg)
+  }
+
+  /** Check if query is about NLP (natural language processing). */
+  private isNLPProcessingQuery(msg: string): boolean {
+    const corePattern = /\b(nlp\s+(pipeline|tokeniz|preprocessing|task|model)|named\s+entity\s+recognition\s+(ner|model|spacy)|word\s+embedding\s+(word2vec|glove|fasttext))\b/i
+    const modelPattern = /\b(bert\s+(model|fine.?tun|pretrain|embedding)|transformer\s+(language\s+model|nlp|attention)|seq2seq\s+(model|translation|encoder|decoder))\b/i
+    const taskPattern = /\b(machine\s+translation\s+(model|neural|bleu)|text\s+(classification|generation|summarization)\s+(nlp|model|bert)|speech\s+recognition\s+(asr|whisper|model)|rag\s+retrieval\s+augmented\s+generation)\b/i
+    return corePattern.test(msg) || modelPattern.test(msg) || taskPattern.test(msg)
+  }
+
+  /** Check if query is about UI/UX design systems. */
+  private isUIUXDesignQuery(msg: string): boolean {
+    const designPattern = /\b(design\s+system\s+(component|token|pattern|library)|atomic\s+design\s+(methodology|pattern|atom)|storybook\s+(component|visual|testing|documentation))\b/i
+    const a11yPattern = /\b(accessibility\s+(wcag|aria|screen\s+reader|audit|guideline)|wcag\s+(2\.\d|compliance|level|aa|aaa)|aria\s+(role|label|live|describedby))\b/i
+    const uxPattern = /\b(responsive\s+design\s+(media|mobile|breakpoint|fluid)|user\s+research\s+(interview|survey|usability|persona)|design\s+token\s+(css|color|typography|theming))\b/i
+    return designPattern.test(msg) || a11yPattern.test(msg) || uxPattern.test(msg)
+  }
+
+  /** Check if query is about computer networking & protocols. */
+  private isNetworkingProtocolsQuery(msg: string): boolean {
+    const protocolPattern = /\b(tcp\s+(handshake|connection|congestion|window|protocol)|udp\s+(protocol|datagram|connectionless|socket)|dns\s+(resolution|record|cache|query|server))\b/i
+    const routingPattern = /\b(bgp\s+(routing|autonomous|as-?path|peer)|ospf\s+(routing|link.?state|area|dijkstra)|vlan\s+(tagging|trunk|802\.1q|switching))\b/i
+    const infraPattern = /\b(vpn\s+(tunnel|ipsec|wireguard|openvpn)|load\s+balancer\s+(nginx|haproxy|layer|algorithm)|cdn\s+(caching|edge|cloudflare|content\s+delivery))\b/i
+    return protocolPattern.test(msg) || routingPattern.test(msg) || infraPattern.test(msg)
+  }
+
+  /** Check if query is about functional programming. */
+  private isFunctionalProgrammingQuery(msg: string): boolean {
+    const corePattern = /\b(functional\s+programming\s+(pure|immutab|composit|paradigm)|monad\s+(maybe|either|option|io|bind|flatmap)|algebraic\s+data\s+type\s+(sum|product|pattern|adt))\b/i
+    const langPattern = /\b(haskell\s+(type\s+class|monad|lazy|ghc|typeclass)|rust\s+(ownership|borrow\s+checker|lifetime|trait)|elixir\s+(otp|genserver|phoenix|pipe|beam))\b/i
+    const reactivePattern = /\b(reactive\s+programming\s+(rxjs|observable|stream|signal)|functional\s+reactive\s+(stream|event|signal|frp)|higher\s+order\s+function\s+(map|filter|reduce|fold))\b/i
+    return corePattern.test(msg) || langPattern.test(msg) || reactivePattern.test(msg)
+  }
+
+  /** Check if query is about robotics & automation. */
+  private isRoboticsAutomationQuery(msg: string): boolean {
+    const rosPattern = /\b(ros\s+(node|topic|service|action|navigation|slam)|ros2?\s+(navigation|gazebo|rviz|slam|nav2)|robot\s+operating\s+system\s+(ros|node|topic))\b/i
+    const kinematicsPattern = /\b(robot\s+(kinematics|dynamics|motion|trajectory|arm|manipulator)|inverse\s+kinematics\s+(jacobian|analytical|numerical)|moveit\s+(motion|planning|collision|grasp))\b/i
+    const automationPattern = /\b(plc\s+(ladder|logic|structured\s+text|programming|scada)|industrial\s+(robot|automation|fanuc|kuka|abb)|drone\s+(uav|autonomous|flight|ardupilot|px4|mavlink))\b/i
+    return rosPattern.test(msg) || kinematicsPattern.test(msg) || automationPattern.test(msg)
   }
 
   /** Extract probable cause from a causal query. */
