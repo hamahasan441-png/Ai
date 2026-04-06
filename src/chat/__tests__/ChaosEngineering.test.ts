@@ -24,16 +24,16 @@ describe('ChaosEngineering', () => {
   })
 
   describe('Semantic concept tests', () => {
-    it('should have concept Chaos Engineering & Resilience with domain devops', () => {
+    it('should have concept Chaos Engineering & Resilience Testing with domain devops', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const concept = graph.findConceptByName('Chaos Engineering & Resilience')
+      const concept = graph.findConceptByName('Chaos Engineering & Resilience Testing')
       expect(concept).toBeDefined()
       expect(concept!.domain).toBe('devops')
     })
 
     it('should have at least 5 connected sub-concepts including Fault Injection and Resilience Patterns', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const concept = graph.findConceptByName('Chaos Engineering & Resilience')
+      const concept = graph.findConceptByName('Chaos Engineering & Resilience Testing')
       expect(concept).toBeDefined()
       const related = graph.findRelated(concept!.id, undefined, 30)
       expect(related.length).toBeGreaterThanOrEqual(5)

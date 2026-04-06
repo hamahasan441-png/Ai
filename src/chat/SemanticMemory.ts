@@ -2578,7 +2578,7 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(graphVisualization, graphAlgorithms, 'related-to', 0.8)
 
   // ── Chaos Engineering & Resilience concepts ──────────────────────────────────
-  const chaosEngineering = memory.addConcept('Chaos Engineering & Resilience', 'devops')
+  const chaosEngineering = memory.addConcept('Chaos Engineering & Resilience Testing', 'devops')
   const faultInjection = memory.addConcept('Fault Injection', 'devops')
   const gameDayExercises = memory.addConcept('GameDay Exercises', 'devops')
   const resiliencePatterns = memory.addConcept('Resilience Patterns', 'devops')

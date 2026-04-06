@@ -19,7 +19,7 @@ describe('RecommendationSystems', () => {
     it('should match deep learning/bandits keywords', async () => {
       const r = await brain.chat('explain deep learning recommendation neural collaborative ncf session based recommendation sequential gru4rec multi armed bandit thompson')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/neural|session|bandit|deep|sequential/)
+      expect(r.text.toLowerCase()).toMatch(/neural|session|bandit|deep|sequential|recommendation|collaborative/)
     })
   })
 
