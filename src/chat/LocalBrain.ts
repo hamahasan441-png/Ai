@@ -151,6 +151,12 @@ import { CoreferenceResolver } from './CoreferenceResolver.js'
 import { LanguageDetector } from './LanguageDetector.js'
 import { DialogueActRecognizer } from './DialogueActRecognizer.js'
 import { QueryDecomposer } from './QueryDecomposer.js'
+import { CrossDomainTransfer } from './CrossDomainTransfer.js'
+import { CounterfactualReasoner } from './CounterfactualReasoner.js'
+import { UserProfileModel } from './UserProfileModel.js'
+import { ConversationSummarizer } from './ConversationSummarizer.js'
+import { ResponseQualityScorer } from './ResponseQualityScorer.js'
+import { MultiFormatGenerator } from './MultiFormatGenerator.js'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -3608,6 +3614,12 @@ export class LocalBrain {
   private languageDetector: LanguageDetector | null = null
   private dialogueActRecognizer: DialogueActRecognizer | null = null
   private queryDecomposer: QueryDecomposer | null = null
+  private crossDomainTransfer: CrossDomainTransfer | null = null
+  private counterfactualReasoner: CounterfactualReasoner | null = null
+  private userProfileModel: UserProfileModel | null = null
+  private conversationSummarizer: ConversationSummarizer | null = null
+  private responseQualityScorer: ResponseQualityScorer | null = null
+  private multiFormatGenerator: MultiFormatGenerator | null = null
 
   // Token budget management
   private tokenBudget: TokenBudgetManager
@@ -3744,6 +3756,12 @@ export class LocalBrain {
       this.languageDetector = new LanguageDetector()
       this.dialogueActRecognizer = new DialogueActRecognizer()
       this.queryDecomposer = new QueryDecomposer()
+      this.crossDomainTransfer = new CrossDomainTransfer()
+      this.counterfactualReasoner = new CounterfactualReasoner()
+      this.userProfileModel = new UserProfileModel()
+      this.conversationSummarizer = new ConversationSummarizer()
+      this.responseQualityScorer = new ResponseQualityScorer()
+      this.multiFormatGenerator = new MultiFormatGenerator()
     }
 
     const now = new Date().toISOString()
@@ -4139,6 +4157,48 @@ export class LocalBrain {
       } catch { /* non-critical */ }
     }
 
+    // CrossDomainTransfer: combine knowledge across domains
+    if (this.crossDomainTransfer && knowledgeResults.length > 0) {
+      try {
+        const matchedDomains = [...new Set(knowledgeResults.map(kr => kr.category))]
+        if (matchedDomains.length > 1) {
+          const crossResult = this.crossDomainTransfer.detectCrossDomain(userMessage, matchedDomains)
+          if (crossResult.isCrossDomain && crossResult.confidence > 0.5) {
+            smartAugmentation += `\n\n**Cross-Domain:** ${crossResult.primaryDomain} ↔ ${crossResult.secondaryDomains.join(', ')} (${crossResult.transferStrategy})`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // CounterfactualReasoner: handle "what if" scenarios
+    if (this.counterfactualReasoner && this.counterfactualReasoner.isCounterfactual(userMessage)) {
+      try {
+        const cfResult = this.counterfactualReasoner.analyze(userMessage)
+        if (cfResult.isCounterfactual && cfResult.confidence > 0.5) {
+          const implications = cfResult.implications.slice(0, 3).map(i => `• ${i}`).join('\n')
+          smartAugmentation += `\n\n**Counterfactual Analysis:**\nPremise: ${cfResult.premise}\n${implications}`
+          if (cfResult.risks.length > 0) {
+            smartAugmentation += `\nRisks: ${cfResult.risks[0]}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // UserProfileModel: track user preferences and adapt
+    if (this.userProfileModel) {
+      try {
+        const topDomain = knowledgeResults.length > 0 ? knowledgeResults[0]!.category : 'general'
+        this.userProfileModel.updateFromInteraction(userMessage, topDomain)
+      } catch { /* non-critical */ }
+    }
+
+    // ConversationSummarizer: track conversation
+    if (this.conversationSummarizer) {
+      try {
+        this.conversationSummarizer.addTurn('user', userMessage)
+      } catch { /* non-critical */ }
+    }
+
     // Kurdish NLP: morphology, sentiment, translation for Kurdish queries
     if (this.isKurdishSoraniQuery(userMessage)) {
       // Kurdish Sentiment Analysis
@@ -4190,6 +4250,33 @@ export class LocalBrain {
     // Append smart augmentation to base response
     if (smartAugmentation) {
       text += smartAugmentation
+    }
+
+    // MultiFormatGenerator: adapt output format
+    if (this.multiFormatGenerator) {
+      try {
+        const formatDetection = this.multiFormatGenerator.detectFormat(userMessage)
+        if (formatDetection.recommendedFormat !== 'plain' && formatDetection.confidence > 0.6) {
+          text = this.multiFormatGenerator.format(text, formatDetection.recommendedFormat)
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ResponseQualityScorer: self-evaluate and flag low quality
+    if (this.responseQualityScorer) {
+      try {
+        const qualityScore = this.responseQualityScorer.score(userMessage, text)
+        if (qualityScore.overall < 0.3 && qualityScore.flags.length > 0) {
+          text += `\n\n*Note: This response may be incomplete. ${qualityScore.flags[0]}*`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ConversationSummarizer: track assistant response
+    if (this.conversationSummarizer) {
+      try {
+        this.conversationSummarizer.addTurn('assistant', text)
+      } catch { /* non-critical */ }
     }
 
     // ── ConfidenceGate: quality control ──────────────────────────────────────
