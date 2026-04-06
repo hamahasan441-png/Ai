@@ -731,8 +731,11 @@ export class AdvancedSearchEngine {
           for (const name of activatedNames) {
             if (docDomain.includes(name) || docTitle.includes(name) ||
                 doc.keywords.some(k => k.includes(name))) {
-              matchScore += activation.get([...this.graphNodes.entries()]
-                .find(([, n]) => n.name.toLowerCase() === name)?.[0] ?? '') ?? 0.5
+              // Look up the activation score for this concept name
+              const nodeEntry = [...this.graphNodes.entries()]
+                .find(([, n]) => n.name.toLowerCase() === name)
+              const activationScore = nodeEntry ? (activation.get(nodeEntry[0]) ?? 0.5) : 0.5
+              matchScore += activationScore
               matched.push(name)
             }
           }
@@ -877,6 +880,11 @@ export class AdvancedSearchEngine {
     // ── Step 9: Meta — Merge, rank, and explain ──────────────────────────────
     const s9Start = Date.now()
     const rankedResults: SearchResultItem[] = []
+
+    // Normalization factor: each strategy contributes up to ~0.6 of the max possible score,
+    // so dividing by (strategyCount * 0.6) normalizes the composite into [0, 1] range.
+    const STRATEGY_NORMALIZATION_FACTOR = 0.6
+
     for (const [, entry] of scoreMap) {
       // Composite score = sum of all strategy scores (already weighted)
       const strategyScoreValues = Object.values(entry.scores) as number[]
@@ -884,7 +892,7 @@ export class AdvancedSearchEngine {
       // Multi-strategy bonus: reward docs matched by multiple strategies
       const strategyCount = entry.matchedBy.size
       const diversityBonus = strategyCount > 1 ? 0.1 * (strategyCount - 1) : 0
-      const finalScore = Math.min(1, compositeScore / (strategiesUsed.length * 0.6) + diversityBonus)
+      const finalScore = Math.min(1, compositeScore / (strategiesUsed.length * STRATEGY_NORMALIZATION_FACTOR) + diversityBonus)
 
       if (finalScore >= this.config.minScore) {
         rankedResults.push({
@@ -908,9 +916,20 @@ export class AdvancedSearchEngine {
 
     const topResults = rankedResults.slice(0, this.config.maxResults)
 
-    // Compute overall confidence
+    // Compute overall confidence:
+    //  - 50% weight from the top result's score (quality of best match)
+    //  - 30% weight from result count (up to 5 results = full weight)
+    //  - 20% weight from strategy diversity (8 strategies = full weight)
+    const TOP_SCORE_WEIGHT = 0.5
+    const RESULT_COUNT_WEIGHT = 0.3
+    const STRATEGY_DIVERSITY_WEIGHT = 0.2
+    const MAX_RESULT_COUNT_FOR_CONFIDENCE = 5
+    const TOTAL_STRATEGIES = 8
     const confidence = topResults.length > 0
-      ? Math.min(1, (topResults[0]!.score * 0.5) + (Math.min(topResults.length, 5) / 5 * 0.3) + (strategiesUsed.length / 8 * 0.2))
+      ? Math.min(1,
+          (topResults[0]!.score * TOP_SCORE_WEIGHT) +
+          (Math.min(topResults.length, MAX_RESULT_COUNT_FOR_CONFIDENCE) / MAX_RESULT_COUNT_FOR_CONFIDENCE * RESULT_COUNT_WEIGHT) +
+          (strategiesUsed.length / TOTAL_STRATEGIES * STRATEGY_DIVERSITY_WEIGHT))
       : 0
 
     thinkingSteps.push({

@@ -2795,6 +2795,18 @@ function extractKeywords(text: string): string[] {
 // ║  §5  KNOWLEDGE SEARCH — Finding relevant knowledge                          ║
 // ╚═══════════════════════════════════════════════════════════════════════════════╝
 
+/** Format a search result into a numbered line for display. */
+function formatSearchResultLine(
+  r: { title: string; score: number; content: string },
+  index: number,
+): string {
+  const MAX_CONTENT_LEN = 150
+  const truncatedContent = r.content.length > MAX_CONTENT_LEN
+    ? r.content.slice(0, MAX_CONTENT_LEN) + '...'
+    : r.content
+  return `${index + 1}. **${r.title}** (${(r.score * 100).toFixed(0)}% relevance): ${truncatedContent}`
+}
+
 /** Search the knowledge base for relevant entries. */
 function searchKnowledge(
   knowledgeBase: KnowledgeEntry[],
@@ -4400,8 +4412,8 @@ export class LocalBrain {
             intent === 'search') {
           // Feed conversation context to the search engine
           this.advancedSearchEngine.addConversationContext(userMessage)
-          // Feed semantic graph nodes if available
-          if (this.semanticMemory) {
+          // Feed semantic graph nodes (only if graph is currently empty to avoid duplicates)
+          if (this.semanticMemory && this.advancedSearchEngine.getGraphNodeCount() === 0) {
             const concepts = this.semanticMemory.getConceptsByDomain('programming')
             for (const concept of concepts.slice(0, 50)) {
               this.advancedSearchEngine.addGraphNode(concept.id, concept.name, concept.domain)
@@ -4413,7 +4425,7 @@ export class LocalBrain {
               .map(s => `${s.step}. [${s.strategy}] ${s.thought} — ${s.detail}`)
               .join('\n')
             const topResults = searchResult.results.slice(0, 3)
-              .map((r, i) => `${i + 1}. **${r.title}** (${(r.score * 100).toFixed(0)}% relevance): ${r.content.slice(0, 150)}${r.content.length > 150 ? '...' : ''}`)
+              .map((r, i) => formatSearchResultLine(r, i))
               .join('\n')
             smartAugmentation += `\n\n**🔍 Advanced Search (${searchResult.strategiesUsed.length} strategies, ${(searchResult.confidence * 100).toFixed(0)}% confidence):**\n\n*Thinking process:*\n${thinkingReport}\n\n*Top results:*\n${topResults}`
           }
