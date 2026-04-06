@@ -1187,7 +1187,7 @@ export type {
 // ══════════════════════════════════════════════════════════════════════════════
 // DOCUMENT ANALYZER — Deep offline document understanding (Phase 11)
 // ══════════════════════════════════════════════════════════════════════════════
-export { DocumentAnalyzer, DEFAULT_DOC_ANALYZER_CONFIG } from './DocumentAnalyzer.js'
+export { DocumentAnalyzer, DEFAULT_DOC_ANALYZER_CONFIG, isRawPdfContent, extractPdfText } from './DocumentAnalyzer.js'
 
 export type {
   DocumentAnalysisRequest,
@@ -1211,6 +1211,10 @@ export type {
   DocumentAnalyzerConfig,
   DocumentAnalyzerStats,
 } from './DocumentAnalyzer.js'
+
+// ── NLP Utilities (shared) ──
+
+export { STOP_WORDS, POSITIVE_WORDS, NEGATIVE_WORDS, TECHNICAL_WORDS, splitSentences, tokenize } from './nlpUtils.js'
 
 // ── PdfExpert (Phase 12 — Document-Grounded Q&A) ──
 
