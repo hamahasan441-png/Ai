@@ -224,7 +224,6 @@ const SENTIMENT_LEXICON: readonly SentimentWord[] = [
   { word: 'دڵشکاو', sentiment: 'negative', weight: -0.80, category: 'sadness' },
   { word: 'ناخۆش', sentiment: 'negative', weight: -0.55, category: 'frustration' },
   { word: 'تەقەت', sentiment: 'negative', weight: -0.50, category: 'frustration' },
-  { word: 'ڕەخنە', sentiment: 'neutral', weight: 0.0, category: 'communication' },
   { word: 'نەیار', sentiment: 'negative', weight: -0.65, category: 'anger' },
   { word: 'تاڵان', sentiment: 'negative', weight: -0.75, category: 'anger' },
   { word: 'داماوی', sentiment: 'negative', weight: -0.55, category: 'sadness' },
@@ -237,8 +236,9 @@ const SENTIMENT_LEXICON: readonly SentimentWord[] = [
   { word: 'نائومێدی', sentiment: 'negative', weight: -0.80, category: 'sadness' },
   { word: 'خوارە', sentiment: 'negative', weight: -0.55, category: 'sadness' },
 
-  // ── Neutral words (35) ───────────────────────────────────────────────────
+  // ── Neutral words (36) ───────────────────────────────────────────────────
   { word: 'ڕۆژ', sentiment: 'neutral', weight: 0.0, category: 'time' },
+  { word: 'ڕەخنە', sentiment: 'neutral', weight: 0.0, category: 'communication' },
   { word: 'کات', sentiment: 'neutral', weight: 0.0, category: 'time' },
   { word: 'شت', sentiment: 'neutral', weight: 0.0, category: 'object' },
   { word: 'کەس', sentiment: 'neutral', weight: 0.0, category: 'person' },
