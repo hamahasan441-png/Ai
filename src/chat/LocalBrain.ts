@@ -2619,6 +2619,72 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('privacy_engineering', ['ccpa california consumer privacy act cpra rights', 'privacy engineering tools onetrust bigid securiti', 'data breach notification incident response gdpr 72 hours'],
     'CCPA/CPRA & breach response: CCPA/CPRA (California) — right to know, delete, opt-out of sale, non-discrimination. Categories: personal information, sensitive personal information. Global Privacy Control (GPC) signal for opt-out. Privacy tools: OneTrust (compliance platform), BigID (data discovery/classification), Securiti (privacy automation), Transcend (data mapping). Breach notification: GDPR requires 72-hour notification to DPA, "without undue delay" to data subjects if high risk. CCPA: notification without unreasonable delay. Incident response: contain, assess scope, notify, remediate, document lessons learned.', 1.0)
 
+  // ── Edge Computing / Serverless ──────────────────────────────────────────────
+  add('edge_serverless', ['aws lambda serverless function event driven cold start', 'lambda function handler runtime timeout memory', 'serverless framework sam cdk deployment infrastructure'],
+    'AWS Lambda & Serverless: Event-driven compute — functions triggered by API Gateway, S3, SQS, DynamoDB Streams, EventBridge. Runtimes: Node.js, Python, Java, Go, .NET, Ruby, custom (container images). Limits: 15min timeout, 10GB memory, 6MB payload (sync), 256KB (async). Cold starts: first invocation latency (Java/C# worst, Python/Node best). Mitigation: provisioned concurrency, SnapStart (Java), smaller packages, keep-alive pings. Frameworks: Serverless Framework (multi-cloud), AWS SAM (CloudFormation), SST (TypeScript), Architect.', 1.1)
+
+  add('edge_serverless', ['cloudflare workers edge function v8 isolate wasm', 'vercel edge functions nextjs middleware runtime', 'deno deploy edge runtime bun serverless'],
+    'Edge computing platforms: Cloudflare Workers — V8 isolates (not containers), <1ms cold starts, 128MB memory, Workers KV (key-value), Durable Objects (stateful), R2 (S3-compatible storage), D1 (SQLite at edge). Vercel Edge Functions — built on Edge Runtime, integrate with Next.js middleware, streaming responses. Deno Deploy — TypeScript-native edge runtime, built-in KV, BroadcastChannel. Bun — fast JavaScript runtime with serverless support. Fastly Compute@Edge — WASM-based edge compute. Use cases: A/B testing, geolocation routing, auth at edge, personalization, bot protection.', 1.0)
+
+  add('edge_serverless', ['edge caching cdn worker global distribution latency', 'serverless database planetscale neon turso supabase', 'function as a service faas event driven architecture'],
+    'Edge architecture patterns: Edge caching — cache API responses at CDN edge (Cache-Control, stale-while-revalidate), Cloudflare Cache API, Vercel ISR (Incremental Static Regeneration). Serverless databases: PlanetScale (MySQL, branching), Neon (Postgres, branching, autoscaling), Turso (SQLite/libSQL, edge replicas), Supabase (Postgres, real-time, auth). FaaS patterns: single-purpose functions, event-driven (pub/sub, queues), fan-out/fan-in, saga pattern for distributed transactions. Cost model: pay-per-invocation (no idle cost), but watch for runaway executions.', 1.0)
+
+  add('edge_serverless', ['step functions orchestration state machine serverless', 'serverless monitoring observability cold start optimization', 'api gateway websocket serverless http endpoint'],
+    'Serverless orchestration & monitoring: AWS Step Functions — state machines for serverless workflows (sequential, parallel, choice, wait, error handling). Express Workflows for high-volume short-duration. Standard for long-running. Monitoring: AWS X-Ray, Lumigo, Dashbird, Epsagon for distributed tracing. Cold start optimization: tree-shaking, lazy imports, connection pooling (RDS Proxy), provisioned concurrency. API Gateway: REST API, HTTP API (cheaper, faster), WebSocket API. Authentication: Lambda authorizers, Cognito, JWT verification at edge.', 1.0)
+
+  // ── Low-Code / No-Code ─────────────────────────────────────────────────────
+  add('low_code', ['retool internal tool builder admin panel dashboard', 'low code platform appsmith tooljet budibase', 'visual programming drag drop component builder'],
+    'Low-code internal tools: Retool — drag-and-drop UI builder for internal tools, connects to databases/APIs, JavaScript transformers, role-based access. Alternatives: Appsmith (open-source), ToolJet (open-source), Budibase (open-source, self-hostable). Visual programming: component-based UIs, form builders, table/chart widgets, workflow triggers. Use cases: admin panels, CRUD apps, data dashboards, customer support tools, approval workflows. Advantages: 10x faster development for internal tools, non-engineers can maintain.', 1.0)
+
+  add('low_code', ['zapier automation workflow trigger action integration', 'n8n make integromat workflow automation self hosted', 'ifttt webhook api connector no code automation'],
+    'Workflow automation: Zapier — connect 5000+ apps with triggers and actions, multi-step Zaps, filters, formatters, paths (conditional logic). Make (formerly Integromat) — visual scenarios, more complex logic, HTTP modules. n8n — open-source, self-hostable, code nodes (JavaScript/Python), AI agents. IFTTT — simple if-this-then-that consumer automations. Patterns: webhook triggers, scheduled runs, email parsing, form submission processing, CRM sync, invoice automation. Limitations: API rate limits, execution time limits, data transformation complexity.', 1.0)
+
+  add('low_code', ['airtable notion database spreadsheet knowledge base', 'no code website builder webflow bubble squarespace', 'citizen developer low code governance shadow it'],
+    'No-code platforms: Airtable — spreadsheet-database hybrid, views (grid, kanban, calendar, gallery), automations, scripting. Notion — docs + databases + wikis, API, templates. Website builders: Webflow (professional CSS control, CMS, hosting), Bubble (full-stack web apps, workflows, database), Squarespace (templates, e-commerce). Citizen developers: business users building solutions. Governance: shadow IT risks, data security, integration standards, approved platform list. Best for: MVPs, prototypes, internal tools, landing pages, simple CRUD apps. Not for: high-scale, complex algorithms, real-time systems.', 1.0)
+
+  // ── Infrastructure as Code (IaC) ───────────────────────────────────────────
+  add('iac', ['terraform infrastructure as code hcl provider resource', 'terraform state management backend remote locking', 'terraform module registry reusable configuration'],
+    'Terraform: HashiCorp IaC tool — declarative HCL (HashiCorp Configuration Language). Core concepts: providers (AWS, GCP, Azure, 3000+), resources (infrastructure components), data sources (read existing), modules (reusable configs). State management: terraform.tfstate tracks real infrastructure. Remote backends: S3+DynamoDB (locking), Terraform Cloud, GCS. Workflow: terraform init → plan → apply → destroy. State locking prevents concurrent modifications. Modules: reuse via Terraform Registry or private. Best practices: remote state, workspace per environment, module versioning, plan review before apply.', 1.1)
+
+  add('iac', ['pulumi aws cdk infrastructure code typescript python', 'ansible configuration management playbook role inventory', 'crossplane kubernetes native infrastructure control plane'],
+    'IaC alternatives: Pulumi — real programming languages (TypeScript, Python, Go, C#) instead of DSL. State management, preview, policy-as-code. AWS CDK — define AWS infra in TypeScript/Python/Java, synthesizes to CloudFormation. Constructs (L1=CFN, L2=opinionated, L3=patterns). Ansible — configuration management, agentless (SSH), playbooks (YAML), roles, inventory, idempotent modules. Not strictly IaC but overlaps. Crossplane — Kubernetes-native IaC, manage cloud resources via K8s CRDs. Chef/Puppet — older CM tools, agent-based.', 1.0)
+
+  add('iac', ['infrastructure drift detection remediation compliance', 'gitops flux argocd infrastructure repository reconciliation', 'iac testing terratest checkov tfsec policy compliance'],
+    'IaC operations: Drift detection — compare declared state vs actual infrastructure, tools: terraform plan, driftctl, CloudQuery. Remediation: auto-apply or alert. GitOps: infrastructure changes through Git PRs — ArgoCD, Flux for Kubernetes, Atlantis for Terraform. Repository structure: mono-repo vs poly-repo, environment branches vs directories. Testing: Terratest (Go, integration tests), Checkov (policy-as-code, security scanning), tfsec (Terraform security), OPA (Open Policy Agent) for custom policies. Compliance: CIS benchmarks, SOC2, HIPAA infrastructure requirements. Secrets: Vault, AWS Secrets Manager, SOPS.', 1.0)
+
+  // ── Observability / Monitoring ──────────────────────────────────────────────
+  add('observability', ['prometheus metrics scraping alertmanager grafana dashboard', 'time series database tsdb promql query recording rules', 'grafana dashboard visualization panel template variable'],
+    'Prometheus & Grafana: Prometheus — pull-based metrics collection, time-series database (TSDB), PromQL query language. Metric types: counter (only increases), gauge (up/down), histogram (distribution), summary. AlertManager: alerting rules, routing, silencing, inhibition. Recording rules: pre-compute expensive queries. Grafana — visualization platform, dashboards, panels (graph, table, stat, gauge, heatmap), template variables, annotations. Data sources: Prometheus, Loki, Tempo, Elasticsearch, InfluxDB, PostgreSQL. Alerting: unified alerting across data sources.', 1.1)
+
+  add('observability', ['opentelemetry otlp traces spans distributed tracing', 'jaeger zipkin tempo distributed trace collector', 'instrumentation sdk auto manual telemetry data'],
+    'Distributed tracing: OpenTelemetry (OTel) — vendor-neutral observability framework. Three signals: traces, metrics, logs. OTLP protocol for data export. Traces: spans (operations) with parent-child relationships, attributes, events. Context propagation: W3C TraceContext, B3 headers. Auto-instrumentation: SDK injects tracing into HTTP clients, databases, frameworks. Backends: Jaeger (Uber, open-source), Tempo (Grafana, cost-effective), Zipkin (Twitter), AWS X-Ray, Datadog APM. Sampling: head-based (decision at start), tail-based (decision after completion, keeps interesting traces).', 1.0)
+
+  add('observability', ['log aggregation elk elasticsearch loki fluentd', 'structured logging json correlation id context', 'datadog newrelic dynatrace apm commercial monitoring'],
+    'Logging & APM: Log aggregation — ELK stack (Elasticsearch + Logstash + Kibana), Grafana Loki (label-based, cost-effective), Fluentd/Fluent Bit (log collection/forwarding). Structured logging: JSON format, correlation IDs for request tracing, log levels (DEBUG, INFO, WARN, ERROR). Best practices: structured > unstructured, include context (requestId, userId), don\'t log PII. Commercial APM: Datadog (unified platform, 700+ integrations), New Relic (full-stack observability), Dynatrace (AI-powered, auto-discovery). SLO-based alerting: alert on SLO burn rate, not individual metrics.', 1.0)
+
+  add('observability', ['synthetic monitoring uptime health check endpoint', 'real user monitoring rum performance web vitals', 'alert routing escalation pagerduty opsgenie oncall'],
+    'Monitoring patterns: Synthetic monitoring — automated checks from external locations (Pingdom, UptimeRobot, Checkly). Health check endpoints: /health, /readiness, /liveness for Kubernetes probes. Real User Monitoring (RUM): actual user experience data (page load, interactions, errors). Core Web Vitals monitoring. Error tracking: Sentry, Bugsnag, Rollbar — capture exceptions with stack traces, breadcrumbs, context. Alert routing: PagerDuty, OpsGenie — on-call schedules, escalation policies, incident management integration. Runbooks linked to alerts for quick resolution.', 1.0)
+
+  // ── Digital Twins / Simulation ──────────────────────────────────────────────
+  add('digital_twins', ['digital twin virtual model real time synchronization', 'physics simulation finite element analysis fem fea', 'agent based modeling simulation complex adaptive system'],
+    'Digital twins & simulation: Digital twin — virtual replica of physical system, synchronized with real-time data (IoT sensors, APIs). Layers: physical entity, virtual model, data connection, analytics. Use cases: predictive maintenance (machinery), urban planning (city twins), healthcare (patient twins), manufacturing (production optimization). Physics simulation: Finite Element Analysis (FEA/FEM) — discretize continuous domain into elements, solve PDEs numerically. Tools: ANSYS, COMSOL, OpenFOAM (CFD). Agent-based modeling (ABM): autonomous agents with rules, emergent behavior. Tools: Mesa (Python), NetLogo, AnyLogic.', 1.0)
+
+  add('digital_twins', ['monte carlo simulation random sampling probability', 'discrete event simulation queuing theory process', 'system dynamics feedback loop stock flow causal'],
+    'Simulation methods: Monte Carlo — random sampling to estimate numerical results. Applications: risk analysis, financial modeling, physics, optimization. Convergence: accuracy improves with √N samples. Variance reduction: importance sampling, stratified sampling, antithetic variates. Discrete Event Simulation (DES): model systems as sequence of events (arrivals, departures, failures). Queuing theory: M/M/1, M/M/c models. Tools: SimPy (Python), Arena, Simio. System dynamics: stocks (accumulations), flows (rates), feedback loops (reinforcing/balancing). Causal loop diagrams. Tools: Vensim, Stella.', 1.0)
+
+  add('digital_twins', ['computational fluid dynamics cfd weather climate', 'simulation optimization genetic algorithm parameter', 'real time simulation hardware in loop testing'],
+    'Advanced simulation: CFD (Computational Fluid Dynamics) — Navier-Stokes equations, turbulence models (RANS, LES, DNS), mesh generation. Weather/climate modeling: GCMs (General Circulation Models), ensemble forecasting. Simulation optimization: use optimization algorithms (genetic, simulated annealing, Bayesian optimization) to find best parameters. Hardware-in-the-loop (HIL): real hardware + simulated environment for testing embedded systems, autonomous vehicles, aerospace. Digital twin platforms: Azure Digital Twins, AWS IoT TwinMaker, NVIDIA Omniverse. Standards: DTDL (Digital Twins Definition Language).', 1.0)
+
+  // ── Natural Language Generation (NLG) ──────────────────────────────────────
+  add('nlg', ['natural language generation template text production', 'text generation gpt language model autoregressive', 'nlg pipeline content determination document structuring'],
+    'Natural Language Generation: NLG pipeline — content determination (what to say), document structuring (order), sentence aggregation (combine), lexicalization (word choice), referring expression generation (pronouns/names), linguistic realization (grammar). Template-based: fill slots in predefined templates (simple, predictable, limited). Rule-based: grammar rules generate varied output. Neural: GPT/LLM-based (fluent but less controlled). Hybrid: templates + neural for controlled yet natural output. Applications: report generation, data-to-text (sports summaries, financial reports), chatbot responses, personalized emails.', 1.0)
+
+  add('nlg', ['text summarization extractive abstractive compression', 'paraphrasing sentence rewriting style transfer', 'grammar checking correction grammarly language tool'],
+    'Text transformation: Summarization — extractive (select important sentences: TextRank, BERT-based) vs abstractive (generate new text: T5, BART, Pegasus). Compression ratio, ROUGE evaluation metrics. Paraphrasing: rephrase while preserving meaning — back-translation, T5 paraphrase models, round-trip translation. Style transfer: formal↔informal, technical↔simple, active↔passive. Grammar correction: rule-based (LanguageTool, open-source), neural (GECToR, T5), commercial (Grammarly). Readability metrics: Flesch-Kincaid, Gunning Fog, SMOG index. Plain language: short sentences, active voice, common words.', 1.0)
+
+  add('nlg', ['dialogue system response generation chatbot conversational', 'data to text report generation automated narrative', 'content generation seo copywriting marketing automation'],
+    'Applied NLG: Dialogue systems — retrieval-based (select from candidates), generative (create novel responses), hybrid. Persona consistency, grounding in knowledge. Data-to-text: convert structured data (tables, charts, databases) to natural language narratives. Automated reporting: financial summaries, sports recaps, weather reports, analytics dashboards. Tools: Narrative Science (acquired by Salesforce), Arria NLG, Amazon Polly (text-to-speech). Content generation: SEO-optimized articles, product descriptions, ad copy, email campaigns. Ethical considerations: disclosure of AI-generated content, misinformation risks, plagiarism detection.', 1.0)
+
   return entries
 }
 
@@ -4688,6 +4754,48 @@ export class LocalBrain {
     const privacyPattern = /\b(privacy\s+by\s+design\s+(default|principle|assessment)|consent\s+management\s+(platform|cmp|cookie|banner)|dpia\s+(data\s+protection|impact|assessment|risk))\b/i
     const piiPattern = /\b(pii\s+(detection|classification|personally\s+identifiable)|data\s+anonymization\s+(pseudonymization|differential\s+privacy)|ccpa\s+(cpra|california|consumer\s+privacy))\b/i
     return gdprPattern.test(msg) || privacyPattern.test(msg) || piiPattern.test(msg)
+  }
+
+  private isEdgeServerlessQuery(msg: string): boolean {
+    const lambdaPattern = /\b(aws\s+lambda\s+(serverless|function|handler|cold\s+start)|serverless\s+framework\s+(sam|cdk|sst|deploy)|lambda\s+(trigger|layer|concurrency|provisioned))\b/i
+    const edgePattern = /\b(cloudflare\s+workers?\s+(v8|isolate|kv|durable|wasm)|vercel\s+edge\s+(function|runtime|middleware)|edge\s+computing\s+(cdn|cache|latency|global))\b/i
+    const faasPattern = /\b(function\s+as\s+a\s+service\s+(faas|event|trigger)|step\s+functions?\s+(state\s+machine|orchestrat|workflow)|serverless\s+database\s+(planetscale|neon|turso|supabase))\b/i
+    return lambdaPattern.test(msg) || edgePattern.test(msg) || faasPattern.test(msg)
+  }
+
+  private isLowCodeQuery(msg: string): boolean {
+    const toolPattern = /\b(retool\s+(internal\s+tool|admin|dashboard|builder)|low.?code\s+platform\s+(appsmith|tooljet|budibase)|visual\s+programming\s+(drag\s+drop|component|builder))\b/i
+    const autoPattern = /\b(zapier\s+(automation|workflow|trigger|zap)|n8n\s+(make|integromat|workflow|automation)|no.?code\s+automation\s+(ifttt|webhook|integration))\b/i
+    const noCodePattern = /\b(airtable\s+(notion|database|spreadsheet)|webflow\s+(bubble|squarespace|website\s+builder)|citizen\s+developer\s+(low.?code|governance|shadow\s+it))\b/i
+    return toolPattern.test(msg) || autoPattern.test(msg) || noCodePattern.test(msg)
+  }
+
+  private isIaCQuery(msg: string): boolean {
+    const terraformPattern = /\b(terraform\s+(hcl|provider|resource|module|state|plan|apply)|terraform\s+state\s+(management|backend|remote|locking)|infrastructure\s+as\s+code\s+(iac|terraform|pulumi))\b/i
+    const altPattern = /\b(pulumi\s+(typescript|python|go|aws\s+cdk|infrastructure)|ansible\s+(playbook|role|inventory|configuration)|aws\s+cdk\s+(construct|stack|synthesize|cloudformation))\b/i
+    const opsPattern = /\b(infrastructure\s+drift\s+(detection|remediation|compliance)|gitops\s+(flux|argocd|atlantis|reconciliation)|iac\s+testing\s+(terratest|checkov|tfsec|policy))\b/i
+    return terraformPattern.test(msg) || altPattern.test(msg) || opsPattern.test(msg)
+  }
+
+  private isObservabilityQuery(msg: string): boolean {
+    const promPattern = /\b(prometheus\s+(metrics|scraping|alertmanager|promql)|grafana\s+(dashboard|visualization|panel|loki|tempo)|opentelemetry\s+(otlp|traces|spans|instrumentation))\b/i
+    const tracePattern = /\b(distributed\s+trac(ing|e)\s+(jaeger|zipkin|tempo|collector)|log\s+aggregation\s+(elk|elasticsearch|loki|fluentd)|structured\s+logging\s+(json|correlation|context))\b/i
+    const monPattern = /\b(synthetic\s+monitoring\s+(uptime|health\s+check|pingdom)|real\s+user\s+monitoring\s+(rum|performance|web\s+vitals)|datadog\s+(newrelic|dynatrace|apm|monitoring))\b/i
+    return promPattern.test(msg) || tracePattern.test(msg) || monPattern.test(msg)
+  }
+
+  private isDigitalTwinsQuery(msg: string): boolean {
+    const twinPattern = /\b(digital\s+twin\s+(virtual|model|synchronization|iot)|physics\s+simulation\s+(finite\s+element|fem|fea)|agent\s+based\s+model(ing)?\s+(simulation|complex|adaptive))\b/i
+    const simPattern = /\b(monte\s+carlo\s+simulation\s+(random|probability|sampling)|discrete\s+event\s+simulation\s+(queuing|simpy|process)|system\s+dynamics\s+(feedback|stock|flow|causal))\b/i
+    const advPattern = /\b(computational\s+fluid\s+dynamics\s+(cfd|navier|turbulence)|simulation\s+optimization\s+(genetic|parameter|bayesian)|hardware\s+in\s+.?loop\s+(hil|testing|embedded))\b/i
+    return twinPattern.test(msg) || simPattern.test(msg) || advPattern.test(msg)
+  }
+
+  private isNLGQuery(msg: string): boolean {
+    const nlgPattern = /\b(natural\s+language\s+generation\s+(template|pipeline|nlg)|text\s+generation\s+(gpt|language\s+model|autoregressive)|nlg\s+(pipeline|content|document|realization))\b/i
+    const transformPattern = /\b(text\s+summarization\s+(extractive|abstractive|compression)|paraphras(e|ing)\s+(sentence|rewriting|style\s+transfer)|grammar\s+(checking|correction|grammarly|language\s+tool))\b/i
+    const appliedPattern = /\b(dialogue\s+system\s+(response|generation|chatbot)|data\s+to\s+text\s+(report|narrative|automated)|content\s+generation\s+(seo|copywriting|marketing))\b/i
+    return nlgPattern.test(msg) || transformPattern.test(msg) || appliedPattern.test(msg)
   }
 
   /** Extract probable cause from a causal query. */
