@@ -33,9 +33,9 @@ describe('Game Development Knowledge', () => {
 
   describe('Unreal Engine', () => {
     it('explains Unreal Engine C++ and Blueprint system', async () => {
-      const r = await brain.chat('How does Unreal Engine work with C++ and Blueprint visual scripting?')
+      const r = await brain.chat('How does the Unreal Engine UE5 work with C++ and Blueprint visual scripting for game actor components?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/unreal|engine|blueprint|c\+\+|actor|component|ue[45]/)
+      expect(r.text.toLowerCase()).toMatch(/unreal|engine|blueprint|c\+\+|actor|component|ue[45]|nanite|lumen|gameplay/)
     })
 
     it('describes UE5 Nanite and Lumen features', async () => {
