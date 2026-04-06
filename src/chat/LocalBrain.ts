@@ -147,6 +147,21 @@ import { KurdishTranslationCorpus } from './KurdishTranslationCorpus.js'
 // New intelligence modules
 import { HypothesisEngine } from './HypothesisEngine.js'
 import { EthicalReasoner } from './EthicalReasoner.js'
+import { CoreferenceResolver } from './CoreferenceResolver.js'
+import { LanguageDetector } from './LanguageDetector.js'
+import { DialogueActRecognizer } from './DialogueActRecognizer.js'
+import { QueryDecomposer } from './QueryDecomposer.js'
+import { CrossDomainTransfer } from './CrossDomainTransfer.js'
+import { CounterfactualReasoner } from './CounterfactualReasoner.js'
+import { UserProfileModel } from './UserProfileModel.js'
+import { ConversationSummarizer } from './ConversationSummarizer.js'
+import { ResponseQualityScorer } from './ResponseQualityScorer.js'
+import { MultiFormatGenerator } from './MultiFormatGenerator.js'
+import { AnomalyDetector } from './AnomalyDetector.js'
+import { EmotionalIntelligence } from './EmotionalIntelligence.js'
+import { ContextualMemoryEngine } from './ContextualMemoryEngine.js'
+import { LogicalProofEngine } from './LogicalProofEngine.js'
+import { CreativeProblemSolver } from './CreativeProblemSolver.js'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -2520,6 +2535,171 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('accessibility_a11y', ['inclusive design universal design disability', 'assistive technology screen magnifier switch', 'accessibility compliance legal section 508 ada'],
     'Inclusive design & compliance: Inclusive design principles — recognize exclusion, solve for one extend to many, learn from diversity. Disability types: visual (blind, low vision, color blind), auditory (deaf, hard of hearing), motor (limited dexterity, tremors), cognitive (learning disabilities, attention). Assistive technologies: screen readers, screen magnifiers (ZoomText), switch devices, eye tracking, voice control (Dragon NaturallySpeaking). Legal: ADA (Americans with Disabilities Act), Section 508 (US federal), EN 301 549 (EU), Accessibility Act (EU 2025). VPAT (Voluntary Product Accessibility Template). Overlay tools: generally ineffective and controversial.', 0.8)
 
+  // ── Data Engineering / ETL ───────────────────────────────────────────────────
+  add('data_engineering', ['apache spark distributed data processing rdd dataframe', 'spark sql catalyst optimizer query execution plan', 'pyspark structured streaming micro batch continuous'],
+    'Apache Spark: Distributed computing engine for large-scale data processing. Core abstraction: RDD (Resilient Distributed Dataset) → immutable, partitioned, fault-tolerant. Modern API: DataFrames/Datasets with Catalyst optimizer for SQL-like queries. Spark SQL: Hive-compatible, supports Parquet/ORC/Avro. Structured Streaming: micro-batch (100ms latency) or continuous processing. Spark MLlib for distributed ML. Deploy on YARN, Kubernetes, Mesos, or standalone. Key tuning: partition count, memory/executor config, broadcast joins, AQE (Adaptive Query Execution).', 1.1)
+
+  add('data_engineering', ['airflow dag directed acyclic graph workflow orchestration', 'data pipeline scheduling task dependency management', 'prefect dagster orchestration modern workflow'],
+    'Workflow orchestration: Apache Airflow — define DAGs (Directed Acyclic Graphs) in Python for pipeline scheduling. Operators: BashOperator, PythonOperator, sensors, transfers. XComs for inter-task communication. Executors: Local, Celery, Kubernetes. Alternatives: Prefect (Pythonic, dynamic DAGs), Dagster (asset-based, type-safe), Luigi (simpler). Key patterns: idempotent tasks, backfill support, SLA monitoring, retry policies, dead-letter queues. Best practice: separate orchestration from transformation logic.', 1.1)
+
+  add('data_engineering', ['dbt data build tool transformation analytics engineering', 'elt extract load transform modern data stack', 'data warehouse snowflake bigquery redshift lakehouse'],
+    'Modern data stack: dbt (data build tool) — SQL-first transformation in the warehouse. Models as SELECT statements, ref() for dependencies, tests for data quality, documentation generation. ELT pattern: Extract → Load raw → Transform in warehouse (vs traditional ETL). Warehouses: Snowflake (multi-cluster, separation of compute/storage), BigQuery (serverless, columnar), Redshift (MPP, Spectrum for S3). Lakehouse: Delta Lake, Apache Iceberg, Apache Hudi — ACID transactions on data lakes. Formats: Parquet (columnar, compressed), ORC, Avro (schema evolution).', 1.1)
+
+  add('data_engineering', ['kafka streams event streaming real time processing', 'data lake delta lake iceberg hudi table format', 'schema evolution registry avro protobuf backward compatible'],
+    'Event streaming & schema management: Kafka Streams — lightweight stream processing library (no separate cluster). Concepts: KStream (event stream), KTable (changelog), joins, windowing (tumbling, hopping, session). Schema Registry: Avro/Protobuf/JSON Schema versioning. Compatibility modes: BACKWARD (new schema reads old data), FORWARD (old schema reads new data), FULL. Data lake table formats: Delta Lake (Databricks, time travel, MERGE), Iceberg (Netflix, hidden partitioning, schema evolution), Hudi (Uber, incremental processing). CDC (Change Data Capture): Debezium for database→Kafka streaming.', 1.0)
+
+  add('data_engineering', ['data quality testing great expectations validation', 'data lineage metadata catalog governance', 'batch processing etl pipeline spark flink beam'],
+    'Data quality & governance: Great Expectations — data validation framework (expectations as tests, data docs, checkpoints). Alternatives: Soda, dbt tests, Monte Carlo (observability). Data lineage: track data flow from source→transformation→destination. Metadata catalogs: Apache Atlas, Amundsen, DataHub, OpenMetadata. Data governance: access control, PII classification, retention policies. Batch engines: Spark (dominant), Flink (true streaming + batch), Apache Beam (unified API, runners for Spark/Flink/Dataflow). ETL anti-patterns: monolithic pipelines, no idempotency, missing data validation.', 1.0)
+
+  add('data_engineering', ['data pipeline design pattern medallion bronze silver gold', 'dimensional modeling star schema fact dimension table', 'data mesh domain oriented decentralized architecture'],
+    'Data architecture patterns: Medallion architecture — Bronze (raw ingestion), Silver (cleaned, conformed), Gold (business-level aggregates). Dimensional modeling (Kimball): star schema with fact tables (measures) and dimension tables (context). Slowly changing dimensions (SCD Type 1/2/3). Data Vault: hub-satellite-link for historical tracking. Data mesh: domain-oriented decentralized ownership, data as a product, self-serve platform, federated governance. Lambda architecture: batch + speed layers (largely superseded by Kappa/streaming-first). Key metrics: data freshness, completeness, accuracy, consistency.', 1.0)
+
+  // ── Site Reliability Engineering (SRE) ──────────────────────────────────────
+  add('sre', ['sli slo sla service level indicator objective agreement', 'error budget reliability target uptime nines', 'sre site reliability engineering google practices'],
+    'SRE fundamentals: Service Level Indicators (SLIs) — quantitative measures of service (latency p99, error rate, throughput). Service Level Objectives (SLOs) — target values for SLIs (e.g., 99.9% availability = 8.76h downtime/year). Service Level Agreements (SLAs) — contractual commitments with consequences. Error budget = 1 - SLO (e.g., 0.1% for 99.9%). When budget exhausted: freeze deployments, focus on reliability. Google SRE principles: embrace risk, eliminate toil, monitor meaningfully, automate everything, release engineering, simplicity.', 1.1)
+
+  add('sre', ['incident management response postmortem blameless review', 'on call rotation escalation runbook playbook', 'incident commander communication stakeholder update'],
+    'Incident management: Severity levels (SEV1-4) with escalation paths. Incident Commander (IC) coordinates response. Roles: IC, Communications Lead, Operations Lead, Subject Matter Experts. Runbooks/playbooks: step-by-step remediation procedures. War rooms for SEV1/2. Status pages: Statuspage.io, Cachet. Post-incident: blameless postmortems — timeline, root cause, contributing factors, action items. Format: What happened? Why? How to prevent? Action items with owners and deadlines. On-call: rotation schedules, escalation policies, PagerDuty/OpsGenie/VictorOps.', 1.0)
+
+  add('sre', ['chaos engineering resilience testing fault injection', 'chaos monkey gameday failure experiment hypothesis', 'reliability testing disaster recovery failover'],
+    'Chaos engineering: Discipline of experimenting on systems to build confidence in resilience. Process: steady state hypothesis → introduce failure → observe → learn. Tools: Chaos Monkey (Netflix, random instance termination), Gremlin (enterprise chaos), Litmus (Kubernetes-native), AWS Fault Injection Simulator. Game Days: planned chaos experiments with team. Types: infrastructure (kill instances, network partition), application (latency injection, error injection), dependency (upstream/downstream failures). Disaster recovery: RPO (Recovery Point Objective), RTO (Recovery Time Objective). DR strategies: backup/restore, pilot light, warm standby, multi-site active-active.', 1.0)
+
+  add('sre', ['toil reduction automation operational work repetitive', 'capacity planning scaling autoscaling resource management', 'release engineering deployment canary blue green rolling'],
+    'Toil & release engineering: Toil — manual, repetitive, automatable, tactical operational work. Goal: keep toil <50% of SRE time. Automation ladder: manual → documented → scripted → self-service → fully automated. Capacity planning: organic growth forecasting, inorganic (launches), load testing for headroom. Release engineering: CI/CD pipelines, canary releases (gradual rollout with metrics comparison), blue-green deployments (instant switchover), rolling updates (zero-downtime). Feature flags for decoupling deployment from release. Rollback strategies: code rollback, config rollback, data rollback.', 1.0)
+
+  add('sre', ['observability three pillars metrics logs traces', 'alerting fatigue noise reduction actionable alerts', 'sre culture reliability engineering team structure'],
+    'SRE observability & culture: Three pillars — metrics (aggregated numerical data), logs (discrete events), traces (request flows across services). Golden signals: latency, traffic, errors, saturation. RED method: Rate, Errors, Duration. USE method: Utilization, Saturation, Errors. Alert best practices: actionable, low-noise, symptom-based (not cause-based), with runbook links. Alert fatigue: too many alerts = ignored alerts. SRE team models: embedded (within product teams), centralized (platform team), or hybrid. Production readiness reviews before launch.', 1.0)
+
+  // ── Performance Engineering ─────────────────────────────────────────────────
+  add('performance_engineering', ['profiling cpu memory flame graph hot path bottleneck', 'performance profiler chrome devtools node inspect', 'cpu profiling sampling instrumentation call stack analysis'],
+    'Performance profiling: CPU profiling — sampling (periodic stack snapshots, low overhead) vs instrumentation (every function call, high overhead). Flame graphs: visualize call stacks (width = time spent). Tools: Chrome DevTools Performance tab, Node.js --inspect + clinic.js, perf (Linux), py-spy (Python), async-profiler (Java). Memory profiling: heap snapshots, allocation tracking, leak detection. Chrome Memory tab: heap snapshot, allocation timeline, allocation sampling. Key metrics: CPU time vs wall time, function self-time vs total time, hot paths (most time-consuming code paths).', 1.1)
+
+  add('performance_engineering', ['benchmarking load testing performance test jmeter k6', 'stress testing soak testing spike testing capacity', 'gatling locust wrk artillery performance tool'],
+    'Load & stress testing: Types — load test (expected traffic), stress test (beyond capacity), soak test (sustained load, find leaks), spike test (sudden traffic burst), capacity test (find breaking point). Tools: k6 (JavaScript, developer-friendly), JMeter (Java, GUI + CLI), Gatling (Scala, code-first), Locust (Python, distributed), Artillery (Node.js, YAML config), wrk/wrk2 (HTTP benchmarking). Methodology: establish baseline, define SLOs, ramp up gradually, monitor all layers, identify bottlenecks. Metrics: throughput (RPS), latency percentiles (p50/p95/p99), error rate, resource utilization.', 1.0)
+
+  add('performance_engineering', ['caching strategy redis memcached cdn cache invalidation', 'cache aside write through write behind read through', 'browser cache http cache etag last modified expires'],
+    'Caching strategies: Patterns — cache-aside (lazy load, app manages cache), read-through (cache manages data source reads), write-through (synchronous write to cache + DB), write-behind (async write to DB). Eviction: LRU (Least Recently Used), LFU (Least Frequently Used), TTL-based. Layers: browser cache (Cache-Control, ETag, Last-Modified), CDN (edge caching, Cloudflare/Fastly/CloudFront), application cache (Redis, Memcached), database cache (query cache, buffer pool). Cache invalidation: TTL, event-based, versioned keys. Redis: in-memory, data structures, pub/sub, Lua scripting, cluster mode.', 1.0)
+
+  add('performance_engineering', ['memory optimization garbage collection heap allocation', 'memory leak detection object pooling buffer reuse', 'latency optimization p99 tail latency response time'],
+    'Memory & latency optimization: Memory — object pooling (reuse expensive objects), buffer reuse, string interning, lazy initialization, weak references for caches. GC tuning: generational GC (young/old gen), G1GC (Java), V8 GC (Node.js Scavenge + Mark-Sweep-Compact). Memory leaks: unbounded caches, event listener accumulation, closures retaining references, circular references. Latency: tail latency (p99/p999) often matters more than average. Techniques: connection pooling, request coalescing, prefetching, async I/O, batch processing, denormalization, index optimization.', 1.0)
+
+  add('performance_engineering', ['database query optimization indexing explain plan', 'n plus one query problem eager loading batch query', 'web performance core web vitals lcp fid cls ttfb'],
+    'Query & web performance: Database — EXPLAIN/EXPLAIN ANALYZE for query plans. Index types: B-tree (range), hash (equality), GIN (full-text), partial indexes. N+1 problem: eager loading (JOIN), batch loading, DataLoader pattern. Query optimization: avoid SELECT *, use covering indexes, partition large tables, materialized views. Web Core Vitals: LCP (Largest Contentful Paint <2.5s), FID/INP (First Input Delay/Interaction to Next Paint <200ms), CLS (Cumulative Layout Shift <0.1). TTFB (Time to First Byte). Techniques: code splitting, lazy loading, image optimization (WebP/AVIF), critical CSS inlining, preload/prefetch hints.', 1.0)
+
+  // ── Technical Writing / Documentation ───────────────────────────────────────
+  add('technical_writing', ['api documentation openapi swagger reference guide', 'documentation generator jsdoc typedoc rustdoc sphinx', 'readme changelog contributing guide project docs'],
+    'API & project documentation: OpenAPI/Swagger — machine-readable REST API specs (YAML/JSON), auto-generate docs (Swagger UI, Redoc), client SDKs, and server stubs. Tools: JSDoc (JavaScript), TypeDoc (TypeScript), Rustdoc (Rust), Sphinx (Python), Javadoc (Java), Godoc (Go). README essentials: project description, installation, quick start, usage examples, contributing guidelines, license. CHANGELOG: follow Keep a Changelog format (Added/Changed/Deprecated/Removed/Fixed/Security). CONTRIBUTING.md: code style, PR process, issue templates, development setup.', 1.0)
+
+  add('technical_writing', ['architecture decision record adr design document rfc', 'technical specification system design document template', 'design review process proposal approval workflow'],
+    'Architecture documentation: ADR (Architecture Decision Record) — captures context, decision, consequences for significant choices. Format: Title, Status, Context, Decision, Consequences. Tools: adr-tools, Log4brains, Markdown ADRs in repo. RFC (Request for Comments) process for larger changes — problem statement, proposed solution, alternatives, timeline. Design documents: goals, non-goals, background, detailed design, alternatives considered, security/privacy, testing plan. C4 model: Context, Container, Component, Code — four levels of system documentation from high-level to detailed.', 1.0)
+
+  add('technical_writing', ['mermaid plantuml diagram as code architecture diagram', 'sequence diagram flowchart class diagram entity relationship', 'documentation site docusaurus mkdocs gitbook vitepress'],
+    'Diagramming & doc sites: Diagram-as-code — Mermaid (Markdown-embeddable, GitHub-rendered: flowcharts, sequence, class, ER, Gantt), PlantUML (Java-based, comprehensive UML), Excalidraw (hand-drawn style), D2 (declarative). Diagram types: sequence (interactions), flowchart (processes), class (OOP), ER (database), state machine, deployment. Doc platforms: Docusaurus (React, MDX, versioning), MkDocs + Material theme (Python, beautiful), VitePress (Vue-based, fast), GitBook (commercial), Confluence (enterprise). Docs-as-code: docs in repo, reviewed in PRs, CI/CD deployed.', 1.0)
+
+  add('technical_writing', ['tutorial howto guide writing structure beginner', 'code example sample snippet documentation best practice', 'technical writing style clarity conciseness audience'],
+    'Writing best practices: Divio documentation system — tutorials (learning-oriented), how-to guides (task-oriented), explanation (understanding-oriented), reference (information-oriented). Writing style: active voice, second person ("you"), short sentences, consistent terminology, progressive disclosure. Code examples: complete (copy-pasteable), tested, with expected output, error handling shown. Audience analysis: beginner (concepts first), intermediate (patterns + gotchas), expert (edge cases + internals). Review checklist: accuracy, completeness, clarity, code tested, links valid, screenshots current.', 1.0)
+
+  add('technical_writing', ['versioned documentation release notes migration guide', 'internationalization i18n translation documentation locale', 'documentation testing broken links spelling grammar'],
+    'Doc lifecycle & quality: Versioned docs: match documentation to software versions (Docusaurus versioning, ReadTheDocs versions). Release notes: user-facing summary of changes per version, migration guides for breaking changes. Internationalization: crowdin, Transifex, or manual translation workflows. Locale-specific examples and screenshots. Documentation testing: broken link checkers (markdown-link-check), spell checkers (cspell, aspell), linters (markdownlint, vale), screenshot automation (Playwright). Freshness: documentation review cadence, ownership per section, "last reviewed" timestamps. Metrics: page views, search queries, feedback ratings.', 0.9)
+
+  // ── Open Source / Community ─────────────────────────────────────────────────
+  add('open_source', ['open source license mit gpl apache bsd mozilla', 'software licensing permissive copyleft choosing license', 'license compatibility gpl mit apache linking distribution'],
+    'Open source licensing: Permissive — MIT (minimal restrictions, most popular), Apache 2.0 (patent grant, attribution), BSD (2/3-clause, similar to MIT), ISC (simplified MIT). Copyleft — GPL v2/v3 (derivatives must be GPL, "viral"), LGPL (library exception, can link without GPL obligation), AGPL (network use triggers copyleft), MPL 2.0 (file-level copyleft). Choosing: permissive for libraries/adoption, copyleft for community protection. License compatibility: Apache 2.0 compatible with GPLv3 but not GPLv2. SPDX identifiers for machine-readable license references. Dual licensing: open source + commercial.', 1.0)
+
+  add('open_source', ['semantic versioning semver major minor patch version', 'changelog keep changelog conventional commits release', 'version management npm version git tag release notes'],
+    'Versioning & releases: Semantic Versioning (SemVer) — MAJOR.MINOR.PATCH. MAJOR: breaking changes, MINOR: backward-compatible features, PATCH: backward-compatible fixes. Pre-release: 1.0.0-alpha.1, 1.0.0-beta.2, 1.0.0-rc.1. Conventional Commits: type(scope): description — feat:, fix:, docs:, chore:, BREAKING CHANGE:. Auto-changelog: conventional-changelog, release-please, semantic-release. Release process: version bump, changelog update, git tag, GitHub Release, package publish. Calver (calendar versioning): YYYY.MM.DD — used by Ubuntu, pip.', 1.0)
+
+  add('open_source', ['contributing guide code of conduct community guidelines', 'pull request template issue template good first issue', 'open source maintainer community management governance'],
+    'Community management: CONTRIBUTING.md — development setup, coding standards, PR process, issue triaging, communication channels. CODE_OF_CONDUCT.md — Contributor Covenant (most common), enforcement guidelines. Issue templates: bug report, feature request, question. PR templates: description, related issues, testing, screenshots. Labels: good first issue, help wanted, bug, enhancement, documentation. Governance models: BDFL (Benevolent Dictator for Life), meritocracy, foundation-backed (Apache, Linux Foundation, CNCF). Maintainer burnout: set boundaries, delegate, use bots (Dependabot, Stale bot).', 1.0)
+
+  add('open_source', ['github actions ci cd open source workflow automation', 'package publishing npm pypi crates rubygems registry', 'open source security vulnerability disclosure responsible'],
+    'Open source operations: CI/CD — GitHub Actions (free for public repos), GitLab CI, CircleCI. Workflows: lint, test, build, release, publish. Package registries: npm (JavaScript), PyPI (Python), crates.io (Rust), RubyGems (Ruby), Maven Central (Java), NuGet (.NET). Publishing: automated with CI, provenance/attestation for supply chain security. Security: SECURITY.md with vulnerability disclosure policy, responsible disclosure, CVE reporting, GitHub Security Advisories. Supply chain: Sigstore for signing, SBOM (Software Bill of Materials), dependency scanning (Dependabot, Snyk, Socket).', 0.9)
+
+  add('open_source', ['open source funding sponsorship sustainability model', 'open source contribution forking upstream downstream', 'inner source enterprise open source practices internal'],
+    'Sustainability & contribution: Funding — GitHub Sponsors, Open Collective, Tidelift, grants (Google Summer of Code, Linux Foundation). Business models: open core, SaaS/hosting, support/consulting, dual licensing. Contributing workflow: fork → clone → branch → commit → push → PR. Upstream/downstream: upstream (original project), downstream (consumers/forks). Cherry-picking patches upstream. InnerSource: applying open source practices inside organizations — discoverable repos, contributing guidelines, internal communities. Metrics: contributors, commit frequency, issue response time, bus factor.', 0.9)
+
+  // ── Privacy Engineering / GDPR ──────────────────────────────────────────────
+  add('privacy_engineering', ['gdpr general data protection regulation european privacy', 'data protection regulation compliance personal data processing', 'gdpr principles lawfulness purpose limitation data minimization'],
+    'GDPR fundamentals: General Data Protection Regulation (EU, 2018) — applies to processing personal data of EU residents. 7 principles: lawfulness/fairness/transparency, purpose limitation, data minimization, accuracy, storage limitation, integrity/confidentiality, accountability. Lawful bases: consent, contract, legal obligation, vital interests, public task, legitimate interests. Rights: access (Art.15), rectification (Art.16), erasure "right to be forgotten" (Art.17), portability (Art.20), objection (Art.21). Fines: up to €20M or 4% global turnover. DPA (Data Protection Authority) per EU member state.', 1.1)
+
+  add('privacy_engineering', ['consent management platform cmp cookie banner opt in', 'privacy by design default data protection impact assessment', 'dpia data protection impact assessment risk evaluation'],
+    'Privacy by design & consent: Privacy by Design (PbD) — 7 foundational principles: proactive, default privacy, embedded, full functionality, end-to-end security, visibility/transparency, user-centric. Data Protection Impact Assessment (DPIA) — required for high-risk processing: systematic description, necessity/proportionality, risk assessment, mitigation measures. Consent Management Platforms (CMPs): OneTrust, Cookiebot, Usercentrics. Cookie consent: strictly necessary (no consent needed), analytics (opt-in), marketing (opt-in). Consent requirements: freely given, specific, informed, unambiguous, withdrawable.', 1.0)
+
+  add('privacy_engineering', ['pii personally identifiable information detection classification', 'data anonymization pseudonymization differential privacy', 'data masking tokenization encryption at rest in transit'],
+    'PII handling & anonymization: PII categories — direct identifiers (name, SSN, email), quasi-identifiers (age, ZIP, gender — can re-identify when combined). Detection: regex patterns, ML classifiers, DLP (Data Loss Prevention) tools. Anonymization techniques: k-anonymity (each record indistinguishable from k-1 others), l-diversity (sensitive attribute diversity), t-closeness. Pseudonymization: replace identifiers with tokens (reversible with key). Differential privacy: add calibrated noise to query results (ε-differential privacy). Data masking: static (permanent), dynamic (at query time). Encryption: at rest (AES-256), in transit (TLS 1.3).', 1.0)
+
+  add('privacy_engineering', ['right to erasure deletion data subject request dsar', 'data retention policy lifecycle management purging', 'cross border data transfer adequacy decision standard clauses'],
+    'Data subject rights & transfers: DSAR (Data Subject Access Request) — organizations must respond within 30 days. Right to erasure: delete personal data when no longer necessary, consent withdrawn, or unlawful processing. Challenges: backups, distributed systems, derived data, third-party copies. Data retention: define policies per data category, automated purging, legal hold exceptions. Cross-border transfers: adequacy decisions (EU Commission approves country), Standard Contractual Clauses (SCCs), Binding Corporate Rules (BCRs). US: no federal privacy law — state-level (CCPA/CPRA California, VCDPA Virginia, CPA Colorado).', 1.0)
+
+  add('privacy_engineering', ['ccpa california consumer privacy act cpra rights', 'privacy engineering tools onetrust bigid securiti', 'data breach notification incident response gdpr 72 hours'],
+    'CCPA/CPRA & breach response: CCPA/CPRA (California) — right to know, delete, opt-out of sale, non-discrimination. Categories: personal information, sensitive personal information. Global Privacy Control (GPC) signal for opt-out. Privacy tools: OneTrust (compliance platform), BigID (data discovery/classification), Securiti (privacy automation), Transcend (data mapping). Breach notification: GDPR requires 72-hour notification to DPA, "without undue delay" to data subjects if high risk. CCPA: notification without unreasonable delay. Incident response: contain, assess scope, notify, remediate, document lessons learned.', 1.0)
+
+  // ── Edge Computing / Serverless ──────────────────────────────────────────────
+  add('edge_serverless', ['aws lambda serverless function event driven cold start', 'lambda function handler runtime timeout memory', 'serverless framework sam cdk deployment infrastructure'],
+    'AWS Lambda & Serverless: Event-driven compute — functions triggered by API Gateway, S3, SQS, DynamoDB Streams, EventBridge. Runtimes: Node.js, Python, Java, Go, .NET, Ruby, custom (container images). Limits: 15min timeout, 10GB memory, 6MB payload (sync), 256KB (async). Cold starts: first invocation latency (Java/C# worst, Python/Node best). Mitigation: provisioned concurrency, SnapStart (Java), smaller packages, keep-alive pings. Frameworks: Serverless Framework (multi-cloud), AWS SAM (CloudFormation), SST (TypeScript), Architect.', 1.1)
+
+  add('edge_serverless', ['cloudflare workers edge function v8 isolate wasm', 'vercel edge functions nextjs middleware runtime', 'deno deploy edge runtime bun serverless'],
+    'Edge computing platforms: Cloudflare Workers — V8 isolates (not containers), <1ms cold starts, 128MB memory, Workers KV (key-value), Durable Objects (stateful), R2 (S3-compatible storage), D1 (SQLite at edge). Vercel Edge Functions — built on Edge Runtime, integrate with Next.js middleware, streaming responses. Deno Deploy — TypeScript-native edge runtime, built-in KV, BroadcastChannel. Bun — fast JavaScript runtime with serverless support. Fastly Compute@Edge — WASM-based edge compute. Use cases: A/B testing, geolocation routing, auth at edge, personalization, bot protection.', 1.0)
+
+  add('edge_serverless', ['edge caching cdn worker global distribution latency', 'serverless database planetscale neon turso supabase', 'function as a service faas event driven architecture'],
+    'Edge architecture patterns: Edge caching — cache API responses at CDN edge (Cache-Control, stale-while-revalidate), Cloudflare Cache API, Vercel ISR (Incremental Static Regeneration). Serverless databases: PlanetScale (MySQL, branching), Neon (Postgres, branching, autoscaling), Turso (SQLite/libSQL, edge replicas), Supabase (Postgres, real-time, auth). FaaS patterns: single-purpose functions, event-driven (pub/sub, queues), fan-out/fan-in, saga pattern for distributed transactions. Cost model: pay-per-invocation (no idle cost), but watch for runaway executions.', 1.0)
+
+  add('edge_serverless', ['step functions orchestration state machine serverless', 'serverless monitoring observability cold start optimization', 'api gateway websocket serverless http endpoint'],
+    'Serverless orchestration & monitoring: AWS Step Functions — state machines for serverless workflows (sequential, parallel, choice, wait, error handling). Express Workflows for high-volume short-duration. Standard for long-running. Monitoring: AWS X-Ray, Lumigo, Dashbird, Epsagon for distributed tracing. Cold start optimization: tree-shaking, lazy imports, connection pooling (RDS Proxy), provisioned concurrency. API Gateway: REST API, HTTP API (cheaper, faster), WebSocket API. Authentication: Lambda authorizers, Cognito, JWT verification at edge.', 1.0)
+
+  // ── Low-Code / No-Code ─────────────────────────────────────────────────────
+  add('low_code', ['retool internal tool builder admin panel dashboard', 'low code platform appsmith tooljet budibase', 'visual programming drag drop component builder'],
+    'Low-code internal tools: Retool — drag-and-drop UI builder for internal tools, connects to databases/APIs, JavaScript transformers, role-based access. Alternatives: Appsmith (open-source), ToolJet (open-source), Budibase (open-source, self-hostable). Visual programming: component-based UIs, form builders, table/chart widgets, workflow triggers. Use cases: admin panels, CRUD apps, data dashboards, customer support tools, approval workflows. Advantages: 10x faster development for internal tools, non-engineers can maintain.', 1.0)
+
+  add('low_code', ['zapier automation workflow trigger action integration', 'n8n make integromat workflow automation self hosted', 'ifttt webhook api connector no code automation'],
+    'Workflow automation: Zapier — connect 5000+ apps with triggers and actions, multi-step Zaps, filters, formatters, paths (conditional logic). Make (formerly Integromat) — visual scenarios, more complex logic, HTTP modules. n8n — open-source, self-hostable, code nodes (JavaScript/Python), AI agents. IFTTT — simple if-this-then-that consumer automations. Patterns: webhook triggers, scheduled runs, email parsing, form submission processing, CRM sync, invoice automation. Limitations: API rate limits, execution time limits, data transformation complexity.', 1.0)
+
+  add('low_code', ['airtable notion database spreadsheet knowledge base', 'no code website builder webflow bubble squarespace', 'citizen developer low code governance shadow it'],
+    'No-code platforms: Airtable — spreadsheet-database hybrid, views (grid, kanban, calendar, gallery), automations, scripting. Notion — docs + databases + wikis, API, templates. Website builders: Webflow (professional CSS control, CMS, hosting), Bubble (full-stack web apps, workflows, database), Squarespace (templates, e-commerce). Citizen developers: business users building solutions. Governance: shadow IT risks, data security, integration standards, approved platform list. Best for: MVPs, prototypes, internal tools, landing pages, simple CRUD apps. Not for: high-scale, complex algorithms, real-time systems.', 1.0)
+
+  // ── Infrastructure as Code (IaC) ───────────────────────────────────────────
+  add('iac', ['terraform infrastructure as code hcl provider resource', 'terraform state management backend remote locking', 'terraform module registry reusable configuration'],
+    'Terraform: HashiCorp IaC tool — declarative HCL (HashiCorp Configuration Language). Core concepts: providers (AWS, GCP, Azure, 3000+), resources (infrastructure components), data sources (read existing), modules (reusable configs). State management: terraform.tfstate tracks real infrastructure. Remote backends: S3+DynamoDB (locking), Terraform Cloud, GCS. Workflow: terraform init → plan → apply → destroy. State locking prevents concurrent modifications. Modules: reuse via Terraform Registry or private. Best practices: remote state, workspace per environment, module versioning, plan review before apply.', 1.1)
+
+  add('iac', ['pulumi aws cdk infrastructure code typescript python', 'ansible configuration management playbook role inventory', 'crossplane kubernetes native infrastructure control plane'],
+    'IaC alternatives: Pulumi — real programming languages (TypeScript, Python, Go, C#) instead of DSL. State management, preview, policy-as-code. AWS CDK — define AWS infra in TypeScript/Python/Java, synthesizes to CloudFormation. Constructs (L1=CFN, L2=opinionated, L3=patterns). Ansible — configuration management, agentless (SSH), playbooks (YAML), roles, inventory, idempotent modules. Not strictly IaC but overlaps. Crossplane — Kubernetes-native IaC, manage cloud resources via K8s CRDs. Chef/Puppet — older CM tools, agent-based.', 1.0)
+
+  add('iac', ['infrastructure drift detection remediation compliance', 'gitops flux argocd infrastructure repository reconciliation', 'iac testing terratest checkov tfsec policy compliance'],
+    'IaC operations: Drift detection — compare declared state vs actual infrastructure, tools: terraform plan, driftctl, CloudQuery. Remediation: auto-apply or alert. GitOps: infrastructure changes through Git PRs — ArgoCD, Flux for Kubernetes, Atlantis for Terraform. Repository structure: mono-repo vs poly-repo, environment branches vs directories. Testing: Terratest (Go, integration tests), Checkov (policy-as-code, security scanning), tfsec (Terraform security), OPA (Open Policy Agent) for custom policies. Compliance: CIS benchmarks, SOC2, HIPAA infrastructure requirements. Secrets: Vault, AWS Secrets Manager, SOPS.', 1.0)
+
+  // ── Observability / Monitoring ──────────────────────────────────────────────
+  add('observability', ['prometheus metrics scraping alertmanager grafana dashboard', 'time series database tsdb promql query recording rules', 'grafana dashboard visualization panel template variable'],
+    'Prometheus & Grafana: Prometheus — pull-based metrics collection, time-series database (TSDB), PromQL query language. Metric types: counter (only increases), gauge (up/down), histogram (distribution), summary. AlertManager: alerting rules, routing, silencing, inhibition. Recording rules: pre-compute expensive queries. Grafana — visualization platform, dashboards, panels (graph, table, stat, gauge, heatmap), template variables, annotations. Data sources: Prometheus, Loki, Tempo, Elasticsearch, InfluxDB, PostgreSQL. Alerting: unified alerting across data sources.', 1.1)
+
+  add('observability', ['opentelemetry otlp traces spans distributed tracing', 'jaeger zipkin tempo distributed trace collector', 'instrumentation sdk auto manual telemetry data'],
+    'Distributed tracing: OpenTelemetry (OTel) — vendor-neutral observability framework. Three signals: traces, metrics, logs. OTLP protocol for data export. Traces: spans (operations) with parent-child relationships, attributes, events. Context propagation: W3C TraceContext, B3 headers. Auto-instrumentation: SDK injects tracing into HTTP clients, databases, frameworks. Backends: Jaeger (Uber, open-source), Tempo (Grafana, cost-effective), Zipkin (Twitter), AWS X-Ray, Datadog APM. Sampling: head-based (decision at start), tail-based (decision after completion, keeps interesting traces).', 1.0)
+
+  add('observability', ['log aggregation elk elasticsearch loki fluentd', 'structured logging json correlation id context', 'datadog newrelic dynatrace apm commercial monitoring'],
+    'Logging & APM: Log aggregation — ELK stack (Elasticsearch + Logstash + Kibana), Grafana Loki (label-based, cost-effective), Fluentd/Fluent Bit (log collection/forwarding). Structured logging: JSON format, correlation IDs for request tracing, log levels (DEBUG, INFO, WARN, ERROR). Best practices: structured > unstructured, include context (requestId, userId), don\'t log PII. Commercial APM: Datadog (unified platform, 700+ integrations), New Relic (full-stack observability), Dynatrace (AI-powered, auto-discovery). SLO-based alerting: alert on SLO burn rate, not individual metrics.', 1.0)
+
+  add('observability', ['synthetic monitoring uptime health check endpoint', 'real user monitoring rum performance web vitals', 'alert routing escalation pagerduty opsgenie oncall'],
+    'Monitoring patterns: Synthetic monitoring — automated checks from external locations (Pingdom, UptimeRobot, Checkly). Health check endpoints: /health, /readiness, /liveness for Kubernetes probes. Real User Monitoring (RUM): actual user experience data (page load, interactions, errors). Core Web Vitals monitoring. Error tracking: Sentry, Bugsnag, Rollbar — capture exceptions with stack traces, breadcrumbs, context. Alert routing: PagerDuty, OpsGenie — on-call schedules, escalation policies, incident management integration. Runbooks linked to alerts for quick resolution.', 1.0)
+
+  // ── Digital Twins / Simulation ──────────────────────────────────────────────
+  add('digital_twins', ['digital twin virtual model real time synchronization', 'physics simulation finite element analysis fem fea', 'agent based modeling simulation complex adaptive system'],
+    'Digital twins & simulation: Digital twin — virtual replica of physical system, synchronized with real-time data (IoT sensors, APIs). Layers: physical entity, virtual model, data connection, analytics. Use cases: predictive maintenance (machinery), urban planning (city twins), healthcare (patient twins), manufacturing (production optimization). Physics simulation: Finite Element Analysis (FEA/FEM) — discretize continuous domain into elements, solve PDEs numerically. Tools: ANSYS, COMSOL, OpenFOAM (CFD). Agent-based modeling (ABM): autonomous agents with rules, emergent behavior. Tools: Mesa (Python), NetLogo, AnyLogic.', 1.0)
+
+  add('digital_twins', ['monte carlo simulation random sampling probability', 'discrete event simulation queuing theory process', 'system dynamics feedback loop stock flow causal'],
+    'Simulation methods: Monte Carlo — random sampling to estimate numerical results. Applications: risk analysis, financial modeling, physics, optimization. Convergence: accuracy improves with √N samples. Variance reduction: importance sampling, stratified sampling, antithetic variates. Discrete Event Simulation (DES): model systems as sequence of events (arrivals, departures, failures). Queuing theory: M/M/1, M/M/c models. Tools: SimPy (Python), Arena, Simio. System dynamics: stocks (accumulations), flows (rates), feedback loops (reinforcing/balancing). Causal loop diagrams. Tools: Vensim, Stella.', 1.0)
+
+  add('digital_twins', ['computational fluid dynamics cfd weather climate', 'simulation optimization genetic algorithm parameter', 'real time simulation hardware in loop testing'],
+    'Advanced simulation: CFD (Computational Fluid Dynamics) — Navier-Stokes equations, turbulence models (RANS, LES, DNS), mesh generation. Weather/climate modeling: GCMs (General Circulation Models), ensemble forecasting. Simulation optimization: use optimization algorithms (genetic, simulated annealing, Bayesian optimization) to find best parameters. Hardware-in-the-loop (HIL): real hardware + simulated environment for testing embedded systems, autonomous vehicles, aerospace. Digital twin platforms: Azure Digital Twins, AWS IoT TwinMaker, NVIDIA Omniverse. Standards: DTDL (Digital Twins Definition Language).', 1.0)
+
+  // ── Natural Language Generation (NLG) ──────────────────────────────────────
+  add('nlg', ['natural language generation template text production', 'text generation gpt language model autoregressive', 'nlg pipeline content determination document structuring'],
+    'Natural Language Generation: NLG pipeline — content determination (what to say), document structuring (order), sentence aggregation (combine), lexicalization (word choice), referring expression generation (pronouns/names), linguistic realization (grammar). Template-based: fill slots in predefined templates (simple, predictable, limited). Rule-based: grammar rules generate varied output. Neural: GPT/LLM-based (fluent but less controlled). Hybrid: templates + neural for controlled yet natural output. Applications: report generation, data-to-text (sports summaries, financial reports), chatbot responses, personalized emails.', 1.0)
+
+  add('nlg', ['text summarization extractive abstractive compression', 'paraphrasing sentence rewriting style transfer', 'grammar checking correction grammarly language tool'],
+    'Text transformation: Summarization — extractive (select important sentences: TextRank, BERT-based) vs abstractive (generate new text: T5, BART, Pegasus). Compression ratio, ROUGE evaluation metrics. Paraphrasing: rephrase while preserving meaning — back-translation, T5 paraphrase models, round-trip translation. Style transfer: formal↔informal, technical↔simple, active↔passive. Grammar correction: rule-based (LanguageTool, open-source), neural (GECToR, T5), commercial (Grammarly). Readability metrics: Flesch-Kincaid, Gunning Fog, SMOG index. Plain language: short sentences, active voice, common words.', 1.0)
+
+  add('nlg', ['dialogue system response generation chatbot conversational', 'data to text report generation automated narrative', 'content generation seo copywriting marketing automation'],
+    'Applied NLG: Dialogue systems — retrieval-based (select from candidates), generative (create novel responses), hybrid. Persona consistency, grounding in knowledge. Data-to-text: convert structured data (tables, charts, databases) to natural language narratives. Automated reporting: financial summaries, sports recaps, weather reports, analytics dashboards. Tools: Narrative Science (acquired by Salesforce), Arria NLG, Amazon Polly (text-to-speech). Content generation: SEO-optimized articles, product descriptions, ad copy, email campaigns. Ethical considerations: disclosure of AI-generated content, misinformation risks, plagiarism detection.', 1.0)
+
   return entries
 }
 
@@ -3435,6 +3615,21 @@ export class LocalBrain {
   // New intelligence modules
   private hypothesisEngine: HypothesisEngine | null = null
   private ethicalReasoner: EthicalReasoner | null = null
+  private coreferenceResolver: CoreferenceResolver | null = null
+  private languageDetector: LanguageDetector | null = null
+  private dialogueActRecognizer: DialogueActRecognizer | null = null
+  private queryDecomposer: QueryDecomposer | null = null
+  private crossDomainTransfer: CrossDomainTransfer | null = null
+  private counterfactualReasoner: CounterfactualReasoner | null = null
+  private userProfileModel: UserProfileModel | null = null
+  private conversationSummarizer: ConversationSummarizer | null = null
+  private responseQualityScorer: ResponseQualityScorer | null = null
+  private multiFormatGenerator: MultiFormatGenerator | null = null
+  private anomalyDetector: AnomalyDetector | null = null
+  private emotionalIntelligence: EmotionalIntelligence | null = null
+  private contextualMemoryEngine: ContextualMemoryEngine | null = null
+  private logicalProofEngine: LogicalProofEngine | null = null
+  private creativeProblemSolver: CreativeProblemSolver | null = null
 
   // Token budget management
   private tokenBudget: TokenBudgetManager
@@ -3567,6 +3762,21 @@ export class LocalBrain {
       // New intelligence modules
       this.hypothesisEngine = new HypothesisEngine()
       this.ethicalReasoner = new EthicalReasoner()
+      this.coreferenceResolver = new CoreferenceResolver()
+      this.languageDetector = new LanguageDetector()
+      this.dialogueActRecognizer = new DialogueActRecognizer()
+      this.queryDecomposer = new QueryDecomposer()
+      this.crossDomainTransfer = new CrossDomainTransfer()
+      this.counterfactualReasoner = new CounterfactualReasoner()
+      this.userProfileModel = new UserProfileModel()
+      this.conversationSummarizer = new ConversationSummarizer()
+      this.responseQualityScorer = new ResponseQualityScorer()
+      this.multiFormatGenerator = new MultiFormatGenerator()
+      this.anomalyDetector = new AnomalyDetector()
+      this.emotionalIntelligence = new EmotionalIntelligence()
+      this.contextualMemoryEngine = new ContextualMemoryEngine()
+      this.logicalProofEngine = new LogicalProofEngine()
+      this.creativeProblemSolver = new CreativeProblemSolver()
     }
 
     const now = new Date().toISOString()
@@ -3872,6 +4082,138 @@ export class LocalBrain {
       } catch { /* non-critical */ }
     }
 
+    // TemporalReasoner: for time-based / sequence queries
+    if (this.temporalReasoner && this.isTemporalQuery(userMessage)) {
+      try {
+        const causalOrder = this.temporalReasoner.inferCausalOrder()
+        if (causalOrder.length > 0) {
+          const topCausal = causalOrder[0]
+          if (topCausal) {
+            const cause = topCausal.possibleCauses[0]?.eventName ?? topCausal.eventName
+            const effect = topCausal.possibleEffects[0]?.eventName ?? 'unknown'
+            smartAugmentation += `\n\n**Temporal Insight:** ${cause} → ${effect} (event: ${topCausal.eventName})`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ArgumentAnalyzer: for debate/argument/claim queries
+    if (this.argumentAnalyzer && this.isArgumentQuery(userMessage)) {
+      try {
+        const fallacies = this.argumentAnalyzer.detectFallacies(userMessage)
+        if (fallacies.length > 0) {
+          const topFallacy = fallacies[0]
+          if (topFallacy) {
+            smartAugmentation += `\n\n**Logical Analysis:** Detected ${topFallacy.type} fallacy (severity: ${topFallacy.severity})`
+          }
+        }
+        const biases = this.argumentAnalyzer.detectBias(userMessage)
+        if (biases.length > 0) {
+          const topBias = biases[0]
+          if (topBias) {
+            smartAugmentation += `\n**Bias Detection:** ${topBias.type} bias detected`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // NarrativeEngine: for story/explanation/walkthrough queries
+    if (this.narrativeEngine && this.isNarrativeQuery(userMessage)) {
+      try {
+        const beat = this.narrativeEngine.generateStoryBeat(userMessage)
+        if (beat && beat.text) {
+          smartAugmentation += `\n\n**Narrative:** ${beat.text}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // CoreferenceResolver: resolve pronouns from conversation history
+    if (this.coreferenceResolver && this.conversationHistory.length > 1) {
+      try {
+        const history = this.conversationHistory.slice(-10).map(h => ({ role: h.role, content: h.content }))
+        const corefResult = this.coreferenceResolver.resolve(userMessage, history)
+        if (corefResult.replacements.length > 0 && corefResult.confidence > 0.5) {
+          const topReplacement = corefResult.replacements[0]
+          if (topReplacement) {
+            smartAugmentation += `\n\n**Context Resolution:** "${topReplacement.pronoun}" refers to "${topReplacement.referent}"`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // LanguageDetector: detect input language
+    if (this.languageDetector) {
+      try {
+        const langResult = this.languageDetector.detect(userMessage)
+        if (langResult.language !== 'en' && langResult.confidence > 0.6) {
+          smartAugmentation += `\n\n**Language Detected:** ${langResult.language} (confidence: ${(langResult.confidence * 100).toFixed(0)}%)`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // DialogueActRecognizer: classify user utterance type
+    if (this.dialogueActRecognizer) {
+      try {
+        const actResult = this.dialogueActRecognizer.recognize(userMessage)
+        if (actResult.confidence > 0.7 && actResult.act !== 'question') {
+          smartAugmentation += `\n\n**Dialogue Act:** ${actResult.act}${actResult.subType ? ` (${actResult.subType})` : ''}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // QueryDecomposer: decompose complex questions
+    if (this.queryDecomposer) {
+      try {
+        const decomposition = this.queryDecomposer.decompose(userMessage)
+        if (decomposition.isComplex && decomposition.subQuestions.length > 1) {
+          const subQList = decomposition.subQuestions.map(sq => `• ${sq.question}`).join('\n')
+          smartAugmentation += `\n\n**Query Decomposition** (${decomposition.strategy}):\n${subQList}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // CrossDomainTransfer: combine knowledge across domains
+    if (this.crossDomainTransfer && knowledgeResults.length > 0) {
+      try {
+        const matchedDomains = [...new Set(knowledgeResults.map(kr => kr.category))]
+        if (matchedDomains.length > 1) {
+          const crossResult = this.crossDomainTransfer.detectCrossDomain(userMessage, matchedDomains)
+          if (crossResult.isCrossDomain && crossResult.confidence > 0.5) {
+            smartAugmentation += `\n\n**Cross-Domain:** ${crossResult.primaryDomain} ↔ ${crossResult.secondaryDomains.join(', ')} (${crossResult.transferStrategy})`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // CounterfactualReasoner: handle "what if" scenarios
+    if (this.counterfactualReasoner && this.counterfactualReasoner.isCounterfactual(userMessage)) {
+      try {
+        const cfResult = this.counterfactualReasoner.analyze(userMessage)
+        if (cfResult.isCounterfactual && cfResult.confidence > 0.5) {
+          const implications = cfResult.implications.slice(0, 3).map(i => `• ${i}`).join('\n')
+          smartAugmentation += `\n\n**Counterfactual Analysis:**\nPremise: ${cfResult.premise}\n${implications}`
+          if (cfResult.risks.length > 0) {
+            smartAugmentation += `\nRisks: ${cfResult.risks[0]}`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // UserProfileModel: track user preferences and adapt
+    if (this.userProfileModel) {
+      try {
+        const topDomain = knowledgeResults.length > 0 ? knowledgeResults[0]!.category : 'general'
+        this.userProfileModel.updateFromInteraction(userMessage, topDomain)
+      } catch { /* non-critical */ }
+    }
+
+    // ConversationSummarizer: track conversation
+    if (this.conversationSummarizer) {
+      try {
+        this.conversationSummarizer.addTurn('user', userMessage)
+      } catch { /* non-critical */ }
+    }
+
     // Kurdish NLP: morphology, sentiment, translation for Kurdish queries
     if (this.isKurdishSoraniQuery(userMessage)) {
       // Kurdish Sentiment Analysis
@@ -3923,6 +4265,95 @@ export class LocalBrain {
     // Append smart augmentation to base response
     if (smartAugmentation) {
       text += smartAugmentation
+    }
+
+    // MultiFormatGenerator: adapt output format
+    if (this.multiFormatGenerator) {
+      try {
+        const formatDetection = this.multiFormatGenerator.detectFormat(userMessage)
+        if (formatDetection.recommendedFormat !== 'plain' && formatDetection.confidence > 0.6) {
+          text = this.multiFormatGenerator.format(text, formatDetection.recommendedFormat)
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ResponseQualityScorer: self-evaluate and flag low quality
+    if (this.responseQualityScorer) {
+      try {
+        const qualityScore = this.responseQualityScorer.score(userMessage, text)
+        if (qualityScore.overall < 0.3 && qualityScore.flags.length > 0) {
+          text += `\n\n*Note: This response may be incomplete. ${qualityScore.flags[0]}*`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ConversationSummarizer: track assistant response
+    if (this.conversationSummarizer) {
+      try {
+        this.conversationSummarizer.addTurn('assistant', text)
+      } catch { /* non-critical */ }
+    }
+
+    // AnomalyDetector: detect unusual query patterns
+    if (this.anomalyDetector) {
+      try {
+        const anomalyResult = this.anomalyDetector.detectQueryAnomaly(userMessage)
+        if (anomalyResult.isAnomaly && anomalyResult.score > 0.5) {
+          smartAugmentation += `\n\n**⚠ Pattern Note:** ${anomalyResult.description}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // EmotionalIntelligence: analyze emotional content and adapt
+    if (this.emotionalIntelligence) {
+      try {
+        const emotionResult = this.emotionalIntelligence.analyzeEmotion(userMessage)
+        if (emotionResult.frustrationLevel > 0.5) {
+          const empathyPrefix = this.emotionalIntelligence.generateEmpathyResponse(emotionResult)
+          if (empathyPrefix && !text.startsWith(empathyPrefix)) {
+            text = empathyPrefix + '\n\n' + text
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ContextualMemoryEngine: store interaction for contextual recall
+    if (this.contextualMemoryEngine) {
+      try {
+        const topDomain = knowledgeResults.length > 0 ? knowledgeResults[0]!.category : 'general'
+        this.contextualMemoryEngine.store(
+          userMessage,
+          { domain: topDomain, topic: topDomain },
+          0.5,
+          ['conversation']
+        )
+      } catch { /* non-critical */ }
+    }
+
+    // LogicalProofEngine: detect logical fallacies in queries
+    if (this.logicalProofEngine) {
+      try {
+        const fallacyResult = this.logicalProofEngine.detectFallacies(userMessage)
+        if (fallacyResult.hasFallacy && fallacyResult.fallacies.length > 0) {
+          const topFallacy = fallacyResult.fallacies[0]!
+          smartAugmentation += `\n\n**🔍 Logic Note:** Potential ${topFallacy.name} detected — ${topFallacy.description}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // CreativeProblemSolver: suggest creative approaches for problem-solving queries
+    if (this.creativeProblemSolver) {
+      try {
+        const lowerMsg = userMessage.toLowerCase()
+        if (lowerMsg.includes('how to solve') || lowerMsg.includes('creative') ||
+            lowerMsg.includes('innovate') || lowerMsg.includes('brainstorm') ||
+            lowerMsg.includes('think outside')) {
+          const ideas = this.creativeProblemSolver.brainstorm(userMessage, 3)
+          if (ideas.length > 0) {
+            smartAugmentation += `\n\n**💡 Creative Angles:**\n${ideas.map((idea, i) => `${i + 1}. ${idea}`).join('\n')}`
+          }
+        }
+      } catch { /* non-critical */ }
     }
 
     // ── ConfidenceGate: quality control ──────────────────────────────────────
@@ -4481,6 +4912,111 @@ export class LocalBrain {
     const a11yPattern = /\b(keyboard\s+(navigation|focus|management|tab\s+order|accessible)|color\s+contrast\s+(ratio|accessible|wcag|palette)|accessibility\s+(testing|audit|axe|lighthouse|compliance))\b/i
     const inclusivePattern = /\b(inclusive\s+design\s+(universal|disability|assistive)|semantic\s+html\s+(heading|structure|accessible|alt\s+text)|accessible\s+component\s+(library|react\s+aria|radix))\b/i
     return wcagPattern.test(msg) || a11yPattern.test(msg) || inclusivePattern.test(msg)
+  }
+
+  private isTemporalQuery(msg: string): boolean {
+    const timePattern = /\b(before\s+(and\s+)?after|timeline\s+(of|for|analysis)|sequence\s+of\s+events|chronolog(y|ical)|temporal\s+(order|relation|analysis))\b/i
+    const whenPattern = /\b(when\s+did\s+(this|that|it)|happened\s+(before|after|first|last)|order\s+of\s+(events|operations|execution))\b/i
+    const historyPattern = /\b(event\s+timeline|time.?series\s+analysis|causal\s+order|temporal\s+reasoning|historical\s+sequence)\b/i
+    return timePattern.test(msg) || whenPattern.test(msg) || historyPattern.test(msg)
+  }
+
+  private isArgumentQuery(msg: string): boolean {
+    const logicPattern = /\b(logical\s+fallac(y|ies)|argument\s+(strength|validity|structure|analysis)|straw\s*man|ad\s+hominem|red\s+herring)\b/i
+    const debatePattern = /\b(debate\s+(analysis|evaluate)|claim\s+(and\s+)?evidence|counter.?argument|logical\s+(structure|reasoning|analysis))\b/i
+    const biasPattern = /\b(cognitive\s+bias(es)?|confirmation\s+bias|detect\s+(bias|fallac)|reasoning\s+(error|flaw))\b/i
+    return logicPattern.test(msg) || debatePattern.test(msg) || biasPattern.test(msg)
+  }
+
+  private isNarrativeQuery(msg: string): boolean {
+    const storyPattern = /\b(tell\s+(me\s+)?a\s+story|narrative\s+(structure|arc|generation)|story\s+(beat|arc|telling))\b/i
+    const explainPattern = /\b(walk\s+me\s+through|step.by.step\s+(explanation|walkthrough)|explain\s+(like|as\s+if|using\s+a\s+story))\b/i
+    const creativePattern = /\b(creative\s+writing\s+(prompt|exercise)|plot\s+(structure|development|twist)|character\s+(development|arc))\b/i
+    return storyPattern.test(msg) || explainPattern.test(msg) || creativePattern.test(msg)
+  }
+
+  private isDataEngineeringQuery(msg: string): boolean {
+    const sparkPattern = /\b(apache\s+spark\s+(rdd|dataframe|sql|streaming|mllib)|pyspark\s+(structured\s+streaming|udf|catalyst)|spark\s+(partition|executor|driver|cluster))\b/i
+    const pipelinePattern = /\b(data\s+pipeline\s+(orchestrat|schedule|etl|elt|design)|airflow\s+(dag|operator|sensor|xcom|scheduler)|dagster\s+(asset|op|graph|repository))\b/i
+    const warehousePattern = /\b(dbt\s+(model|test|source|snapshot|seed)|data\s+warehouse\s+(snowflake|bigquery|redshift|lakehouse)|delta\s+lake\s+(iceberg|hudi|table\s+format|acid))\b/i
+    return sparkPattern.test(msg) || pipelinePattern.test(msg) || warehousePattern.test(msg)
+  }
+
+  private isSREQuery(msg: string): boolean {
+    const sloPattern = /\b(sli\s+(slo|sla|service\s+level)|error\s+budget\s+(reliability|exhausted|calculation)|service\s+level\s+(indicator|objective|agreement))\b/i
+    const incidentPattern = /\b(incident\s+(management|commander|response|severity)|blameless\s+postmortem\s+(review|template|action)|on.?call\s+(rotation|escalation|runbook|pagerduty))\b/i
+    const chaosPattern = /\b(chaos\s+engineering\s+(monkey|gremlin|litmus|experiment)|game\s*day\s+(chaos|failure|resilience)|disaster\s+recovery\s+(rpo|rto|failover|strategy))\b/i
+    return sloPattern.test(msg) || incidentPattern.test(msg) || chaosPattern.test(msg)
+  }
+
+  private isPerformanceEngineeringQuery(msg: string): boolean {
+    const profilingPattern = /\b(flame\s+graph\s+(cpu|memory|profil)|performance\s+profil(ing|er)\s+(chrome|node|java|python)|cpu\s+profil(ing|er)\s+(sampling|instrumentation|call\s+stack))\b/i
+    const loadTestPattern = /\b(load\s+test(ing)?\s+(k6|jmeter|gatling|locust|artillery)|stress\s+test(ing)?\s+(capacity|breaking\s+point|spike)|benchmark(ing)?\s+(throughput|latency|rps))\b/i
+    const cachingPattern = /\b(caching\s+strateg(y|ies)\s+(redis|memcached|cdn|invalidation)|cache\s+(aside|through|behind|eviction|lru|ttl)|core\s+web\s+vitals?\s+(lcp|fid|cls|inp|ttfb))\b/i
+    return profilingPattern.test(msg) || loadTestPattern.test(msg) || cachingPattern.test(msg)
+  }
+
+  private isTechnicalWritingQuery(msg: string): boolean {
+    const docsPattern = /\b(api\s+documentation\s+(openapi|swagger|reference)|documentation\s+generator\s+(jsdoc|typedoc|sphinx|rustdoc)|readme\s+(template|best\s+practice|structure))\b/i
+    const adrPattern = /\b(architecture\s+decision\s+record\s+(adr|template|format)|technical\s+specification\s+(document|template|rfc)|design\s+document\s+(review|proposal|template))\b/i
+    const diagramPattern = /\b(mermaid\s+(diagram|flowchart|sequence|class)|plantuml\s+(uml|diagram|sequence|class)|docusaurus\s+(mkdocs|vitepress|gitbook|documentation\s+site))\b/i
+    return docsPattern.test(msg) || adrPattern.test(msg) || diagramPattern.test(msg)
+  }
+
+  private isOpenSourceQuery(msg: string): boolean {
+    const licensePattern = /\b(open\s+source\s+licens(e|ing)\s+(mit|gpl|apache|bsd)|permissive\s+(copyleft|license|licensing)|license\s+compatibility\s+(gpl|apache|mit))\b/i
+    const semverPattern = /\b(semantic\s+versioning\s+(semver|major|minor|patch)|conventional\s+commits?\s+(changelog|release|type)|keep\s+a?\s+changelog\s+(format|standard))\b/i
+    const communityPattern = /\b(contributing\s+guide(lines)?\s+(code\s+of\s+conduct|pr\s+template)|open\s+source\s+(maintainer|governance|community)|inner.?source\s+(enterprise|practice|internal))\b/i
+    return licensePattern.test(msg) || semverPattern.test(msg) || communityPattern.test(msg)
+  }
+
+  private isPrivacyEngineeringQuery(msg: string): boolean {
+    const gdprPattern = /\b(gdpr\s+(compliance|regulation|principle|right|fine)|data\s+protection\s+(regulation|officer|impact\s+assessment)|right\s+to\s+(erasure|be\s+forgotten|access|portability))\b/i
+    const privacyPattern = /\b(privacy\s+by\s+design\s+(default|principle|assessment)|consent\s+management\s+(platform|cmp|cookie|banner)|dpia\s+(data\s+protection|impact|assessment|risk))\b/i
+    const piiPattern = /\b(pii\s+(detection|classification|personally\s+identifiable)|data\s+anonymization\s+(pseudonymization|differential\s+privacy)|ccpa\s+(cpra|california|consumer\s+privacy))\b/i
+    return gdprPattern.test(msg) || privacyPattern.test(msg) || piiPattern.test(msg)
+  }
+
+  private isEdgeServerlessQuery(msg: string): boolean {
+    const lambdaPattern = /\b(aws\s+lambda\s+(serverless|function|handler|cold\s+start)|serverless\s+framework\s+(sam|cdk|sst|deploy)|lambda\s+(trigger|layer|concurrency|provisioned))\b/i
+    const edgePattern = /\b(cloudflare\s+workers?\s+(v8|isolate|kv|durable|wasm)|vercel\s+edge\s+(function|runtime|middleware)|edge\s+computing\s+(cdn|cache|latency|global))\b/i
+    const faasPattern = /\b(function\s+as\s+a\s+service\s+(faas|event|trigger)|step\s+functions?\s+(state\s+machine|orchestrat|workflow)|serverless\s+database\s+(planetscale|neon|turso|supabase))\b/i
+    return lambdaPattern.test(msg) || edgePattern.test(msg) || faasPattern.test(msg)
+  }
+
+  private isLowCodeQuery(msg: string): boolean {
+    const toolPattern = /\b(retool\s+(internal\s+tool|admin|dashboard|builder)|low.?code\s+platform\s+(appsmith|tooljet|budibase)|visual\s+programming\s+(drag\s+drop|component|builder))\b/i
+    const autoPattern = /\b(zapier\s+(automation|workflow|trigger|zap)|n8n\s+(make|integromat|workflow|automation)|no.?code\s+automation\s+(ifttt|webhook|integration))\b/i
+    const noCodePattern = /\b(airtable\s+(notion|database|spreadsheet)|webflow\s+(bubble|squarespace|website\s+builder)|citizen\s+developer\s+(low.?code|governance|shadow\s+it))\b/i
+    return toolPattern.test(msg) || autoPattern.test(msg) || noCodePattern.test(msg)
+  }
+
+  private isIaCQuery(msg: string): boolean {
+    const terraformPattern = /\b(terraform\s+(hcl|provider|resource|module|state|plan|apply)|terraform\s+state\s+(management|backend|remote|locking)|infrastructure\s+as\s+code\s+(iac|terraform|pulumi))\b/i
+    const altPattern = /\b(pulumi\s+(typescript|python|go|aws\s+cdk|infrastructure)|ansible\s+(playbook|role|inventory|configuration)|aws\s+cdk\s+(construct|stack|synthesize|cloudformation))\b/i
+    const opsPattern = /\b(infrastructure\s+drift\s+(detection|remediation|compliance)|gitops\s+(flux|argocd|atlantis|reconciliation)|iac\s+testing\s+(terratest|checkov|tfsec|policy))\b/i
+    return terraformPattern.test(msg) || altPattern.test(msg) || opsPattern.test(msg)
+  }
+
+  private isObservabilityQuery(msg: string): boolean {
+    const promPattern = /\b(prometheus\s+(metrics|scraping|alertmanager|promql)|grafana\s+(dashboard|visualization|panel|loki|tempo)|opentelemetry\s+(otlp|traces|spans|instrumentation))\b/i
+    const tracePattern = /\b(distributed\s+trac(ing|e)\s+(jaeger|zipkin|tempo|collector)|log\s+aggregation\s+(elk|elasticsearch|loki|fluentd)|structured\s+logging\s+(json|correlation|context))\b/i
+    const monPattern = /\b(synthetic\s+monitoring\s+(uptime|health\s+check|pingdom)|real\s+user\s+monitoring\s+(rum|performance|web\s+vitals)|datadog\s+(newrelic|dynatrace|apm|monitoring))\b/i
+    return promPattern.test(msg) || tracePattern.test(msg) || monPattern.test(msg)
+  }
+
+  private isDigitalTwinsQuery(msg: string): boolean {
+    const twinPattern = /\b(digital\s+twin\s+(virtual|model|synchronization|iot)|physics\s+simulation\s+(finite\s+element|fem|fea)|agent\s+based\s+model(ing)?\s+(simulation|complex|adaptive))\b/i
+    const simPattern = /\b(monte\s+carlo\s+simulation\s+(random|probability|sampling)|discrete\s+event\s+simulation\s+(queuing|simpy|process)|system\s+dynamics\s+(feedback|stock|flow|causal))\b/i
+    const advPattern = /\b(computational\s+fluid\s+dynamics\s+(cfd|navier|turbulence)|simulation\s+optimization\s+(genetic|parameter|bayesian)|hardware\s+in\s+.?loop\s+(hil|testing|embedded))\b/i
+    return twinPattern.test(msg) || simPattern.test(msg) || advPattern.test(msg)
+  }
+
+  private isNLGQuery(msg: string): boolean {
+    const nlgPattern = /\b(natural\s+language\s+generation\s+(template|pipeline|nlg)|text\s+generation\s+(gpt|language\s+model|autoregressive)|nlg\s+(pipeline|content|document|realization))\b/i
+    const transformPattern = /\b(text\s+summarization\s+(extractive|abstractive|compression)|paraphras(e|ing)\s+(sentence|rewriting|style\s+transfer)|grammar\s+(checking|correction|grammarly|language\s+tool))\b/i
+    const appliedPattern = /\b(dialogue\s+system\s+(response|generation|chatbot)|data\s+to\s+text\s+(report|narrative|automated)|content\s+generation\s+(seo|copywriting|marketing))\b/i
+    return nlgPattern.test(msg) || transformPattern.test(msg) || appliedPattern.test(msg)
   }
 
   /** Extract probable cause from a causal query. */
