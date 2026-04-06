@@ -12,12 +12,14 @@ describe('FinTechPayments', () => {
   describe('KB entry tests', () => {
     it('should respond to payments and open banking queries', async () => {
       const response = await brain.chat('explain payment processing gateway stripe square adyen pci dss open banking psd2 api banking as a service fintech digital banking')
-      expect(response).toMatch(/payment|stripe|pci|open\s+banking|psd2|fintech/)
+      expect(response.text.length).toBeGreaterThan(50)
+      expect(response.text.toLowerCase()).toMatch(/payment|stripe|pci|open\s+banking|psd2|fintech/)
     })
 
     it('should respond to lending trading and compliance queries', async () => {
       const response = await brain.chat('explain lending credit scoring underwriting algorithmic trading high frequency kyc know your customer aml anti money laundering compliance')
-      expect(response).toMatch(/credit|lending|trading|kyc|aml|compliance/)
+      expect(response.text.length).toBeGreaterThan(50)
+      expect(response.text.toLowerCase()).toMatch(/credit|lending|trading|kyc|aml|compliance/)
     })
   })
 
@@ -33,7 +35,7 @@ describe('FinTechPayments', () => {
       const graph = createProgrammingKnowledgeGraph()
       const concept = graph.findConceptByName('FinTech & Payment Systems')
       expect(concept).toBeDefined()
-      const related = graph.findRelated(concept!.name)
+      const related = graph.findRelated(concept!.id, undefined, 30)
       expect(related.length).toBeGreaterThanOrEqual(5)
       const names = related.map(r => r.name)
       expect(names).toContain('Payment Processing & Gateways')
@@ -42,7 +44,9 @@ describe('FinTechPayments', () => {
 
     it('should relate Payment Processing & Gateways to Regulatory Compliance & KYC', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const related = graph.findRelated('Payment Processing & Gateways')
+      const node = graph.findConceptByName('Payment Processing & Gateways')
+      expect(node).toBeDefined()
+      const related = graph.findRelated(node!.id, undefined, 30)
       const names = related.map(r => r.name)
       expect(names).toContain('Regulatory Compliance & KYC')
     })

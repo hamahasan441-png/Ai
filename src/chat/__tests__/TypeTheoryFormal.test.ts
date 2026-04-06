@@ -12,12 +12,14 @@ describe('TypeTheoryFormal', () => {
   describe('KB entry tests', () => {
     it('should respond to type theory and model checking queries', async () => {
       const response = await brain.chat('explain type theory dependent type linear type refinement model checking temporal logic ltl ctl spin nusmv theorem prover coq')
-      expect(response).toMatch(/type\s+theory|dependent|model\s+checking|temporal|theorem|coq/)
+      expect(response.text.length).toBeGreaterThan(50)
+      expect(response.text.toLowerCase()).toMatch(/type\s+theory|dependent|model\s+checking|temporal|theorem|coq/)
     })
 
     it('should respond to formal verification and contracts queries', async () => {
       const response = await brain.chat('explain formal verification program correctness safety liveness abstract interpretation design by contract precondition postcondition invariant')
-      expect(response).toMatch(/formal\s+verification|correctness|abstract\s+interpretation|contract|precondition/)
+      expect(response.text.length).toBeGreaterThan(50)
+      expect(response.text.toLowerCase()).toMatch(/formal\s+verification|correctness|abstract\s+interpretation|contract|precondition/)
     })
   })
 
@@ -33,7 +35,7 @@ describe('TypeTheoryFormal', () => {
       const graph = createProgrammingKnowledgeGraph()
       const concept = graph.findConceptByName('Type Theory & Formal Methods')
       expect(concept).toBeDefined()
-      const related = graph.findRelated(concept!.name)
+      const related = graph.findRelated(concept!.id, undefined, 30)
       expect(related.length).toBeGreaterThanOrEqual(5)
       const names = related.map(r => r.name)
       expect(names).toContain('Dependent Types')
@@ -42,7 +44,9 @@ describe('TypeTheoryFormal', () => {
 
     it('should relate Model Checking to Formal Verification', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const related = graph.findRelated('Model Checking')
+      const node = graph.findConceptByName('Model Checking')
+      expect(node).toBeDefined()
+      const related = graph.findRelated(node!.id, undefined, 30)
       const names = related.map(r => r.name)
       expect(names).toContain('Formal Verification')
     })

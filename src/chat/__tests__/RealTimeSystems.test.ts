@@ -10,14 +10,16 @@ describe('RealTimeSystems', () => {
   })
 
   describe('KB entry tests', () => {
-    it('should match stream processing/websocket keywords', () => {
-      const response = brain.chat('explain stream processing apache flink kafka streams spark streaming websocket server sent events sse real time')
-      expect(response).toMatch(/flink|kafka\s+streams|websocket|sse|stream\s+processing|real.time/i)
+    it('should match stream processing/websocket keywords', async () => {
+      const r = await brain.chat('explain stream processing apache flink kafka streams spark streaming websocket server sent events sse real time')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/flink|kafka\s+streams|websocket|sse|stream\s+processing|real.time/)
     })
 
-    it('should match low latency/clock sync keywords', () => {
-      const response = brain.chat('explain low latency networking kernel bypass dpdk clock synchronization ntp ptp vector clock lamport backpressure flow control')
-      expect(response).toMatch(/latency|dpdk|clock|ntp|lamport|backpressure/i)
+    it('should match low latency/clock sync keywords', async () => {
+      const r = await brain.chat('explain low latency networking kernel bypass dpdk clock synchronization ntp ptp vector clock lamport backpressure flow control')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/latency|dpdk|clock|ntp|lamport|backpressure/)
     })
   })
 
@@ -33,7 +35,7 @@ describe('RealTimeSystems', () => {
       const graph = createProgrammingKnowledgeGraph()
       const concept = graph.findConceptByName('Real-Time Systems & Streaming')
       expect(concept).toBeDefined()
-      const related = graph.findRelated(concept!.name)
+      const related = graph.findRelated(concept!.id, undefined, 30)
       expect(related.length).toBeGreaterThanOrEqual(5)
       const names = related.map(r => r.name)
       expect(names).toContain('Stream Processing Engines')
@@ -42,7 +44,9 @@ describe('RealTimeSystems', () => {
 
     it('should relate Stream Processing Engines to Real-Time Analytics', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const related = graph.findRelated('Stream Processing Engines')
+      const node = graph.findConceptByName('Stream Processing Engines')
+      expect(node).toBeDefined()
+      const related = graph.findRelated(node!.id, undefined, 30)
       const names = related.map(r => r.name)
       expect(names).toContain('Real-Time Analytics')
     })

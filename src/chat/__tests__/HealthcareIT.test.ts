@@ -12,12 +12,14 @@ describe('HealthcareIT', () => {
   describe('KB entry tests', () => {
     it('should respond to EHR FHIR and HIPAA queries', async () => {
       const response = await brain.chat('explain electronic health record ehr emr fhir hl7 interoperability hipaa compliance protected health information phi')
-      expect(response).toMatch(/ehr|fhir|hl7|hipaa|phi|interoperability/)
+      expect(response.text.length).toBeGreaterThan(50)
+      expect(response.text.toLowerCase()).toMatch(/ehr|fhir|hl7|hipaa|phi|interoperability/)
     })
 
     it('should respond to telemedicine and imaging queries', async () => {
       const response = await brain.chat('explain telemedicine telehealth remote patient monitoring clinical decision support medical imaging pacs radiology dicom')
-      expect(response).toMatch(/telemedicine|remote\s+patient|clinical\s+decision|pacs|dicom|radiology/)
+      expect(response.text.length).toBeGreaterThan(50)
+      expect(response.text.toLowerCase()).toMatch(/telemedicine|remote\s+patient|clinical\s+decision|pacs|dicom|radiology/)
     })
   })
 
@@ -33,7 +35,7 @@ describe('HealthcareIT', () => {
       const graph = createProgrammingKnowledgeGraph()
       const concept = graph.findConceptByName('Healthcare IT & HIPAA')
       expect(concept).toBeDefined()
-      const related = graph.findRelated(concept!.name)
+      const related = graph.findRelated(concept!.id, undefined, 30)
       expect(related.length).toBeGreaterThanOrEqual(5)
       const names = related.map(r => r.name)
       expect(names).toContain('EHR & FHIR Standards')
@@ -42,7 +44,9 @@ describe('HealthcareIT', () => {
 
     it('should relate EHR & FHIR Standards to HIPAA Compliance & PHI', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const related = graph.findRelated('EHR & FHIR Standards')
+      const node = graph.findConceptByName('EHR & FHIR Standards')
+      expect(node).toBeDefined()
+      const related = graph.findRelated(node!.id, undefined, 30)
       const names = related.map(r => r.name)
       expect(names).toContain('HIPAA Compliance & PHI')
     })

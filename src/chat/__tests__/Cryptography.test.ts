@@ -10,14 +10,16 @@ describe('Cryptography', () => {
   })
 
   describe('KB entry tests', () => {
-    it('should match symmetric/public-key/hash keywords', () => {
-      const response = brain.chat('explain symmetric encryption aes des public key cryptography rsa elliptic curve hash function sha256 hmac')
-      expect(response).toMatch(/aes|rsa|elliptic|sha|hmac|encryption/i)
+    it('should match symmetric/public-key/hash keywords', async () => {
+      const r = await brain.chat('explain symmetric encryption aes des public key cryptography rsa elliptic curve hash function sha256 hmac')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/aes|rsa|elliptic|sha|hmac|encryption/)
     })
 
-    it('should match tls/post-quantum/zkp keywords', () => {
-      const response = brain.chat('explain tls ssl https certificate post quantum cryptography lattice kyber zero knowledge proof zkp zk snark')
-      expect(response).toMatch(/tls|post.quantum|lattice|zero.knowledge|zkp/i)
+    it('should match tls/post-quantum/zkp keywords', async () => {
+      const r = await brain.chat('explain tls ssl https certificate post quantum cryptography lattice kyber zero knowledge proof zkp zk snark')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/tls|post.quantum|lattice|zero.knowledge|zkp/)
     })
   })
 
@@ -33,7 +35,7 @@ describe('Cryptography', () => {
       const graph = createProgrammingKnowledgeGraph()
       const concept = graph.findConceptByName('Cryptography & Applied Security')
       expect(concept).toBeDefined()
-      const related = graph.findRelated(concept!.name)
+      const related = graph.findRelated(concept!.id, undefined, 30)
       expect(related.length).toBeGreaterThanOrEqual(5)
       const names = related.map(r => r.name)
       expect(names).toContain('Symmetric Encryption')
@@ -42,7 +44,9 @@ describe('Cryptography', () => {
 
     it('should relate Symmetric Encryption to Public-Key Cryptography', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const related = graph.findRelated('Symmetric Encryption')
+      const node = graph.findConceptByName('Symmetric Encryption')
+      expect(node).toBeDefined()
+      const related = graph.findRelated(node!.id, undefined, 30)
       const names = related.map(r => r.name)
       expect(names).toContain('Public-Key Cryptography')
     })

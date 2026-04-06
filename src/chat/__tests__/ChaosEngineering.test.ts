@@ -12,12 +12,14 @@ describe('ChaosEngineering', () => {
   describe('KB entry tests', () => {
     it('should respond to chaos engineering and tools queries', async () => {
       const response = await brain.chat('explain chaos engineering fault injection failure testing chaos monkey litmus gremlin toxiproxy gameday exercise disaster recovery')
-      expect(response).toMatch(/chaos|fault\s+injection|chaos\s+monkey|litmus|gremlin|gameday/)
+      expect(response.text.length).toBeGreaterThan(50)
+      expect(response.text.toLowerCase()).toMatch(/chaos|fault\s+injection|chaos\s+monkey|litmus|gremlin|gameday/)
     })
 
     it('should respond to resilience and steady state queries', async () => {
       const response = await brain.chat('explain resilience pattern circuit breaker bulkhead retry fallback steady state hypothesis error budget slo sli observability')
-      expect(response).toMatch(/circuit\s+breaker|bulkhead|resilience|steady.state|error\s+budget|slo/)
+      expect(response.text.length).toBeGreaterThan(50)
+      expect(response.text.toLowerCase()).toMatch(/circuit\s+breaker|bulkhead|resilience|steady.state|error\s+budget|slo/)
     })
   })
 
@@ -33,7 +35,7 @@ describe('ChaosEngineering', () => {
       const graph = createProgrammingKnowledgeGraph()
       const concept = graph.findConceptByName('Chaos Engineering & Resilience')
       expect(concept).toBeDefined()
-      const related = graph.findRelated(concept!.name)
+      const related = graph.findRelated(concept!.id, undefined, 30)
       expect(related.length).toBeGreaterThanOrEqual(5)
       const names = related.map(r => r.name)
       expect(names).toContain('Fault Injection')
@@ -42,7 +44,9 @@ describe('ChaosEngineering', () => {
 
     it('should relate Fault Injection to Blast Radius Control', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const related = graph.findRelated('Fault Injection')
+      const node = graph.findConceptByName('Fault Injection')
+      expect(node).toBeDefined()
+      const related = graph.findRelated(node!.id, undefined, 30)
       const names = related.map(r => r.name)
       expect(names).toContain('Blast Radius Control')
     })

@@ -10,14 +10,16 @@ describe('EventDrivenArchitecture', () => {
   })
 
   describe('KB entry tests', () => {
-    it('should match EDA/kafka/event sourcing keywords', () => {
-      const response = brain.chat('explain event driven architecture eda message broker kafka rabbitmq event sourcing cqrs command query responsibility')
-      expect(response).toMatch(/event|kafka|rabbitmq|cqrs|sourcing|message/i)
+    it('should match EDA/kafka/event sourcing keywords', async () => {
+      const r = await brain.chat('explain event driven architecture eda message broker kafka rabbitmq event sourcing cqrs command query responsibility')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/event|kafka|rabbitmq|cqrs|sourcing|message/)
     })
 
-    it('should match saga/pub-sub keywords', () => {
-      const response = brain.chat('explain saga pattern choreography orchestration distributed transaction pub sub publish subscribe dead letter queue')
-      expect(response).toMatch(/saga|choreography|pub.sub|dead\s+letter|distributed/i)
+    it('should match saga/pub-sub keywords', async () => {
+      const r = await brain.chat('explain saga pattern choreography orchestration distributed transaction pub sub publish subscribe dead letter queue')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/saga|choreography|pub.sub|dead\s+letter|distributed/)
     })
   })
 
@@ -33,7 +35,7 @@ describe('EventDrivenArchitecture', () => {
       const graph = createProgrammingKnowledgeGraph()
       const concept = graph.findConceptByName('Event-Driven Architecture & Messaging')
       expect(concept).toBeDefined()
-      const related = graph.findRelated(concept!.name)
+      const related = graph.findRelated(concept!.id, undefined, 30)
       expect(related.length).toBeGreaterThanOrEqual(5)
       const names = related.map(r => r.name)
       expect(names).toContain('Message Brokers & Queues')
@@ -42,7 +44,9 @@ describe('EventDrivenArchitecture', () => {
 
     it('should relate Event Sourcing to CQRS Pattern', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const related = graph.findRelated('Event Sourcing')
+      const node = graph.findConceptByName('Event Sourcing')
+      expect(node).toBeDefined()
+      const related = graph.findRelated(node!.id, undefined, 30)
       const names = related.map(r => r.name)
       expect(names).toContain('CQRS Pattern')
     })

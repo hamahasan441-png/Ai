@@ -10,14 +10,16 @@ describe('RecommendationSystems', () => {
   })
 
   describe('KB entry tests', () => {
-    it('should match collaborative/content-based keywords', () => {
-      const response = brain.chat('explain collaborative filtering user item matrix factorization content based filtering feature similarity cosine recommendation system')
-      expect(response).toMatch(/collaborative|content.based|matrix|filtering|recommendation/i)
+    it('should match collaborative/content-based keywords', async () => {
+      const r = await brain.chat('explain collaborative filtering user item matrix factorization content based filtering feature similarity cosine recommendation system')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/collaborative|content.based|matrix|filtering|recommendation/)
     })
 
-    it('should match deep learning/bandits keywords', () => {
-      const response = brain.chat('explain deep learning recommendation neural collaborative ncf session based recommendation sequential gru4rec multi armed bandit thompson')
-      expect(response).toMatch(/neural|session|bandit|deep|sequential/i)
+    it('should match deep learning/bandits keywords', async () => {
+      const r = await brain.chat('explain deep learning recommendation neural collaborative ncf session based recommendation sequential gru4rec multi armed bandit thompson')
+      expect(r.text.length).toBeGreaterThan(50)
+      expect(r.text.toLowerCase()).toMatch(/neural|session|bandit|deep|sequential/)
     })
   })
 
@@ -33,7 +35,7 @@ describe('RecommendationSystems', () => {
       const graph = createProgrammingKnowledgeGraph()
       const concept = graph.findConceptByName('Recommendation Systems & Personalization')
       expect(concept).toBeDefined()
-      const related = graph.findRelated(concept!.name)
+      const related = graph.findRelated(concept!.id, undefined, 30)
       expect(related.length).toBeGreaterThanOrEqual(5)
       const names = related.map(r => r.name)
       expect(names).toContain('Collaborative Filtering')
@@ -42,7 +44,9 @@ describe('RecommendationSystems', () => {
 
     it('should relate Collaborative Filtering to Content-Based Filtering', () => {
       const graph = createProgrammingKnowledgeGraph()
-      const related = graph.findRelated('Collaborative Filtering')
+      const node = graph.findConceptByName('Collaborative Filtering')
+      expect(node).toBeDefined()
+      const related = graph.findRelated(node!.id, undefined, 30)
       const names = related.map(r => r.name)
       expect(names).toContain('Content-Based Filtering')
     })
