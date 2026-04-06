@@ -388,11 +388,46 @@ export class ImageAnalyzer {
   }
 
   private sampleByteValues(b64Sample: string): number[] {
-    const values: number[] = []
+    // Decode base64 to actual binary bytes instead of using base64 character
+    // indexes as brightness proxies. Base64 encodes 3 bytes into 4 characters;
+    // the character's position in the alphabet has NO correlation with the
+    // original pixel byte value.
+    try {
+      const buf = Buffer.from(b64Sample, 'base64')
+      const limit = Math.min(buf.length, 2048)
+      const values: number[] = new Array(limit)
+      for (let i = 0; i < limit; i++) {
+        values[i] = buf[i]!
+      }
+      return values
+    } catch {
+      // Fallback: manual base64 decode for environments without Buffer
+      return this.decodeBase64Bytes(b64Sample, 2048)
+    }
+  }
+
+  /**
+   * Manual base64 → byte decode fallback.
+   * Each group of 4 base64 characters encodes 3 bytes.
+   */
+  private decodeBase64Bytes(b64: string, maxBytes: number): number[] {
+    const lut = new Uint8Array(128)
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    for (let i = 0; i < b64Sample.length && i < 2048; i++) {
-      const idx = chars.indexOf(b64Sample[i]!)
-      if (idx >= 0) values.push(Math.floor((idx / 63) * 255))
+    for (let i = 0; i < 64; i++) lut[chars.charCodeAt(i)] = i
+
+    const values: number[] = []
+    let i = 0
+    while (i < b64.length - 3 && values.length < maxBytes) {
+      const a = lut[b64.charCodeAt(i++)] ?? 0
+      const b = lut[b64.charCodeAt(i++)] ?? 0
+      const c = lut[b64.charCodeAt(i++)] ?? 0
+      const d = lut[b64.charCodeAt(i++)] ?? 0
+
+      values.push((a << 2) | (b >> 4))
+      if (values.length >= maxBytes) break
+      if (b64[i - 2] !== '=') values.push(((b & 0x0F) << 4) | (c >> 2))
+      if (values.length >= maxBytes) break
+      if (b64[i - 1] !== '=') values.push(((c & 0x03) << 6) | d)
     }
     return values
   }
@@ -537,29 +572,39 @@ export class ImageAnalyzer {
   }
 
   private computeEdgeDensity(b64Data: string): number {
-    let transitions = 0
-    const sample = b64Data.slice(0, 2000)
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    // Decode base64 to actual bytes, then measure transitions between
+    // adjacent byte values — this reflects real pixel-level edges.
+    const sampleB64 = b64Data.slice(0, 2700) // ~2000 decoded bytes
+    const bytes = this.sampleByteValues(sampleB64)
 
-    for (let i = 1; i < sample.length; i++) {
-      const curr = chars.indexOf(sample[i]!)
-      const prev = chars.indexOf(sample[i - 1]!)
-      if (curr >= 0 && prev >= 0 && Math.abs(curr - prev) > 16) {
+    if (bytes.length < 2) return 0
+
+    let transitions = 0
+    const limit = Math.min(bytes.length, 2000)
+    for (let i = 1; i < limit; i++) {
+      if (Math.abs(bytes[i]! - bytes[i - 1]!) > 64) {
         transitions++
       }
     }
-    return Math.round((transitions / Math.max(1, sample.length - 1)) * 100) / 100
+    return Math.round((transitions / Math.max(1, limit - 1)) * 100) / 100
   }
 
   private computeSymmetry(b64Data: string): number {
-    const half = Math.min(500, Math.floor(b64Data.length / 2))
-    const first = b64Data.slice(0, half)
-    const second = b64Data.slice(b64Data.length - half)
+    // Decode base64 to actual bytes, then compare the first-half bytes with
+    // the reversed second-half bytes.  This gives a real pixel-level symmetry
+    // metric rather than comparing arbitrary base64 characters.
+    const bytes = this.sampleByteValues(b64Data.slice(0, 1400)) // ~1000 decoded bytes
+    const half = Math.min(500, Math.floor(bytes.length / 2))
+    if (half === 0) return 0
+
     let matches = 0
     for (let i = 0; i < half; i++) {
-      if (first[i] === second[half - 1 - i]) matches++
+      // Allow a small tolerance (±8) since lossy compression introduces noise
+      if (Math.abs(bytes[i]! - bytes[bytes.length - 1 - i]!) <= 8) {
+        matches++
+      }
     }
-    return Math.round((matches / Math.max(1, half)) * 100) / 100
+    return Math.round((matches / half) * 100) / 100
   }
 
   private detectComposition(edgeDensity: number, symmetry: number, pixels: PixelAnalysis): CompositionType {

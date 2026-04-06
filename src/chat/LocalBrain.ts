@@ -52,6 +52,12 @@ import { CodeReviewer } from './codemaster/CodeReviewer.js'
 import { CodeFixer } from './codemaster/CodeFixer.js'
 import { ProblemDecomposer } from './codemaster/ProblemDecomposer.js'
 import { LearningEngine } from './codemaster/LearningEngine.js'
+import { PerformanceAnalyzer } from './codemaster/PerformanceAnalyzer.js'
+import { TypeFlowAnalyzer } from './codemaster/TypeFlowAnalyzer.js'
+import { DependencyGraphAnalyzer } from './codemaster/DependencyGraphAnalyzer.js'
+import { AsyncFlowAnalyzer } from './codemaster/AsyncFlowAnalyzer.js'
+import { TestCoverageAnalyzer } from './codemaster/TestCoverageAnalyzer.js'
+import { ArchitecturalAnalyzer } from './codemaster/ArchitecturalAnalyzer.js'
 import type { CodeAnalysis, CodeReviewOutput, FixResult, TaskPlan, AnalysisLanguage } from './codemaster/types.js'
 
 // Intelligence modules
@@ -3527,6 +3533,12 @@ export class LocalBrain {
   private codeFixer: CodeFixer
   private problemDecomposer: ProblemDecomposer
   private codeLearningEngine: LearningEngine
+  private performanceAnalyzer: PerformanceAnalyzer
+  private typeFlowAnalyzer: TypeFlowAnalyzer
+  private dependencyGraphAnalyzer: DependencyGraphAnalyzer
+  private asyncFlowAnalyzer: AsyncFlowAnalyzer
+  private testCoverageAnalyzer: TestCoverageAnalyzer
+  private architecturalAnalyzer: ArchitecturalAnalyzer
 
   // ── Intelligence modules (cognitive layer) ──
   private semanticEngine: SemanticEngine | null = null
@@ -3674,6 +3686,12 @@ export class LocalBrain {
     this.codeFixer = new CodeFixer()
     this.problemDecomposer = new ProblemDecomposer()
     this.codeLearningEngine = new LearningEngine()
+    this.performanceAnalyzer = new PerformanceAnalyzer()
+    this.typeFlowAnalyzer = new TypeFlowAnalyzer()
+    this.dependencyGraphAnalyzer = new DependencyGraphAnalyzer()
+    this.asyncFlowAnalyzer = new AsyncFlowAnalyzer()
+    this.testCoverageAnalyzer = new TestCoverageAnalyzer()
+    this.architecturalAnalyzer = new ArchitecturalAnalyzer()
 
     // Initialize intelligence modules if enabled
     if (this.config.enableIntelligence) {
@@ -5181,6 +5199,51 @@ export class LocalBrain {
       }
     }
 
+    // Enhance with new CodeMaster analyzers: performance, type safety, async flow
+    const perfResult = this.performanceAnalyzer.analyze(request.code)
+    for (const issue of perfResult.issues) {
+      const msg = issue.title.toLowerCase()
+      if (!existingMessages.has(msg)) {
+        existingMessages.add(msg)
+        baseReview.issues.push({
+          severity: issue.severity === 'critical' || issue.severity === 'high' ? 'warning' as const : 'info' as const,
+          line: issue.line,
+          message: `[Performance] ${issue.title}`,
+          suggestion: issue.suggestion,
+        })
+      }
+    }
+
+    const asyncResult = this.asyncFlowAnalyzer.analyze(request.code)
+    for (const issue of asyncResult.issues) {
+      const msg = issue.title.toLowerCase()
+      if (!existingMessages.has(msg)) {
+        existingMessages.add(msg)
+        baseReview.issues.push({
+          severity: issue.severity === 'critical' || issue.severity === 'high' ? 'error' as const : 'warning' as const,
+          line: issue.line,
+          message: `[Async] ${issue.title}`,
+          suggestion: issue.suggestion,
+        })
+      }
+    }
+
+    if (lang === 'typescript' || lang === 'javascript') {
+      const typeResult = this.typeFlowAnalyzer.analyze(request.code)
+      for (const issue of typeResult.issues) {
+        const msg = issue.title.toLowerCase()
+        if (!existingMessages.has(msg)) {
+          existingMessages.add(msg)
+          baseReview.issues.push({
+            severity: issue.severity === 'critical' || issue.severity === 'high' ? 'warning' as const : 'info' as const,
+            line: issue.line,
+            message: `[TypeSafety] ${issue.title}`,
+            suggestion: issue.suggestion,
+          })
+        }
+      }
+    }
+
     // Use the lower (stricter) of the two scores
     baseReview.score = Math.min(baseReview.score, cmReview.overallScore)
 
@@ -5263,6 +5326,73 @@ export class LocalBrain {
   deepReview(code: string, language?: string): CodeReviewOutput {
     const lang = language as AnalysisLanguage | undefined
     return this.codeReviewer.review(code, lang)
+  }
+
+  // ── Performance Analysis (powered by CodeMaster PerformanceAnalyzer) ──
+
+  /**
+   * Analyze code for performance issues: Big-O complexity, nested loops,
+   * allocation in loops, memoization opportunities, etc.
+   */
+  analyzePerformance(code: string, language?: string): ReturnType<PerformanceAnalyzer['analyze']> {
+    if (language) this.performanceAnalyzer.setLanguage(language as AnalysisLanguage)
+    return this.performanceAnalyzer.analyze(code)
+  }
+
+  /** Estimate Big-O complexity of a code snippet. */
+  estimateComplexity(code: string): ReturnType<PerformanceAnalyzer['estimateComplexity']> {
+    return this.performanceAnalyzer.estimateComplexity(code)
+  }
+
+  // ── Type Safety Analysis (powered by CodeMaster TypeFlowAnalyzer) ──
+
+  /**
+   * Analyze code for type safety issues: unsafe assertions, nullable access,
+   * implicit any, non-exhaustive switches, etc.
+   */
+  analyzeTypeSafety(code: string, language?: string): ReturnType<TypeFlowAnalyzer['analyze']> {
+    if (language) this.typeFlowAnalyzer.setLanguage(language as AnalysisLanguage)
+    return this.typeFlowAnalyzer.analyze(code)
+  }
+
+  // ── Dependency Analysis (powered by CodeMaster DependencyGraphAnalyzer) ──
+
+  /**
+   * Analyze dependencies across multiple files: circular deps, unused exports,
+   * coupling metrics, import validation.
+   */
+  analyzeDependencies(files: Array<{ path: string; content: string }>): ReturnType<DependencyGraphAnalyzer['analyzeFiles']> {
+    return this.dependencyGraphAnalyzer.analyzeFiles(files)
+  }
+
+  // ── Async Flow Analysis (powered by CodeMaster AsyncFlowAnalyzer) ──
+
+  /**
+   * Analyze code for async/await issues: missing await, unhandled rejections,
+   * race conditions, sequential awaits, floating promises, etc.
+   */
+  analyzeAsyncFlow(code: string): ReturnType<AsyncFlowAnalyzer['analyze']> {
+    return this.asyncFlowAnalyzer.analyze(code)
+  }
+
+  // ── Test Coverage Analysis (powered by CodeMaster TestCoverageAnalyzer) ──
+
+  /**
+   * Estimate test coverage by comparing source code with test code.
+   * Detects untested functions, missing error/edge cases, and coverage gaps.
+   */
+  analyzeTestCoverage(sourceCode: string, testCode?: string): ReturnType<TestCoverageAnalyzer['analyze']> {
+    return this.testCoverageAnalyzer.analyze(sourceCode, testCode)
+  }
+
+  // ── Architectural Analysis (powered by CodeMaster ArchitecturalAnalyzer) ──
+
+  /**
+   * Analyze code architecture: SOLID violations, god classes/functions,
+   * design pattern usage, cohesion/coupling, abstraction opportunities.
+   */
+  analyzeArchitecture(code: string): ReturnType<ArchitecturalAnalyzer['analyze']> {
+    return this.architecturalAnalyzer.analyze(code)
   }
 
   // ── Code Completion (Phase 1) ──
