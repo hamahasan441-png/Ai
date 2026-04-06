@@ -157,6 +157,11 @@ import { UserProfileModel } from './UserProfileModel.js'
 import { ConversationSummarizer } from './ConversationSummarizer.js'
 import { ResponseQualityScorer } from './ResponseQualityScorer.js'
 import { MultiFormatGenerator } from './MultiFormatGenerator.js'
+import { AnomalyDetector } from './AnomalyDetector.js'
+import { EmotionalIntelligence } from './EmotionalIntelligence.js'
+import { ContextualMemoryEngine } from './ContextualMemoryEngine.js'
+import { LogicalProofEngine } from './LogicalProofEngine.js'
+import { CreativeProblemSolver } from './CreativeProblemSolver.js'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -3620,6 +3625,11 @@ export class LocalBrain {
   private conversationSummarizer: ConversationSummarizer | null = null
   private responseQualityScorer: ResponseQualityScorer | null = null
   private multiFormatGenerator: MultiFormatGenerator | null = null
+  private anomalyDetector: AnomalyDetector | null = null
+  private emotionalIntelligence: EmotionalIntelligence | null = null
+  private contextualMemoryEngine: ContextualMemoryEngine | null = null
+  private logicalProofEngine: LogicalProofEngine | null = null
+  private creativeProblemSolver: CreativeProblemSolver | null = null
 
   // Token budget management
   private tokenBudget: TokenBudgetManager
@@ -3762,6 +3772,11 @@ export class LocalBrain {
       this.conversationSummarizer = new ConversationSummarizer()
       this.responseQualityScorer = new ResponseQualityScorer()
       this.multiFormatGenerator = new MultiFormatGenerator()
+      this.anomalyDetector = new AnomalyDetector()
+      this.emotionalIntelligence = new EmotionalIntelligence()
+      this.contextualMemoryEngine = new ContextualMemoryEngine()
+      this.logicalProofEngine = new LogicalProofEngine()
+      this.creativeProblemSolver = new CreativeProblemSolver()
     }
 
     const now = new Date().toISOString()
@@ -4276,6 +4291,68 @@ export class LocalBrain {
     if (this.conversationSummarizer) {
       try {
         this.conversationSummarizer.addTurn('assistant', text)
+      } catch { /* non-critical */ }
+    }
+
+    // AnomalyDetector: detect unusual query patterns
+    if (this.anomalyDetector) {
+      try {
+        const anomalyResult = this.anomalyDetector.detectQueryAnomaly(userMessage)
+        if (anomalyResult.isAnomaly && anomalyResult.score > 0.5) {
+          smartAugmentation += `\n\n**⚠ Pattern Note:** ${anomalyResult.description}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // EmotionalIntelligence: analyze emotional content and adapt
+    if (this.emotionalIntelligence) {
+      try {
+        const emotionResult = this.emotionalIntelligence.analyzeEmotion(userMessage)
+        if (emotionResult.frustrationLevel > 0.5) {
+          const empathyPrefix = this.emotionalIntelligence.generateEmpathyResponse(emotionResult)
+          if (empathyPrefix && !text.startsWith(empathyPrefix)) {
+            text = empathyPrefix + '\n\n' + text
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ContextualMemoryEngine: store interaction for contextual recall
+    if (this.contextualMemoryEngine) {
+      try {
+        const topDomain = knowledgeResults.length > 0 ? knowledgeResults[0]!.category : 'general'
+        this.contextualMemoryEngine.store(
+          userMessage,
+          { domain: topDomain, topic: topDomain },
+          0.5,
+          ['conversation']
+        )
+      } catch { /* non-critical */ }
+    }
+
+    // LogicalProofEngine: detect logical fallacies in queries
+    if (this.logicalProofEngine) {
+      try {
+        const fallacyResult = this.logicalProofEngine.detectFallacies(userMessage)
+        if (fallacyResult.hasFallacy && fallacyResult.fallacies.length > 0) {
+          const topFallacy = fallacyResult.fallacies[0]!
+          smartAugmentation += `\n\n**🔍 Logic Note:** Potential ${topFallacy.name} detected — ${topFallacy.description}`
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // CreativeProblemSolver: suggest creative approaches for problem-solving queries
+    if (this.creativeProblemSolver) {
+      try {
+        const lowerMsg = userMessage.toLowerCase()
+        if (lowerMsg.includes('how to solve') || lowerMsg.includes('creative') ||
+            lowerMsg.includes('innovate') || lowerMsg.includes('brainstorm') ||
+            lowerMsg.includes('think outside')) {
+          const ideas = this.creativeProblemSolver.brainstorm(userMessage, 3)
+          if (ideas.length > 0) {
+            smartAugmentation += `\n\n**💡 Creative Angles:**\n${ideas.map((idea, i) => `${i + 1}. ${idea}`).join('\n')}`
+          }
+        }
       } catch { /* non-critical */ }
     }
 
