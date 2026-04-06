@@ -479,10 +479,10 @@ export class ImageAnalyzer {
       if (bytes.length < 25) return null
       if (bytes[20] !== 0x2F) return null
       // Read 28 bits starting at byte 21
-      const b0 = bytes[21]!
-      const b1 = bytes[22]!
-      const b2 = bytes[23]!
-      const b3 = bytes[24]!
+      const b0 = bytes[21] ?? 0
+      const b1 = bytes[22] ?? 0
+      const b2 = bytes[23] ?? 0
+      const b3 = bytes[24] ?? 0
       const bits = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24)
       const width = (bits & 0x3FFF) + 1
       const height = ((bits >>> 14) & 0x3FFF) + 1
@@ -490,8 +490,8 @@ export class ImageAnalyzer {
     } else if (chunk === 'VP8X') {
       // Extended: canvas dimensions start at byte 24
       if (bytes.length < 30) return null
-      const width = (bytes[24]! | (bytes[25]! << 8) | (bytes[26]! << 16)) + 1
-      const height = (bytes[27]! | (bytes[28]! << 8) | (bytes[29]! << 16)) + 1
+      const width = ((bytes[24] ?? 0) | ((bytes[25] ?? 0) << 8) | ((bytes[26] ?? 0) << 16)) + 1
+      const height = ((bytes[27] ?? 0) | ((bytes[28] ?? 0) << 8) | ((bytes[29] ?? 0) << 16)) + 1
       if (width > 0 && height > 0) return { width, height }
     }
 
