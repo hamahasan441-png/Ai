@@ -54,6 +54,7 @@
   "optionalDependencies": {
     "better-sqlite3": "^11.0.0",
     "mysql2": "^3.11.0",
+    "pdf-parse": "^2.4.5",
     "pg": "^8.13.0"
   }
 }

@@ -20,6 +20,37 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
+import { STOP_WORDS, POSITIVE_WORDS, NEGATIVE_WORDS, TECHNICAL_WORDS, splitSentences, tokenize as nlpTokenize } from './nlpUtils.js'
+
+// ─── PDF Extraction (optional) ─────────────────────────────────────────────────
+
+/** Attempt to extract plain text from a raw PDF binary buffer using pdf-parse. */
+async function tryExtractPdfText(buffer: Buffer): Promise<string> {
+  try {
+    const pdfParse = (await import('pdf-parse')).default as (data: Buffer) => Promise<{ text: string }>
+    const result = await pdfParse(buffer)
+    return result.text
+  } catch {
+    throw new Error('pdf-parse is not available. Install it with: npm install pdf-parse')
+  }
+}
+
+/**
+ * Detect whether a string value is a raw PDF binary (starts with `%PDF`).
+ */
+export function isRawPdfContent(content: string): boolean {
+  return content.startsWith('%PDF')
+}
+
+/**
+ * Extract text from a raw PDF binary buffer.
+ * Requires the optional `pdf-parse` dependency.
+ * Throws if `pdf-parse` is not installed.
+ */
+export async function extractPdfText(buffer: Buffer): Promise<string> {
+  return tryExtractPdfText(buffer)
+}
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 /** Request to analyze a document. */
@@ -248,45 +279,7 @@ export const DEFAULT_DOC_ANALYZER_CONFIG: DocumentAnalyzerConfig = {
   wordsPerPage: 250,
 }
 
-const STOP_WORDS = new Set([
-  'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-  'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
-  'should', 'may', 'might', 'shall', 'can', 'to', 'of', 'in', 'for',
-  'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through', 'during',
-  'before', 'after', 'above', 'below', 'between', 'and', 'but', 'or',
-  'nor', 'not', 'so', 'yet', 'both', 'either', 'neither', 'each',
-  'every', 'all', 'any', 'few', 'more', 'most', 'other', 'some',
-  'such', 'no', 'only', 'own', 'same', 'than', 'too', 'very',
-  'just', 'because', 'if', 'when', 'where', 'how', 'what', 'which',
-  'who', 'whom', 'this', 'that', 'these', 'those', 'i', 'me', 'my',
-  'we', 'our', 'you', 'your', 'he', 'him', 'his', 'she', 'her',
-  'it', 'its', 'they', 'them', 'their', 'about', 'also', 'back',
-  'been', 'then', 'there', 'here', 'now', 'even', 'well', 'way',
-  'many', 'much', 'such', 'take', 'like', 'get', 'make', 'use',
-])
 
-const POSITIVE_WORDS = new Set([
-  'good', 'great', 'excellent', 'best', 'better', 'improve', 'success',
-  'effective', 'efficient', 'powerful', 'innovative', 'positive', 'benefit',
-  'advantage', 'optimal', 'robust', 'reliable', 'seamless', 'elegant',
-  'brilliant', 'outstanding', 'remarkable', 'impressive', 'perfect',
-])
-
-const NEGATIVE_WORDS = new Set([
-  'bad', 'worse', 'worst', 'fail', 'failure', 'error', 'bug', 'issue',
-  'problem', 'difficult', 'complex', 'slow', 'broken', 'deprecated',
-  'vulnerable', 'risk', 'danger', 'warning', 'critical', 'severe',
-  'limitation', 'drawback', 'disadvantage', 'concern', 'threat',
-])
-
-const TECHNICAL_WORDS = new Set([
-  'api', 'function', 'class', 'method', 'interface', 'module', 'package',
-  'import', 'export', 'async', 'await', 'promise', 'callback', 'type',
-  'variable', 'const', 'let', 'var', 'return', 'parameter', 'argument',
-  'algorithm', 'database', 'server', 'client', 'request', 'response',
-  'endpoint', 'middleware', 'framework', 'library', 'runtime', 'compiler',
-  'deploy', 'container', 'kubernetes', 'docker', 'git', 'repository',
-])
 
 // ─── DocumentAnalyzer ──────────────────────────────────────────────────────────
 
@@ -878,7 +871,7 @@ export class DocumentAnalyzer {
     }
 
     // Report
-    if (structure.sections.length > 3 && lower.includes('conclusion') || lower.includes('summary')) {
+    if (structure.sections.length > 3 && (lower.includes('conclusion') || lower.includes('summary'))) {
       scores.report += 2
     }
 
@@ -1275,14 +1268,11 @@ export class DocumentAnalyzer {
   // ── Utility Methods ────────────────────────────────────────────────────────
 
   private tokenize(text: string): string[] {
-    return text.split(/[\s\n]+/).filter(w => w.length > 0 && /[a-zA-Z0-9]/.test(w))
+    return nlpTokenize(text)
   }
 
   private splitSentences(text: string): string[] {
-    return text
-      .split(/(?<=[.!?])\s+/)
-      .map(s => s.trim())
-      .filter(s => s.length > 5)
+    return splitSentences(text)
   }
 
   private countSyllables(word: string): number {

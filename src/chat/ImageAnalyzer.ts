@@ -298,8 +298,9 @@ export class ImageAnalyzer {
     // Detect format from signature
     const detectedFormat = this.detectFormatFromSignature(cleanData)
 
-    // Estimate dimensions from data size and format
-    const dims = this.estimateDimensions(sizeBytes, detectedFormat || formatName.toLowerCase())
+    // Try to parse exact dimensions from image headers; fall back to heuristic
+    const parsedDims = this.parseHeaderDimensions(cleanData, detectedFormat ?? formatName.toLowerCase())
+    const dims = parsedDims ?? this.estimateDimensions(sizeBytes, detectedFormat || formatName.toLowerCase())
 
     // Detect features
     const hasAlpha = mediaType === 'image/png' || mediaType === 'image/webp'
@@ -324,6 +325,176 @@ export class ImageAnalyzer {
     if (b64Data.startsWith(JPEG_SIGNATURE_B64)) return 'jpeg'
     if (b64Data.startsWith(GIF_SIGNATURE_B64)) return 'gif'
     if (b64Data.startsWith(WEBP_SIGNATURE_B64)) return 'webp'
+    return null
+  }
+
+  /**
+   * Parse exact dimensions from image header bytes.
+   * Supports PNG (IHDR chunk), JPEG (SOF0/SOF2 markers), GIF (logical screen descriptor),
+   * and WebP (VP8/VP8L/VP8X chunks). Returns null if parsing fails.
+   */
+  private parseHeaderDimensions(b64Data: string, format: string): { width: number; height: number } | null {
+    try {
+      // Decode enough bytes to cover any format header (~128 bytes is sufficient)
+      const headerB64 = b64Data.slice(0, 172) // 172 chars ≈ 129 bytes decoded
+      const bytes = Buffer.from(headerB64, 'base64')
+
+      switch (format) {
+        case 'png':
+          return this.parsePngDimensions(bytes)
+        case 'jpeg':
+        case 'jpg':
+          return this.parseJpegDimensions(b64Data)
+        case 'gif':
+          return this.parseGifDimensions(bytes)
+        case 'webp':
+          return this.parseWebpDimensions(bytes)
+        default:
+          return null
+      }
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * Parse PNG dimensions from the IHDR chunk.
+   * PNG header layout:
+   *   Bytes  0- 7: PNG signature (8 bytes)
+   *   Bytes  8-11: IHDR chunk length (4 bytes, big-endian)
+   *   Bytes 12-15: "IHDR" type (4 bytes)
+   *   Bytes 16-19: Width (4 bytes, big-endian)
+   *   Bytes 20-23: Height (4 bytes, big-endian)
+   */
+  private parsePngDimensions(bytes: Buffer): { width: number; height: number } | null {
+    // Need at least 24 bytes
+    if (bytes.length < 24) return null
+    // Verify PNG signature: 89 50 4E 47 0D 0A 1A 0A
+    if (bytes[0] !== 0x89 || bytes[1] !== 0x50 || bytes[2] !== 0x4E || bytes[3] !== 0x47) return null
+    const width = bytes.readUInt32BE(16)
+    const height = bytes.readUInt32BE(20)
+    if (width <= 0 || height <= 0 || width > 65535 || height > 65535) return null
+    return { width, height }
+  }
+
+  /**
+   * Parse JPEG dimensions by scanning for SOF0 (0xFFC0) or SOF2 (0xFFC2) markers.
+   * SOF segment layout after the marker:
+   *   2 bytes: segment length
+   *   1 byte:  precision
+   *   2 bytes: height (big-endian)
+   *   2 bytes: width (big-endian)
+   * Because the SOF marker may be deep in the file, decode more bytes here.
+   */
+  private parseJpegDimensions(b64Data: string): { width: number; height: number } | null {
+    // Decode up to ~8 KB to find the SOF marker
+    const maxBytes = 8192
+    const headerB64 = b64Data.slice(0, Math.ceil(maxBytes * 4 / 3))
+    const bytes = Buffer.from(headerB64, 'base64')
+
+    // JPEG starts with FF D8
+    if (bytes[0] !== 0xFF || bytes[1] !== 0xD8) return null
+
+    let i = 2
+    while (i + 3 < bytes.length) {
+      if (bytes[i] !== 0xFF) break
+      const marker = bytes[i + 1]
+      // SOF0 (0xC0) or SOF2 (0xC2) — progressive JPEG
+      if (marker === 0xC0 || marker === 0xC2) {
+        if (i + 8 >= bytes.length) break
+        const height = bytes.readUInt16BE(i + 5)
+        const width = bytes.readUInt16BE(i + 7)
+        if (width > 0 && height > 0 && width <= 65535 && height <= 65535) {
+          return { width, height }
+        }
+      }
+      // Skip to next segment: marker (2) + length field (2) + length value
+      if (i + 3 >= bytes.length) break
+      const segLen = bytes.readUInt16BE(i + 2)
+      i += 2 + segLen
+    }
+    return null
+  }
+
+  /**
+   * Parse GIF dimensions from the Logical Screen Descriptor.
+   * GIF header layout:
+   *   Bytes 0-5: "GIF87a" or "GIF89a" (6 bytes)
+   *   Bytes 6-7: Logical Screen Width (little-endian 16-bit)
+   *   Bytes 8-9: Logical Screen Height (little-endian 16-bit)
+   */
+  private parseGifDimensions(bytes: Buffer): { width: number; height: number } | null {
+    if (bytes.length < 10) return null
+    // Verify GIF signature
+    if (bytes[0] !== 0x47 || bytes[1] !== 0x49 || bytes[2] !== 0x46) return null // "GIF"
+    const width = bytes.readUInt16LE(6)
+    const height = bytes.readUInt16LE(8)
+    if (width <= 0 || height <= 0 || width > 65535 || height > 65535) return null
+    return { width, height }
+  }
+
+  /**
+   * Parse WebP dimensions from the VP8, VP8L, or VP8X chunk.
+   * RIFF/WebP header layout:
+   *   Bytes  0- 3: "RIFF" (4 bytes)
+   *   Bytes  4- 7: File size (little-endian)
+   *   Bytes  8-11: "WEBP" (4 bytes)
+   *   Bytes 12-15: Chunk FourCC ("VP8 ", "VP8L", "VP8X")
+   *   Bytes 16-19: Chunk size (little-endian)
+   *
+   * VP8 (lossy) bitstream at byte 20:
+   *   3 bytes: frame tag
+   *   3 bytes: start code (0x9D 0x01 0x2A)
+   *   2 bytes: width (little-endian 14 bits)
+   *   2 bytes: height (little-endian 14 bits)
+   *
+   * VP8L (lossless) bitstream at byte 21:
+   *   signature: 0x2F
+   *   Bits 0-13:  width - 1
+   *   Bits 14-27: height - 1
+   *
+   * VP8X chunk payload at byte 20:
+   *   1 byte:  flags
+   *   3 bytes: reserved
+   *   3 bytes: canvas width - 1 (24-bit little-endian)
+   *   3 bytes: canvas height - 1 (24-bit little-endian)
+   */
+  private parseWebpDimensions(bytes: Buffer): { width: number; height: number } | null {
+    if (bytes.length < 30) return null
+    // Verify RIFF....WEBP
+    if (bytes[0] !== 0x52 || bytes[1] !== 0x49 || bytes[2] !== 0x46 || bytes[3] !== 0x46) return null
+    if (bytes[8] !== 0x57 || bytes[9] !== 0x45 || bytes[10] !== 0x42 || bytes[11] !== 0x50) return null
+
+    const chunk = bytes.slice(12, 16).toString('ascii')
+
+    if (chunk === 'VP8 ') {
+      // Lossy: skip 3-byte frame tag + start code check
+      if (bytes.length < 30) return null
+      if (bytes[23] !== 0x9D || bytes[24] !== 0x01 || bytes[25] !== 0x2A) return null
+      const width = bytes.readUInt16LE(26) & 0x3FFF
+      const height = bytes.readUInt16LE(28) & 0x3FFF
+      if (width > 0 && height > 0) return { width, height }
+    } else if (chunk === 'VP8L') {
+      // Lossless
+      if (bytes.length < 25) return null
+      if (bytes[20] !== 0x2F) return null
+      // Read 28 bits starting at byte 21
+      const b0 = bytes[21] ?? 0
+      const b1 = bytes[22] ?? 0
+      const b2 = bytes[23] ?? 0
+      const b3 = bytes[24] ?? 0
+      const bits = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24)
+      const width = (bits & 0x3FFF) + 1
+      const height = ((bits >>> 14) & 0x3FFF) + 1
+      if (width > 0 && height > 0) return { width, height }
+    } else if (chunk === 'VP8X') {
+      // Extended: canvas dimensions start at byte 24
+      if (bytes.length < 30) return null
+      const width = ((bytes[24] ?? 0) | ((bytes[25] ?? 0) << 8) | ((bytes[26] ?? 0) << 16)) + 1
+      const height = ((bytes[27] ?? 0) | ((bytes[28] ?? 0) << 8) | ((bytes[29] ?? 0) << 16)) + 1
+      if (width > 0 && height > 0) return { width, height }
+    }
+
     return null
   }
 

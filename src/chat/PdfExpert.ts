@@ -20,7 +20,11 @@ import {
   type DocumentAnalysisResult,
   type DocumentSection,
   type KeywordResult,
+  isRawPdfContent,
+  extractPdfText,
 } from './DocumentAnalyzer.js'
+import { SemanticEngine } from './SemanticEngine.js'
+import { STOP_WORDS, splitSentences as nlpSplitSentences } from './nlpUtils.js'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -38,6 +42,8 @@ export interface PdfExpertConfig {
   readonly maxContentLength: number
   /** Enable cross-document comparison. Default: true */
   readonly enableComparison: boolean
+  /** Enable semantic similarity scoring via SemanticEngine. Default: true */
+  readonly enableSemantic: boolean
 }
 
 /** Represents a loaded document in the knowledge base. */
@@ -159,22 +165,8 @@ export const DEFAULT_PDF_EXPERT_CONFIG: PdfExpertConfig = {
   maxQuoteLength: 500,
   maxContentLength: 500_000,
   enableComparison: true,
+  enableSemantic: true,
 }
-
-const STOP_WORDS = new Set([
-  'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-  'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
-  'should', 'may', 'might', 'shall', 'can', 'to', 'of', 'in', 'for',
-  'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through', 'during',
-  'before', 'after', 'above', 'below', 'between', 'and', 'but', 'or',
-  'nor', 'not', 'so', 'yet', 'both', 'either', 'neither', 'each',
-  'every', 'all', 'any', 'few', 'more', 'most', 'other', 'some',
-  'such', 'no', 'only', 'own', 'same', 'than', 'too', 'very',
-  'just', 'because', 'if', 'when', 'where', 'how', 'what', 'which',
-  'who', 'whom', 'this', 'that', 'these', 'those', 'i', 'me', 'my',
-  'we', 'our', 'you', 'your', 'he', 'him', 'his', 'she', 'her',
-  'it', 'its', 'they', 'them', 'their', 'about', 'also', 'then',
-])
 
 const NOT_COVERED_MESSAGE = 'This is not covered in the uploaded documents'
 
@@ -183,6 +175,7 @@ const NOT_COVERED_MESSAGE = 'This is not covered in the uploaded documents'
 export class PdfExpert {
   private readonly config: PdfExpertConfig
   private readonly analyzer: DocumentAnalyzer
+  private readonly semantic: SemanticEngine | null
   private readonly documents: Map<string, LoadedDocument> = new Map()
   private nextDocId = 1
   private queriesAnswered = 0
@@ -195,6 +188,7 @@ export class PdfExpert {
     this.analyzer = new DocumentAnalyzer({
       maxContentLength: this.config.maxContentLength,
     })
+    this.semantic = this.config.enableSemantic ? new SemanticEngine() : null
   }
 
   // ── Document Management ──────────────────────────────────────────────────
@@ -202,10 +196,18 @@ export class PdfExpert {
   /**
    * Load a document into the knowledge base.
    * Returns the document ID assigned.
+   *
+   * For raw PDF binary content, use {@link loadPdfBuffer} instead.
    */
   loadDocument(content: string, fileName?: string, mimeType?: string): string {
     if (!content || content.trim().length === 0) {
       throw new Error('Document content is empty')
+    }
+
+    if (isRawPdfContent(content)) {
+      throw new Error(
+        'Raw PDF binary detected. Use loadPdfBuffer(buffer, fileName) to load PDF files.',
+      )
     }
 
     if (this.documents.size >= this.config.maxDocuments) {
@@ -234,6 +236,30 @@ export class PdfExpert {
 
     this.documents.set(id, doc)
     return id
+  }
+
+  /**
+   * Load a raw PDF binary buffer into the knowledge base.
+   * Extracts text from the PDF using `pdf-parse` (optional dependency).
+   * Returns the document ID assigned.
+   *
+   * Requires: `npm install pdf-parse`
+   */
+  async loadPdfBuffer(buffer: Buffer, fileName?: string): Promise<string> {
+    if (!buffer || buffer.length === 0) {
+      throw new Error('PDF buffer is empty')
+    }
+
+    if (this.documents.size >= this.config.maxDocuments) {
+      throw new Error(`Maximum number of documents (${this.config.maxDocuments}) reached`)
+    }
+
+    const text = await extractPdfText(buffer)
+    if (!text || text.trim().length === 0) {
+      throw new Error('Could not extract any text from the PDF')
+    }
+
+    return this.loadDocument(text, fileName ?? 'document.pdf', 'application/pdf')
   }
 
   /**
@@ -527,7 +553,7 @@ export class PdfExpert {
   private extractQueryKeywords(question: string): string[] {
     return question
       .toLowerCase()
-      .split(/[\s\n,.!?;:'"()\[\]{}]+/)
+      .split(/[\s\n,.!?;:'"()[\]{}]+/)
       .filter(w => w.length > 1 && !STOP_WORDS.has(w))
   }
 
@@ -577,23 +603,33 @@ export class PdfExpert {
     }
 
     // Base relevance: fraction of keywords found
-    let relevance = matchedKeywords / queryKeywords.length
+    let keywordRelevance = matchedKeywords / queryKeywords.length
 
     // Bonus for title matches (title match is a strong signal)
-    relevance += (titleMatches / queryKeywords.length) * 0.3
+    keywordRelevance += (titleMatches / queryKeywords.length) * 0.3
 
     // Bonus for exact phrase match
     const questionLower = question.toLowerCase()
     if (sectionLower.includes(questionLower)) {
-      relevance += 0.3
+      keywordRelevance += 0.3
     }
 
     // Penalty for very short sections (likely not informative)
     if (section.wordCount < 10) {
-      relevance *= 0.5
+      keywordRelevance *= 0.5
     }
 
-    return Math.min(1, relevance)
+    keywordRelevance = Math.min(1, keywordRelevance)
+
+    // Semantic scoring: only blend when there is some keyword relevance,
+    // to avoid false positives from semantic similarity alone.
+    if (this.semantic !== null && keywordRelevance > 0 && section.content.trim().length > 0) {
+      const semanticScore = this.semantic.similarity(question, section.content)
+      // Weighted average: 40% keyword, 60% semantic
+      return Math.min(1, 0.4 * keywordRelevance + 0.6 * semanticScore)
+    }
+
+    return keywordRelevance
   }
 
   private extractBestQuote(content: string, queryKeywords: string[]): string {
@@ -730,9 +766,6 @@ export class PdfExpert {
   }
 
   private splitSentences(text: string): string[] {
-    return text
-      .split(/(?<=[.!?])\s+/)
-      .map(s => s.trim())
-      .filter(s => s.length > 5)
+    return nlpSplitSentences(text)
   }
 }
