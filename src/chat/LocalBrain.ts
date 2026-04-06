@@ -3872,6 +3872,51 @@ export class LocalBrain {
       } catch { /* non-critical */ }
     }
 
+    // TemporalReasoner: for time-based / sequence queries
+    if (this.temporalReasoner && this.isTemporalQuery(userMessage)) {
+      try {
+        const causalOrder = this.temporalReasoner.inferCausalOrder()
+        if (causalOrder.length > 0) {
+          const topCausal = causalOrder[0]
+          if (topCausal) {
+            const cause = topCausal.possibleCauses[0]?.eventName ?? topCausal.eventName
+            const effect = topCausal.possibleEffects[0]?.eventName ?? 'unknown'
+            smartAugmentation += `\n\n**Temporal Insight:** ${cause} → ${effect} (event: ${topCausal.eventName})`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // ArgumentAnalyzer: for debate/argument/claim queries
+    if (this.argumentAnalyzer && this.isArgumentQuery(userMessage)) {
+      try {
+        const fallacies = this.argumentAnalyzer.detectFallacies(userMessage)
+        if (fallacies.length > 0) {
+          const topFallacy = fallacies[0]
+          if (topFallacy) {
+            smartAugmentation += `\n\n**Logical Analysis:** Detected ${topFallacy.type} fallacy (severity: ${topFallacy.severity})`
+          }
+        }
+        const biases = this.argumentAnalyzer.detectBias(userMessage)
+        if (biases.length > 0) {
+          const topBias = biases[0]
+          if (topBias) {
+            smartAugmentation += `\n**Bias Detection:** ${topBias.type} bias detected`
+          }
+        }
+      } catch { /* non-critical */ }
+    }
+
+    // NarrativeEngine: for story/explanation/walkthrough queries
+    if (this.narrativeEngine && this.isNarrativeQuery(userMessage)) {
+      try {
+        const beat = this.narrativeEngine.generateStoryBeat(userMessage)
+        if (beat && beat.text) {
+          smartAugmentation += `\n\n**Narrative:** ${beat.text}`
+        }
+      } catch { /* non-critical */ }
+    }
+
     // Kurdish NLP: morphology, sentiment, translation for Kurdish queries
     if (this.isKurdishSoraniQuery(userMessage)) {
       // Kurdish Sentiment Analysis
@@ -4481,6 +4526,27 @@ export class LocalBrain {
     const a11yPattern = /\b(keyboard\s+(navigation|focus|management|tab\s+order|accessible)|color\s+contrast\s+(ratio|accessible|wcag|palette)|accessibility\s+(testing|audit|axe|lighthouse|compliance))\b/i
     const inclusivePattern = /\b(inclusive\s+design\s+(universal|disability|assistive)|semantic\s+html\s+(heading|structure|accessible|alt\s+text)|accessible\s+component\s+(library|react\s+aria|radix))\b/i
     return wcagPattern.test(msg) || a11yPattern.test(msg) || inclusivePattern.test(msg)
+  }
+
+  private isTemporalQuery(msg: string): boolean {
+    const timePattern = /\b(before\s+(and\s+)?after|timeline\s+(of|for|analysis)|sequence\s+of\s+events|chronolog(y|ical)|temporal\s+(order|relation|analysis))\b/i
+    const whenPattern = /\b(when\s+did\s+(this|that|it)|happened\s+(before|after|first|last)|order\s+of\s+(events|operations|execution))\b/i
+    const historyPattern = /\b(event\s+timeline|time.?series\s+analysis|causal\s+order|temporal\s+reasoning|historical\s+sequence)\b/i
+    return timePattern.test(msg) || whenPattern.test(msg) || historyPattern.test(msg)
+  }
+
+  private isArgumentQuery(msg: string): boolean {
+    const logicPattern = /\b(logical\s+fallac(y|ies)|argument\s+(strength|validity|structure|analysis)|straw\s*man|ad\s+hominem|red\s+herring)\b/i
+    const debatePattern = /\b(debate\s+(analysis|evaluate)|claim\s+(and\s+)?evidence|counter.?argument|logical\s+(structure|reasoning|analysis))\b/i
+    const biasPattern = /\b(cognitive\s+bias(es)?|confirmation\s+bias|detect\s+(bias|fallac)|reasoning\s+(error|flaw))\b/i
+    return logicPattern.test(msg) || debatePattern.test(msg) || biasPattern.test(msg)
+  }
+
+  private isNarrativeQuery(msg: string): boolean {
+    const storyPattern = /\b(tell\s+(me\s+)?a\s+story|narrative\s+(structure|arc|generation)|story\s+(beat|arc|telling))\b/i
+    const explainPattern = /\b(walk\s+me\s+through|step.by.step\s+(explanation|walkthrough)|explain\s+(like|as\s+if|using\s+a\s+story))\b/i
+    const creativePattern = /\b(creative\s+writing\s+(prompt|exercise)|plot\s+(structure|development|twist)|character\s+(development|arc))\b/i
+    return storyPattern.test(msg) || explainPattern.test(msg) || creativePattern.test(msg)
   }
 
   /** Extract probable cause from a causal query. */
