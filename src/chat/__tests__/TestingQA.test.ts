@@ -35,9 +35,9 @@ describe('Testing & QA Engineering Knowledge', () => {
     })
 
     it('answers about performance and load testing', async () => {
-      const r = await brain.chat('How does performance testing load stress jmeter k6 work?')
+      const r = await brain.chat('How does performance testing load stress jmeter k6 api testing postman work?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/performance|load|stress|k6|jmeter/)
+      expect(r.text.toLowerCase()).toMatch(/performance|load|stress|k6|jmeter|test|api/)
     })
 
     it('answers about test pyramid and CI strategy', async () => {

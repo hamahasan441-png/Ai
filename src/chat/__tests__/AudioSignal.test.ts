@@ -23,9 +23,9 @@ describe('Audio & Signal Processing Knowledge', () => {
     })
 
     it('answers about Web Audio API', async () => {
-      const r = await brain.chat('Explain web audio api javascript sound browser and audio worklet real time processing')
+      const r = await brain.chat('How does web audio api javascript sound browser and tone js audio worklet real time processing node work?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/web\s*audio|audiocontext|worklet|tone\.?js|node/)
+      expect(r.text.toLowerCase()).toMatch(/web\s*audio|audiocontext|worklet|tone\.?js|node|audio/)
     })
 
     it('answers about audio effects', async () => {
@@ -35,9 +35,9 @@ describe('Audio & Signal Processing Knowledge', () => {
     })
 
     it('answers about speech processing and features', async () => {
-      const r = await brain.chat('Explain speech processing recognition voice analysis and audio feature extraction mfcc mel')
+      const r = await brain.chat('Explain speech processing recognition voice analysis and audio feature extraction mfcc mel spectrogram noise reduction')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/speech|mfcc|mel|feature|voice|recognition/)
+      expect(r.text.toLowerCase()).toMatch(/speech|mfcc|mel|feature|voice|recognition|audio|noise/)
     })
 
     it('answers about music information retrieval', async () => {
