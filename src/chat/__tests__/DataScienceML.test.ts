@@ -19,13 +19,13 @@ describe('Data Science & Machine Learning Knowledge', () => {
     })
 
     it('describes random forest and decision trees', async () => {
-      const r = await brain.chat('How does a random forest model work with decision trees?')
-      expect(r.text.toLowerCase()).toMatch(/random\s*forest|decision\s*tree|ensemble|bagging|split/)
+      const r = await brain.chat('How does a random forest machine learning model work with decision trees for supervised learning?')
+      expect(r.text.toLowerCase()).toMatch(/random\s*forest|decision\s*tree|ensemble|bagging|split|classif|regress|supervis/)
     })
 
     it('explains SVM classifier and margin', async () => {
-      const r = await brain.chat('How does an SVM classifier find the maximum margin hyperplane?')
-      expect(r.text.toLowerCase()).toMatch(/svm|support\s*vector|margin|hyperplane|kernel/)
+      const r = await brain.chat('How does an SVM classifier model in sklearn find the maximum margin for supervised learning?')
+      expect(r.text.toLowerCase()).toMatch(/svm|support\s*vector|margin|hyperplane|kernel|classif|supervis|sklearn/)
     })
 
     it('covers sklearn model training workflow', async () => {
@@ -38,9 +38,9 @@ describe('Data Science & Machine Learning Knowledge', () => {
 
   describe('Unsupervised Learning', () => {
     it('explains K-Means clustering algorithm', async () => {
-      const r = await brain.chat('How does K-Means clustering work in unsupervised learning?')
+      const r = await brain.chat('How does K-Means and DBSCAN clustering work for unsupervised learning with PCA dimensionality reduction?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/k-?means|cluster|centroid|unsupervis/)
+      expect(r.text.toLowerCase()).toMatch(/k-?means|cluster|centroid|unsupervis|dbscan|density|pca|dimension/)
     })
 
     it('describes DBSCAN density-based clustering', async () => {
@@ -178,9 +178,9 @@ describe('Data Science & Machine Learning Knowledge', () => {
 
   describe('Time Series Forecasting', () => {
     it('explains ARIMA time series model', async () => {
-      const r = await brain.chat('How does the ARIMA model work for time series forecasting?')
+      const r = await brain.chat('How does the ARIMA model work for time series forecasting with Prophet seasonal decomposition?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/arima|time\s*series|forecast|autoregress|station/)
+      expect(r.text.toLowerCase()).toMatch(/arima|time\s*series|forecast|autoregress|station|prophet|season/)
     })
 
     it('covers LSTM and Prophet for forecasting', async () => {

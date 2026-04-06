@@ -1633,20 +1633,20 @@ export function createProgrammingKnowledgeGraph(
   const parsingAst = memory.addConcept('Parsing & AST', 'compilers')
   const typeSystems = memory.addConcept('Type Systems', 'compilers')
   const codeGeneration = memory.addConcept('Code Generation & Optimization', 'compilers')
-  const garbageCollection = memory.addConcept('Garbage Collection', 'runtime-systems')
+  const compilerGarbageCollection = memory.addConcept('Garbage Collection', 'runtime-systems')
   const virtualMachines = memory.addConcept('Virtual Machines & Interpreters', 'runtime-systems')
 
   memory.addRelation(lexicalAnalysis, compilerDesign, 'part-of', 0.95)
   memory.addRelation(parsingAst, compilerDesign, 'part-of', 0.95)
   memory.addRelation(typeSystems, compilerDesign, 'part-of', 0.9)
   memory.addRelation(codeGeneration, compilerDesign, 'part-of', 0.9)
-  memory.addRelation(garbageCollection, compilerDesign, 'part-of', 0.85)
+  memory.addRelation(compilerGarbageCollection, compilerDesign, 'part-of', 0.85)
   memory.addRelation(virtualMachines, compilerDesign, 'part-of', 0.9)
   memory.addRelation(lexicalAnalysis, parsingAst, 'related-to', 0.95)
   memory.addRelation(parsingAst, typeSystems, 'related-to', 0.9)
   memory.addRelation(typeSystems, codeGeneration, 'related-to', 0.85)
   memory.addRelation(codeGeneration, virtualMachines, 'related-to', 0.85)
-  memory.addRelation(garbageCollection, virtualMachines, 'related-to', 0.9)
+  memory.addRelation(compilerGarbageCollection, virtualMachines, 'related-to', 0.9)
 
   return memory
 }
