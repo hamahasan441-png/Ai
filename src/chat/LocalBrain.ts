@@ -2708,6 +2708,93 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('nlg', ['dialogue system response generation chatbot conversational', 'data to text report generation automated narrative', 'content generation seo copywriting marketing automation'],
     'Applied NLG: Dialogue systems — retrieval-based (select from candidates), generative (create novel responses), hybrid. Persona consistency, grounding in knowledge. Data-to-text: convert structured data (tables, charts, databases) to natural language narratives. Automated reporting: financial summaries, sports recaps, weather reports, analytics dashboards. Tools: Narrative Science (acquired by Salesforce), Arria NLG, Amazon Polly (text-to-speech). Content generation: SEO-optimized articles, product descriptions, ad copy, email campaigns. Ethical considerations: disclosure of AI-generated content, misinformation risks, plagiarism detection.', 1.0)
 
+  // ── Computer Vision & Image Processing ───────────────────────────────────────
+  add('computer_vision', ['object detection recognition yolo ssd faster rcnn', 'image segmentation semantic instance panoptic mask', 'convolutional neural network cnn feature extraction'],
+    'Computer Vision fundamentals: Object detection — localize and classify objects with bounding boxes. YOLO (You Only Look Once) real-time single-shot detector, SSD (Single Shot MultiBox Detector), Faster R-CNN two-stage detector (RPN + classification). Image segmentation: semantic (per-pixel class labels), instance (separate object instances), panoptic (unified semantic+instance). Architectures: U-Net (biomedical), Mask R-CNN (instance), DeepLab (atrous convolution). Feature extraction: CNNs (ResNet, VGG, EfficientNet), Vision Transformers (ViT, DeiT, Swin Transformer). Transfer learning: pretrained ImageNet models fine-tuned for domain tasks. Data augmentation: rotation, flipping, color jitter, CutOut, MixUp, CutMix.', 1.0)
+
+  add('computer_vision', ['optical flow motion estimation video tracking surveillance', 'image enhancement restoration super resolution denoising', '3d vision depth estimation stereo point cloud lidar'],
+    'Advanced CV: Optical flow — pixel-level motion between frames. Dense (Farneback, FlowNet, RAFT) vs sparse (Lucas-Kanade). Video tracking: SORT, DeepSORT, ByteTrack, multi-object tracking (MOT). Action recognition: I3D, SlowFast, TimeSFormer. Image enhancement: super-resolution (SRCNN, ESRGAN, Real-ESRGAN), denoising (DnCNN, noise2noise), dehazing, low-light enhancement. Image restoration: inpainting (fill missing regions), deblurring, artifact removal. 3D vision: depth estimation (monocular MiDaS, stereo matching), point cloud processing (PointNet, PointNet++), LiDAR processing, structure from motion (SfM), SLAM (simultaneous localization and mapping). Applications: autonomous driving, medical imaging, satellite imagery, manufacturing inspection.', 1.0)
+
+  add('computer_vision', ['opencv image processing computer vision library', 'face detection recognition deepface arcface', 'ocr optical character recognition tesseract paddleocr'],
+    'CV tools & applications: OpenCV — comprehensive open-source library for image processing, feature detection (SIFT, ORB, SURF), camera calibration, contour detection, morphological operations. Face processing: detection (MTCNN, RetinaFace), recognition (ArcFace, CosFace, DeepFace), landmark detection (dlib, MediaPipe), face alignment, anti-spoofing. OCR: Tesseract (open-source), PaddleOCR, EasyOCR, scene text detection (EAST, CRAFT). Document AI: layout analysis, table extraction, form parsing. Pose estimation: body (OpenPose, MediaPipe), hand, full-body mesh (SMPL). Visual SLAM: ORB-SLAM, LSD-SLAM. Edge deployment: TensorRT, ONNX Runtime, OpenVINO, TFLite.', 1.0)
+
+  // ── Cryptography & Applied Security ──────────────────────────────────────────
+  add('cryptography', ['symmetric encryption aes des block cipher stream cipher', 'public key cryptography rsa elliptic curve diffie hellman', 'hash function sha256 md5 hmac message authentication code'],
+    'Cryptography fundamentals: Symmetric encryption — same key for encrypt/decrypt. Block ciphers: AES (128/192/256-bit, CBC/CTR/GCM modes), DES/3DES (legacy). Stream ciphers: ChaCha20, RC4 (deprecated). Key management: key derivation (PBKDF2, bcrypt, scrypt, Argon2), key rotation, key escrow. Asymmetric/public-key: RSA (2048+ bits), Elliptic Curve (ECDSA, Ed25519, Curve25519), Diffie-Hellman key exchange (DH, ECDH). Digital signatures: sign with private key, verify with public. PKI: certificates (X.509), certificate authorities (CA), certificate chains, revocation (CRL, OCSP). Hash functions: SHA-256, SHA-3, BLAKE2, BLAKE3. MACs: HMAC, CMAC, Poly1305. Collision resistance, preimage resistance.', 1.0)
+
+  add('cryptography', ['tls ssl https certificate transport layer security', 'post quantum cryptography lattice based ntru kyber dilithium', 'zero knowledge proof zkp zk snark zk stark'],
+    'Applied cryptography: TLS/SSL — TLS 1.3 (simplified handshake, forward secrecy), cipher suites, certificate pinning, mTLS (mutual TLS). Post-quantum cryptography: NIST PQC standards — CRYSTALS-Kyber (key encapsulation), CRYSTALS-Dilithium (signatures), FALCON (signatures), SPHINCS+ (hash-based signatures). Lattice-based, code-based, hash-based, isogeny-based approaches. Quantum threat: Shor\'s algorithm breaks RSA/ECC, Grover\'s weakens symmetric. Zero-knowledge proofs: prove statement truth without revealing info. zk-SNARKs (succinct, non-interactive), zk-STARKs (transparent, scalable). Homomorphic encryption: compute on encrypted data (fully: TFHE, BFV; partially: Paillier). Secure multi-party computation (MPC). Secret sharing (Shamir). Applications: privacy-preserving ML, anonymous credentials, blockchain privacy.', 1.0)
+
+  // ── Recommendation Systems & Personalization ─────────────────────────────────
+  add('recommendation_systems', ['collaborative filtering user item matrix factorization', 'content based filtering feature similarity cosine tf idf', 'recommendation system personalization engine'],
+    'Recommendation Systems: Collaborative filtering — user-based (find similar users, recommend their items) vs item-based (find similar items to user\'s history). Matrix factorization: SVD, NMF, ALS. Implicit feedback: clicks, views, dwell time vs explicit ratings. Cold-start problem: new users/items with no history. Content-based: item features (TF-IDF, embeddings), user profile matching, cosine similarity. Hybrid approaches: weighted, switching, cascade, feature augmentation. Knowledge-based: constraint-based (user requirements) and case-based (similarity to past cases). Evaluation: precision@K, recall@K, NDCG, MAP, hit rate, coverage, diversity, serendipity. A/B testing for recommenders.', 1.0)
+
+  add('recommendation_systems', ['deep learning recommendation neural collaborative ncf', 'session based recommendation sequential gru4rec', 'multi armed bandit exploration exploitation thompson sampling'],
+    'Advanced recommenders: Deep learning approaches — Neural Collaborative Filtering (NCF), DeepFM, Wide & Deep, DLRM (Deep Learning Recommendation Model). Embedding-based: item2vec, user/item embeddings. Two-tower models for retrieval. Sequential/session-based: GRU4Rec, SASRec, BERT4Rec — model temporal patterns, next-item prediction. Multi-armed bandits: exploration vs exploitation tradeoff. Thompson sampling, UCB (Upper Confidence Bound), epsilon-greedy, contextual bandits (LinUCB). Explainable recommendations: attention weights, knowledge graph paths, counterfactual explanations. Feature stores: real-time feature serving (Feast, Tecton). Production systems: candidate generation → ranking → re-ranking pipeline. Bias mitigation: popularity bias, position bias, fairness constraints.', 1.0)
+
+  // ── Data Visualization & Dashboarding ────────────────────────────────────────
+  add('data_visualization', ['data visualization chart bar line scatter pie heatmap', 'dashboard design layout tableau power bi grafana', 'd3 js plotly matplotlib seaborn vega lite'],
+    'Data Visualization: Chart types — bar (comparison), line (trend), scatter (correlation), pie (composition), heatmap (matrix), treemap (hierarchy), sankey (flow), box plot (distribution), violin (density). Grammar of Graphics (Leland Wilkinson): data, aesthetics, geometries, facets, statistics, coordinates, themes. Tools: D3.js (low-level, web), Plotly (interactive, multi-language), Matplotlib/Seaborn (Python), Vega-Lite (declarative), Chart.js, ECharts, Highcharts. Dashboard platforms: Tableau, Power BI, Grafana, Looker, Metabase, Apache Superset. Design principles: data-ink ratio (Tufte), pre-attentive attributes, Gestalt principles, color theory (sequential, diverging, categorical palettes). Responsive design for dashboards.', 1.0)
+
+  add('data_visualization', ['interactive visualization brushing linking zoom filter', 'geospatial visualization map choropleth leaflet mapbox', 'storytelling with data narrative annotation'],
+    'Advanced visualization: Interactive techniques — brushing & linking (coordinate multiple views), zooming & panning, filtering, tooltips, drill-down. Geospatial: choropleth maps, point maps, flow maps, cartograms. Tools: Leaflet, Mapbox GL JS, Kepler.gl, deck.gl, Folium. Storytelling with data: annotation layers, progressive disclosure (scrollytelling), narrative structure (setup-tension-resolution). Accessibility: colorblind-safe palettes (viridis, cividis), alt text for charts, screen reader compatibility, high contrast modes. Large data: aggregation, sampling, WebGL rendering (deck.gl, regl), server-side rendering. Real-time dashboards: streaming updates, WebSocket integration, time-window aggregation.', 1.0)
+
+  // ── Event-Driven Architecture & Messaging ────────────────────────────────────
+  add('event_driven', ['event driven architecture eda event bus event emitter', 'message broker kafka rabbitmq activemq pulsar nats', 'event sourcing cqrs command query responsibility segregation'],
+    'Event-Driven Architecture: Core concepts — events (immutable facts), commands (requests), queries (reads). Patterns: event notification, event-carried state transfer, event sourcing, CQRS. Message brokers: Apache Kafka (distributed log, partitions, consumer groups, exactly-once), RabbitMQ (AMQP, exchanges, queues, routing), Apache Pulsar (multi-tenant, tiered storage), NATS (lightweight, JetStream), Amazon SQS/SNS, Azure Service Bus. Event sourcing: persist all state changes as events, rebuild state by replaying. Benefits: audit trail, temporal queries, debugging. CQRS: separate read/write models, optimized independently. Event schemas: Avro, Protobuf, JSON Schema. Schema registry (Confluent, Apicurio).', 1.0)
+
+  add('event_driven', ['saga pattern choreography orchestration distributed transaction', 'pub sub publish subscribe topic fan out', 'dead letter queue dlq retry backoff idempotency'],
+    'EDA patterns: Saga pattern — manage distributed transactions across microservices. Choreography (event-based, decentralized) vs orchestration (central coordinator). Compensating transactions for rollback. Pub/Sub: publishers emit events to topics, subscribers consume asynchronously. Fan-out: one event to many consumers. Fan-in: many events to one processor. Reliability: at-least-once, at-most-once, exactly-once delivery guarantees. Dead letter queues (DLQ): capture failed messages for analysis/retry. Retry strategies: exponential backoff, jitter, circuit breaker. Idempotency: design consumers to handle duplicate events safely (idempotency keys). Event ordering: partition-based ordering (Kafka), sequence numbers. Eventual consistency patterns. Outbox pattern: reliable event publishing with transactional outbox.', 1.0)
+
+  // ── Real-Time Systems & Streaming ────────────────────────────────────────────
+  add('realtime_systems', ['real time system streaming data pipeline', 'stream processing apache kafka flink spark streaming', 'websocket server sent events sse real time communication'],
+    'Real-Time Systems: Stream processing engines — Apache Flink (stateful, exactly-once, event-time), Apache Kafka Streams (lightweight, embedded), Spark Structured Streaming (micro-batch, unified batch/stream), Apache Storm (original stream processor). Windowing: tumbling, sliding, session, global windows. Watermarks for handling late data. State management: RocksDB, checkpointing, savepoints. WebSocket: full-duplex, persistent connection, binary/text frames. Server-Sent Events (SSE): server-to-client, auto-reconnect, event IDs. Long polling (fallback). gRPC streaming: unary, server, client, bidirectional. MQTT for IoT real-time. Real-time databases: Firebase Realtime DB, Supabase, RethinkDB changefeeds.', 1.0)
+
+  add('realtime_systems', ['low latency networking kernel bypass dpdk', 'clock synchronization ntp ptp vector clock lamport', 'backpressure flow control rate limiting throttle'],
+    'Advanced real-time: Low-latency networking — kernel bypass (DPDK, io_uring, XDP/eBPF), zero-copy, RDMA, user-space networking. TCP tuning: Nagle algorithm, TCP_NODELAY, buffer sizes. UDP for latency-critical (QUIC, game networking). Clock synchronization: NTP (millisecond accuracy), PTP/IEEE 1588 (microsecond), GPS-based. Logical clocks: Lamport timestamps, vector clocks, hybrid logical clocks (HLC). Ordering guarantees: total order, causal order, FIFO. Backpressure: reactive streams (Publisher/Subscriber/Processor), flow control (TCP window, credit-based), rate limiting (token bucket, leaky bucket, sliding window). Circuit breaker pattern for cascading failure prevention. Real-time analytics: OLAP cubes, pre-aggregation, approximate algorithms (HyperLogLog, Count-Min Sketch, t-digest).', 1.0)
+
+  // ── Type Theory & Formal Methods ─────────────────────────────────────────────
+  add('type_theory', ['type theory dependent type linear type refinement type', 'model checking temporal logic ltl ctl spin nusmv', 'theorem prover proof assistant coq agda lean idris'],
+    'Type Theory & Formal Methods: Type systems — simple types, polymorphism (parametric, ad-hoc), dependent types (types depend on values: Coq, Agda, Idris, Lean). Linear types (use exactly once: Rust ownership, Clean). Refinement types (types with predicates: Liquid Haskell, F*). Effect systems: track side effects in types. Model checking: automatically verify finite-state systems against temporal logic specifications. LTL (Linear Temporal Logic), CTL (Computation Tree Logic). Tools: SPIN (Promela), NuSMV, TLA+ (Lamport). Theorem provers: Coq (Gallina, tactics), Lean 4 (Mathlib), Agda (dependently typed), Isabelle/HOL. Curry-Howard correspondence: proofs as programs, types as propositions.', 1.0)
+
+  add('type_theory', ['formal verification program correctness safety liveness', 'abstract interpretation static analysis soundness', 'design by contract precondition postcondition invariant'],
+    'Applied formal methods: Formal verification — prove program correctness mathematically. Safety properties (nothing bad happens), liveness properties (something good eventually happens). Techniques: deductive verification (Hoare logic, weakest precondition), symbolic execution, bounded model checking. Tools: Dafny, CBMC, Frama-C, KeY. Abstract interpretation: approximate program semantics for static analysis. Sound analysis (no false negatives) vs complete (no false positives). Domains: numerical (intervals, octagons, polyhedra), pointer analysis, taint analysis. Design by contract: preconditions, postconditions, class invariants (Eiffel, Ada SPARK, Kotlin contracts). Runtime verification: monitor properties during execution. Concurrency verification: deadlock detection, race condition analysis, linearizability checking.', 1.0)
+
+  // ── Scientific Computing & HPC ───────────────────────────────────────────────
+  add('scientific_computing', ['high performance computing hpc supercomputer cluster', 'parallel computing openmp thread simd vectorization', 'gpu computing cuda opencl nvidia tensor core'],
+    'Scientific Computing & HPC: Parallel computing paradigms — shared memory (OpenMP, pthreads, TBB), distributed memory (MPI), GPU (CUDA, OpenCL, HIP). SIMD vectorization: AVX-512, NEON, auto-vectorization. Task parallelism vs data parallelism. GPU computing: CUDA (NVIDIA), ROCm (AMD), Tensor Cores (mixed-precision), CUDA kernels, shared memory, warp divergence. Libraries: cuBLAS, cuDNN, cuFFT, Thrust. OpenCL for heterogeneous. Supercomputers: TOP500 list, FLOPS benchmarking, Linpack. Cluster architectures: fat-tree, dragonfly, torus. Job schedulers: Slurm, PBS, LSF. Containers in HPC: Singularity/Apptainer, Shifter. Performance profiling: NVIDIA Nsight, Intel VTune, HPCToolkit, TAU.', 1.0)
+
+  add('scientific_computing', ['mpi message passing interface distributed hpc', 'numerical methods finite element method simulation', 'hpc storage parallel file system lustre gpfs'],
+    'HPC infrastructure: MPI — point-to-point (Send/Recv), collective (Broadcast, Reduce, AllReduce, Scatter, Gather), non-blocking communication, MPI I/O. Implementations: OpenMPI, MPICH, Intel MPI. Numerical methods: finite element method (FEM) for PDEs, finite difference, finite volume, spectral methods. Linear algebra: LAPACK, ScaLAPACK, PETSc, Trilinos. Solvers: direct (LU, Cholesky), iterative (CG, GMRES, multigrid). Monte Carlo methods, molecular dynamics, N-body simulations. HPC storage: parallel file systems (Lustre, GPFS/Spectrum Scale, BeeGFS), object storage, burst buffers. I/O libraries: HDF5, NetCDF, ADIOS2. Data management: staging, checkpoint/restart, in-situ visualization (ParaView Catalyst, VisIt LibSim).', 1.0)
+
+  // ── FinTech & Payment Systems ────────────────────────────────────────────────
+  add('fintech', ['payment processing gateway stripe square adyen pci dss', 'open banking psd2 api banking as a service baas', 'fintech financial technology digital banking neobank'],
+    'FinTech & Payment Systems: Payment processing — merchant → payment gateway → payment processor → card network (Visa/Mastercard) → issuing bank. Gateways: Stripe, Square, Adyen, Braintree, PayPal. PCI DSS compliance: 12 requirements, SAQ levels, tokenization, P2PE. 3D Secure (3DS2) for card-not-present fraud prevention. Open Banking: PSD2 (EU), Open Banking Standard (UK), FDX (US). APIs: account information, payment initiation, confirmation of funds. Banking-as-a-Service (BaaS): Synapse, Marqeta, Galileo, Unit. Neobanks: Revolut, N26, Chime — mobile-first, no physical branches. Embedded finance: integrating financial services into non-financial platforms.', 1.0)
+
+  add('fintech', ['lending credit scoring underwriting loan origination', 'algorithmic trading high frequency trading quantitative finance', 'kyc know your customer aml anti money laundering compliance'],
+    'FinTech domains: Lending — credit scoring (FICO, VantageScore, alternative data), ML-based underwriting, loan origination systems, buy-now-pay-later (BNPL: Klarna, Affirm, Afterpay). P2P lending platforms. InsurTech: usage-based insurance (UBI), parametric insurance, claims automation, risk modeling. Algorithmic trading: quantitative strategies (mean reversion, momentum, stat arb), HFT (colocation, FPGA, market making), execution algorithms (TWAP, VWAP, iceberg). Risk management: VaR, stress testing, Monte Carlo simulation. Regulatory compliance: KYC (Know Your Customer), AML (Anti-Money Laundering), sanctions screening (OFAC), transaction monitoring. RegTech: automated compliance, regulatory reporting (XBRL), audit trails. Cryptocurrency: exchanges, custody, staking, DeFi protocols.', 1.0)
+
+  // ── Healthcare IT & HIPAA ────────────────────────────────────────────────────
+  add('healthcare_it', ['electronic health record ehr emr fhir hl7 interoperability', 'hipaa compliance protected health information phi', 'healthcare it medical informatics clinical system'],
+    'Healthcare IT: EHR/EMR systems — Epic, Cerner (Oracle Health), Allscripts, Meditech. Interoperability standards: HL7 v2 (messaging), HL7 FHIR (RESTful API, JSON/XML resources: Patient, Observation, MedicationRequest), CDA (Clinical Document Architecture), DICOM (medical imaging). FHIR resources, search parameters, SMART on FHIR (OAuth2 for clinical apps). HIPAA compliance: Privacy Rule (PHI use/disclosure), Security Rule (administrative, physical, technical safeguards), Breach Notification Rule. PHI: 18 identifiers (name, DOB, SSN, medical record numbers). De-identification: Safe Harbor, Expert Determination. Business Associate Agreements (BAA). HITECH Act: meaningful use, health information exchange (HIE).', 1.0)
+
+  add('healthcare_it', ['telemedicine telehealth remote patient monitoring wearable', 'clinical decision support system cdss diagnosis alert', 'medical imaging pacs radiology dicom ai diagnosis'],
+    'Healthcare IT applications: Telemedicine — video consultations, asynchronous (store-and-forward), remote patient monitoring (RPM: wearables, IoT sensors, continuous glucose monitors). Platforms: Teladoc, Amwell, Doxy.me. Regulatory: state licensing, prescribing rules, reimbursement (CPT codes for telehealth). Clinical Decision Support (CDS): rule-based alerts, ML-assisted diagnosis, drug interaction checking, clinical pathways. CDS Hooks (HL7): real-time decision support triggers. Medical imaging IT: PACS (Picture Archiving and Communication System), RIS (Radiology Information System), VNA (Vendor Neutral Archive). AI in radiology: chest X-ray screening, mammography (CAD), pathology (digital slides). Health data analytics: population health, readmission prediction, clinical trials matching, pharmacovigilance, real-world evidence (RWE).', 1.0)
+
+  // ── Graph Databases & Knowledge Graphs ───────────────────────────────────────
+  add('graph_databases', ['graph database neo4j property graph cypher query language', 'rdf sparql knowledge graph ontology triple store', 'graph algorithm pagerank shortest path community detection'],
+    'Graph Databases & Knowledge Graphs: Property graph model — nodes (entities), edges (relationships), properties (key-value on both). Neo4j (Cypher query language), Amazon Neptune, JanusGraph, ArangoDB (multi-model), TigerGraph. Cypher: MATCH, WHERE, RETURN, CREATE, MERGE patterns. Performance: index-free adjacency, traversal-optimized. RDF (Resource Description Framework): subject-predicate-object triples, URIs, literals. SPARQL query language. Triple stores: Apache Jena, Virtuoso, Blazegraph, Stardog. OWL ontologies, RDFS, SHACL validation. Graph algorithms: PageRank (centrality), shortest path (Dijkstra, BFS), community detection (Louvain, label propagation), betweenness centrality, connected components. Libraries: NetworkX (Python), igraph, Apache TinkerPop/Gremlin.', 1.0)
+
+  add('graph_databases', ['knowledge graph construction entity extraction relation', 'graph neural network gnn node classification link prediction', 'graph visualization layout force directed hierarchical'],
+    'Advanced graph topics: Knowledge graph construction — entity extraction (NER), relation extraction (RE), entity linking/disambiguation, knowledge base completion. Open KGs: Wikidata, DBpedia, YAGO, Freebase. Enterprise KGs: Google Knowledge Graph, Amazon Product Graph. Ontology design: classes, properties, inheritance, reasoning (OWL-DL). Graph Neural Networks: message passing, GCN (Graph Convolutional Network), GAT (Graph Attention), GraphSAGE, GIN. Tasks: node classification, link prediction, graph classification. Frameworks: PyTorch Geometric (PyG), DGL, Spektral. Graph visualization: force-directed layout (d3-force), hierarchical (Sugiyama), circular, geographic. Tools: Gephi, Cytoscape, Neo4j Browser/Bloom, GraphXR. Graph embeddings: node2vec, TransE, RotatE, ComplEx for knowledge graph embeddings.', 1.0)
+
+  // ── Chaos Engineering & Resilience ───────────────────────────────────────────
+  add('chaos_engineering', ['chaos engineering fault injection failure testing resilience', 'chaos monkey litmus gremlin toxiproxy fault injection tool', 'gameday exercise disaster recovery tabletop simulation'],
+    'Chaos Engineering: Principles (Netflix) — build hypothesis about steady state, vary real-world events, run experiments in production, automate. Fault injection: network (latency, packet loss, partition), resource (CPU stress, memory pressure, disk fill), application (exception injection, dependency failure). Tools: Chaos Monkey (random instance termination), Litmus (Kubernetes-native), Gremlin (enterprise SaaS), Toxiproxy (network faults), Chaos Mesh (K8s), AWS Fault Injection Simulator. GameDay exercises: planned chaos experiments with stakeholders, runbooks, rollback procedures. Tabletop exercises: discussion-based, no actual injection. Disaster recovery testing: RTO (Recovery Time Objective), RPO (Recovery Point Objective). Blast radius control: start small, canary experiments, automated rollback.', 1.0)
+
+  add('chaos_engineering', ['resilience pattern circuit breaker bulkhead retry fallback', 'steady state hypothesis error budget slo sli', 'observability chaos experiment metric anomaly detection'],
+    'Resilience patterns: Circuit breaker (closed→open→half-open states, Hystrix, Resilience4j, Polly), bulkhead (isolate failures, limit concurrency), retry (exponential backoff, jitter, max attempts), fallback (graceful degradation, cached responses, default values), timeout (prevent hanging), rate limiter. Steady-state hypothesis: define normal behavior metrics before experiments — error rate, latency p99, throughput. Compare during/after chaos injection. Error budgets: SLI (Service Level Indicator), SLO (Service Level Objective), SLA (Service Level Agreement). Burn rate alerting. Observability for chaos: distributed tracing (correlate failures), metric anomaly detection during experiments, log aggregation for root cause. Progressive delivery: canary releases + chaos testing. Site reliability engineering integration: toil reduction, postmortems, blameless culture.', 1.0)
+
   return entries
 }
 
@@ -5097,6 +5184,90 @@ export class LocalBrain {
     const transformPattern = /\b(text\s+summarization\s+(extractive|abstractive|compression)|paraphras(e|ing)\s+(sentence|rewriting|style\s+transfer)|grammar\s+(checking|correction|grammarly|language\s+tool))\b/i
     const appliedPattern = /\b(dialogue\s+system\s+(response|generation|chatbot)|data\s+to\s+text\s+(report|narrative|automated)|content\s+generation\s+(seo|copywriting|marketing))\b/i
     return nlgPattern.test(msg) || transformPattern.test(msg) || appliedPattern.test(msg)
+  }
+
+  private isComputerVisionQuery(msg: string): boolean {
+    const detectionPattern = /\b(object\s+detection\s+(yolo|ssd|rcnn|faster)|image\s+segmentation\s+(semantic|instance|panoptic|mask)|image\s+classification\s+(resnet|vgg|efficientnet|vit))\b/i
+    const processingPattern = /\b(optical\s+flow\s+(motion|estimation|tracking)|image\s+(enhancement|restoration|super\s+resolution|denoising)|3d\s+vision\s+(depth|stereo|point\s+cloud|lidar))\b/i
+    const toolPattern = /\b(opencv\s+(image|contour|feature|camera)|face\s+(detection|recognition|landmark|deepface)|ocr\s+(optical|tesseract|paddle|text\s+detection))\b/i
+    return detectionPattern.test(msg) || processingPattern.test(msg) || toolPattern.test(msg)
+  }
+
+  private isCryptographyQuery(msg: string): boolean {
+    const symmetricPattern = /\b(symmetric\s+encryption\s+(aes|des|block|stream)|public\s+key\s+(cryptography|rsa|ecc|elliptic)|hash\s+function\s+(sha|md5|blake|hmac))\b/i
+    const appliedPattern = /\b(tls\s+(ssl|https|certificate|handshake|1\.3)|post.?quantum\s+(cryptography|lattice|kyber|dilithium)|zero.?knowledge\s+(proof|zkp|snark|stark))\b/i
+    const advancedPattern = /\b(homomorphic\s+encryption\s+(fully|partially|compute)|secure\s+multi.?party\s+(computation|mpc|secret)|digital\s+signature\s+(ecdsa|ed25519|rsa))\b/i
+    return symmetricPattern.test(msg) || appliedPattern.test(msg) || advancedPattern.test(msg)
+  }
+
+  private isRecommendationQuery(msg: string): boolean {
+    const cfPattern = /\b(collaborative\s+filtering\s+(user|item|matrix|svd)|content.?based\s+(filtering|recommendation|similarity)|recommendation\s+(system|engine|personalization))\b/i
+    const deepPattern = /\b(neural\s+collaborative\s+(filtering|ncf|embedding)|session.?based\s+(recommendation|sequential|gru4rec)|multi.?armed\s+(bandit|exploration|thompson|ucb))\b/i
+    const evalPattern = /\b(recommendation\s+(evaluation|precision|recall|ndcg)|cold\s+start\s+(problem|new\s+user|new\s+item)|explainable\s+(recommendation|attention|counterfactual))\b/i
+    return cfPattern.test(msg) || deepPattern.test(msg) || evalPattern.test(msg)
+  }
+
+  private isDataVisualizationQuery(msg: string): boolean {
+    const chartPattern = /\b(data\s+visualization\s+(chart|bar|line|scatter)|dashboard\s+(design|layout|tableau|power\s+bi|grafana)|grammar\s+of\s+graphics\s+(ggplot|vega|d3))\b/i
+    const toolPattern = /\b(d3\.?js\s+(chart|interactive|svg)|plotly\s+(chart|interactive|dash)|matplotlib\s+(plot|figure|seaborn|pyplot))\b/i
+    const advPattern = /\b(interactive\s+visualization\s+(brush|link|zoom)|geospatial\s+visualization\s+(map|choropleth|leaflet)|storytelling\s+with\s+data\s+(narrative|annotation))\b/i
+    return chartPattern.test(msg) || toolPattern.test(msg) || advPattern.test(msg)
+  }
+
+  private isEventDrivenQuery(msg: string): boolean {
+    const edaPattern = /\b(event.?driven\s+(architecture|eda|design|pattern)|message\s+broker\s+(kafka|rabbitmq|pulsar|nats)|event\s+sourcing\s+(cqrs|command|query|replay))\b/i
+    const sagaPattern = /\b(saga\s+pattern\s+(choreography|orchestration|distributed)|cqrs\s+(pattern|command|query|read\s+model)|pub.?sub\s+(publish|subscribe|topic|fan))\b/i
+    const reliabilityPattern = /\b(dead\s+letter\s+(queue|dlq|retry|failed)|exactly.?once\s+(delivery|processing|semantic)|outbox\s+pattern\s+(transactional|reliable|event))\b/i
+    return edaPattern.test(msg) || sagaPattern.test(msg) || reliabilityPattern.test(msg)
+  }
+
+  private isRealTimeQuery(msg: string): boolean {
+    const streamPattern = /\b(stream\s+processing\s+(flink|kafka\s+streams|spark\s+streaming)|real.?time\s+(system|streaming|data\s+pipeline)|websocket\s+(server.?sent|sse|full.?duplex|connection))\b/i
+    const latencyPattern = /\b(low.?latency\s+(networking|kernel\s+bypass|dpdk|rdma)|clock\s+(synchronization|ntp|ptp|vector|lamport)|backpressure\s+(flow\s+control|reactive|rate\s+limit))\b/i
+    const analyticsPattern = /\b(real.?time\s+analytics\s+(olap|aggregation|streaming)|windowing\s+(tumbling|sliding|session|watermark)|change\s+data\s+capture\s+(cdc|debezium|binlog))\b/i
+    return streamPattern.test(msg) || latencyPattern.test(msg) || analyticsPattern.test(msg)
+  }
+
+  private isTypeTheoryQuery(msg: string): boolean {
+    const typePattern = /\b(type\s+theory\s+(dependent|linear|refinement)|dependent\s+type\s+(coq|agda|lean|idris)|linear\s+type\s+(rust|ownership|affine|use\s+once))\b/i
+    const formalPattern = /\b(model\s+checking\s+(temporal|ltl|ctl|spin|nusmv)|theorem\s+prov(er|ing)\s+(coq|lean|isabelle|proof\s+assistant)|formal\s+verification\s+(correctness|safety|liveness))\b/i
+    const appliedPattern = /\b(abstract\s+interpretation\s+(static|analysis|soundness)|design\s+by\s+contract\s+(precondition|postcondition|invariant)|curry.?howard\s+(correspondence|isomorphism|proofs))\b/i
+    return typePattern.test(msg) || formalPattern.test(msg) || appliedPattern.test(msg)
+  }
+
+  private isScientificComputingQuery(msg: string): boolean {
+    const hpcPattern = /\b(high\s+performance\s+computing\s+(hpc|supercomputer|cluster)|parallel\s+computing\s+(openmp|thread|simd|vectorization)|gpu\s+computing\s+(cuda|opencl|nvidia|tensor\s+core))\b/i
+    const mpiPattern = /\b(mpi\s+(message\s+passing|distributed|send|recv|collective)|numerical\s+method\s+(finite\s+element|fem|finite\s+difference)|scientific\s+computing\s+(simulation|modeling|solver))\b/i
+    const infraPattern = /\b(hpc\s+storage\s+(lustre|gpfs|parallel\s+file)|cluster\s+management\s+(slurm|pbs|job\s+scheduler)|linear\s+algebra\s+(lapack|blas|petsc|scalapack))\b/i
+    return hpcPattern.test(msg) || mpiPattern.test(msg) || infraPattern.test(msg)
+  }
+
+  private isFinTechQuery(msg: string): boolean {
+    const paymentPattern = /\b(payment\s+(processing|gateway|stripe|adyen|pci)|open\s+banking\s+(psd2|api|banking.?as.?a.?service)|fintech\s+(financial|digital\s+banking|neobank))\b/i
+    const lendingPattern = /\b(credit\s+scoring\s+(fico|underwriting|alternative)|algorithmic\s+trading\s+(hft|quantitative|execution)|lending\s+(platform|p2p|bnpl|buy.?now.?pay))\b/i
+    const compliancePattern = /\b(kyc\s+(know\s+your\s+customer|identity|verification)|aml\s+(anti.?money\s+laundering|sanctions|transaction)|regulatory\s+(compliance|reporting|regtech))\b/i
+    return paymentPattern.test(msg) || lendingPattern.test(msg) || compliancePattern.test(msg)
+  }
+
+  private isHealthcareITQuery(msg: string): boolean {
+    const ehrPattern = /\b(electronic\s+health\s+record\s+(ehr|emr|epic|cerner)|fhir\s+(hl7|resource|api|smart\s+on|interoperability)|hipaa\s+(compliance|phi|protected\s+health|security\s+rule))\b/i
+    const telePattern = /\b(telemedicine\s+(telehealth|remote|video\s+consult)|remote\s+patient\s+(monitoring|wearable|iot)|clinical\s+decision\s+(support|cdss|alert|rule))\b/i
+    const imagingPattern = /\b(medical\s+imaging\s+(pacs|dicom|radiology|ai)|health\s+data\s+(analytics|population|readmission)|clinical\s+(trial|pathway|pharmacovigilance))\b/i
+    return ehrPattern.test(msg) || telePattern.test(msg) || imagingPattern.test(msg)
+  }
+
+  private isGraphDatabaseQuery(msg: string): boolean {
+    const graphPattern = /\b(graph\s+database\s+(neo4j|property|cypher|neptune)|rdf\s+(sparql|knowledge\s+graph|ontology|triple)|graph\s+algorithm\s+(pagerank|shortest|community|centrality))\b/i
+    const kgPattern = /\b(knowledge\s+graph\s+(construction|entity|relation|wikidata)|graph\s+neural\s+(network|gnn|gcn|gat|sage)|graph\s+(embedding|node2vec|transe|rotate))\b/i
+    const vizPattern = /\b(graph\s+visualization\s+(force|hierarchical|gephi|cytoscape)|property\s+graph\s+(model|node|edge|traversal)|triple\s+store\s+(jena|virtuoso|blazegraph|stardog))\b/i
+    return graphPattern.test(msg) || kgPattern.test(msg) || vizPattern.test(msg)
+  }
+
+  private isChaosEngineeringQuery(msg: string): boolean {
+    const chaosPattern = /\b(chaos\s+(engineering|monkey|experiment|injection)|fault\s+injection\s+(network|resource|dependency|tool)|chaos\s+(mesh|litmus|gremlin|toxiproxy))\b/i
+    const resiliencePattern = /\b(resilience\s+pattern\s+(circuit\s+breaker|bulkhead|retry)|steady.?state\s+(hypothesis|metric|baseline)|gameday\s+(exercise|disaster|tabletop|simulation))\b/i
+    const sloPattern = /\b(error\s+budget\s+(slo|sli|burn\s+rate)|blast\s+radius\s+(control|canary|rollback)|resilience\s+(testing|engineering|pattern|fallback))\b/i
+    return chaosPattern.test(msg) || resiliencePattern.test(msg) || sloPattern.test(msg)
   }
 
   /** Extract probable cause from a causal query. */
