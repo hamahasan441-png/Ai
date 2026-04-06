@@ -1283,6 +1283,31 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(soranTranslationHistory, soranHistory, 'related-to', 0.85)
   memory.addRelation(soranTranslationHealth, soranVocabulary, 'related-to', 0.75)
 
+  // ── Kurdish Sorani — NLP & Sentiment Analysis Concepts ──────────────────
+  const soranSentimentAnalysis = memory.addConcept('Sorani Sentiment Analysis', 'language')
+  const soranMorphologicalAnalysis = memory.addConcept('Sorani Morphological Analysis', 'language')
+  const soranStemming = memory.addConcept('Sorani Stemming', 'language')
+  const soranSuffixStripping = memory.addConcept('Sorani Suffix Stripping', 'language')
+  const soranEmotionDetection = memory.addConcept('Sorani Emotion Detection', 'language')
+  const soranIdioms = memory.addConcept('Sorani Idiomatic Expressions', 'language')
+  const soranCollocations = memory.addConcept('Sorani Collocations', 'language')
+  const soranNegationPatterns = memory.addConcept('Sorani Negation Patterns', 'language')
+  const soranIntensifiers = memory.addConcept('Sorani Intensifiers', 'language')
+  const soranAgglutination = memory.addConcept('Sorani Agglutination', 'language')
+
+  // NLP → Kurdish Sorani relations
+  memory.addRelation(soranSentimentAnalysis, kurdishSorani, 'part-of', 0.9)
+  memory.addRelation(soranMorphologicalAnalysis, kurdishSorani, 'part-of', 0.9)
+  memory.addRelation(soranStemming, soranMorphologicalAnalysis, 'part-of', 0.95)
+  memory.addRelation(soranSuffixStripping, soranStemming, 'part-of', 0.95)
+  memory.addRelation(soranEmotionDetection, soranSentimentAnalysis, 'part-of', 0.9)
+  memory.addRelation(soranIdioms, soranSemantics, 'part-of', 0.85)
+  memory.addRelation(soranCollocations, soranSemantics, 'part-of', 0.85)
+  memory.addRelation(soranNegationPatterns, soranGrammar, 'part-of', 0.9)
+  memory.addRelation(soranIntensifiers, soranGrammar, 'part-of', 0.85)
+  memory.addRelation(soranAgglutination, soranMorphology, 'part-of', 0.95)
+  memory.addRelation(soranSentimentAnalysis, soranSemantics, 'related-to', 0.85)
+
   // ── Exploit Development Concepts ──────────────────────────────────────────
 
   const exploitDevelopment = memory.addConcept('Exploit Development', 'security')

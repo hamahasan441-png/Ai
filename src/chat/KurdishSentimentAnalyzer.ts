@@ -146,6 +146,25 @@ const SENTIMENT_LEXICON: readonly SentimentWord[] = [
   { word: 'بەرەکەت', sentiment: 'positive', weight: 0.65, category: 'gratitude' },
   { word: 'ئاشتی', sentiment: 'positive', weight: 0.70, category: 'hope' },
   { word: 'دڵۆڤانی', sentiment: 'positive', weight: 0.75, category: 'love' },
+  { word: 'بژی', sentiment: 'positive', weight: 0.80, category: 'hope' },
+  { word: 'خۆشبێت', sentiment: 'positive', weight: 0.75, category: 'gratitude' },
+  { word: 'گەورە', sentiment: 'positive', weight: 0.60, category: 'pride' },
+  { word: 'ڕازی', sentiment: 'positive', weight: 0.65, category: 'joy' },
+  { word: 'بەرەو', sentiment: 'positive', weight: 0.40, category: 'hope' },
+  { word: 'ئومێد', sentiment: 'positive', weight: 0.70, category: 'hope' },
+  { word: 'ئەخلاق', sentiment: 'positive', weight: 0.65, category: 'pride' },
+  { word: 'دڵسۆزی', sentiment: 'positive', weight: 0.70, category: 'love' },
+  { word: 'خودا', sentiment: 'positive', weight: 0.50, category: 'hope' },
+  { word: 'پارێزگاری', sentiment: 'positive', weight: 0.65, category: 'pride' },
+  { word: 'لەزەت', sentiment: 'positive', weight: 0.70, category: 'joy' },
+  { word: 'میهرەبان', sentiment: 'positive', weight: 0.75, category: 'love' },
+  { word: 'هاوڕێ', sentiment: 'positive', weight: 0.65, category: 'love' },
+  { word: 'بەخت', sentiment: 'positive', weight: 0.75, category: 'joy' },
+  { word: 'نیشتمان', sentiment: 'positive', weight: 0.60, category: 'pride' },
+  { word: 'ئازادی', sentiment: 'positive', weight: 0.80, category: 'hope' },
+  { word: 'سۆز', sentiment: 'positive', weight: 0.65, category: 'love' },
+  { word: 'دەستخۆش', sentiment: 'positive', weight: 0.75, category: 'gratitude' },
+  { word: 'شایەنی', sentiment: 'positive', weight: 0.60, category: 'pride' },
 
   // ── Negative words (55) ──────────────────────────────────────────────────
   { word: 'خەم', sentiment: 'negative', weight: -0.70, category: 'sadness' },
@@ -203,6 +222,20 @@ const SENTIMENT_LEXICON: readonly SentimentWord[] = [
   { word: 'پەژارە', sentiment: 'negative', weight: -0.70, category: 'sadness' },
   { word: 'بێچارە', sentiment: 'negative', weight: -0.75, category: 'sadness' },
   { word: 'دڵشکاو', sentiment: 'negative', weight: -0.80, category: 'sadness' },
+  { word: 'ناخۆش', sentiment: 'negative', weight: -0.55, category: 'frustration' },
+  { word: 'تەقەت', sentiment: 'negative', weight: -0.50, category: 'frustration' },
+  { word: 'ڕەخنە', sentiment: 'neutral', weight: 0.0, category: 'communication' },
+  { word: 'نەیار', sentiment: 'negative', weight: -0.65, category: 'anger' },
+  { word: 'تاڵان', sentiment: 'negative', weight: -0.75, category: 'anger' },
+  { word: 'داماوی', sentiment: 'negative', weight: -0.55, category: 'sadness' },
+  { word: 'تۆمار', sentiment: 'negative', weight: -0.40, category: 'frustration' },
+  { word: 'بێتاقەت', sentiment: 'negative', weight: -0.65, category: 'frustration' },
+  { word: 'خەڵوەز', sentiment: 'negative', weight: -0.60, category: 'sadness' },
+  { word: 'گومان', sentiment: 'negative', weight: -0.45, category: 'fear' },
+  { word: 'ئاوارە', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'بێکەسی', sentiment: 'negative', weight: -0.75, category: 'sadness' },
+  { word: 'نائومێدی', sentiment: 'negative', weight: -0.80, category: 'sadness' },
+  { word: 'خوارە', sentiment: 'negative', weight: -0.55, category: 'sadness' },
 
   // ── Neutral words (35) ───────────────────────────────────────────────────
   { word: 'ڕۆژ', sentiment: 'neutral', weight: 0.0, category: 'time' },
@@ -492,17 +525,73 @@ function containsKurdishScript(text: string): boolean {
 }
 
 /**
- * Basic tokenizer for Kurdish Sorani text.
- * Splits on whitespace and common punctuation while preserving
- * multi-word lexicon entries (e.g. "زۆر باش", "بێ ئومێد").
+ * Tokenizer for Kurdish Sorani text.
+ * Splits on whitespace and common punctuation, normalises ZWNJ characters,
+ * and preserves multi-word lexicon entries (e.g. "زۆر باش", "بێ ئومێد").
  */
 function tokenize(text: string): string[] {
   const cleaned = text
+    // Normalise ZWNJ (U+200C) and ZWJ (U+200D) to regular space
+    .replace(/[\u200C\u200D]/g, ' ')
     .replace(/[.،؛:؟!«»"'()[\]{}\-_/\\|@#$%^&*~`<>]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 
   return cleaned.length === 0 ? [] : cleaned.split(' ')
+}
+
+/**
+ * Kurdish Sorani suffixes ordered from longest to shortest for greedy
+ * stripping. Each entry specifies the suffix string and a minimum root
+ * length to avoid over-stemming short words.
+ */
+const KURDISH_SUFFIXES: readonly { suffix: string; minRoot: number }[] = [
+  // Superlative + ezafe combinations
+  { suffix: 'ترینی', minRoot: 2 },
+  { suffix: 'ترین', minRoot: 2 },
+  // Definite/plural suffixes
+  { suffix: 'ەکان', minRoot: 2 },
+  { suffix: 'ەکە', minRoot: 2 },
+  // Person plural suffixes
+  { suffix: 'مان', minRoot: 2 },
+  { suffix: 'تان', minRoot: 2 },
+  { suffix: 'یان', minRoot: 2 },
+  // Compound verb endings
+  { suffix: 'بێت', minRoot: 2 },
+  { suffix: 'دەکا', minRoot: 2 },
+  // Comparative
+  { suffix: 'تر', minRoot: 2 },
+  // Plural / verb
+  { suffix: 'ان', minRoot: 2 },
+  // Abstract noun suffix
+  { suffix: 'یی', minRoot: 2 },
+  // Person verb endings
+  { suffix: 'ێت', minRoot: 2 },
+  // Single-char person/ezafe suffixes
+  { suffix: 'م', minRoot: 2 },
+  { suffix: 'ت', minRoot: 2 },
+  { suffix: 'ی', minRoot: 2 },
+  { suffix: 'ن', minRoot: 2 },
+  { suffix: 'ە', minRoot: 3 },
+]
+
+/**
+ * Attempt to stem a Kurdish Sorani token by stripping common inflectional
+ * suffixes. Returns an array of candidate stems (longest-stem-first),
+ * always including the original token as the last fallback.
+ */
+function stemKurdish(token: string): string[] {
+  const candidates: string[] = []
+
+  for (const { suffix, minRoot } of KURDISH_SUFFIXES) {
+    if (token.endsWith(suffix) && token.length - suffix.length >= minRoot) {
+      candidates.push(token.slice(0, token.length - suffix.length))
+    }
+  }
+
+  // Always include the original token as a fallback
+  candidates.push(token)
+  return candidates
 }
 
 /**
@@ -729,9 +818,18 @@ export class KurdishSentimentAnalyzer {
         ? this.lexiconMap.get(`${token} ${tokens[i + 1]}`)
         : undefined
 
-      const match = bigramMatch ?? this.lexiconMap.get(token)
+      let match = bigramMatch ?? this.lexiconMap.get(token)
       if (bigramMatch) {
         i++ // skip next token since it was consumed by the bigram
+      }
+
+      // If no exact match, try stemmed forms
+      if (!match) {
+        const stems = stemKurdish(token)
+        for (const stem of stems) {
+          match = this.lexiconMap.get(stem)
+          if (match) break
+        }
       }
 
       if (match) {
