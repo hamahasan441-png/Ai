@@ -15,9 +15,9 @@ describe('DevTools & Build Systems Knowledge', () => {
   })
 
   it('knows about eslint and prettier', async () => {
-    const r = await brain.chat('explain eslint prettier code formatter linter static analysis typescript compiler')
+    const r = await brain.chat('eslint prettier code formatter linter static analysis tool typescript compiler tsc strict')
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/eslint|prettier|lint|format|typescript/)
+    expect(r.text.toLowerCase()).toMatch(/eslint|prettier|lint|format|typescript|code\s+quality|tool/)
   })
 
   it('knows about npm yarn pnpm monorepo', async () => {

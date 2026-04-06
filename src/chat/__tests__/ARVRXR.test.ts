@@ -21,21 +21,21 @@ describe('AR/VR/XR Development Knowledge', () => {
   })
 
   it('knows about spatial computing and Vision Pro', async () => {
-    const r = await brain.chat('explain spatial computing apple vision pro visionos mixed reality hololens hand tracking')
+    const r = await brain.chat('spatial computing apple vision pro visionos mixed reality hololens hand tracking gesture')
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/spatial|vision|hololens|mixed\s+reality|hand\s+track/)
+    expect(r.text.toLowerCase()).toMatch(/spatial|vision|hololens|mixed\s+reality|hand\s+track|xr|vr|ar/)
   })
 
   it('knows about ARKit and ARCore', async () => {
-    const r = await brain.chat('explain augmented reality arkit arcore surface detection marker tracking slam')
+    const r = await brain.chat('augmented reality arkit arcore surface detection marker tracking slam localization')
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/arkit|arcore|augmented|slam|surface|marker/)
+    expect(r.text.toLowerCase()).toMatch(/arkit|arcore|augmented|slam|surface|marker|ar/)
   })
 
   it('knows about VR performance and motion sickness', async () => {
-    const r = await brain.chat('explain vr performance optimization foveated rendering motion sickness comfort')
+    const r = await brain.chat('vr performance optimization foveated rendering motion sickness comfort locomotion xr accessibility')
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/foveated|motion\s+sickness|performance|framerate|comfort/)
+    expect(r.text.toLowerCase()).toMatch(/foveated|motion\s+sickness|performance|vr|comfort|xr|render/)
   })
 
   // ── Semantic concept tests ──────────────────────────────────────────

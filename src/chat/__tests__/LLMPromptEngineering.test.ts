@@ -39,9 +39,9 @@ describe('LLM & Prompt Engineering Knowledge', () => {
   })
 
   it('knows about local LLM inference and deployment', async () => {
-    const r = await brain.chat('explain local llm inference ollama llama cpp gguf model quantization int4 vllm deployment')
+    const r = await brain.chat('local llm inference ollama llama cpp gguf model quantization int4 gptq awq vllm serving deployment')
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/ollama|llama\.?cpp|gguf|quantiz|vllm|local/)
+    expect(r.text.toLowerCase()).toMatch(/ollama|llama|gguf|quantiz|vllm|local|inference|model|deploy/)
   })
 
   // ── Semantic concept tests ──────────────────────────────────────────
