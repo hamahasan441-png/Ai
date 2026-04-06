@@ -478,7 +478,7 @@ export class ArchitecturalAnalyzer {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]
 
-      const funcMatch = line.match(/(?:function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?\()(\([^)]*\))/)
+      const funcMatch = line.match(/(?:function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?)\s*\(/)
       if (!funcMatch) continue
 
       const params = line.match(/\(([^)]*)\)/)
