@@ -69,7 +69,7 @@ export class ContextualMemoryEngine {
   /**
    * Store a new memory with context
    */
-  store(content: string, context: Partial<MemoryContext>, importance: number = 0.5, tags: string[] = []): string {
+  store(content: string, context: Partial<MemoryContext> = {}, importance: number = 0.5, tags: string[] = []): string {
     const id = `mem_${this.nextId++}`
     const now = Date.now()
 

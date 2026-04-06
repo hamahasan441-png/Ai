@@ -511,6 +511,7 @@ export class LogicalProofEngine {
       .replace(/\b(all|some|no|every|each|none|are|is|a|an|the|if|then)\b/g, '')
       .split(/\s+/)
       .filter(w => w.length > 2)
+      .map(w => w.replace(/s$/, '')) // normalize simple plurals
   }
 
   private isNegation(s1: string, s2: string): boolean {
