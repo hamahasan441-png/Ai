@@ -857,7 +857,7 @@ interface CodePattern {
 const CODE_PATTERNS: CodePattern[] = [
   {
     name: 'unchecked-ordersend',
-    pattern: /OrderSend\s*\([^)]+\)\s*;/g,
+    pattern: /OrderSend\s*\((?:[^()]*\([^()]*\))*[^()]*\)\s*;/g,
     severity: 'critical',
     description: 'OrderSend result is not checked — errors will be silently ignored',
     fix: 'Store result in variable and check: int ticket = OrderSend(...); if(ticket < 0) { Print(GetLastError()); }',
@@ -865,7 +865,7 @@ const CODE_PATTERNS: CodePattern[] = [
   },
   {
     name: 'unchecked-orderclose',
-    pattern: /OrderClose\s*\([^)]+\)\s*;/g,
+    pattern: /OrderClose\s*\((?:[^()]*\([^()]*\))*[^()]*\)\s*;/g,
     severity: 'warning',
     description: 'OrderClose result not checked',
     fix: 'Check result: if(!OrderClose(...)) Print("Close failed: ", GetLastError());',
@@ -873,7 +873,7 @@ const CODE_PATTERNS: CodePattern[] = [
   },
   {
     name: 'unchecked-ordermodify',
-    pattern: /OrderModify\s*\([^)]+\)\s*;/g,
+    pattern: /OrderModify\s*\((?:[^()]*\([^()]*\))*[^()]*\)\s*;/g,
     severity: 'warning',
     description: 'OrderModify result not checked',
     fix: 'Check result: if(!OrderModify(...)) Print("Modify failed: ", GetLastError());',
@@ -921,7 +921,7 @@ const CODE_PATTERNS: CodePattern[] = [
   },
   {
     name: 'mql5-unchecked-trade',
-    pattern: /trade\.\s*(?:Buy|Sell|BuyLimit|SellLimit|BuyStop|SellStop)\s*\([^)]*\)\s*;/g,
+    pattern: /trade\.\s*(?:Buy|Sell|BuyLimit|SellLimit|BuyStop|SellStop)\s*\((?:[^()]*\([^()]*\))*[^()]*\)\s*;/g,
     severity: 'critical',
     description: 'CTrade operation result not checked',
     fix: 'Check: if(!trade.Buy(...)) Print(trade.ResultRetcode(), trade.ResultComment());',
