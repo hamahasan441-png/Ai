@@ -1964,6 +1964,94 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('trading_code_templates', ['mql5 ea template', 'mt5 expert advisor template', 'mql5 ea boilerplate', 'mql5 starter ea'],
     'MQL5 Expert Advisor template: //+------------------------------------------------------------------+ //| MyEA.mq5 | //+------------------------------------------------------------------+ #property copyright "Author" #property version "1.00" #include <Trade/Trade.mqh> input double InpLotSize=0.01; input int InpStopLoss=500; // in points input int InpTakeProfit=1000; input ulong InpMagicNumber=12345; input int InpMaxSpread=30; CTrade trade; int maHandle; double maBuffer[]; int OnInit() { trade.SetExpertMagicNumber(InpMagicNumber); maHandle=iMA(Symbol(),PERIOD_CURRENT,20,0,MODE_SMA,PRICE_CLOSE); if(maHandle==INVALID_HANDLE) { Print("Failed to create MA handle"); return(INIT_FAILED); } ArraySetAsSeries(maBuffer,true); return(INIT_SUCCEEDED); } void OnDeinit(const int reason) { IndicatorRelease(maHandle); Comment(""); } void OnTick() { if(!TerminalInfoInteger(TERMINAL_TRADE_ALLOWED)) return; if((int)SymbolInfoInteger(Symbol(),SYMBOL_SPREAD)>InpMaxSpread) return; if(CopyBuffer(maHandle,0,0,3,maBuffer)<3) return; double ask=SymbolInfoDouble(Symbol(),SYMBOL_ASK); double bid=SymbolInfoDouble(Symbol(),SYMBOL_BID); double point=SymbolInfoDouble(Symbol(),SYMBOL_POINT); if(PositionsTotal()==0 && maBuffer[1]>maBuffer[2]) { double sl=ask-InpStopLoss*point; double tp=ask+InpTakeProfit*point; trade.Buy(InpLotSize,Symbol(),ask,sl,tp,"MyEA"); } }', 1.5)
 
+  // ── MQL4/MQL5 Advanced: Order Types & Execution ───────────────────────────
+
+  add('mql_order_types', ['mql4 order types', 'mt4 pending order', 'mql4 ordersend buy sell limit stop', 'mql4 market execution'],
+    'MQL4 order types and execution: Market orders — OP_BUY (0), OP_SELL (1) executed at current Ask/Bid. Pending orders — OP_BUYLIMIT (2) buy below price, OP_SELLLIMIT (3) sell above price, OP_BUYSTOP (4) buy above price, OP_SELLSTOP (5) sell below price. OrderSend(Symbol(),OP_BUYLIMIT,lots,price,slippage,sl,tp,"comment",magic,expiration,clrGreen). Modify with OrderModify(ticket,price,sl,tp,expiration,clrBlue). Delete pending: OrderDelete(ticket). Check execution mode: MarketInfo(Symbol(),MODE_EXECUTION) — EXECUTION_INSTANT, EXECUTION_MARKET (ECN/STP). For ECN brokers: open order first with zero SL/TP, then OrderModify to add SL/TP. Always use NormalizeDouble() for prices. Check MODE_STOPLEVEL for minimum SL/TP distance.', 1.4)
+
+  add('mql_order_types', ['mql5 order types positions', 'mt5 ctrade buy sell', 'mql5 order vs position vs deal', 'mql5 trade execution model'],
+    'MQL5 order/position/deal model: Three-tier system — Orders (pending instructions), Deals (executed transactions), Positions (current holdings). CTrade class: trade.Buy(volume,symbol,price,sl,tp,comment), trade.Sell(), trade.BuyLimit(), trade.SellLimit(), trade.BuyStop(), trade.SellStop(). Position management: PositionSelect(symbol), PositionGetDouble(POSITION_VOLUME), PositionGetInteger(POSITION_TYPE). History: HistorySelect(from,to), HistoryDealsTotal(), HistoryDealGetDouble(ticket,DEAL_PROFIT). Two account modes: ACCOUNT_MARGIN_MODE_RETAIL_NETTING (one position per symbol) vs ACCOUNT_MARGIN_MODE_RETAIL_HEDGING (multiple positions per symbol). OrderSend fills MqlTradeRequest struct: request.action=TRADE_ACTION_DEAL for market, TRADE_ACTION_PENDING for pending. Check SymbolInfoInteger(symbol,SYMBOL_FILLING_MODE) for fill policy.', 1.4)
+
+  add('mql_order_types', ['mql order loop management', 'mql scan open orders', 'mql close all orders symbol', 'mql order pool iteration'],
+    'MQL order pool management: MQL4 — iterate backwards to safely close: for(int i=OrdersTotal()-1;i>=0;i--){if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES)){if(OrderSymbol()==Symbol()&&OrderMagicNumber()==Magic){if(OrderType()==OP_BUY) OrderClose(OrderTicket(),OrderLots(),Bid,3); else if(OrderType()==OP_SELL) OrderClose(OrderTicket(),OrderLots(),Ask,3);}}} Delete all pending: if(OrderType()>1) OrderDelete(OrderTicket()). Count by type: maintain separate counters for buys/sells/pending. MQL5 — positions: for(int i=PositionsTotal()-1;i>=0;i--){ulong ticket=PositionGetTicket(i);if(PositionGetString(POSITION_SYMBOL)==Symbol()) trade.PositionClose(ticket);} Orders: for(int i=OrdersTotal()-1;i>=0;i--){ulong ticket=OrderGetTicket(i); trade.OrderDelete(ticket);} Always iterate backwards when closing to avoid index shifting.', 1.3)
+
+  // ── MQL4/MQL5 Advanced: Money Management ─────────────────────────────────
+
+  add('mql_money_management', ['mql4 lot size calculation', 'mql risk per trade percent', 'mql4 money management position sizing', 'mql4 lot calculator'],
+    'MQL4 money management: Risk-based lot sizing — double RiskPercent=2.0; double StopLossPips=50; double tickValue=MarketInfo(Symbol(),MODE_TICKVALUE); double tickSize=MarketInfo(Symbol(),MODE_TICKSIZE); double point=MarketInfo(Symbol(),MODE_POINT); double riskAmount=AccountBalance()*RiskPercent/100; double pipValue=tickValue*(point/tickSize); double lots=NormalizeDouble(riskAmount/(StopLossPips*pipValue),2); lots=MathMax(MarketInfo(Symbol(),MODE_MINLOT),MathMin(lots,MarketInfo(Symbol(),MODE_MAXLOT))). Fixed ratio: lots=AccountEquity()/10000*baseLot. Margin check: AccountFreeMarginCheck(Symbol(),OP_BUY,lots)>0. Step normalization: double step=MarketInfo(Symbol(),MODE_LOTSTEP); lots=NormalizeDouble(MathFloor(lots/step)*step,2). Always verify: lots>=MINLOT && lots<=MAXLOT && lots%LOTSTEP==0.', 1.4)
+
+  add('mql_money_management', ['mql5 lot calculation ctrade', 'mql5 position sizing risk', 'mql5 money management', 'mt5 risk management code'],
+    'MQL5 money management: AccountInfoDouble(ACCOUNT_BALANCE), AccountInfoDouble(ACCOUNT_EQUITY), AccountInfoDouble(ACCOUNT_MARGIN_FREE). Lot calculation: double tickSize=SymbolInfoDouble(sym,SYMBOL_TRADE_TICK_SIZE); double tickValue=SymbolInfoDouble(sym,SYMBOL_TRADE_TICK_VALUE); double point=SymbolInfoDouble(sym,SYMBOL_POINT); double riskMoney=AccountInfoDouble(ACCOUNT_BALANCE)*riskPct/100; double slPoints=slPips*10; // 5-digit double lots=NormalizeDouble(riskMoney/(slPoints*tickValue/tickSize),2). Validate: double minLot=SymbolInfoDouble(sym,SYMBOL_VOLUME_MIN); double maxLot=SymbolInfoDouble(sym,SYMBOL_VOLUME_MAX); double lotStep=SymbolInfoDouble(sym,SYMBOL_VOLUME_STEP); lots=MathMax(minLot,MathMin(maxLot,MathRound(lots/lotStep)*lotStep)). Margin requirement: OrderCalcMargin(ORDER_TYPE_BUY,sym,lots,ask,margin).', 1.4)
+
+  add('mql_money_management', ['mql drawdown control', 'mql equity protection', 'mql max loss stop trading', 'mql daily loss limit ea'],
+    'MQL equity/drawdown protection: Daily loss limit — store starting equity at day start: if(TimeDay(TimeCurrent())!=lastDay){startEquity=AccountEquity();lastDay=TimeDay(TimeCurrent());}. Check: if(AccountEquity()<startEquity*(1-maxDailyLossPct/100)) return; // stop trading. Max drawdown: track peak equity: peakEquity=MathMax(peakEquity,AccountEquity()); double dd=(peakEquity-AccountEquity())/peakEquity*100; if(dd>maxDD) CloseAllPositions(). Equity trailing: move SL to breakeven after X pips profit. Account protection: if(AccountMarginLevel()<150) CloseWorstPosition(). Recovery mode: after loss, reduce lot size by factor. Compound growth: lots=baseLot*MathPow(AccountBalance()/initialBalance,0.5). Risk of ruin: never risk >2% per trade, keep max open risk <6% total.', 1.3)
+
+  // ── MQL4/MQL5 Advanced: Chart Objects & GUI ──────────────────────────────
+
+  add('mql_chart_objects', ['mql4 chart objects', 'mql draw line rectangle text', 'mql4 objectcreate label', 'mt4 graphical objects programming'],
+    'MQL4 chart objects: ObjectCreate(0,"myLine",OBJ_HLINE,0,0,price) for horizontal line. Types: OBJ_VLINE, OBJ_HLINE, OBJ_TREND, OBJ_RECTANGLE, OBJ_TRIANGLE, OBJ_TEXT, OBJ_LABEL, OBJ_BUTTON, OBJ_EDIT, OBJ_BITMAP_LABEL, OBJ_ARROW. Set properties: ObjectSetInteger(0,"myLine",OBJPROP_COLOR,clrRed); ObjectSetInteger(0,"myLine",OBJPROP_STYLE,STYLE_DASH); ObjectSetInteger(0,"myLine",OBJPROP_WIDTH,2); ObjectSetString(0,"myLabel",OBJPROP_TEXT,"Price: "+DoubleToStr(Bid,Digits)). Labels use pixel coordinates: ObjectSetInteger(0,"lab",OBJPROP_XDISTANCE,20); ObjectSetInteger(0,"lab",OBJPROP_YDISTANCE,30); ObjectSetInteger(0,"lab",OBJPROP_CORNER,CORNER_LEFT_UPPER). Delete: ObjectDelete(0,"myLine"). Delete all: ObjectsDeleteAll(0,0,-1) or by prefix: ObjectsDeleteAll(0,"EA_"). ChartRedraw() to refresh.', 1.3)
+
+  add('mql_chart_objects', ['mql4 button panel gui', 'mql create dashboard buttons', 'mql4 interactive panel click event', 'mql4 ea graphical interface'],
+    'MQL4 interactive GUI panels: Create button: ObjectCreate(0,"btnBuy",OBJ_BUTTON,0,0,0); ObjectSetInteger(0,"btnBuy",OBJPROP_XDISTANCE,20); ObjectSetInteger(0,"btnBuy",OBJPROP_YDISTANCE,30); ObjectSetInteger(0,"btnBuy",OBJPROP_XSIZE,100); ObjectSetInteger(0,"btnBuy",OBJPROP_YSIZE,30); ObjectSetString(0,"btnBuy",OBJPROP_TEXT,"BUY"); ObjectSetInteger(0,"btnBuy",OBJPROP_BGCOLOR,clrGreen). Handle clicks in OnChartEvent: void OnChartEvent(const int id,const long &lparam,const double &dparam,const string &sparam){if(id==CHARTEVENT_OBJECT_CLICK){if(sparam=="btnBuy"){/* execute buy */ObjectSetInteger(0,"btnBuy",OBJPROP_STATE,false);}}if(id==CHARTEVENT_CHART_CHANGE){/* redraw panel */}}. Edit fields: OBJ_EDIT for user input, read with ObjectGetString(). Build info panel: display spread, account info, signal status.', 1.3)
+
+  add('mql_chart_objects', ['mql5 chart objects canvas', 'mql5 cgraphic canvas drawing', 'mql5 custom panel CDialog', 'mt5 gui programming'],
+    'MQL5 chart objects and canvas: Same OBJ_* types as MQL4 plus OBJ_CHART (embedded chart). CCanvas class for pixel drawing: #include <Canvas/Canvas.mqh>. CCanvas canvas; canvas.CreateBitmapLabel("myCanvas",20,30,400,300); canvas.Erase(ColorToARGB(clrBlack)); canvas.FillRectangle(0,0,100,100,ColorToARGB(clrBlue)); canvas.TextOut(50,50,"Hello",ColorToARGB(clrWhite)); canvas.Update(). CGraphic for charts: #include <Graphics/Graphic.mqh>. Dialog panels: #include <Controls/Dialog.mqh>; CAppDialog uses CButton, CEdit, CLabel, CComboBox, CCheckBox. Events: EVENT_CHART_OBJECT_CLICK, EVENT_CHART_OBJECT_DRAG. ChartSetInteger(0,CHART_EVENT_OBJECT_CREATE,true) to receive creation events. Canvas supports anti-aliased drawing, gradients, and alpha blending.', 1.3)
+
+  // ── MQL4/MQL5 Advanced: File I/O Operations ──────────────────────────────
+
+  add('mql_file_operations', ['mql4 file read write csv', 'mql4 fileopen filewrite', 'mql4 csv export trade log', 'mt4 file operations'],
+    'MQL4 file operations: Open: int handle=FileOpen("data.csv",FILE_CSV|FILE_WRITE|FILE_ANSI,","); Write CSV: FileWrite(handle,"Time","Symbol","Type","Lots","Price","Profit"); FileWrite(handle,TimeToStr(OrderOpenTime()),OrderSymbol(),OrderType()==OP_BUY?"Buy":"Sell",OrderLots(),OrderOpenPrice(),OrderProfit()); FileClose(handle). Read: handle=FileOpen("settings.csv",FILE_CSV|FILE_READ,","); while(!FileIsEnding(handle)){string val=FileReadString(handle);}. Binary: FILE_BIN|FILE_WRITE, FileWriteDouble(handle,value), FileWriteInteger(handle,value). File location: MQL4/Files/ folder (sandboxed). Check existence: FileIsExist("data.csv"). Delete: FileDelete("old.csv"). Common folder: FILE_COMMON flag for shared files between terminals.', 1.3)
+
+  add('mql_file_operations', ['mql5 file operations database', 'mql5 fileopen csv binary', 'mql5 sqlite database', 'mt5 data storage file'],
+    'MQL5 file operations: Similar to MQL4 but adds DatabaseOpen for SQLite: int db=DatabaseOpen("trades.sqlite",DATABASE_OPEN_READWRITE|DATABASE_OPEN_CREATE); DatabaseExecute(db,"CREATE TABLE IF NOT EXISTS trades(ticket INT,symbol TEXT,profit REAL)"); DatabaseExecute(db,"INSERT INTO trades VALUES("+ticket+",\'"+symbol+"\',"+profit+")"); int request=DatabasePrepare(db,"SELECT * FROM trades WHERE profit>0"); while(DatabaseRead(request)){long t;DatabaseColumnLong(request,0,t);}; DatabaseFinalize(request); DatabaseClose(db). File ops: FileOpen, FileWrite, FileReadString, FileReadNumber — same patterns as MQL4. Advantages of SQLite: indexed queries, transactions, complex filtering vs flat CSV files. Can store EA state, trade journal, optimization results.', 1.3)
+
+  add('mql_file_operations', ['mql save ea settings', 'mql persistent state storage', 'mql global variables file', 'mql ea configuration save load'],
+    'MQL persistent state management: Global terminal variables — GlobalVariableSet("EA_lastTrade",TimeCurrent()); double val=GlobalVariableGet("EA_state"); GlobalVariableCheck("name") to verify existence. Survives EA restart but not terminal reinstall. File-based persistence: Save state to binary file: int h=FileOpen("EA_state.bin",FILE_BIN|FILE_WRITE); FileWriteInteger(h,currentState); FileWriteDouble(h,lastPrice); FileClose(h). Load: h=FileOpen("EA_state.bin",FILE_BIN|FILE_READ); currentState=FileReadInteger(h); lastPrice=FileReadDouble(h). INI-style config: Write sections with [Header] and Key=Value pairs. MQL5 adds: FileLoad()/FileSave() for array serialization. Best practice: save state in OnDeinit(reason), load in OnInit(). Use reason code: if(reason==REASON_CHARTCHANGE||reason==REASON_PARAMETERS) save settings.', 1.2)
+
+  // ── MQL4/MQL5 Advanced: Network & Web Requests ───────────────────────────
+
+  add('mql_network_web', ['mql4 webrequest http api', 'mql4 send http request', 'mql4 telegram notification bot', 'mt4 webrequest rest api'],
+    'MQL4 WebRequest for HTTP: Must add URL to Tools→Options→Expert Advisors→Allow WebRequest. int res=WebRequest("POST","https://api.telegram.org/bot<TOKEN>/sendMessage","Content-Type: application/x-www-form-urlencoded\\r\\n",5000,StringToCharArray("chat_id=123&text="+msg),result,headers). GET request: WebRequest("GET",url,"",5000,empty,result,headers); string response=CharArrayToString(result). Parse JSON manually: find key positions with StringFind(), extract with StringSubstr(). Telegram bot integration: send trade alerts, daily summaries, error notifications. Send to webhook: post trade data to Discord, Slack, custom endpoints. Limitations: synchronous (blocks OnTick), 5-second timeout recommended, HTTPS only, no WebSocket support in MQL4.', 1.3)
+
+  add('mql_network_web', ['mql5 webrequest json api', 'mql5 http post get', 'mql5 socket network', 'mt5 api integration web'],
+    'MQL5 network operations: WebRequest enhanced: int res=WebRequest("POST",url,headers,timeout,post_data,result,result_headers). MQL5 adds native sockets: int sock=SocketCreate(); if(SocketConnect(sock,"api.example.com",80,5000)){string req="GET /data HTTP/1.1\\r\\nHost: api.example.com\\r\\n\\r\\n"; SocketSend(sock,req,StringLen(req)); char buf[]; SocketRead(sock,buf,1024,5000); SocketClose(sock);}. JSON parsing: #include <JAson.mqh> or manual parsing. CJAVal json; json.Deserialize(response); double price=json["price"].ToDbl(). Push notifications: SendNotification("Trade opened"). Email: SendMail("Subject","Body"). SocketIsConnected() for persistent connections. TLS/SSL supported for HTTPS and secure sockets.', 1.3)
+
+  add('mql_network_web', ['mql copy trading signal', 'mql ea communication between terminals', 'mql named pipes shared memory', 'mql multi terminal sync'],
+    'MQL inter-terminal communication: Named pipes (Windows): FileOpen("\\\\.\\pipe\\myPipe",FILE_BIN|FILE_WRITE) — requires DLL import for CreateNamedPipe. Shared files: Master EA writes signals to common file: FileOpen("signal.csv",FILE_CSV|FILE_WRITE|FILE_COMMON); Slave EA reads from same file using FILE_COMMON flag. GlobalVariables: shared within same terminal instance. Copy trading pattern: Master sends: FileWrite(h,Symbol(),cmd,lots,sl,tp,ticket); Slave reads and executes matching orders, tracks master ticket→slave ticket mapping. MQL5 custom events: ChartCustomEvent(chartId,eventId,param,message) for charts in same terminal. Memory-mapped files via DLL for high-speed IPC. Socket-based: run a local TCP server on one terminal, connect from others for real-time sync.', 1.2)
+
+  // ── MQL4/MQL5 Advanced: Strategy Patterns ────────────────────────────────
+
+  add('mql_strategy_patterns', ['mql grid trading ea', 'mql4 grid bot code', 'mql grid strategy pending orders', 'mt4 grid trading system'],
+    'MQL grid trading EA pattern: Place buy and sell orders at fixed intervals above and below current price. Grid setup: double gridStep=20*Point; int gridLevels=10; for(int i=1;i<=gridLevels;i++){double buyPrice=NormalizeDouble(Ask-i*gridStep,Digits); double sellPrice=NormalizeDouble(Bid+i*gridStep,Digits); OrderSend(Symbol(),OP_BUYLIMIT,lots,buyPrice,3,buyPrice-gridStep,buyPrice+gridStep*tp_mult,"Grid",magic); OrderSend(Symbol(),OP_SELLLIMIT,lots,sellPrice,3,sellPrice+gridStep,sellPrice-gridStep*tp_mult,"Grid",magic);}. Grid management: count active orders per direction, replace filled pending orders, set max grid size. Anti-grid: only trade in trend direction. Dynamic grid: adjust gridStep based on ATR. Risk: grid systems have unlimited drawdown potential in strong trends — always use max loss circuit breaker.', 1.4)
+
+  add('mql_strategy_patterns', ['mql scalping ea fast execution', 'mql4 scalper code pattern', 'mql high frequency trading', 'mt4 tick scalping ea'],
+    'MQL scalping EA patterns: Fast execution: minimize calculations in OnTick, pre-calculate in OnTimer or on new bar. Spread filter: if(Ask-Bid>maxSpread*Point) return; Tick-based entry: track tick direction (uptick/downtick sequences). Candle scalper: trade first N seconds of new candle with tight SL/TP. Mean reversion: RSI<20 buy, RSI>80 sell on M1 with 5-10 pip targets. Breakout scalper: enter on break of previous bar high/low. Key considerations: use ECN/STP broker (no dealing desk), VPS with <5ms latency, check MODE_FREEZELEVEL, avoid news time. Partial close for scaling out: OrderClose(ticket,OrderLots()/2,Bid,3). Candle timer: if(TimeCurrent()-iTime(Symbol(),PERIOD_M1,0)<10) return; // only trade first 10 seconds. MQL5: use SymbolInfoTick() for latest tick data.', 1.4)
+
+  add('mql_strategy_patterns', ['mql hedging strategy code', 'mql martingale ea', 'mql news trading filter', 'mql anti-martingale money management'],
+    'MQL advanced strategy patterns: Hedging — open opposite positions to lock profit/loss: buy AND sell simultaneously (MT5 hedging mode), close profitable side on signal. Martingale — double lot on loss: nextLot=baseLot*MathPow(2,consecutiveLosses); WARNING: guaranteed account blow-up eventually, always cap at maxMultiplier. Anti-martingale: increase on wins, reset on loss — better risk profile. News filter: avoid trading around high-impact news — parse ForexFactory calendar or use time-based exclusion: input string newsTime1="14:30"; if(MathAbs(TimeHour(TimeCurrent())*60+TimeMinute(TimeCurrent())-(14*60+30))<30) return; Session filter: trade only London/NY overlap (12:00-16:00 GMT). Basket trading: trade correlated pairs together (EURUSD+GBPUSD), manage total exposure. Pyramiding: add to winning positions with trailing stops.', 1.3)
+
+  // ── MQL4/MQL5 Advanced: Indicator Mathematical Formulas ──────────────────
+
+  add('mql_indicator_formulas', ['mql custom moving average code', 'mql ema sma wma calculation', 'mql4 moving average formula', 'mql indicator math calculation'],
+    'MQL moving average formulas: SMA — sum/period: double sum=0; for(int i=0;i<period;i++) sum+=Close[shift+i]; sma=sum/period. EMA — exponential: double k=2.0/(period+1); ema[i]=Close[i]*k+ema[i+1]*(1-k); or: ema=prevEma+k*(Close[i]-prevEma). WMA — weighted: double wsum=0,wdiv=0; for(int i=0;i<period;i++){wsum+=Close[shift+i]*(period-i);wdiv+=(period-i);} wma=wsum/wdiv. DEMA: 2*EMA-EMA(EMA). TEMA: 3*EMA-3*EMA(EMA)+EMA(EMA(EMA)). Hull MA: WMA(2*WMA(n/2)-WMA(n),sqrt(n)) — faster response. Adaptive MA (Kaufman KAMA): direction=MathAbs(Close[0]-Close[period]); volatility=sum of MathAbs(Close[i]-Close[i+1]); er=direction/volatility; smooth=(er*(fast-slow)+slow)^2. SMMA: first=SMA, then smma[i]=(smma[i+1]*(period-1)+Close[i])/period.', 1.4)
+
+  add('mql_indicator_formulas', ['mql rsi macd stochastic formula', 'mql oscillator calculation code', 'mql4 custom rsi code', 'mql momentum indicator math'],
+    'MQL oscillator formulas: RSI — for each bar: change=Close[i]-Close[i+1]; if(change>0) gain+=change; else loss-=change; avgGain=gain/period; avgLoss=loss/period; RS=avgGain/avgLoss; RSI=100-100/(1+RS). Subsequent: avgGain=(prevAvgGain*(period-1)+currentGain)/period. MACD: fastEMA-slowEMA, signal=EMA(MACD,signalPeriod), histogram=MACD-signal. Stochastic: %K=100*(Close-LowestLow(period))/(HighestHigh(period)-LowestLow(period)); %D=SMA(%K,slowing). CCI: (TypicalPrice-SMA(TP))/0.015/MeanDeviation. MFI (Money Flow Index): like RSI but volume-weighted. Williams %R: -100*(HighestHigh-Close)/(HighestHigh-LowestLow). Momentum: Close[0]-Close[period] or Close[0]/Close[period]*100. ROC: (Close-Close[n])/Close[n]*100.', 1.4)
+
+  add('mql_indicator_formulas', ['mql bollinger bands atr formula', 'mql volatility indicator code', 'mql4 custom bands channel', 'mql ichimoku keltner donchian math'],
+    'MQL volatility/channel indicator formulas: Bollinger Bands — middle=SMA(Close,period); double dev=0; for(int i=0;i<period;i++) dev+=(Close[shift+i]-middle)*(Close[shift+i]-middle); stddev=MathSqrt(dev/period); upper=middle+mult*stddev; lower=middle-mult*stddev. ATR: TR=MathMax(High[i]-Low[i], MathMax(MathAbs(High[i]-Close[i+1]), MathAbs(Low[i]-Close[i+1]))); ATR=SMA(TR,period) or Wilder smoothing. Keltner Channel: middle=EMA(Close,period); upper=middle+mult*ATR; lower=middle-mult*ATR. Donchian: upper=Highest(High,period); lower=Lowest(Low,period); middle=(upper+lower)/2. Ichimoku: TenkanSen=(Highest(9)+Lowest(9))/2; KijunSen=(Highest(26)+Lowest(26))/2; SenkouA=(Tenkan+Kijun)/2 shifted 26 forward; SenkouB=(Highest(52)+Lowest(52))/2 shifted 26; ChikouSpan=Close shifted 26 back.', 1.4)
+
+  // ── MQL4/MQL5 Advanced: Testing & Code Quality ───────────────────────────
+
+  add('mql_testing_quality', ['mql4 strategy tester optimization', 'mt4 backtest settings tips', 'mql4 strategy tester best practices', 'mql ea testing guide'],
+    'MQL4 Strategy Tester best practices: Model: "Every tick" for accurate results (Open Prices Only for fast screening). Use 99% quality history data from TickDataSuite or Birt TDS. Input optimization: set Start/Step/Stop for each parameter — use genetic algorithm for >3 parameters. Avoid over-fitting: test on out-of-sample data (train 2015-2020, validate 2021-2023). Walk-forward: optimize on rolling window, test on next period. Key metrics: Profit Factor>1.5, Expected Payoff>0, Max Drawdown<30%, Sharpe>1. Custom criteria: double OnTester(){return AccountInfoDouble(ACCOUNT_BALANCE)*MathSqrt(TotalTrades)/MaxDrawdown;}. Common mistakes: curve-fitting with too many parameters, ignoring spread/commission, not testing across different market conditions. Export results: press "Copy" for tab-separated data, analyze in Excel/Python.', 1.3)
+
+  add('mql_testing_quality', ['mql5 strategy tester agent', 'mt5 optimization cloud', 'mql5 ontester custom criterion', 'mt5 multi-currency backtest'],
+    'MQL5 Strategy Tester features: Multi-currency testing: trade multiple symbols in one EA. Tick modes: Every tick, Every tick based on real ticks, 1 minute OHLC, Open prices. MQL5 Cloud Network: distributed optimization using thousands of agents. Custom optimization: double OnTester(){double trades=TesterStatistics(STAT_TRADES); double pf=TesterStatistics(STAT_PROFIT_FACTOR); double dd=TesterStatistics(STAT_EQUITY_DDREL_PERCENT); return trades>100?pf*MathSqrt(trades)*100/(dd+1):0;}. Frame mode: OnTesterInit()/OnTesterPass()/OnTesterDeinit() for collecting optimization results. Visual testing: step through bar-by-bar with live chart. Forward testing: automatic out-of-sample validation. Export via FrameAdd()/FrameNext() for custom analysis. Debug in tester: Print() output goes to Journal tab.', 1.3)
+
+  add('mql_testing_quality', ['mql code quality standards', 'mql best coding practices', 'mql clean code organization', 'mql ea code review checklist'],
+    'MQL code quality checklist: 1) Always use #property strict (MQL4) or strict type checking. 2) Magic number + symbol check in all order loops. 3) NormalizeDouble() for all price comparisons. 4) Check return values: if(OrderSend()<0){Print("Error: ",GetLastError());}. 5) Proper error handling: ResetLastError() before, GetLastError() after operations. 6) No hardcoded values: use input parameters with sensible defaults. 7) Resource cleanup in OnDeinit(): delete indicators, objects, timers. 8) Comment code with // or /* */ for complex logic. 9) Use meaningful variable names: totalBuyOrders not x. 10) Separate logic into functions: IsNewBar(), GetSignal(), ManageTrades(). 11) Log important events: Print("EA v1.0 initialized on "+Symbol()). 12) Handle zero-divide: if(divisor!=0) result=value/divisor. 13) Avoid infinite loops: always have break conditions. 14) Test edge cases: no history, weekend gaps, holidays. 15) Version numbering in EA properties.', 1.3)
+
   // ── Network Security Python (Black Hat Python 3) ──────────────────────────
   // Source: EONRaider/blackhat-python3 — Python 3 implementations from
   // "Black Hat Python" by Justin Seitz. Educational network-security reference.
@@ -5237,6 +5325,70 @@ export class LocalBrain {
     const indicatorTemplate = /\b(indicator\s+template\s+(mql4|mql5|code)|custom\s+indicator\s+(template|boilerplate|starter)|mql[45]\s+indicator\s+template)\b/i
     const codePattern = /\b(trading\s+code\s+template|mql\s+(code\s+example|code\s+sample|starter\s+code|boilerplate)|ea\s+code\s+template|indicator\s+code\s+template)\b/i
     return templatePattern.test(msg) || indicatorTemplate.test(msg) || codePattern.test(msg)
+  }
+
+  /** Check if query is about MQL order types and execution. */
+  private isMqlOrderTypesQuery(msg: string): boolean {
+    const orderPattern = /\b(mql[45]?\s+(order\s+types?|pending\s+order|market\s+order|ordersend|buy\s+limit|sell\s+limit|buy\s+stop|sell\s+stop)|mt[45]\s+(order\s+type|pending\s+order|execution))\b/i
+    const execPattern = /\b(ecn\s+(broker\s+)?execution|market\s+execution\s+mode|instant\s+execution|mql\s+(netting|hedging)\s+mode|position\s+vs\s+order\s+vs\s+deal)\b/i
+    const poolPattern = /\b(order\s+pool\s+iteration|order\s+loop\s+management|close\s+all\s+orders|scan\s+open\s+(orders|positions)|orders\s*total\s+loop)\b/i
+    return orderPattern.test(msg) || execPattern.test(msg) || poolPattern.test(msg)
+  }
+
+  /** Check if query is about MQL money management and lot sizing. */
+  private isMqlMoneyManagementQuery(msg: string): boolean {
+    const lotPattern = /\b(mql[45]?\s+(lot\s+size|lot\s+calculation|position\s+sizing|money\s+management)|mt[45]\s+(lot\s+calculator|risk\s+per\s+trade|money\s+management))\b/i
+    const riskPattern = /\b(risk\s+per(cent|\s+trade)\s+(mql|ea|mt[45])|mql\s+(drawdown|equity)\s+(control|protection|limit)|daily\s+loss\s+limit\s+ea)\b/i
+    const equityPattern = /\b(account\s*(balance|equity|margin)\s+(check|calculation|mql)|lot\s+step\s+normali[sz]|minlot\s+maxlot|mql\s+compound\s+growth)\b/i
+    return lotPattern.test(msg) || riskPattern.test(msg) || equityPattern.test(msg)
+  }
+
+  /** Check if query is about MQL chart objects and GUI programming. */
+  private isMqlChartObjectsQuery(msg: string): boolean {
+    const objPattern = /\b(mql[45]?\s+(chart\s+object|graphical\s+object|objectcreate|draw\s+(line|rectangle|text|arrow))|mt[45]\s+(chart\s+object|draw\s+on\s+chart))\b/i
+    const guiPattern = /\b(mql[45]?\s+(button|panel|gui|dashboard|interactive)|obj_(button|label|edit|rectangle_label|bitmap)|onchartevent\s+(click|button))\b/i
+    const canvasPattern = /\b(mql5\s+(canvas|cgraphic|cappd?ialog)|ccanvas\s+(draw|pixel|bitmap)|mql\s+(custom\s+panel|trade\s+panel|info\s+panel))\b/i
+    return objPattern.test(msg) || guiPattern.test(msg) || canvasPattern.test(msg)
+  }
+
+  /** Check if query is about MQL file I/O operations. */
+  private isMqlFileOperationsQuery(msg: string): boolean {
+    const filePattern = /\b(mql[45]?\s+(file\s+(read|write|open|operations?|csv)|fileopen|filewrite|fileread)|mt[45]\s+(file\s+operations?|csv\s+export|trade\s+log\s+file))\b/i
+    const dbPattern = /\b(mql5?\s+(sqlite|database|databaseopen)|mt5\s+(database|sqlite|data\s+storage)|mql\s+sql\s+query)\b/i
+    const statePattern = /\b(mql\s+(persistent|save|load)\s+(state|settings?|config)|global\s*variable\s*(set|get|check)\s+mql|ea\s+(save|restore)\s+state)\b/i
+    return filePattern.test(msg) || dbPattern.test(msg) || statePattern.test(msg)
+  }
+
+  /** Check if query is about MQL network/web operations. */
+  private isMqlNetworkWebQuery(msg: string): boolean {
+    const webPattern = /\b(mql[45]?\s+(webrequest|http\s+(get|post|api)|telegram\s+(bot|notification|send)|webhook)|mt[45]\s+(web\s+request|http|api\s+call))\b/i
+    const socketPattern = /\b(mql5?\s+(socket|socketcreate|socketconnect)|mt5\s+(socket|tcp\s+connect)|mql\s+(rest\s+api|json\s+pars))\b/i
+    const copyPattern = /\b(mql\s+(copy\s+trading|signal\s+provider|named\s+pipe|shared\s+memory)|mt[45]\s+(copy\s+trade|multi\s+terminal\s+sync)|ea\s+communication\s+between)\b/i
+    return webPattern.test(msg) || socketPattern.test(msg) || copyPattern.test(msg)
+  }
+
+  /** Check if query is about MQL strategy patterns (grid, scalping, hedging). */
+  private isMqlStrategyPatternsQuery(msg: string): boolean {
+    const gridPattern = /\b(mql[45]?\s+(grid\s+(trading|bot|ea|strategy)|martingale\s+(ea|code|system))|mt[45]\s+(grid\s+ea|grid\s+trading))\b/i
+    const scalpPattern = /\b(mql[45]?\s+(scalp|scalping|high\s+frequency|tick\s+scalp)|mt[45]\s+(scalp|scalping)\s+(ea|strategy|bot)|fast\s+execution\s+ea)\b/i
+    const hedgePattern = /\b(mql[45]?\s+(hedg|hedge\s+strategy|news\s+trading\s+(ea|code)|anti.martingale)|mt[45]\s+(hedg|basket\s+trading|pyramid))\b/i
+    return gridPattern.test(msg) || scalpPattern.test(msg) || hedgePattern.test(msg)
+  }
+
+  /** Check if query is about MQL indicator mathematical formulas. */
+  private isMqlIndicatorFormulasQuery(msg: string): boolean {
+    const maPattern = /\b(mql[45]?\s+(ema|sma|wma|moving\s+average)\s+(formula|calculation|code|math)|custom\s+(ema|sma|wma|moving\s+average)\s+(code|formula)\s+mql|hull\s+ma\s+mql|kama\s+mql)\b/i
+    const oscPattern = /\b(mql[45]?\s+(rsi|macd|stochastic|cci|momentum)\s+(formula|calculation|code|math)|custom\s+(rsi|macd|stochastic)\s+(code|formula)\s+mql)\b/i
+    const bandPattern = /\b(mql[45]?\s+(bollinger|atr|keltner|donchian|ichimoku)\s+(formula|calculation|code|math)|(bollinger|atr|keltner|ichimoku)\s+(formula|math)\s+mql)\b/i
+    return maPattern.test(msg) || oscPattern.test(msg) || bandPattern.test(msg)
+  }
+
+  /** Check if query is about MQL testing and code quality. */
+  private isMqlTestingQualityQuery(msg: string): boolean {
+    const testerPattern = /\b(mql[45]?\s+(strategy\s+tester|backtest|optimization|walk.forward)|mt[45]\s+(strategy\s+tester|backtest|optimi[sz]|every\s+tick))\b/i
+    const qualityPattern = /\b(mql[45]?\s+(code\s+quality|best\s+practice|coding\s+standard|clean\s+code|review\s+checklist)|mt[45]\s+(code\s+quality|best\s+practice))\b/i
+    const cloudPattern = /\b(mql5\s+cloud\s+network|mt5\s+(cloud|distributed)\s+optimi|ontester\s+custom\s+criterion|mql\s+profit\s+factor\s+sharpe)\b/i
+    return testerPattern.test(msg) || qualityPattern.test(msg) || cloudPattern.test(msg)
   }
 
   /** Check if query is about exploit development / binary exploitation. */
