@@ -5,7 +5,7 @@
  * ║  Decomposes Kurdish Sorani words into morphemes, identifies roots,         ║
  * ║  prefixes, suffixes, and part of speech. Provides spelling validation,     ║
  * ║  transliteration between Arabic and Latin scripts, and basic verb          ║
- * ║  conjugation. Built-in dictionary of 60+ common roots.                    ║
+ * ║  conjugation. Built-in dictionary of 200+ common roots.                   ║
  * ║                                                                            ║
  * ║  No external dependencies. Fully self-contained.                           ║
  * ╚══════════════════════════════════════════════════════════════════════════════╝
@@ -69,23 +69,41 @@ const PREFIXES: ReadonlyMap<string, string> = new Map([
   ['دا', 'down/setting'],
   ['ڕا', 'directional/away'],
   ['وەر', 'receptive'],
+  ['پێ', 'with/to'],
+  ['تێ', 'through/into'],
+  ['لێ', 'from/at'],
+  ['سەر', 'on/over'],
+  ['بەر', 'toward/before'],
 ])
 
 /** Kurdish suffix definitions: form → label. */
 const SUFFIXES: ReadonlyMap<string, string> = new Map([
+  ['ەکانمان', 'def. plural + 1st pl. possessive'],
+  ['ەکانتان', 'def. plural + 2nd pl. possessive'],
+  ['ەکانیان', 'def. plural + 3rd pl. possessive'],
+  ['ترینی', 'superlative + ezafe'],
+  ['ترین', 'superlative'],
   ['ەکان', 'definite plural'],
+  ['ەکەم', 'def. singular + 1st sg. possessive'],
+  ['ەکەت', 'def. singular + 2nd sg. possessive'],
   ['ەکە', 'definite singular'],
   ['انە', 'abstract noun'],
   ['یانە', 'adjectival'],
   ['کار', 'doer (agent)'],
   ['گەر', 'doer (agent)'],
+  ['وانە', 'manner adverb'],
+  ['مان', '1st person plural possessive'],
+  ['تان', '2nd person plural possessive'],
+  ['یان', '3rd person plural possessive'],
   ['ان', 'plural'],
   ['ێک', 'indefinite'],
+  ['تر', 'comparative'],
+  ['یی', 'abstract/nisba'],
+  ['ین', '1st person plural'],
   ['ی', 'ezafe/possessive'],
   ['ن', 'verb plural'],
   ['م', '1st person singular'],
   ['ت', '2nd person singular'],
-  ['ین', '1st person plural'],
 ])
 
 /**
@@ -532,6 +550,194 @@ export class KurdishMorphologicalAnalyzer {
     roots.set('خۆشەویستی', { meaning: 'love', pos: 'noun' })
     roots.set('ڕێز', { meaning: 'respect', pos: 'noun' })
     roots.set('ئەخلاق', { meaning: 'morals/manners', pos: 'noun' })
+
+    // ── Nouns (nature / environment) ──
+    roots.set('ئاسمان', { meaning: 'sky', pos: 'noun' })
+    roots.set('هەتاو', { meaning: 'sun', pos: 'noun' })
+    roots.set('مانگ', { meaning: 'moon/month', pos: 'noun' })
+    roots.set('ئەستێرە', { meaning: 'star', pos: 'noun' })
+    roots.set('هەور', { meaning: 'cloud', pos: 'noun' })
+    roots.set('باران', { meaning: 'rain', pos: 'noun' })
+    roots.set('بەفر', { meaning: 'snow', pos: 'noun' })
+    roots.set('با', { meaning: 'wind', pos: 'noun' })
+    roots.set('خاک', { meaning: 'earth/soil', pos: 'noun' })
+    roots.set('بەرد', { meaning: 'stone/rock', pos: 'noun' })
+    roots.set('گوڵ', { meaning: 'flower', pos: 'noun' })
+    roots.set('دەریا', { meaning: 'sea/lake', pos: 'noun' })
+    roots.set('زەمین', { meaning: 'ground/land', pos: 'noun' })
+    roots.set('چیا', { meaning: 'mountain', pos: 'noun' })
+    roots.set('دەشت', { meaning: 'plain/field', pos: 'noun' })
+    roots.set('جەنگەل', { meaning: 'forest', pos: 'noun' })
+    roots.set('گەڵا', { meaning: 'leaf', pos: 'noun' })
+    roots.set('تۆو', { meaning: 'seed', pos: 'noun' })
+
+    // ── Nouns (animals) ──
+    roots.set('ئەسپ', { meaning: 'horse', pos: 'noun' })
+    roots.set('سەگ', { meaning: 'dog', pos: 'noun' })
+    roots.set('پشیلە', { meaning: 'cat', pos: 'noun' })
+    roots.set('مەڕ', { meaning: 'sheep', pos: 'noun' })
+    roots.set('بزن', { meaning: 'goat', pos: 'noun' })
+    roots.set('گا', { meaning: 'cow/ox', pos: 'noun' })
+    roots.set('مریشک', { meaning: 'chicken', pos: 'noun' })
+    roots.set('باڵندە', { meaning: 'bird', pos: 'noun' })
+    roots.set('ماسی', { meaning: 'fish', pos: 'noun' })
+    roots.set('شێر', { meaning: 'lion', pos: 'noun' })
+    roots.set('ڕێوی', { meaning: 'fox', pos: 'noun' })
+    roots.set('پەلەوەر', { meaning: 'butterfly', pos: 'noun' })
+
+    // ── Nouns (food / daily life) ──
+    roots.set('شیر', { meaning: 'milk', pos: 'noun' })
+    roots.set('پەنیر', { meaning: 'cheese', pos: 'noun' })
+    roots.set('چا', { meaning: 'tea', pos: 'noun' })
+    roots.set('بریج', { meaning: 'rice', pos: 'noun' })
+    roots.set('گۆشت', { meaning: 'meat', pos: 'noun' })
+    roots.set('میوە', { meaning: 'fruit', pos: 'noun' })
+    roots.set('سێو', { meaning: 'apple', pos: 'noun' })
+    roots.set('هەنار', { meaning: 'pomegranate', pos: 'noun' })
+    roots.set('خواردن', { meaning: 'food', pos: 'noun' })
+    roots.set('ئاو', { meaning: 'water', pos: 'noun' })
+    roots.set('نمەک', { meaning: 'salt', pos: 'noun' })
+    roots.set('مەی', { meaning: 'wine', pos: 'noun' })
+
+    // ── Nouns (time / calendar) ──
+    roots.set('ڕۆژ', { meaning: 'day', pos: 'noun' })
+    roots.set('شەو', { meaning: 'night', pos: 'noun' })
+    roots.set('ساڵ', { meaning: 'year', pos: 'noun' })
+    roots.set('هەفتە', { meaning: 'week', pos: 'noun' })
+    roots.set('کاتژمێر', { meaning: 'hour/clock', pos: 'noun' })
+    roots.set('خولەک', { meaning: 'minute', pos: 'noun' })
+    roots.set('بەیانی', { meaning: 'morning', pos: 'noun' })
+    roots.set('ئێوارە', { meaning: 'evening', pos: 'noun' })
+    roots.set('نیوەڕۆ', { meaning: 'noon/midday', pos: 'noun' })
+    roots.set('بەهار', { meaning: 'spring', pos: 'noun' })
+    roots.set('هاوین', { meaning: 'summer', pos: 'noun' })
+    roots.set('پاییز', { meaning: 'autumn', pos: 'noun' })
+    roots.set('زستان', { meaning: 'winter', pos: 'noun' })
+
+    // ── Nouns (family / relationships) ──
+    roots.set('دایک', { meaning: 'mother', pos: 'noun' })
+    roots.set('باوک', { meaning: 'father', pos: 'noun' })
+    roots.set('برا', { meaning: 'brother', pos: 'noun' })
+    roots.set('خوشک', { meaning: 'sister', pos: 'noun' })
+    roots.set('باپیر', { meaning: 'grandfather', pos: 'noun' })
+    roots.set('داپیر', { meaning: 'grandmother', pos: 'noun' })
+    roots.set('مام', { meaning: 'paternal uncle', pos: 'noun' })
+    roots.set('خاڵ', { meaning: 'maternal uncle', pos: 'noun' })
+    roots.set('پور', { meaning: 'aunt (paternal)', pos: 'noun' })
+    roots.set('هاوسەر', { meaning: 'spouse', pos: 'noun' })
+    roots.set('خێزان', { meaning: 'family', pos: 'noun' })
+    roots.set('هاوڕێ', { meaning: 'friend', pos: 'noun' })
+    roots.set('دراوسێ', { meaning: 'neighbor', pos: 'noun' })
+
+    // ── Nouns (professions) ──
+    roots.set('وانەبێژ', { meaning: 'lecturer', pos: 'noun' })
+    roots.set('پارێزەر', { meaning: 'lawyer', pos: 'noun' })
+    roots.set('ئەندازیار', { meaning: 'engineer', pos: 'noun' })
+    roots.set('جوتیار', { meaning: 'farmer', pos: 'noun' })
+    roots.set('بازرگان', { meaning: 'merchant', pos: 'noun' })
+    roots.set('داهێنەر', { meaning: 'inventor/creator', pos: 'noun' })
+    roots.set('نووسەر', { meaning: 'writer', pos: 'noun' })
+    roots.set('شاعیر', { meaning: 'poet', pos: 'noun' })
+    roots.set('هونەرمەند', { meaning: 'artist', pos: 'noun' })
+    roots.set('ئافرەت', { meaning: 'woman (formal)', pos: 'noun' })
+    roots.set('سەرباز', { meaning: 'soldier', pos: 'noun' })
+    roots.set('ڕۆژنامەنووس', { meaning: 'journalist', pos: 'noun' })
+
+    // ── Nouns (abstract / concepts) ──
+    roots.set('زانست', { meaning: 'science', pos: 'noun' })
+    roots.set('فەلسەفە', { meaning: 'philosophy', pos: 'noun' })
+    roots.set('مێژوو', { meaning: 'history', pos: 'noun' })
+    roots.set('هونەر', { meaning: 'art', pos: 'noun' })
+    roots.set('ئەدەب', { meaning: 'literature', pos: 'noun' })
+    roots.set('زمان', { meaning: 'language', pos: 'noun' })
+    roots.set('نەتەوە', { meaning: 'nation', pos: 'noun' })
+    roots.set('وڵات', { meaning: 'country', pos: 'noun' })
+    roots.set('حکومەت', { meaning: 'government', pos: 'noun' })
+    roots.set('یاسا', { meaning: 'law', pos: 'noun' })
+    roots.set('دادوەری', { meaning: 'justice', pos: 'noun' })
+    roots.set('ئابووری', { meaning: 'economy', pos: 'noun' })
+    roots.set('کەلەپوور', { meaning: 'heritage', pos: 'noun' })
+    roots.set('ئایین', { meaning: 'religion', pos: 'noun' })
+    roots.set('بیروڕا', { meaning: 'opinion', pos: 'noun' })
+
+    // ── Additional verbs ──
+    roots.set('ژی', { meaning: 'live', pos: 'verb' })
+    roots.set('گوت', { meaning: 'said (past)', pos: 'verb' })
+    roots.set('دیت', { meaning: 'saw (past)', pos: 'verb' })
+    roots.set('کوشت', { meaning: 'kill', pos: 'verb' })
+    roots.set('دروست', { meaning: 'make/create', pos: 'verb' })
+    roots.set('شکان', { meaning: 'break (intrans.)', pos: 'verb' })
+    roots.set('ڕوون', { meaning: 'sit', pos: 'verb' })
+    roots.set('پاراست', { meaning: 'protect', pos: 'verb' })
+    roots.set('گەڕا', { meaning: 'search/look for', pos: 'verb' })
+    roots.set('کوت', { meaning: 'beat/hit', pos: 'verb' })
+    roots.set('نوست', { meaning: 'sleep', pos: 'verb' })
+    roots.set('خست', { meaning: 'throw/put', pos: 'verb' })
+    roots.set('هاوشت', { meaning: 'throw', pos: 'verb' })
+    roots.set('دوا', { meaning: 'sew/run', pos: 'verb' })
+
+    // ── Additional adjectives ──
+    roots.set('ئاسایی', { meaning: 'normal/ordinary', pos: 'adjective' })
+    roots.set('تایبەت', { meaning: 'special/particular', pos: 'adjective' })
+    roots.set('گشتی', { meaning: 'general/public', pos: 'adjective' })
+    roots.set('سروشتی', { meaning: 'natural', pos: 'adjective' })
+    roots.set('ئاوەدان', { meaning: 'prosperous/flourishing', pos: 'adjective' })
+    roots.set('وشک', { meaning: 'dry', pos: 'adjective' })
+    roots.set('تەر', { meaning: 'wet/fresh', pos: 'adjective' })
+    roots.set('بەرفراوان', { meaning: 'wide/vast', pos: 'adjective' })
+    roots.set('تەنگ', { meaning: 'narrow/tight', pos: 'adjective' })
+    roots.set('قووڵ', { meaning: 'deep', pos: 'adjective' })
+    roots.set('سوور', { meaning: 'red', pos: 'adjective' })
+    roots.set('شین', { meaning: 'blue/green', pos: 'adjective' })
+    roots.set('سپی', { meaning: 'white', pos: 'adjective' })
+    roots.set('ڕەش', { meaning: 'black', pos: 'adjective' })
+    roots.set('زەرد', { meaning: 'yellow', pos: 'adjective' })
+    roots.set('سەوز', { meaning: 'green', pos: 'adjective' })
+    roots.set('خوێن', { meaning: 'read', pos: 'verb' })  // re-alias to avoid collision
+
+    // ── Nouns (numbers as words) ──
+    roots.set('یەک', { meaning: 'one', pos: 'numeral' })
+    roots.set('دوو', { meaning: 'two', pos: 'numeral' })
+    roots.set('سێ', { meaning: 'three', pos: 'numeral' })
+    roots.set('چوار', { meaning: 'four', pos: 'numeral' })
+    roots.set('پێنج', { meaning: 'five', pos: 'numeral' })
+    roots.set('شەش', { meaning: 'six', pos: 'numeral' })
+    roots.set('حەوت', { meaning: 'seven', pos: 'numeral' })
+    roots.set('هەشت', { meaning: 'eight', pos: 'numeral' })
+    roots.set('نۆ', { meaning: 'nine', pos: 'numeral' })
+    roots.set('دە', { meaning: 'ten', pos: 'numeral' })
+    roots.set('سەد', { meaning: 'hundred', pos: 'numeral' })
+    roots.set('هەزار', { meaning: 'thousand', pos: 'numeral' })
+
+    // ── Adverbs ──
+    roots.set('ئێستا', { meaning: 'now', pos: 'adverb' })
+    roots.set('دوێنێ', { meaning: 'yesterday', pos: 'adverb' })
+    roots.set('سبەی', { meaning: 'tomorrow', pos: 'adverb' })
+    roots.set('هەمیشە', { meaning: 'always', pos: 'adverb' })
+    roots.set('هەرگیز', { meaning: 'never', pos: 'adverb' })
+    roots.set('زوو', { meaning: 'early/fast', pos: 'adverb' })
+    roots.set('درەنگ', { meaning: 'late', pos: 'adverb' })
+    roots.set('ئەمڕۆ', { meaning: 'today', pos: 'adverb' })
+
+    // ── Pronouns ──
+    roots.set('من', { meaning: 'I/me', pos: 'pronoun' })
+    roots.set('تۆ', { meaning: 'you (singular)', pos: 'pronoun' })
+    roots.set('ئەو', { meaning: 'he/she/it', pos: 'pronoun' })
+    roots.set('ئێمە', { meaning: 'we', pos: 'pronoun' })
+    roots.set('ئێوە', { meaning: 'you (plural)', pos: 'pronoun' })
+    roots.set('ئەوان', { meaning: 'they', pos: 'pronoun' })
+
+    // ── Postpositions / particles ──
+    roots.set('لە', { meaning: 'in/at/from', pos: 'postposition' })
+    roots.set('بۆ', { meaning: 'for/to', pos: 'postposition' })
+    roots.set('بە', { meaning: 'with/by', pos: 'postposition' })
+    roots.set('لەگەڵ', { meaning: 'with/together', pos: 'postposition' })
+    roots.set('لەسەر', { meaning: 'on/upon', pos: 'postposition' })
+    roots.set('لەژێر', { meaning: 'under', pos: 'postposition' })
+    roots.set('لەنێوان', { meaning: 'between', pos: 'postposition' })
+    roots.set('پێش', { meaning: 'before', pos: 'postposition' })
+    roots.set('پاش', { meaning: 'after', pos: 'postposition' })
+    roots.set('بەبێ', { meaning: 'without', pos: 'postposition' })
 
     return roots
   }
