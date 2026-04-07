@@ -1445,7 +1445,7 @@ export class CodeAgent {
     const filename = request.path.split('/').pop() ?? 'index'
     const baseName = filename.replace(/\.(ts|tsx|js|jsx|py|go|rs)$/, '')
     const pascal = toPascalCase(baseName)
-    const isTs = lang === 'typescript'
+    const _isTs = lang === 'typescript'
 
     // Detect file purpose from path and description
     const lower = request.description.toLowerCase()
@@ -1507,8 +1507,10 @@ export class CodeAgent {
       content = this.generateControllerFile(pascal, request.description, lang)
       exportsProvided.push(...this.extractExportNames(content))
     } else if (isHook) {
-      content = this.generateHookFile(pascal, baseName, request.description, lang)
-      exportsProvided.push(`use${pascal}`)
+      // Strip 'Use' prefix if already present to avoid 'useUseAuth'
+      const hookPascal = pascal.startsWith('Use') ? pascal.slice(3) || pascal : pascal
+      content = this.generateHookFile(hookPascal, baseName, request.description, lang)
+      exportsProvided.push(`use${hookPascal}`)
     } else if (isComponent) {
       content = this.generateComponentFile(pascal, request.description, lang)
       exportsProvided.push(pascal)
@@ -1668,7 +1670,7 @@ export class CodeAgent {
   // ║  PRIVATE — File generators per file type                               ║
   // ╚═════════════════════════════════════════════════════════════════════════╝
 
-  private generateTestFile(pascal: string, baseName: string, desc: string, lang: ScaffoldLanguage): string {
+  private generateTestFile(pascal: string, baseName: string, desc: string, _lang: ScaffoldLanguage): string {
     const camel = toCamelCase(baseName)
     return `import { describe, it, expect } from 'vitest'
 import { ${pascal} } from '../${camel}'
@@ -1803,7 +1805,7 @@ export function loadConfig(overrides${isTs ? '?: Partial<AppConfig>' : ''} = {})
 
   private generateServiceFile(pascal: string, desc: string, lang: ScaffoldLanguage): string {
     const isTs = lang === 'typescript'
-    const camel = toCamelCase(pascal)
+    const _camel = toCamelCase(pascal)
     return `${buildComment(`${pascal} service — ${desc}`, lang)}
 
 ${isTs ? `export interface ${pascal}Data {

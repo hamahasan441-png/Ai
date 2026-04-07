@@ -170,6 +170,19 @@ import { CreativeProblemSolver } from './CreativeProblemSolver.js'
 import { AdvancedSearchEngine } from './AdvancedSearchEngine.js'
 import type { SearchWithThinkingResult } from './AdvancedSearchEngine.js'
 
+// Smart coding agent
+import { CodeAgent } from './CodeAgent.js'
+import type {
+  ProjectTemplate,
+  ScaffoldLanguage,
+  ScaffoldResult,
+  CreateFileRequest,
+  CreateFileResult,
+  AddToFileRequest,
+  AddToFileResult,
+  ExportFromFileRequest,
+} from './CodeAgent.js'
+
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -4230,6 +4243,9 @@ export class LocalBrain {
   private creativeProblemSolver: CreativeProblemSolver | null = null
   private advancedSearchEngine: AdvancedSearchEngine | null = null
 
+  // Smart coding agent
+  private codeAgent: CodeAgent
+
   // Token budget management
   private tokenBudget: TokenBudgetManager
 
@@ -4397,6 +4413,9 @@ export class LocalBrain {
         }))
       )
     }
+
+    // Initialize CodeAgent (always available — no external deps)
+    this.codeAgent = new CodeAgent()
 
     const now = new Date().toISOString()
     this.stats = {
@@ -6240,6 +6259,52 @@ export class LocalBrain {
     this.stats.totalCodeGenerations++
     this.stats.lastUsedAt = new Date().toISOString()
     return generateCodeLocally(request)
+  }
+
+  // ── Smart Coding Agent — Engineer-like file creation and project scaffolding ──
+
+  /**
+   * Scaffold a complete project with files, configs, tests, and directory structure.
+   * Works like a smart engineer creating a project from scratch.
+   */
+  scaffoldProject(name: string, template: ProjectTemplate, language?: ScaffoldLanguage): ScaffoldResult {
+    this.stats.totalCodeGenerations++
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.codeAgent.scaffold(name, template, language)
+  }
+
+  /**
+   * Create a single file with smart code generation.
+   * Detects file type from path, generates imports/exports, links to existing files.
+   */
+  smartCreateFile(request: CreateFileRequest): CreateFileResult {
+    this.stats.totalCodeGenerations++
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.codeAgent.createFile(request)
+  }
+
+  /**
+   * Add code to an existing file at the specified position.
+   * Intelligently detects where to place new code.
+   */
+  smartAddToFile(request: AddToFileRequest): AddToFileResult {
+    this.stats.totalCodeGenerations++
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.codeAgent.addToFile(request)
+  }
+
+  /**
+   * Add an export statement for a symbol in a file.
+   * Handles named exports, default exports, and language-specific patterns.
+   */
+  smartAddExport(request: ExportFromFileRequest): string {
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.codeAgent.addExport(request)
+  }
+
+  /** Get available project templates. */
+  getProjectTemplates(): ProjectTemplate[] {
+    return this.codeAgent.getTemplates()
   }
 
   // ── Code Review (enhanced with CodeMaster deep analysis) ──
