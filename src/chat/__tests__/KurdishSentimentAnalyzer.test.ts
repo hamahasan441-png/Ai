@@ -474,20 +474,32 @@ describe('KurdishSentimentAnalyzer', () => {
       // LocalBrain uses an internal KB search; we verify the brain can handle
       // sentiment-related queries without errors
       const response = await brain.chat('sorani sentiment analysis')
-      expect(typeof response).toBe('string')
-      expect(response.length).toBeGreaterThan(0)
+      if (typeof response === 'string') {
+        expect(response.length).toBeGreaterThan(0)
+      } else {
+        expect(typeof response.text).toBe('string')
+        expect(response.text.length).toBeGreaterThan(0)
+      }
     })
 
     it('search for "kurdish positive words" returns knowledge results', async () => {
       const response = await brain.chat('kurdish positive words')
-      expect(typeof response).toBe('string')
-      expect(response.length).toBeGreaterThan(0)
+      if (typeof response === 'string') {
+        expect(response.length).toBeGreaterThan(0)
+      } else {
+        expect(typeof response.text).toBe('string')
+        expect(response.text.length).toBeGreaterThan(0)
+      }
     })
 
     it('search for "kurdish negative sentiment" returns knowledge results', async () => {
       const response = await brain.chat('kurdish negative sentiment')
-      expect(typeof response).toBe('string')
-      expect(response.length).toBeGreaterThan(0)
+      if (typeof response === 'string') {
+        expect(response.length).toBeGreaterThan(0)
+      } else {
+        expect(typeof response.text).toBe('string')
+        expect(response.text.length).toBeGreaterThan(0)
+      }
     })
   })
 
