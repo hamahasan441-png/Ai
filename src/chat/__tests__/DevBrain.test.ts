@@ -46,7 +46,7 @@ vi.mock('path', () => ({
 }))
 
 import { DevBrain } from '../DevBrain'
-import type { DevBrainConfig, DevBrainStats, DevBrainLogEntry } from '../DevBrain'
+import type { DevBrainConfig } from '../DevBrain'
 
 // Helper to create a DevBrain in offline mode
 function createOfflineDevBrain(overrides?: Partial<DevBrainConfig>): DevBrain {

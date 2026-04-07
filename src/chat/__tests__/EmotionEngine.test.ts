@@ -2,13 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { EmotionEngine } from '../EmotionEngine.js'
 import type {
   EmotionDetection,
-  EmotionCategory,
-  SentimentResult,
-  EmpathyResponse,
-  EmotionTimeline,
-  EmotionalContext,
-  EmotionPattern,
-  EmotionEngineStats,
 } from '../EmotionEngine.js'
 
 describe('EmotionEngine', () => {
@@ -280,7 +273,7 @@ describe('EmotionEngine', () => {
     })
 
     it('question marks influence confusion/curiosity', () => {
-      const noQ = engine.detectEmotion('this code works')
+      const _noQ = engine.detectEmotion('this code works')
       const withQ = engine.detectEmotion('why does this code work???')
       // The question version should trigger confusion or curiosity
       expect(withQ.triggers.some(t => t === '?' || t.length > 0)).toBe(true)

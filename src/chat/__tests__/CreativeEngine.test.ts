@@ -1,16 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   CreativeEngine,
-  type CreativeEngineConfig,
-  type CreativeEngineStats,
-  type BrainstormResult,
-  type LateralThinkingResult,
-  type CreativeCombination,
-  type Metaphor,
-  type ReframingResult,
-  type InspirationSource,
   type CreativeIdea,
-  type IdeaEvolution,
 } from '../CreativeEngine'
 
 // ── Constructor Tests ──

@@ -1,17 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   ConceptMapper,
-  type ConceptMapperConfig,
-  type ConceptMapperStats,
-  type Concept,
-  type Relation,
-  type RelationType,
-  type ConceptPath,
-  type ConceptCluster,
-  type InferenceResult,
-  type SimilarityResult,
-  type ConceptMapSummary,
-  type SpreadingActivationResult,
 } from '../ConceptMapper'
 
 // ── Constructor Tests ──

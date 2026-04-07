@@ -1,12 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   CodeIntentPredictor,
-  type PredictionResult,
-  type IntentPrediction,
-  type SequencePrediction,
-  type CompletionPrediction,
   type ContextSignal,
-  type IntentFeedback,
 } from '../CodeIntentPredictor.js'
 
 describe('CodeIntentPredictor', () => {

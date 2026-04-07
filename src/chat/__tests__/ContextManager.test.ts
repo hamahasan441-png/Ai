@@ -2,11 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   ContextManager,
   type ContextTurn,
-  type ContextSummary,
-  type ContextStats,
-  type TopicInfo,
-  type TrackedEntity,
-  type ContextManagerConfig,
 } from '../ContextManager'
 
 // ── Helpers ──
