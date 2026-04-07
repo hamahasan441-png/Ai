@@ -3367,11 +3367,13 @@ function searchKnowledge(
           matchedKeywords.push(keyword)
         }
         // Entry keyword contains query keyword (e.g., entry "reinforcement learning" matches query "reinforcement")
+        // Min length 3 prevents short words like "is", "at", "to" from triggering false partial matches
         else if (entryKeyword.includes(keyword) && keyword.length >= 3) {
           score += 1.5 * entry.weight
           matchedKeywords.push(keyword)
         }
-        // Query keyword contains entry keyword (less specific match)
+        // Query keyword contains entry keyword (less specific, lower score)
+        // Min length 3 on entry keyword prevents short entry keywords from matching everything
         else if (keyword.includes(entryKeyword) && entryKeyword.length >= 3) {
           score += 1.0 * entry.weight
           matchedKeywords.push(keyword)
