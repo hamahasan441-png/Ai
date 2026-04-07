@@ -1445,7 +1445,6 @@ export class CodeAgent {
     const filename = request.path.split('/').pop() ?? 'index'
     const baseName = filename.replace(/\.(ts|tsx|js|jsx|py|go|rs)$/, '')
     const pascal = toPascalCase(baseName)
-    const _isTs = lang === 'typescript'
 
     // Detect file purpose from path and description
     const lower = request.description.toLowerCase()
@@ -1805,7 +1804,6 @@ export function loadConfig(overrides${isTs ? '?: Partial<AppConfig>' : ''} = {})
 
   private generateServiceFile(pascal: string, desc: string, lang: ScaffoldLanguage): string {
     const isTs = lang === 'typescript'
-    const _camel = toCamelCase(pascal)
     return `${buildComment(`${pascal} service — ${desc}`, lang)}
 
 ${isTs ? `export interface ${pascal}Data {
