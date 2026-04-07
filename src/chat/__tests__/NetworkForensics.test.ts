@@ -1,15 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   NetworkForensics,
-  type NetworkForensicsConfig,
-  type NetworkForensicsStats,
   type PacketInfo,
   type NetworkAnomaly,
-  type ProtocolAnalysis,
-  type NetworkIncident,
-  type TrafficPattern,
   type NetworkTopology,
-  type ForensicReport,
 } from '../NetworkForensics'
 
 // ── Helpers ──
@@ -44,7 +38,7 @@ function makePortScanPackets(count: number): PacketInfo[] {
   )
 }
 
-function makeBruteForcePackets(count: number): PacketInfo[] {
+function _makeBruteForcePackets(count: number): PacketInfo[] {
   const now = Date.now()
   return Array.from({ length: count }, (_, i) =>
     makePacket({

@@ -1,16 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   PatternRecognizer,
-  type PatternRecognizerConfig,
-  type PatternRecognizerStats,
-  type PatternAnalysisResult,
   type DataPattern,
-  type PatternType,
-  type SequenceInfo,
-  type AnomalyInfo,
-  type FrequencyInfo,
-  type CorrelationInfo,
-  type ClusterInfo,
 } from '../PatternRecognizer'
 
 // ── Helper ──
@@ -603,7 +594,7 @@ describe('PatternRecognizer serialize / deserialize', () => {
 
   it('preserves config through round-trip', () => {
     const original = new PatternRecognizer({ maxPatterns: 42, windowSize: 20 })
-    const restored = PatternRecognizer.deserialize(original.serialize())
+    const _restored = PatternRecognizer.deserialize(original.serialize())
     const data = JSON.parse(original.serialize())
     expect(data.config.maxPatterns).toBe(42)
     expect(data.config.windowSize).toBe(20)

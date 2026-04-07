@@ -1,12 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   SemanticBridge,
-  type NlToCodeResult,
-  type CodeToNlResult,
-  type ConceptMapping,
-  type SemanticSearchResult,
-  type CodeSkeleton,
-  type BridgeAnalysis,
 } from '../SemanticBridge.js'
 
 describe('SemanticBridge', () => {
@@ -312,7 +306,7 @@ describe('SemanticBridge', () => {
     })
 
     it('should learn from corrections', () => {
-      const initialVocab = bridge.getStats().vocabularySize
+      const _initialVocab = bridge.getStats().vocabularySize
       bridge.provideFeedback({
         translationType: 'nl_to_code',
         wasAccurate: false,

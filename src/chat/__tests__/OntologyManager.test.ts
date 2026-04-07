@@ -502,7 +502,7 @@ describe('OntologyManager', () => {
 
     it('filters by hasProperty', () => {
       const a = om.addConcept('A')
-      const b = om.addConcept('B')
+      const _b = om.addConcept('B')
       om.addProperty(a, 'color', 'red')
       const res = om.query({ hasProperty: 'color' })
       expect(res.totalMatches).toBe(1)
@@ -904,7 +904,7 @@ describe('OntologyManager', () => {
 
     it('builds hierarchy from all roots', () => {
       const r1 = om.addConcept('Root1')
-      const r2 = om.addConcept('Root2')
+      const _r2 = om.addConcept('Root2')
       om.addConcept('C1', '', r1)
       const h = om.getHierarchy()
       expect(h).toHaveLength(2)

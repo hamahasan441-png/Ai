@@ -1,19 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   PortfolioOptimizer,
-  type PortfolioOptimizerConfig,
-  type PortfolioOptimizerStats,
   type Asset,
   type Portfolio,
-  type OptimizationResult,
-  type RiskAssessment,
-  type AllocationRecommendation,
-  type RebalanceTrade,
-  type PositionSize,
-  type DrawdownAnalysis,
-  type PerformanceAttribution,
-  type EfficientFrontierPoint,
-  type RiskProfile,
 } from '../PortfolioOptimizer'
 
 // ── Helpers: generate sample asset data ──

@@ -1,13 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   SemanticCodeAnalyzer,
-  type SemanticCodeAnalyzerConfig,
-  type SemanticCodeAnalysis,
-  type CodeSymbol,
-  type DetectedPattern,
-  type DetectedAntiPattern,
-  type DependencyEdge,
-  type QualityMetrics,
 } from '../SemanticCodeAnalyzer.js'
 
 describe('SemanticCodeAnalyzer', () => {

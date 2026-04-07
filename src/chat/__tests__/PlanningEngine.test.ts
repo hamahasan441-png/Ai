@@ -1,13 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   PlanningEngine,
-  type Plan,
   type PlanStep,
-  type PlanEvaluation,
-  type PlanOptimization,
   type DependencyGraph,
-  type PlanningEngineConfig,
-  type PlanningEngineStats,
 } from '../PlanningEngine'
 
 // ── Constructor Tests ──
@@ -497,7 +492,7 @@ describe('PlanningEngine adaptPlan', () => {
   it('marks affected steps as adapted', () => {
     const plan = engine.createPlan('Implement user authentication with security review')
     const adapted = engine.adaptPlan(plan, ['security requirements tightened'])
-    const adaptedSteps = adapted.steps.filter((s) => s.description.startsWith('[Adapted]'))
+    const _adaptedSteps = adapted.steps.filter((s) => s.description.startsWith('[Adapted]'))
     // At least some steps could be adapted if keywords overlap
     expect(adapted.steps.length).toBeGreaterThan(0)
   })

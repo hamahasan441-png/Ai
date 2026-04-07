@@ -70,7 +70,7 @@ describe('NarrativeEngine', () => {
       e.addCharacter('Alice', 'protagonist')
       e.addCharacter('Bob', 'antagonist')
       // mark first as inactive so eviction can find a candidate
-      const chars = e.getCharacters()
+      const _chars = e.getCharacters()
       // Third add may evict
       e.addCharacter('Charlie', 'mentor')
       expect(e.getCharacters().length).toBeLessThanOrEqual(3)
@@ -345,17 +345,17 @@ describe('NarrativeEngine', () => {
     })
 
     it('creates automatic relation when characters co-appear', () => {
-      const a = engine.addCharacter('Alpha')
-      const b = engine.addCharacter('Beta')
+      const _a = engine.addCharacter('Alpha')
+      const _b = engine.addCharacter('Beta')
       engine.addBeat('Alpha and Beta met under the tree.')
       const relations = engine.getCharacterRelations()
       expect(relations.length).toBeGreaterThan(0)
     })
 
     it('filters relations by character ID', () => {
-      const a = engine.addCharacter('Alpha')
+      const _a = engine.addCharacter('Alpha')
       const b = engine.addCharacter('Beta')
-      const c = engine.addCharacter('Gamma')
+      const _c = engine.addCharacter('Gamma')
       engine.addBeat('Alpha and Beta met.')
       engine.addBeat('Beta and Gamma talked.')
       const betaRelations = engine.getCharacterRelations(b.id)
