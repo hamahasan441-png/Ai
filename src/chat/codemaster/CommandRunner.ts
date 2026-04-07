@@ -534,7 +534,7 @@ export class CommandRunner {
     // Suggest fixes for common errors
     const suggestedFixes: string[] = []
     for (const error of errors) {
-      if (error.type === 'typescript' && error.message.includes('Cannot find module')) {
+      if (error.message.includes('Cannot find module') || error.message.includes('cannot find module')) {
         suggestedFixes.push('npm install')
       }
       if (error.message.includes('ENOENT') || error.message.includes('not found')) {

@@ -518,7 +518,13 @@ export class FileNavigator {
     if (importMap) {
       for (const [file, imports] of importMap) {
         const normalizedChanged = changedFile.replace(/\.\w+$/, '')
-        if (imports.some(imp => imp.includes(normalizedChanged))) {
+        const changedBaseName = normalizedChanged.split('/').pop() ?? ''
+        if (imports.some(imp => {
+          const normalizedImp = imp.replace(/^\.\//, '').replace(/\.\w+$/, '')
+          return normalizedImp === normalizedChanged ||
+                 normalizedImp === changedBaseName ||
+                 normalizedChanged.endsWith(normalizedImp)
+        })) {
           directDependents.push(file)
         }
       }

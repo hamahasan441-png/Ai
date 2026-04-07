@@ -299,7 +299,7 @@ const VULN_PATTERNS: VulnPattern[] = [
   },
   // CORS wildcard
   {
-    pattern: /(?:Access-Control-Allow-Origin|cors)\s*[:({]\s*['"]?\*/,
+    pattern: /Access-Control-Allow-Origin.*['"]\*/,
     title: 'CORS Wildcard Origin',
     cwe: 'CWE-942',
     owasp: 'A05:2021-Security-Misconfiguration',
