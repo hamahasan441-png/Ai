@@ -1,8 +1,22 @@
 {
   "name": "ai",
-  "version": "2.2.0",
-  "description": "**1,886+ source files · 36+ modules · 39 tools · 50+ commands — ALL connected into one AI.** Now with Structured Logging, Input Validation, API Retry, Plugin SDK, and Observability.",
+  "version": "2.3.0",
+  "description": "**1,886+ source files · 36+ modules · 39 tools · 50+ commands — ALL connected into one AI.** Now with Structured Logging, Input Validation, API Retry, Plugin SDK, Observability, and Startup Environment Validation.",
   "main": "src/chat/index.ts",
+  "types": "src/chat/index.ts",
+  "exports": {
+    ".": "./src/chat/index.ts",
+    "./utils": "./src/utils/index.ts",
+    "./services": "./src/services/index.ts",
+    "./plugins": "./src/plugins/PluginSDK.ts"
+  },
+  "files": [
+    "src/",
+    "scripts/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "bin": {
     "ai": "./src/entrypoints/cli.tsx"
   },
@@ -17,7 +31,8 @@
     "start": "npx tsx src/entrypoints/cli.tsx",
     "dev": "npx tsx src/entrypoints/cli.tsx",
     "postinstall": "node scripts/postinstall.js",
-    "prepublishOnly": "echo 'Note: This package requires tsx or a TypeScript runtime to execute the CLI entry point.'"
+    "prepublishOnly": "npm run typecheck && npm run test",
+    "prepack": "echo 'Note: This package requires tsx or a TypeScript runtime to execute the CLI entry point.'"
   },
   "repository": {
     "type": "git",
@@ -33,7 +48,10 @@
     "brain",
     "offline",
     "database",
-    "cache"
+    "cache",
+    "plugin-sdk",
+    "structured-logging",
+    "code-analysis"
   ],
   "author": "",
   "license": "ISC",

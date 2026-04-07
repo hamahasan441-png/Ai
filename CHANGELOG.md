@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-04-07
+
+### Added
+- **Startup Environment Validator** (`src/utils/startupEnvValidator.ts`)
+  - Schema-based validation for all environment variables at boot time
+  - Type validation: string, number, boolean, url, enum
+  - Cross-field validation (at least one AI provider configured)
+  - Feature availability warnings for missing optional vars
+  - Sensitive value masking (API keys, DB connection strings)
+  - Safe environment snapshot for logging
+  - 45 unit tests
+- **CI Security Audit** — Added `npm audit --audit-level=high` step to CI pipeline
+- **README Badges** — CI status, Node.js version, license, TypeScript, version badges
+
+### Changed
+- **Package.json npm publish readiness**
+  - Added `types` field for TypeScript consumers
+  - Added `exports` field with subpath exports (chat, utils, services, plugins)
+  - Added `files` field to control published package contents
+  - Added `prepublishOnly` script that runs typecheck + tests before publish
+  - Added `prepack` informational message about tsx requirement
+  - Added additional keywords (plugin-sdk, structured-logging, code-analysis)
+  - Version bumped to 2.3.0
+
 ## [2.2.0] - 2026-04-07
 
 ### Added

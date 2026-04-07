@@ -1,5 +1,11 @@
 # 🤖 Ai — Complete Integrated AI System
 
+[![CI](https://github.com/hamahasan441-png/Ai/actions/workflows/ci.yml/badge.svg)](https://github.com/hamahasan441-png/Ai/actions/workflows/ci.yml)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/)
+[![Version](https://img.shields.io/badge/version-2.3.0-orange)](https://github.com/hamahasan441-png/Ai/releases)
+
 **1,886+ source files · 36+ modules · 39 tools · 50+ commands — ALL connected into one AI.**
 
 ## 🚀 Quick Installation
