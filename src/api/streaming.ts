@@ -8,6 +8,7 @@
  */
 
 import { ServerResponse } from 'node:http'
+import { randomUUID } from 'node:crypto'
 import type { Router, ApiRequest, ApiResponse } from './router.js'
 
 // ── SSE Connection ──
@@ -196,7 +197,7 @@ export function createStreamingRoutes(router: Router): { manager: SSEManager; ev
   const eventBus = new EventBus()
 
   router.get('/api/v1/stream', async (req: ApiRequest, res: ApiResponse) => {
-    const connectionId = req.query.id ?? req.headers['x-connection-id'] as string ?? `conn-${Date.now()}`
+    const connectionId = req.query.id ?? req.headers['x-connection-id'] as string ?? `conn-${randomUUID()}`
     const conn = new SSEConnection(res.raw)
     manager.addConnection(connectionId, conn)
 
@@ -233,7 +234,7 @@ export function createStreamingRoutes(router: Router): { manager: SSEManager; ev
     }
 
     const conn = new SSEConnection(res.raw)
-    const connectionId = `chat-${Date.now()}`
+    const connectionId = `chat-${randomUUID()}`
     manager.addConnection(connectionId, conn)
 
     conn.sendEvent('chat:start', { id: connectionId })
