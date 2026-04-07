@@ -643,7 +643,7 @@ export class SemanticCodeAnalyzer {
     }
 
     // Type usage
-    const typeUsages = [...code.matchAll(/:\s*([A-Z]\w+)(?:\s*[<\[|,;)\n])/g)]
+    const typeUsages = [...code.matchAll(/:\s*([A-Z]\w+)(?:\s*[<[|,;)\n])/g)]
     const seenTypes = new Set<string>()
     for (const tu of typeUsages) {
       const name = tu[1]

@@ -142,7 +142,7 @@ const LANGUAGE_SIGNATURES: LanguageSignature[] = [
   {
     language: 'scala',
     keywords: ['def', 'val', 'var', 'object', 'trait', 'case class', 'implicit'],
-    patterns: [/def\s+\w+[\[(]/, /case\s+class/, /object\s+\w+/, /implicit\s+/],
+    patterns: [/def\s+\w+[[(]/, /case\s+class/, /object\s+\w+/, /implicit\s+/],
     weight: 1.0,
   },
   {

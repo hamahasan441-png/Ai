@@ -987,7 +987,7 @@ export class DevBrain implements BrainInterface {
     const templates: Record<string, string> = {
       typescript: `// ${topic}\n// TODO: Implement your solution here\n\nexport function solve(input: unknown): unknown {\n  // Your code here\n  throw new Error('Not implemented')\n}\n`,
       javascript: `// ${topic}\n// TODO: Implement your solution here\n\nfunction solve(input) {\n  // Your code here\n  throw new Error('Not implemented')\n}\n\nmodule.exports = { solve }\n`,
-      python: `# ${topic}\n# TODO: Implement your solution here\n\ndef solve(input):\n    \"\"\"Your solution here.\"\"\"\n    raise NotImplementedError()\n`,
+      python: `# ${topic}\n# TODO: Implement your solution here\n\ndef solve(input):\n    """Your solution here."""\n    raise NotImplementedError()\n`,
       rust: `// ${topic}\n// TODO: Implement your solution here\n\npub fn solve(input: &str) -> String {\n    todo!()\n}\n`,
       go: `package main\n\n// ${topic}\n// TODO: Implement your solution here\n\nfunc solve(input string) string {\n\tpanic("not implemented")\n}\n`,
       java: `// ${topic}\n// TODO: Implement your solution here\n\npublic class Solution {\n    public static Object solve(Object input) {\n        throw new UnsupportedOperationException("Not implemented");\n    }\n}\n`,
@@ -1000,7 +1000,7 @@ export class DevBrain implements BrainInterface {
     const templates: Record<string, string> = {
       typescript: `// ${topic} — Reference Solution\n\nexport function solve(input: unknown): unknown {\n  // Reference implementation\n  return input\n}\n`,
       javascript: `// ${topic} — Reference Solution\n\nfunction solve(input) {\n  // Reference implementation\n  return input\n}\n\nmodule.exports = { solve }\n`,
-      python: `# ${topic} — Reference Solution\n\ndef solve(input):\n    \"\"\"Reference implementation.\"\"\"\n    return input\n`,
+      python: `# ${topic} — Reference Solution\n\ndef solve(input):\n    """Reference implementation."""\n    return input\n`,
       rust: `// ${topic} — Reference Solution\n\npub fn solve(input: &str) -> String {\n    input.to_string()\n}\n`,
       go: `package main\n\n// ${topic} — Reference Solution\n\nfunc solve(input string) string {\n\treturn input\n}\n`,
       java: `// ${topic} — Reference Solution\n\npublic class Solution {\n    public static Object solve(Object input) {\n        return input;\n    }\n}\n`,
