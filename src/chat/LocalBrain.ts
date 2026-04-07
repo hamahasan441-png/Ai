@@ -3413,50 +3413,55 @@ function buildResponse(
   conversationHistory: ApiMessage[],
   creativity: number,
 ): string {
+  // Check learned patterns
+  const matchedPattern = findBestLearnedPattern(message, learnedPatterns)
+
   // Build from knowledge base
   if (knowledgeResults.length > 0) {
     const topResult = knowledgeResults[0]!
 
-    // Very strong KB match (high precision multi-keyword match) — always prefer KB
-    if (topResult.score >= 8) {
-      let response = topResult.entry.content
-
-      // If multiple strong results, combine them (only from different categories)
-      if (knowledgeResults.length > 1 && knowledgeResults[1]!.score >= topResult.score * 0.6) {
-        const additional = knowledgeResults[1]!.entry.content
-        if (knowledgeResults[1]!.entry.category !== topResult.entry.category) {
-          response += '\n\n' + additional
+    // If KB has a very strong match, prefer it over learned patterns
+    // This handles keyword collision resolution where the KB entry is clearly the right answer
+    if (topResult.score >= 3) {
+      // If we also have a learned pattern, check if KB is significantly more specific
+      if (matchedPattern && matchedPattern.confidence >= 0.7) {
+        // Count how many query keywords are exact-matched by the KB entry keywords
+        const msgKeywords = extractKeywords(message)
+        const kbExactMatches = msgKeywords.filter(kw =>
+          topResult.entry.keywords.some(ek => ek === kw)
+        ).length
+        const patternExactMatches = msgKeywords.filter(kw =>
+          matchedPattern.keywords.some(pk => pk === kw)
+        ).length
+        // KB wins if it has more exact keyword matches than the learned pattern
+        if (kbExactMatches > patternExactMatches) {
+          let response = topResult.entry.content
+          if (knowledgeResults.length > 1 && knowledgeResults[1]!.score >= 2) {
+            const additional = knowledgeResults[1]!.entry.content
+            if (knowledgeResults[1]!.entry.category !== topResult.entry.category) {
+              response += '\n\n' + additional
+            }
+          }
+          return response
         }
+        // Otherwise, learned pattern wins (it's from a previous successful interaction)
+        return matchedPattern.response
       }
 
-      return response
-    }
-  }
-
-  // Check learned patterns (self-learning has priority for weaker KB matches)
-  const matchedPattern = findBestLearnedPattern(message, learnedPatterns)
-  if (matchedPattern && matchedPattern.confidence >= 0.7) {
-    return matchedPattern.response
-  }
-
-  // Build from knowledge base
-  if (knowledgeResults.length > 0) {
-    const topResult = knowledgeResults[0]!
-
-    // If high score, use the knowledge directly
-    if (topResult.score >= 3) {
+      // No competing learned pattern — use KB directly
       let response = topResult.entry.content
-
-      // If multiple strong results, combine them
       if (knowledgeResults.length > 1 && knowledgeResults[1]!.score >= 2) {
         const additional = knowledgeResults[1]!.entry.content
-        // Only add if from different category to avoid repetition
         if (knowledgeResults[1]!.entry.category !== topResult.entry.category) {
           response += '\n\n' + additional
         }
       }
-
       return response
+    }
+
+    // For weaker KB matches, prefer learned patterns
+    if (matchedPattern && matchedPattern.confidence >= 0.7) {
+      return matchedPattern.response
     }
 
     // Medium score — use knowledge but indicate uncertainty
