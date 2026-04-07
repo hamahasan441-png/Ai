@@ -208,6 +208,8 @@ export type {
   ConversationSummary,
   FollowUpSuggestion,
   ConversationCheckpoint,
+  ConversationSentiment,
+  SmartSuggestion,
 } from './ConversationEngine.js'
 
 export type {
