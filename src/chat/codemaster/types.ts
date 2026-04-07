@@ -23,6 +23,7 @@ export type AnalysisLanguage =
   | 'kotlin' | 'ruby' | 'php' | 'html' | 'css'
   | 'sql' | 'bash' | 'powershell' | 'r' | 'dart'
   | 'scala' | 'lua' | 'haskell' | 'elixir'
+  | 'mql4' | 'mql5' | 'pinescript'
   | 'unknown'
 
 /** Complexity metrics for code analysis. */

@@ -582,6 +582,54 @@ export type {
   MarketRegime,
 } from './TradingEngine.js'
 
+// ── Trading Strategy Analyzer — MQL4/MQL5/PineScript strategy analysis ──
+export { TradingStrategyAnalyzer } from './TradingStrategyAnalyzer.js'
+
+export type {
+  TradingLanguage,
+  StrategyPattern,
+  StrategyIssue,
+  RiskAssessment,
+  CodeQualityResult,
+  PerformanceResult,
+  BacktestQuality,
+  StrategyAnalysis,
+  TradingStrategyAnalyzerConfig,
+  TradingStrategyAnalyzerStats,
+} from './TradingStrategyAnalyzer.js'
+
+// ── MQL Code Fixer — MQL4/MQL5 error handler, code fixer, migration helper ──
+export { MQLCodeFixer } from './MQLCodeFixer.js'
+
+export type {
+  MQLVersion,
+  ErrorCategory as MQLErrorCategory,
+  FixDifficulty,
+  MQLErrorInfo,
+  CompilationError,
+  CodeFixSuggestion,
+  MigrationMapping,
+  ErrorHandlerTemplate,
+  MQLCodeFixerConfig,
+  MQLCodeFixerStats,
+} from './MQLCodeFixer.js'
+
+// ── Chart Pattern Engine — candlestick & chart pattern recognition, S/R, Fibonacci ──
+export { ChartPatternEngine } from './ChartPatternEngine.js'
+
+export type {
+  Candle,
+  CandlestickPatternType,
+  ChartPatternType,
+  CandlestickPattern,
+  ChartPattern as ChartPatternResult,
+  SupportResistanceLevel,
+  FibonacciLevel,
+  TradeSignal as ChartTradeSignal,
+  ChartPatternEngineConfig,
+  ChartPatternEngineStats,
+} from './ChartPatternEngine.js'
+
 // ── Decision Engine — Multi-criteria decision making, Bayesian inference, game theory ──
 export { DecisionEngine } from './DecisionEngine.js'
 

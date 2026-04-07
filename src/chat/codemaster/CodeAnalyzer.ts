@@ -181,6 +181,24 @@ const LANGUAGE_SIGNATURES: LanguageSignature[] = [
     patterns: [/defmodule\s+\w+/, /def\s+\w+/, /\|>/, /@spec\s/],
     weight: 1.0,
   },
+  {
+    language: 'mql4',
+    keywords: ['#property', 'extern', 'datetime', 'OrderSend', 'OrderClose', 'OrderModify', 'iMA', 'iRSI'],
+    patterns: [/int\s+(?:init|start|deinit)\s*\(\)/, /OrderSend\s*\(/, /iMA\s*\(/, /#property\s+(?:indicator|script|copyright)/],
+    weight: 1.2,
+  },
+  {
+    language: 'mql5',
+    keywords: ['#property', 'input', 'datetime', 'CTrade', 'CPositionInfo', 'OnInit', 'OnTick', 'OnDeinit'],
+    patterns: [/int\s+OnInit\s*\(\)/, /void\s+OnTick\s*\(\)/, /void\s+OnDeinit\s*\(/, /#property\s+(?:indicator|script|copyright)/],
+    weight: 1.3,
+  },
+  {
+    language: 'pinescript',
+    keywords: ['//@version', 'strategy', 'indicator', 'plot', 'ta.sma', 'ta.ema', 'ta.rsi', 'ta.crossover'],
+    patterns: [/\/\/@version\s*=\s*\d+/, /strategy\s*\(/, /indicator\s*\(/, /ta\.\w+\s*\(/],
+    weight: 1.3,
+  },
 ]
 
 /**

@@ -9,14 +9,14 @@ describe('MultiLanguageSupport constructor', () => {
     expect(mls).toBeInstanceOf(MultiLanguageSupport)
   })
 
-  it('has all 24 languages after construction', () => {
+  it('has all 27 languages after construction', () => {
     const mls = new MultiLanguageSupport()
-    expect(mls.getSupportedLanguages()).toHaveLength(24)
+    expect(mls.getSupportedLanguages()).toHaveLength(27)
   })
 
-  it('getLanguageCount returns 24', () => {
+  it('getLanguageCount returns 27', () => {
     const mls = new MultiLanguageSupport()
-    expect(mls.getLanguageCount()).toBe(24)
+    expect(mls.getLanguageCount()).toBe(27)
   })
 })
 
@@ -29,8 +29,8 @@ describe('MultiLanguageSupport getSupportedLanguages', () => {
     mls = new MultiLanguageSupport()
   })
 
-  it('returns an array of 24 languages', () => {
-    expect(mls.getSupportedLanguages()).toHaveLength(24)
+  it('returns an array of 27 languages', () => {
+    expect(mls.getSupportedLanguages()).toHaveLength(27)
   })
 
   it('includes typescript', () => {
@@ -411,7 +411,7 @@ describe('MultiLanguageSupport isSupported', () => {
     expect(mls.isSupported('python')).toBe(true)
   })
 
-  it('returns true for all 24 supported languages', () => {
+  it('returns true for all 27 supported languages', () => {
     const langs = mls.getSupportedLanguages()
     for (const lang of langs) {
       expect(mls.isSupported(lang)).toBe(true)
@@ -466,9 +466,9 @@ describe('MultiLanguageSupport getCapabilitiesSummary', () => {
     mls = new MultiLanguageSupport()
   })
 
-  it('returns a string mentioning 24 languages', () => {
+  it('returns a string mentioning 27 languages', () => {
     const summary = mls.getCapabilitiesSummary()
-    expect(summary).toContain('24')
+    expect(summary).toContain('27')
   })
 
   it('contains display names of languages', () => {
