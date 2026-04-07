@@ -1,6 +1,6 @@
 {
   "name": "ai",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "**1,900+ source files · 40+ modules · 39 tools · 50+ commands — ALL connected into one AI.** Now with Auth/RBAC, REST API Server, Database Abstraction, Config Validation, and enhanced CI/CD.",
   "main": "src/chat/index.ts",
   "bin": {

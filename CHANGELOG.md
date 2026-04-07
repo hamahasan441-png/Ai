@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-04-07
+
+### Added
+- **OpenAPI/Swagger Specification** (`src/api/openapi.ts`) — Auto-generated OpenAPI 3.0.3 spec, Swagger UI at `/api/v1/docs` (80 tests)
+- **Multi-Model LLM Provider** (`src/services/llmProvider/`) — Unified interface for Claude, OpenAI, Ollama with model routing and cost estimation (53 tests)
+- **Error Recovery & Checkpointing** (`src/services/recovery/`) — Checkpoint manager, graceful degradation, dead letter queue (54 tests)
+- **SSE Streaming** (`src/api/streaming.ts`) — Server-Sent Events, connection manager, event bus (51 tests)
+- **Workflow/Pipeline Engine** (`src/services/workflow/`) — DAG execution, conditions, parallel steps, built-in templates (51 tests)
+- **Architecture Documentation** (`docs/`) — ARCHITECTURE.md, API_REFERENCE.md, PLUGIN_GUIDE.md
+
 ## [2.3.0] - 2026-04-07
 
 ### Added
