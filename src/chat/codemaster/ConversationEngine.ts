@@ -81,6 +81,8 @@ export interface ConversationState {
   lastMessageAt: string
   /** Total token estimate. */
   tokenEstimate: number
+  /** Topics discussed across conversation turns. */
+  topics: Set<string>
 }
 
 /** A conversation summary for context compression. */
@@ -121,6 +123,21 @@ export interface ConversationCheckpoint {
   timestamp: string
 }
 
+/** Sentiment detected in conversation messages. */
+export type ConversationSentiment = 'positive' | 'neutral' | 'frustrated' | 'confused' | 'curious'
+
+/** A smart response suggestion generated from conversation context. */
+export interface SmartSuggestion {
+  /** Suggested text. */
+  text: string
+  /** Type of suggestion. */
+  type: 'action' | 'question' | 'explanation' | 'code'
+  /** Confidence score (0-1). */
+  confidence: number
+  /** Reason for this suggestion. */
+  reason: string
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // INTENT DETECTION
 // ══════════════════════════════════════════════════════════════════════════════
@@ -140,6 +157,87 @@ const INTENT_KEYWORDS: IntentKeyword[] = [
   { intent: 'documentation', keywords: ['document', 'docs', 'readme', 'comment', 'explain', 'describe', 'jsdoc'], weight: 0.8 },
   { intent: 'security', keywords: ['security', 'vulnerability', 'auth', 'permission', 'encrypt', 'sanitize', 'xss', 'injection'], weight: 1.1 },
 ]
+
+const TOPIC_KEYWORDS: Record<string, string[]> = {
+  programming: ['code', 'function', 'variable', 'class', 'method', 'programming', 'syntax'],
+  databases: ['database', 'sql', 'query', 'table', 'schema', 'postgres', 'mysql', 'mongo', 'redis'],
+  security: ['security', 'auth', 'encrypt', 'vulnerability', 'xss', 'injection', 'csrf', 'token'],
+  testing: ['test', 'spec', 'assert', 'mock', 'coverage', 'unit test', 'integration test'],
+  deployment: ['deploy', 'ci/cd', 'pipeline', 'docker', 'kubernetes', 'release', 'staging'],
+  architecture: ['architecture', 'microservice', 'monolith', 'pattern', 'solid', 'layer', 'module'],
+  debugging: ['debug', 'breakpoint', 'stack trace', 'log', 'error', 'exception'],
+  performance: ['performance', 'optimize', 'cache', 'latency', 'throughput', 'benchmark', 'profil'],
+  documentation: ['document', 'readme', 'jsdoc', 'comment', 'api doc', 'wiki'],
+  devops: ['devops', 'terraform', 'ansible', 'jenkins', 'github actions', 'ci', 'cd', 'infrastructure'],
+  'ai/ml': ['machine learning', 'neural', 'model', 'training', 'tensor', 'nlp'],
+  networking: ['network', 'http', 'tcp', 'websocket', 'dns', 'proxy', 'load balancer'],
+  mobile: ['mobile', 'ios', 'android', 'react native', 'flutter'],
+  web: ['web', 'html', 'css', 'browser', 'dom', 'frontend', 'spa', 'ssr'],
+  cloud: ['cloud', 'aws', 'azure', 'gcp', 'lambda', 's3', 'serverless'],
+  api: ['api', 'rest', 'graphql', 'endpoint', 'request', 'response', 'grpc'],
+  'design-patterns': ['singleton', 'factory', 'observer', 'strategy', 'decorator', 'adapter'],
+  algorithms: ['algorithm', 'sort', 'search', 'graph', 'tree', 'dynamic programming', 'recursion'],
+  'data-structures': ['array', 'linked list', 'hash map', 'stack', 'queue', 'heap', 'trie'],
+  concurrency: ['async', 'await', 'thread', 'mutex', 'concurrent', 'parallel', 'race condition', 'promise'],
+}
+
+const EXPERTISE_PATTERNS: Record<string, Record<string, string[]>> = {
+  languages: {
+    typescript: ['typescript', '.ts', '.tsx'],
+    javascript: ['javascript', '.js', '.jsx', 'node', 'npm'],
+    python: ['python', '.py', 'pip', 'django', 'flask'],
+    rust: ['rust', '.rs', 'cargo'],
+    go: ['golang', '.go', 'go mod'],
+    java: ['java', '.java', 'maven', 'gradle'],
+    csharp: ['c#', '.cs', 'dotnet', '.net'],
+    ruby: ['ruby', '.rb', 'rails', 'gem'],
+    php: ['php', '.php', 'laravel', 'composer'],
+    swift: ['swift', '.swift', 'xcode'],
+    kotlin: ['kotlin', '.kt'],
+    sql: ['sql', '.sql'],
+  },
+  frameworks: {
+    react: ['react', 'jsx', 'tsx', 'next.js', 'nextjs'],
+    vue: ['vue', 'vuex', 'nuxt'],
+    angular: ['angular'],
+    express: ['express', 'middleware'],
+    django: ['django'],
+    flask: ['flask'],
+    spring: ['spring', 'spring boot'],
+    rails: ['rails', 'ruby on rails'],
+    svelte: ['svelte', 'sveltekit'],
+  },
+  tools: {
+    docker: ['docker', 'container', 'dockerfile'],
+    git: ['git', 'commit', 'branch', 'merge', 'rebase'],
+    webpack: ['webpack', 'bundle'],
+    vite: ['vite'],
+    jest: ['jest'],
+    vitest: ['vitest'],
+    eslint: ['eslint', 'lint'],
+    kubernetes: ['kubernetes', 'k8s', 'kubectl'],
+    terraform: ['terraform'],
+  },
+}
+
+const SENTIMENT_KEYWORDS: Record<ConversationSentiment, string[]> = {
+  frustrated: ['not working', 'broken', 'stuck', 'error again'],
+  positive: ['thanks', 'great', 'perfect', 'awesome', 'works', 'nice'],
+  curious: ['how', 'what', 'explain', 'tell me', 'show me'],
+  confused: ["don't understand", 'unclear', 'confused', 'what do you mean', 'lost'],
+  neutral: [],
+}
+
+// Understanding score weights (sum to 1.0)
+const UNDERSTANDING_WEIGHTS = {
+  intentClarity: 0.3,
+  codeRefDensity: 0.25,
+  topicConsistency: 0.25,
+  sentimentTracking: 0.2,
+}
+
+// Expect at least 1 topic per 2 user messages for full topic consistency score
+const TOPIC_TO_MESSAGE_RATIO = 0.5
 
 // ══════════════════════════════════════════════════════════════════════════════
 // HELPERS
@@ -175,6 +273,7 @@ export class ConversationEngine {
   private checkpoints: ConversationCheckpoint[] = []
   private maxMessages: number
   private maxTokens: number
+  private contextMemory: Map<string, string> = new Map()
 
   constructor(options?: { title?: string; maxMessages?: number; maxTokens?: number }) {
     this.maxMessages = options?.maxMessages ?? 200
@@ -191,6 +290,7 @@ export class ConversationEngine {
       createdAt: new Date().toISOString(),
       lastMessageAt: new Date().toISOString(),
       tokenEstimate: 0,
+      topics: new Set(),
     }
   }
 
@@ -200,6 +300,24 @@ export class ConversationEngine {
   addUserMessage(content: string, metadata?: Record<string, unknown>): ConversationMessage {
     const codeRefs = this.extractCodeReferences(content)
     const intent = this.detectIntent(content)
+    const sentiment = this.analyzeSentiment(content)
+    const topics = this.extractTopics(content)
+
+    for (const topic of topics) {
+      this.state.topics.add(topic)
+    }
+
+    // Auto-remember recurring topics and language preference
+    if (topics.length > 0) {
+      this.contextMemory.set('recent_topics', topics.join(', '))
+    }
+    const langMentions = ['typescript', 'javascript', 'python', 'rust', 'go', 'java']
+    for (const lang of langMentions) {
+      if (content.toLowerCase().includes(lang)) {
+        this.contextMemory.set('language_preference', lang)
+        break
+      }
+    }
 
     const message: ConversationMessage = {
       id: generateMessageId(),
@@ -209,7 +327,7 @@ export class ConversationEngine {
       codeRefs,
       intent: intent ?? undefined,
       summarized: false,
-      metadata,
+      metadata: { ...metadata, sentiment },
     }
 
     this.state.messages.push(message)
@@ -336,7 +454,7 @@ export class ConversationEngine {
    * Get the current conversation state.
    */
   getState(): ConversationState {
-    return { ...this.state, mentionedFiles: new Set(this.state.mentionedFiles), mentionedSymbols: new Set(this.state.mentionedSymbols) }
+    return { ...this.state, mentionedFiles: new Set(this.state.mentionedFiles), mentionedSymbols: new Set(this.state.mentionedSymbols), topics: new Set(this.state.topics) }
   }
 
   /**
@@ -473,6 +591,7 @@ export class ConversationEngine {
         createdAt: this.state.createdAt,
         lastMessageAt: this.state.lastMessageAt,
         tokenEstimate: this.state.tokenEstimate,
+        topics: new Set(this.state.topics),
       },
       timestamp: new Date().toISOString(),
     }
@@ -498,6 +617,7 @@ export class ConversationEngine {
     this.state.completedTasks = [...checkpoint.state.completedTasks]
     this.state.pendingTasks = [...checkpoint.state.pendingTasks]
     this.state.tokenEstimate = checkpoint.state.tokenEstimate
+    this.state.topics = new Set(checkpoint.state.topics)
 
     // Remove checkpoints after this one
     const idx = this.checkpoints.indexOf(checkpoint)
@@ -595,8 +715,227 @@ export class ConversationEngine {
       createdAt: new Date().toISOString(),
       lastMessageAt: new Date().toISOString(),
       tokenEstimate: 0,
+      topics: new Set(),
     }
     this.checkpoints = []
+    this.contextMemory.clear()
+  }
+
+  // ── Sentiment Awareness ──
+
+  /**
+   * Analyze sentiment/mood of a message.
+   */
+  analyzeSentiment(content: string): ConversationSentiment {
+    const lower = content.toLowerCase()
+
+    let frustratedScore = 0
+    let positiveScore = 0
+    let curiousScore = 0
+    let confusedScore = 0
+
+    for (const kw of SENTIMENT_KEYWORDS.frustrated) { if (lower.includes(kw)) frustratedScore++ }
+    for (const kw of SENTIMENT_KEYWORDS.positive) { if (lower.includes(kw)) positiveScore++ }
+    for (const kw of SENTIMENT_KEYWORDS.curious) { if (lower.includes(kw)) curiousScore++ }
+    for (const kw of SENTIMENT_KEYWORDS.confused) { if (lower.includes(kw)) confusedScore++ }
+
+    if (frustratedScore > 0 && frustratedScore >= confusedScore) return 'frustrated'
+    if (confusedScore > 0) return 'confused'
+    if (positiveScore > 0 && positiveScore >= curiousScore) return 'positive'
+    if (curiousScore > 0) return 'curious'
+
+    return 'neutral'
+  }
+
+  // ── Smart Response Suggestions ──
+
+  /**
+   * Generate context-aware smart suggestions based on sentiment, intent, and topics.
+   */
+  generateSmartSuggestions(): SmartSuggestion[] {
+    const suggestions: SmartSuggestion[] = []
+    const msgs = this.state.messages
+    const lastUserMsg = [...msgs].reverse().find(m => m.role === 'user')
+
+    if (!lastUserMsg) return suggestions
+
+    const sentiment = this.analyzeSentiment(lastUserMsg.content)
+    const intent = this.state.currentIntent
+    const topics = [...this.state.topics]
+
+    if (sentiment === 'frustrated') {
+      suggestions.push({
+        text: 'Let me help debug this step by step',
+        type: 'action',
+        confidence: 0.9,
+        reason: 'User appears frustrated — offering structured debugging help',
+      })
+      suggestions.push({
+        text: 'Can you share the exact error message?',
+        type: 'question',
+        confidence: 0.85,
+        reason: 'Gathering specific error details to provide targeted help',
+      })
+    }
+
+    if (sentiment === 'confused') {
+      suggestions.push({
+        text: 'Let me break this down into simpler concepts',
+        type: 'explanation',
+        confidence: 0.9,
+        reason: 'User seems confused — simplifying explanation',
+      })
+      suggestions.push({
+        text: 'Here is a minimal example to illustrate',
+        type: 'code',
+        confidence: 0.8,
+        reason: 'Providing concrete code example for clarity',
+      })
+    }
+
+    if (sentiment === 'curious') {
+      suggestions.push({
+        text: 'Would you like a deeper dive into this topic?',
+        type: 'question',
+        confidence: 0.8,
+        reason: 'User is curious — offering deeper exploration',
+      })
+      if (topics.length > 0) {
+        suggestions.push({
+          text: `Related topics you might explore: ${topics.slice(0, 3).join(', ')}`,
+          type: 'explanation',
+          confidence: 0.7,
+          reason: 'Suggesting related topics based on conversation',
+        })
+      }
+    }
+
+    if (intent === 'new-feature' || intent === 'fix-bug') {
+      suggestions.push({
+        text: 'Shall I suggest tests for this change?',
+        type: 'action',
+        confidence: 0.85,
+        reason: 'Building/fixing code — testing is a logical next step',
+      })
+      suggestions.push({
+        text: 'Should we document this change?',
+        type: 'action',
+        confidence: 0.6,
+        reason: 'Code changes benefit from documentation',
+      })
+    }
+
+    if (sentiment === 'positive') {
+      suggestions.push({
+        text: 'Would you like to tackle the next task?',
+        type: 'action',
+        confidence: 0.75,
+        reason: 'User is positive — momentum for next steps',
+      })
+    }
+
+    suggestions.sort((a, b) => b.confidence - a.confidence)
+    return suggestions.slice(0, 5)
+  }
+
+  // ── Contextual Memory ──
+
+  /**
+   * Store a key-value fact in contextual memory.
+   */
+  remember(key: string, value: string): void {
+    this.contextMemory.set(key, value)
+  }
+
+  /**
+   * Recall a fact from contextual memory.
+   */
+  recall(key: string): string | undefined {
+    return this.contextMemory.get(key)
+  }
+
+  /**
+   * Get all stored memory as a plain object.
+   */
+  getMemoryContext(): Record<string, string> {
+    return Object.fromEntries(this.contextMemory)
+  }
+
+  // ── Understanding Score ──
+
+  /**
+   * Rate how well the engine understands the current conversation (0-100).
+   */
+  getUnderstandingScore(): { score: number; breakdown: Record<string, number> } {
+    const msgs = this.state.messages
+    const userMsgs = msgs.filter(m => m.role === 'user')
+
+    const intentClarity = userMsgs.length > 0
+      ? Math.round((userMsgs.filter(m => m.intent).length / userMsgs.length) * 100)
+      : 0
+
+    const codeRefDensity = msgs.length > 0
+      ? Math.round((msgs.filter(m => m.codeRefs.length > 0).length / msgs.length) * 100)
+      : 0
+
+    const topicConsistency = userMsgs.length > 0
+      ? Math.round(Math.min(this.state.topics.size / Math.max(userMsgs.length * TOPIC_TO_MESSAGE_RATIO, 1), 1) * 100)
+      : 0
+
+    let sentimentTracking = 0
+    if (userMsgs.length > 0) {
+      const withSentiment = userMsgs.filter(m =>
+        m.metadata?.sentiment && m.metadata.sentiment !== 'neutral',
+      )
+      sentimentTracking = Math.round((withSentiment.length / userMsgs.length) * 100)
+    }
+
+    const breakdown: Record<string, number> = {
+      intentClarity,
+      codeRefDensity,
+      topicConsistency,
+      sentimentTracking,
+    }
+
+    const score = Math.round(
+      intentClarity * UNDERSTANDING_WEIGHTS.intentClarity +
+      codeRefDensity * UNDERSTANDING_WEIGHTS.codeRefDensity +
+      topicConsistency * UNDERSTANDING_WEIGHTS.topicConsistency +
+      sentimentTracking * UNDERSTANDING_WEIGHTS.sentimentTracking,
+    )
+
+    return { score: Math.min(score, 100), breakdown }
+  }
+
+  // ── Language Expertise Detection ──
+
+  /**
+   * Detect languages, frameworks, and tools discussed in the conversation.
+   */
+  getDetectedExpertise(): { languages: string[]; frameworks: string[]; tools: string[] } {
+    const allContent = this.state.messages.map(m => m.content).join(' ').toLowerCase()
+
+    const detected: { languages: string[]; frameworks: string[]; tools: string[] } = {
+      languages: [],
+      frameworks: [],
+      tools: [],
+    }
+
+    for (const [category, entries] of Object.entries(EXPERTISE_PATTERNS)) {
+      for (const [name, keywords] of Object.entries(entries)) {
+        for (const kw of keywords) {
+          if (allContent.includes(kw)) {
+            const list = detected[category as keyof typeof detected]
+            if (!list.includes(name)) {
+              list.push(name)
+            }
+            break
+          }
+        }
+      }
+    }
+
+    return detected
   }
 
   // ── Private helpers ──
@@ -651,5 +990,19 @@ export class ConversationEngine {
       (sum, m) => sum + estimateTokens(m.content),
       0,
     )
+  }
+
+  private extractTopics(content: string): string[] {
+    const lower = content.toLowerCase()
+    const found: string[] = []
+    for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
+      for (const kw of keywords) {
+        if (lower.includes(kw)) {
+          found.push(topic)
+          break
+        }
+      }
+    }
+    return found
   }
 }

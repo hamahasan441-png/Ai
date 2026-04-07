@@ -30,6 +30,7 @@ export { CodeGenerator } from './CodeGenerator.js'
 export { DiffEngine } from './DiffEngine.js'
 
 // ── Copilot-Agent-Level Sub-modules (Phase 2) ──
+export { MultiLanguageSupport } from './MultiLanguageSupport.js'
 export { CommandRunner } from './CommandRunner.js'
 export { FileNavigator } from './FileNavigator.js'
 export { ConversationEngine } from './ConversationEngine.js'
@@ -166,6 +167,16 @@ export type {
 
 // ── Copilot-Agent-Level Phase 2 Types ──
 export type {
+  LanguageProfile,
+  CommonFix,
+  SupportedLanguage,
+  WriteRequest,
+  WriteResult,
+  FixRequest,
+  FixResult as MultiLangFixResult,
+} from './MultiLanguageSupport.js'
+
+export type {
   ShellType,
   CommandCategory,
   CommandRisk,
@@ -197,6 +208,8 @@ export type {
   ConversationSummary,
   FollowUpSuggestion,
   ConversationCheckpoint,
+  ConversationSentiment,
+  SmartSuggestion,
 } from './ConversationEngine.js'
 
 export type {

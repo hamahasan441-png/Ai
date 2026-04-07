@@ -151,6 +151,36 @@ const LANGUAGE_SIGNATURES: LanguageSignature[] = [
     patterns: [/module\s+\w+/, /::\s*/, /\w+\s*=\s*do/, /import\s+qualified/],
     weight: 1.0,
   },
+  {
+    language: 'powershell',
+    keywords: ['$_', 'function', 'param', 'cmdlet', 'Write-Host', 'Get-', 'Set-'],
+    patterns: [/\$\w+\s*=/, /function\s+\w+-\w+/, /param\s*\(/, /Write-Host\s/],
+    weight: 1.0,
+  },
+  {
+    language: 'r',
+    keywords: ['library', 'function', '<-', 'data.frame', 'ggplot', 'mutate', 'filter'],
+    patterns: [/\w+\s*<-\s/, /library\s*\(/, /function\s*\(/, /data\.frame\s*\(/],
+    weight: 1.0,
+  },
+  {
+    language: 'dart',
+    keywords: ['void', 'class', 'final', 'var', 'Widget', 'setState', 'async', 'await'],
+    patterns: [/void\s+main\s*\(/, /class\s+\w+\s+extends/, /Widget\s+build/, /final\s+\w+\s*=/],
+    weight: 1.0,
+  },
+  {
+    language: 'lua',
+    keywords: ['function', 'local', 'end', 'then', 'require', 'table', 'nil'],
+    patterns: [/function\s+\w+\s*\(/, /local\s+\w+\s*=/, /if\s+.+\s+then/, /require\s*\(\s*["']/],
+    weight: 1.0,
+  },
+  {
+    language: 'elixir',
+    keywords: ['defmodule', 'def', 'defp', 'do', 'end', 'pipe', '|>'],
+    patterns: [/defmodule\s+\w+/, /def\s+\w+/, /\|>/, /@spec\s/],
+    weight: 1.0,
+  },
 ]
 
 /**
