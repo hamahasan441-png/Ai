@@ -22,3 +22,14 @@ export { ApiServer, ApiServerError } from './server.js'
 export type { ApiServerConfig } from './server.js'
 
 export { createApiRoutes } from './routes.js'
+
+export { generateOpenApiSpec, serveOpenApiSpec, serveSwaggerUi } from './openapi.js'
+export type {
+  OpenApiSpec,
+  OpenApiInfo,
+  OpenApiSchema,
+  OpenApiOperation,
+  OpenApiPathItem,
+  OpenApiComponents,
+  GenerateOpenApiOptions,
+} from './openapi.js'
