@@ -3495,5 +3495,32 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(quantTradingConcept, tradingPlatforms, 'related-to', 0.8)
   memory.addRelation(portfolioMgmtConcept, finTechPayments, 'related-to', 0.75)
 
+  // ── AI Toolkit / Image Generation / Diffusion Models concepts ─────────────────
+  const aiToolkitConcept = memory.addConcept('AI Toolkit & Diffusion Models', 'ai')
+  const imageGenConcept = memory.addConcept('Text-to-Image Generation', 'ai')
+  const fluxModelConcept = memory.addConcept('FLUX Models (Black Forest Labs)', 'ai')
+  const stableDiffusionConcept = memory.addConcept('Stable Diffusion (SD/SDXL)', 'ai')
+  const loraTrainingConcept = memory.addConcept('LoRA Training & Fine-Tuning', 'ai')
+  const videoGenAIConcept = memory.addConcept('AI Video Generation (Wan/LTX)', 'ai')
+  const imageEditAIConcept = memory.addConcept('AI Image Editing (Kontext/Qwen)', 'ai')
+  const diffusionSamplerConcept = memory.addConcept('Diffusion Samplers & Scheduling', 'ai')
+  const promptEngineeringGenConcept = memory.addConcept('Prompt Engineering for Image Gen', 'ai')
+  const modelExtractionConcept = memory.addConcept('Model Extraction & Merging', 'ai')
+  memory.addRelation(imageGenConcept, aiToolkitConcept, 'part-of', 0.95)
+  memory.addRelation(fluxModelConcept, imageGenConcept, 'part-of', 0.95)
+  memory.addRelation(stableDiffusionConcept, imageGenConcept, 'part-of', 0.95)
+  memory.addRelation(loraTrainingConcept, aiToolkitConcept, 'part-of', 0.95)
+  memory.addRelation(videoGenAIConcept, aiToolkitConcept, 'part-of', 0.9)
+  memory.addRelation(imageEditAIConcept, aiToolkitConcept, 'part-of', 0.9)
+  memory.addRelation(diffusionSamplerConcept, imageGenConcept, 'part-of', 0.85)
+  memory.addRelation(promptEngineeringGenConcept, imageGenConcept, 'part-of', 0.85)
+  memory.addRelation(modelExtractionConcept, aiToolkitConcept, 'part-of', 0.85)
+  memory.addRelation(loraTrainingConcept, fluxModelConcept, 'related-to', 0.9)
+  memory.addRelation(loraTrainingConcept, stableDiffusionConcept, 'related-to', 0.9)
+  memory.addRelation(promptEngineeringGenConcept, diffusionSamplerConcept, 'related-to', 0.85)
+  memory.addRelation(imageEditAIConcept, fluxModelConcept, 'related-to', 0.85)
+  memory.addRelation(modelExtractionConcept, loraTrainingConcept, 'related-to', 0.9)
+  memory.addRelation(aiToolkitConcept, computerVision, 'related-to', 0.8)
+
   return memory
 }
