@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-04-07
+
+### Added
+- **Authentication & Authorization Module** (`src/auth/`)
+  - Role-Based Access Control (RBAC) with 4 built-in roles (admin, user, viewer, plugin)
+  - Wildcard permission matching for admin role
+  - Dynamic role/permission management
+  - Session management with TTL, activity tracking, and auto-expiry
+  - API key management with SHA-256 hashing, rotation, and prefix extraction
+  - 62 unit tests
+- **REST/HTTP API Server** (`src/api/`)
+  - Lightweight HTTP server using Node.js built-in modules (zero dependencies)
+  - Pattern-based routing with `:param` support
+  - Middleware stack: CORS, security headers, request IDs, token-bucket rate limiter
+  - Health probes: `/health`, `/ready`, `/api/v1/version`
+  - Application routes for chat, brain, knowledge, plugins, config
+  - 76 unit tests
+- **Database Abstraction Layer** (`src/database/`)
+  - Unified interface over SQLite, PostgreSQL, MySQL, and in-memory
+  - In-memory database driver for testing and development
+  - Migration runner with up/down, version tracking, rollback
+  - Generic repository pattern with parameterized CRUD queries
+  - Transaction support with automatic rollback on error
+  - 81 unit tests
+- **Configuration Validation Module** (`src/utils/configValidation.ts`)
+  - Zod-inspired config validation for environment variables
+  - Type-safe schemas with coercion (string → number/boolean/enum)
+  - Complete application config schema for all env vars from .env.example
+  - Custom validators for URLs, ports, connection strings
+  - Non-throwing validation mode with collected errors
+  - 33 unit tests
+
+### Improved
+- **CI/CD Pipeline** (`.github/workflows/ci.yml`)
+  - Added coverage reporting with artifact uploads
+  - Added Docker image build validation
+  - Added security dependency audit
+  - Better job naming and dependencies
+- **Vitest Configuration** (`vitest.config.ts`)
+  - Added v8 coverage provider with lcov/json reporters
+  - Added coverage thresholds (statements, branches, functions, lines)
+  - Added file include/exclude patterns for accurate coverage
+
 ## [2.2.0] - 2026-04-07
 
 ### Added

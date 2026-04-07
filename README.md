@@ -1,6 +1,6 @@
 # 🤖 Ai — Complete Integrated AI System
 
-**1,886+ source files · 36+ modules · 39 tools · 50+ commands — ALL connected into one AI.**
+**1,900+ source files · 40+ modules · 39 tools · 50+ commands — ALL connected into one AI.**
 
 ## 🚀 Quick Installation
 
@@ -32,6 +32,111 @@ cd Ai
 npm install
 npm test
 ```
+
+## ✨ What's New in v2.3
+
+### 🔐 Authentication & Authorization (NEW)
+Unified auth module with RBAC, sessions, and API key management:
+```ts
+import { RBACManager, SessionManager, ApiKeyManager } from './auth/index.js'
+
+// Role-Based Access Control
+const rbac = new RBACManager()
+rbac.createRole('editor', [
+  { resource: 'knowledge', action: 'create' },
+  { resource: 'knowledge', action: 'update' },
+])
+rbac.hasPermission(['editor'], 'knowledge', 'create')  // true
+
+// Session Management
+const sessions = new SessionManager()
+const session = sessions.createSession('user-123', ['editor'], 3600000)
+sessions.validateSession(session.id)  // { valid: true, session: ... }
+
+// API Key Management
+const keys = new ApiKeyManager()
+const { key, apiKey } = keys.createKey('prod-api', ['user'])
+keys.validateKey(key)  // { valid: true, apiKey: ... }
+```
+- **4 built-in roles**: admin, user, viewer, plugin
+- **Wildcard permissions** for admin: `*` matches any resource/action
+- **Session TTL** with activity tracking and auto-expiry
+- **SHA-256 hashed** API keys with rotation support
+
+### 🌐 REST/HTTP API Server (NEW)
+Lightweight HTTP server built on Node.js built-in modules (zero dependencies):
+```ts
+import { ApiServer, Router, createApiRoutes } from './api/index.js'
+import { corsMiddleware, securityHeadersMiddleware, rateLimitMiddleware } from './api/index.js'
+
+const router = createApiRoutes()
+router.use(corsMiddleware({ origin: '*' }))
+router.use(securityHeadersMiddleware())
+router.use(rateLimitMiddleware({ windowMs: 60000, maxRequests: 100 }))
+
+const server = new ApiServer({ port: 3000, host: '0.0.0.0' }, router)
+await server.start()
+// GET /health → { status: 'ok', uptime: 123.45 }
+// GET /ready → { status: 'ready' }
+// POST /api/v1/chat → { response: '...' }
+```
+- **Pattern-based routing** with `:param` support
+- **Middleware stack**: CORS, security headers, rate limiting, request IDs
+- **Health probes**: `/health`, `/ready`, `/api/v1/version`
+- **Token bucket** rate limiter with per-IP tracking
+
+### 🗃️ Database Abstraction Layer (NEW)
+Unified database interface with migrations and repository pattern:
+```ts
+import { createConnection, MigrationRunner, Repository } from './database/index.js'
+
+// Connect to any supported database
+const db = await createConnection({ driver: 'memory' })
+
+// Run migrations
+const runner = new MigrationRunner(db)
+await runner.initialize()
+await runner.migrate([
+  { version: 1, name: 'create-users', up: 'CREATE TABLE users ...', down: 'DROP TABLE users' },
+])
+
+// Generic repository pattern
+const repo = new Repository(db, 'users', ['id', 'name', 'email'])
+await repo.create({ id: '1', name: 'Alice', email: 'alice@example.com' })
+const users = await repo.findAll({ orderBy: 'name', limit: 10 })
+```
+- **Unified interface** over SQLite, PostgreSQL, MySQL, and in-memory
+- **Migration runner** with up/down, version tracking, rollback
+- **Repository pattern** with parameterized queries
+- **Transaction support** with automatic rollback
+
+### ⚙️ Configuration Validation (NEW)
+Zod-inspired environment variable validation:
+```ts
+import { loadConfig, appConfigSchema, validateConfig } from './utils/configValidation.js'
+
+// Validate all env vars at startup (throws on errors)
+const config = loadConfig(appConfigSchema)
+config.nodeEnv       // 'development' | 'production' | 'test'
+config.serverPort    // number (validated range 1-65535)
+config.logLevel      // 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal'
+
+// Non-throwing validation
+const result = validateConfig(appConfigSchema)
+if (!result.valid) console.error(result.errors)
+```
+- **Type-safe schemas** for all environment variables
+- **Coercion** (string → number/boolean/enum)
+- **Friendly error messages** with all failures collected
+- **Custom validators** for URLs, ports, and more
+
+### 🔄 Enhanced CI/CD Pipeline (IMPROVED)
+- **Coverage reporting** with artifact uploads
+- **Docker build** validation on every PR
+- **Security audit** for dependency vulnerabilities
+- **Multi-node testing** (Node 18, 20, 22)
+
+---
 
 ## ✨ What's New in v2.2
 
