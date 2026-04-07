@@ -90,6 +90,25 @@ export { CodeFixer } from './codemaster/CodeFixer.js'
 export { ProblemDecomposer } from './codemaster/ProblemDecomposer.js'
 export { LearningEngine } from './codemaster/LearningEngine.js'
 
+// ══════════════════════════════════════════════════════════════════════════════
+// CODE AGENT — Smart coding engineer (file creation, scaffolding, exports)
+// ══════════════════════════════════════════════════════════════════════════════
+export { CodeAgent } from './CodeAgent.js'
+
+export type {
+  ProjectTemplate,
+  ScaffoldLanguage,
+  AgentFile,
+  ScaffoldResult,
+  CreateFileRequest,
+  CreateFileResult,
+  AddToFileRequest,
+  AddToFileResult,
+  ExportFromFileRequest,
+  CodeAgentConfig,
+  CodeAgentStats,
+} from './CodeAgent.js'
+
 export type {
   Severity,
   AnalysisLanguage,

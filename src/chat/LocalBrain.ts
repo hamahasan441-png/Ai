@@ -30,7 +30,6 @@ import type {
   ImageAnalysisRequest,
   ImageAnalysisResult,
   ProgrammingLanguage,
-  AiBrainConfig,
   ApiMessage,
   DocumentAnalysisInput,
   DocumentAnalysisOutput,
@@ -170,6 +169,19 @@ import { LogicalProofEngine } from './LogicalProofEngine.js'
 import { CreativeProblemSolver } from './CreativeProblemSolver.js'
 import { AdvancedSearchEngine } from './AdvancedSearchEngine.js'
 import type { SearchWithThinkingResult } from './AdvancedSearchEngine.js'
+
+// Smart coding agent
+import { CodeAgent } from './CodeAgent.js'
+import type {
+  ProjectTemplate,
+  ScaffoldLanguage,
+  ScaffoldResult,
+  CreateFileRequest,
+  CreateFileResult,
+  AddToFileRequest,
+  AddToFileResult,
+  ExportFromFileRequest,
+} from './CodeAgent.js'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -3413,7 +3425,7 @@ function buildResponse(
   knowledgeResults: KnowledgeSearchResult[],
   learnedPatterns: LearnedPattern[],
   conversationHistory: ApiMessage[],
-  creativity: number,
+  _creativity: number,
 ): string {
   // Check learned patterns
   const matchedPattern = findBestLearnedPattern(message, learnedPatterns)
@@ -3622,7 +3634,7 @@ function toCamelCase(phrase: string): string {
 
 /** Check if text appears to contain code. */
 function code_likeContent(text: string): boolean {
-  return /[\{\}\[\];]|=>|function\s|class\s|def\s|import\s|const\s|let\s|var\s/.test(text)
+  return /[{}[\];]|=>|function\s|class\s|def\s|import\s|const\s|let\s|var\s/.test(text)
 }
 
 /** Infer function parameters from description. */
@@ -4231,6 +4243,9 @@ export class LocalBrain {
   private creativeProblemSolver: CreativeProblemSolver | null = null
   private advancedSearchEngine: AdvancedSearchEngine | null = null
 
+  // Smart coding agent
+  private codeAgent: CodeAgent
+
   // Token budget management
   private tokenBudget: TokenBudgetManager
 
@@ -4399,6 +4414,9 @@ export class LocalBrain {
       )
     }
 
+    // Initialize CodeAgent (always available — no external deps)
+    this.codeAgent = new CodeAgent()
+
     const now = new Date().toISOString()
     this.stats = {
       totalChats: 0, totalCodeGenerations: 0, totalCodeReviews: 0,
@@ -4426,8 +4444,34 @@ export class LocalBrain {
     budgetExhausted?: boolean
     remainingTokens?: number
     usagePercent?: number
+    moduleFailures?: string[]
   }> {
     const start = Date.now()
+    const moduleFailures: string[] = []
+
+    // ── Input Validation ─────────────────────────────────────────────────────
+    if (typeof userMessage !== 'string') {
+      return {
+        text: '⚠️ Invalid input: message must be a string.',
+        usage: { inputTokens: 0, outputTokens: 10, cacheReadTokens: 0, cacheCreationTokens: 0 },
+        durationMs: Date.now() - start,
+      }
+    }
+    userMessage = userMessage.trim()
+    if (userMessage.length === 0) {
+      return {
+        text: "It looks like you sent an empty message. How can I help you?",
+        usage: { inputTokens: 0, outputTokens: 15, cacheReadTokens: 0, cacheCreationTokens: 0 },
+        durationMs: Date.now() - start,
+      }
+    }
+    if (userMessage.length > 100_000) {
+      return {
+        text: '⚠️ Message too long. Please keep messages under 100,000 characters.',
+        usage: { inputTokens: Math.ceil(userMessage.length / 4), outputTokens: 15, cacheReadTokens: 0, cacheCreationTokens: 0 },
+        durationMs: Date.now() - start,
+      }
+    }
 
     // ── Budget: handle continuation commands ─────────────────────────────────
     const lower = userMessage.trim().toLowerCase()
@@ -4586,7 +4630,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**Reasoning:**\n${stepsText}`
           }
         }
-      } catch { /* non-critical — continue without reasoning */ }
+      } catch (e) { moduleFailures.push('reasoningEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // CausalReasoner: for "why" questions
@@ -4599,7 +4643,7 @@ export class LocalBrain {
         if (inference && inference.strength > 0.2) {
           smartAugmentation += `\n\n**Causal Analysis:** ${inference.explanation ?? `Causal link strength: ${(inference.strength * 100).toFixed(0)}%`}`
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('causalReasoner: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // PlanningEngine: for "how to" / planning queries
@@ -4612,7 +4656,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**Plan:**\n${planText}`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('planningEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // CreativeEngine: for creative tasks (write, generate, create)
@@ -4625,7 +4669,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**Creative Insight:** ${bestIdea.description ?? bestIdea.title ?? ''}`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('creativeEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // AbstractionEngine: for concept explanation queries
@@ -4641,7 +4685,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**Concept:** ${desc}`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('abstractionEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // AnalogicalReasoner: for comparison/analogy queries
@@ -4651,7 +4695,7 @@ export class LocalBrain {
         if (analogy && analogy.explanation) {
           smartAugmentation += `\n\n**Analogy:** ${analogy.explanation}`
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('analogicalReasoner: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // KnowledgeSynthesizer: combine multiple knowledge sources
@@ -4673,7 +4717,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**Synthesized Insight:** ${insightText}`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('knowledgeSynthesizer: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // HypothesisEngine: for observation/explanation queries
@@ -4686,7 +4730,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**Hypothesis:** ${topH.statement} (confidence: ${(topH.confidence * 100).toFixed(0)}%)`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('hypothesisEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // EthicalReasoner: for ethical/moral dilemma queries
@@ -4699,7 +4743,7 @@ export class LocalBrain {
             smartAugmentation += `\n**Recommendation:** ${analysis.recommendation}`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('ethicalReasoner: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // TemporalReasoner: for time-based / sequence queries
@@ -4714,7 +4758,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**Temporal Insight:** ${cause} → ${effect} (event: ${topCausal.eventName})`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('temporalReasoner: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // ArgumentAnalyzer: for debate/argument/claim queries
@@ -4734,7 +4778,7 @@ export class LocalBrain {
             smartAugmentation += `\n**Bias Detection:** ${topBias.type} bias detected`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('argumentAnalyzer: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // NarrativeEngine: for story/explanation/walkthrough queries
@@ -4744,7 +4788,7 @@ export class LocalBrain {
         if (beat && beat.text) {
           smartAugmentation += `\n\n**Narrative:** ${beat.text}`
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('narrativeEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // CoreferenceResolver: resolve pronouns from conversation history
@@ -4758,7 +4802,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**Context Resolution:** "${topReplacement.pronoun}" refers to "${topReplacement.referent}"`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('coreferenceResolver: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // LanguageDetector: detect input language
@@ -4768,7 +4812,7 @@ export class LocalBrain {
         if (langResult.language !== 'en' && langResult.confidence > 0.6) {
           smartAugmentation += `\n\n**Language Detected:** ${langResult.language} (confidence: ${(langResult.confidence * 100).toFixed(0)}%)`
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('languageDetector: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // DialogueActRecognizer: classify user utterance type
@@ -4778,7 +4822,7 @@ export class LocalBrain {
         if (actResult.confidence > 0.7 && actResult.act !== 'question') {
           smartAugmentation += `\n\n**Dialogue Act:** ${actResult.act}${actResult.subType ? ` (${actResult.subType})` : ''}`
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('dialogueActRecognizer: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // QueryDecomposer: decompose complex questions
@@ -4789,7 +4833,7 @@ export class LocalBrain {
           const subQList = decomposition.subQuestions.map(sq => `• ${sq.question}`).join('\n')
           smartAugmentation += `\n\n**Query Decomposition** (${decomposition.strategy}):\n${subQList}`
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('queryDecomposer: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // CrossDomainTransfer: combine knowledge across domains
@@ -4802,7 +4846,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**Cross-Domain:** ${crossResult.primaryDomain} ↔ ${crossResult.secondaryDomains.join(', ')} (${crossResult.transferStrategy})`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('crossDomainTransfer: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // CounterfactualReasoner: handle "what if" scenarios
@@ -4816,7 +4860,7 @@ export class LocalBrain {
             smartAugmentation += `\nRisks: ${cfResult.risks[0]}`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('counterfactualReasoner: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // UserProfileModel: track user preferences and adapt
@@ -4824,14 +4868,14 @@ export class LocalBrain {
       try {
         const topDomain = knowledgeResults.length > 0 ? knowledgeResults[0]!.category : 'general'
         this.userProfileModel.updateFromInteraction(userMessage, topDomain)
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('userProfileModel: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // ConversationSummarizer: track conversation
     if (this.conversationSummarizer) {
       try {
         this.conversationSummarizer.addTurn('user', userMessage)
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('conversationSummarizer: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // Kurdish NLP: morphology, sentiment, translation for Kurdish queries
@@ -4843,7 +4887,7 @@ export class LocalBrain {
           if (sentimentResult.confidence > 0.3) {
             smartAugmentation += `\n\n**Kurdish Sentiment:** ${sentimentResult.label} (${sentimentResult.dominantEmotion}, confidence: ${(sentimentResult.confidence * 100).toFixed(0)}%)`
           }
-        } catch { /* non-critical */ }
+        } catch (e) { moduleFailures.push('kurdishSentiment: ' + (e instanceof Error ? e.message : String(e))) }
       }
 
       // Kurdish Morphological Analysis (for single-word or short Kurdish text queries)
@@ -4857,7 +4901,7 @@ export class LocalBrain {
           if (morphResults.length > 0) {
             smartAugmentation += `\n\n**Morphological Analysis:** ${morphResults.join('; ')}`
           }
-        } catch { /* non-critical */ }
+        } catch (e) { moduleFailures.push('kurdishMorphology: ' + (e instanceof Error ? e.message : String(e))) }
       }
 
       // Kurdish Translation Corpus — find relevant parallel sentences
@@ -4869,7 +4913,7 @@ export class LocalBrain {
             const top = translations[0]!
             smartAugmentation += `\n\n**Translation Example:** ${top.ckb} → ${top.eng}`
           }
-        } catch { /* non-critical */ }
+        } catch (e) { moduleFailures.push('kurdishCorpus: ' + (e instanceof Error ? e.message : String(e))) }
       }
     }
 
@@ -4894,7 +4938,7 @@ export class LocalBrain {
         if (formatDetection.recommendedFormat !== 'plain' && formatDetection.confidence > 0.6) {
           text = this.multiFormatGenerator.format(text, formatDetection.recommendedFormat)
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('multiFormatGenerator: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // ResponseQualityScorer: self-evaluate and flag low quality
@@ -4904,14 +4948,14 @@ export class LocalBrain {
         if (qualityScore.overall < 0.3 && qualityScore.flags.length > 0) {
           text += `\n\n*Note: This response may be incomplete. ${qualityScore.flags[0]}*`
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('responseQualityScorer: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // ConversationSummarizer: track assistant response
     if (this.conversationSummarizer) {
       try {
         this.conversationSummarizer.addTurn('assistant', text)
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('conversationSummarizer: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // AnomalyDetector: detect unusual query patterns
@@ -4921,7 +4965,7 @@ export class LocalBrain {
         if (anomalyResult.isAnomaly && anomalyResult.score > 0.5) {
           smartAugmentation += `\n\n**⚠ Pattern Note:** ${anomalyResult.description}`
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('anomalyDetector: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // EmotionalIntelligence: analyze emotional content and adapt
@@ -4934,7 +4978,7 @@ export class LocalBrain {
             text = empathyPrefix + '\n\n' + text
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('emotionalIntelligence: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // ContextualMemoryEngine: store interaction for contextual recall
@@ -4947,7 +4991,7 @@ export class LocalBrain {
           0.5,
           ['conversation']
         )
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('contextualMemoryEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // LogicalProofEngine: detect logical fallacies in queries
@@ -4958,7 +5002,7 @@ export class LocalBrain {
           const topFallacy = fallacyResult.fallacies[0]!
           smartAugmentation += `\n\n**🔍 Logic Note:** Potential ${topFallacy.name} detected — ${topFallacy.description}`
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('logicalProofEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // CreativeProblemSolver: suggest creative approaches for problem-solving queries
@@ -4973,7 +5017,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**💡 Creative Angles:**\n${ideas.map((idea, i) => `${i + 1}. ${idea}`).join('\n')}`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('creativeProblemSolver: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // AdvancedSearchEngine: multi-strategy search with thinking for search/find queries
@@ -5008,7 +5052,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**🔍 Advanced Search (${searchResult.strategiesUsed.length} strategies, ${(searchResult.confidence * 100).toFixed(0)}% confidence):**\n\n*Thinking process:*\n${thinkingReport}\n\n*Top results:*\n${topResults}`
           }
         }
-      } catch { /* non-critical */ }
+      } catch (e) { moduleFailures.push('advancedSearchEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // ── ConfidenceGate: quality control ──────────────────────────────────────
@@ -5124,6 +5168,7 @@ export class LocalBrain {
       usage: { inputTokens, outputTokens, cacheReadTokens: 0, cacheCreationTokens: 0 },
       durationMs,
       ...this.getBudgetFields(),
+      ...(moduleFailures.length > 0 ? { moduleFailures } : {}),
     }
   }
 
@@ -6128,7 +6173,7 @@ export class LocalBrain {
     userMessage: string,
     response: string,
     knowledgeResults: KnowledgeSearchResult[],
-    confidence: number,
+    _confidence: number,
   ): void {
     // Auto-reinforce from strong KB matches (only for non-trivial messages)
     if (knowledgeResults.length > 0 && knowledgeResults[0]!.score >= 3 && userMessage.trim().split(/\s+/).length >= 3) {
@@ -6214,6 +6259,52 @@ export class LocalBrain {
     this.stats.totalCodeGenerations++
     this.stats.lastUsedAt = new Date().toISOString()
     return generateCodeLocally(request)
+  }
+
+  // ── Smart Coding Agent — Engineer-like file creation and project scaffolding ──
+
+  /**
+   * Scaffold a complete project with files, configs, tests, and directory structure.
+   * Works like a smart engineer creating a project from scratch.
+   */
+  scaffoldProject(name: string, template: ProjectTemplate, language?: ScaffoldLanguage): ScaffoldResult {
+    this.stats.totalCodeGenerations++
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.codeAgent.scaffold(name, template, language)
+  }
+
+  /**
+   * Create a single file with smart code generation.
+   * Detects file type from path, generates imports/exports, links to existing files.
+   */
+  smartCreateFile(request: CreateFileRequest): CreateFileResult {
+    this.stats.totalCodeGenerations++
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.codeAgent.createFile(request)
+  }
+
+  /**
+   * Add code to an existing file at the specified position.
+   * Intelligently detects where to place new code.
+   */
+  smartAddToFile(request: AddToFileRequest): AddToFileResult {
+    this.stats.totalCodeGenerations++
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.codeAgent.addToFile(request)
+  }
+
+  /**
+   * Add an export statement for a symbol in a file.
+   * Handles named exports, default exports, and language-specific patterns.
+   */
+  smartAddExport(request: ExportFromFileRequest): string {
+    this.stats.lastUsedAt = new Date().toISOString()
+    return this.codeAgent.addExport(request)
+  }
+
+  /** Get available project templates. */
+  getProjectTemplates(): ProjectTemplate[] {
+    return this.codeAgent.getTemplates()
   }
 
   // ── Code Review (enhanced with CodeMaster deep analysis) ──
@@ -6568,8 +6659,8 @@ export class LocalBrain {
     }
     // Fallback: try to close open brackets
     else {
-      const opens = (before.match(/[\{\[\(]/g) ?? []).length
-      const closes = (before.match(/[\}\]\)]/g) ?? []).length
+      const opens = (before.match(/[{[(]/g) ?? []).length
+      const closes = (before.match(/[}\])]/g) ?? []).length
       if (opens > closes) {
         const diff = opens - closes
         const closers = before.lastIndexOf('{') > before.lastIndexOf('[') ? '}' : ']'
@@ -6754,7 +6845,7 @@ export class LocalBrain {
 
     // Step 2: Plan approach
     const knowledgeResults = searchKnowledge(this.knowledgeBase, keywords, 5)
-    const relevantKnowledge = knowledgeResults.map(r => r.entry.content).join('\n')
+    const _relevantKnowledge = knowledgeResults.map(r => r.entry.content).join('\n')
     steps.push({
       type: 'plan',
       description: 'Searching knowledge base and planning response',
@@ -6981,7 +7072,6 @@ export class LocalBrain {
 
     // Check for deep nesting
     let maxNesting = 0
-    let nestLevel = 0
     let maxNestLine = 0
     for (let i = 0; i < lines.length; i++) {
       const leadingSpaces = (lines[i]!.match(/^(\s*)/) ?? [''])[0]!.length
@@ -8263,5 +8353,255 @@ export class LocalBrain {
   /** Force save current state (for manual persistence). */
   save(): void {
     this.autoSave()
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // §  ENHANCED CHAT — Conversation persistence, search & export
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Save conversation history to a file for persistence and crash recovery.
+   * Conversations are saved as JSON and can be restored with `loadConversation()`.
+   */
+  saveConversation(filePath: string): void {
+    try {
+      const dir = path.dirname(filePath)
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+      }
+      const data = JSON.stringify({
+        version: 1,
+        savedAt: new Date().toISOString(),
+        config: { model: this.config.model },
+        history: this.conversationHistory,
+        summary: this.conversationSummarizer?.getSummary() ?? null,
+        stats: this.stats,
+      }, null, 2)
+      fs.writeFileSync(filePath, data, 'utf-8')
+    } catch (e) {
+      throw new Error(
+        `Failed to save conversation to ${filePath}: ${e instanceof Error ? e.message : String(e)}`,
+      )
+    }
+  }
+
+  /**
+   * Load a previously saved conversation history, restoring context.
+   * Merges with or replaces the current conversation based on the `replace` option.
+   */
+  loadConversation(filePath: string, options?: { replace?: boolean }): { restored: number } {
+    try {
+      const json = fs.readFileSync(filePath, 'utf-8')
+      const data = JSON.parse(json) as {
+        version: number
+        history: ApiMessage[]
+        summary?: ReturnType<ConversationSummarizer['getSummary']> | null
+      }
+
+      if (!Array.isArray(data.history)) {
+        throw new Error('Invalid conversation file: missing history array')
+      }
+
+      if (options?.replace) {
+        this.conversationHistory = data.history
+      } else {
+        this.conversationHistory.push(...data.history)
+      }
+
+      // Re-feed the summarizer if available
+      if (this.conversationSummarizer && data.history.length > 0) {
+        for (const msg of data.history) {
+          this.conversationSummarizer.addTurn(msg.role, typeof msg.content === 'string' ? msg.content : '')
+        }
+      }
+
+      // Re-feed context manager
+      if (this.contextManager && data.history.length > 0) {
+        for (const msg of data.history.slice(-10)) {
+          this.contextManager.addTurn({
+            role: msg.role,
+            content: typeof msg.content === 'string' ? msg.content : '',
+            timestamp: Date.now(),
+          })
+        }
+      }
+
+      return { restored: data.history.length }
+    } catch (e) {
+      throw new Error(
+        `Failed to load conversation from ${filePath}: ${e instanceof Error ? e.message : String(e)}`,
+      )
+    }
+  }
+
+  /**
+   * Search through conversation history for messages matching a query.
+   * Returns matching messages with their index and relevance score.
+   */
+  searchConversation(query: string, options?: {
+    role?: 'user' | 'assistant'
+    maxResults?: number
+    caseSensitive?: boolean
+  }): Array<{
+    index: number
+    role: string
+    content: string
+    score: number
+    preview: string
+  }> {
+    const maxResults = options?.maxResults ?? 10
+    const queryLower = options?.caseSensitive ? query : query.toLowerCase()
+    const queryWords = queryLower.split(/\s+/).filter(w => w.length > 2)
+
+    const results: Array<{
+      index: number
+      role: string
+      content: string
+      score: number
+      preview: string
+    }> = []
+
+    for (let i = 0; i < this.conversationHistory.length; i++) {
+      const msg = this.conversationHistory[i]!
+      if (options?.role && msg.role !== options.role) continue
+
+      const content = typeof msg.content === 'string' ? msg.content : ''
+      const contentLower = options?.caseSensitive ? content : content.toLowerCase()
+
+      // Calculate relevance score based on keyword overlap
+      let score = 0
+      for (const word of queryWords) {
+        if (contentLower.includes(word)) {
+          score += 1
+        }
+      }
+      // Exact phrase match bonus
+      if (contentLower.includes(queryLower)) {
+        score += queryWords.length
+      }
+
+      if (score > 0) {
+        // Build a preview (snippet around first match)
+        const matchIdx = contentLower.indexOf(queryLower.split(/\s+/)[0] ?? queryLower)
+        const previewStart = Math.max(0, matchIdx - 40)
+        const previewEnd = Math.min(content.length, matchIdx + 120)
+        const preview = (previewStart > 0 ? '...' : '') +
+          content.slice(previewStart, previewEnd).trim() +
+          (previewEnd < content.length ? '...' : '')
+
+        results.push({
+          index: i,
+          role: msg.role,
+          content,
+          score: score / queryWords.length,
+          preview,
+        })
+      }
+    }
+
+    // Sort by score descending
+    results.sort((a, b) => b.score - a.score)
+    return results.slice(0, maxResults)
+  }
+
+  /**
+   * Export conversation history in a readable format.
+   * Supports 'markdown', 'json', and 'text' formats.
+   */
+  exportConversation(format: 'markdown' | 'json' | 'text' = 'markdown'): string {
+    const history = this.conversationHistory
+    const summary = this.conversationSummarizer?.getSummary()
+
+    if (format === 'json') {
+      return JSON.stringify({
+        exportedAt: new Date().toISOString(),
+        messageCount: history.length,
+        summary: summary ?? null,
+        messages: history.map((msg, i) => ({
+          index: i,
+          role: msg.role,
+          content: typeof msg.content === 'string' ? msg.content : '',
+        })),
+      }, null, 2)
+    }
+
+    if (format === 'text') {
+      return history.map(msg => {
+        const role = msg.role === 'user' ? 'You' : 'AI'
+        const content = typeof msg.content === 'string' ? msg.content : ''
+        return `[${role}]: ${content}`
+      }).join('\n\n')
+    }
+
+    // Default: markdown
+    let md = `# Conversation Export\n\n`
+    md += `**Messages:** ${history.length}\n`
+    md += `**Exported:** ${new Date().toISOString()}\n\n`
+
+    if (summary) {
+      if (summary.topics.length > 0) {
+        md += `**Topics:** ${summary.topics.join(', ')}\n`
+      }
+      if (summary.decisions.length > 0) {
+        md += `\n## Decisions\n${summary.decisions.map(d => `- ${d}`).join('\n')}\n`
+      }
+      if (summary.openQuestions.length > 0) {
+        md += `\n## Open Questions\n${summary.openQuestions.map(q => `- ${q}`).join('\n')}\n`
+      }
+    }
+
+    md += `\n---\n\n## Messages\n\n`
+
+    for (const msg of history) {
+      const role = msg.role === 'user' ? '👤 **You**' : '🤖 **AI**'
+      const content = typeof msg.content === 'string' ? msg.content : ''
+      md += `### ${role}\n\n${content}\n\n---\n\n`
+    }
+
+    return md
+  }
+
+  /**
+   * Get conversation statistics — useful for monitoring chat health.
+   */
+  getConversationStats(): {
+    totalMessages: number
+    userMessages: number
+    assistantMessages: number
+    averageResponseLength: number
+    topics: string[]
+    openQuestions: string[]
+    decisions: string[]
+  } {
+    const userMsgs = this.conversationHistory.filter(m => m.role === 'user')
+    const assistantMsgs = this.conversationHistory.filter(m => m.role === 'assistant')
+    const avgLen = assistantMsgs.length > 0
+      ? assistantMsgs.reduce((sum, m) => sum + (typeof m.content === 'string' ? m.content.length : 0), 0) / assistantMsgs.length
+      : 0
+
+    const summary = this.conversationSummarizer?.getSummary()
+
+    return {
+      totalMessages: this.conversationHistory.length,
+      userMessages: userMsgs.length,
+      assistantMessages: assistantMsgs.length,
+      averageResponseLength: Math.round(avgLen),
+      topics: summary?.topics ?? [],
+      openQuestions: summary?.openQuestions ?? [],
+      decisions: summary?.decisions ?? [],
+    }
+  }
+
+  /**
+   * Clear conversation history, optionally keeping the last N messages for context.
+   */
+  clearConversation(keepLast?: number): { cleared: number } {
+    const total = this.conversationHistory.length
+    if (keepLast && keepLast > 0) {
+      this.conversationHistory = this.conversationHistory.slice(-keepLast)
+    } else {
+      this.conversationHistory = []
+    }
+    return { cleared: total - this.conversationHistory.length }
   }
 }
