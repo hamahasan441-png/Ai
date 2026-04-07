@@ -227,7 +227,9 @@ export class ConversationSummarizer {
   }
 
   /**
-   * Track questions and mark answered ones
+   * Track questions and mark answered ones.
+   * Uses keyword overlap to match answers to the correct open question
+   * instead of blindly popping the most recent one.
    */
   private trackQuestions(content: string, role: string): void {
     if (role === 'user') {
@@ -244,8 +246,28 @@ export class ConversationSummarizer {
         }
       }
     } else if (role === 'assistant' && this.summary.openQuestions.length > 0) {
-      // Heuristic: if assistant responds, mark most recent question as answered
-      this.summary.openQuestions.pop();
+      // Match the answer to the best-matching open question using keyword overlap
+      const answerWords = new Set(
+        content.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+      );
+      let bestIdx = -1;
+      let bestOverlap = 0;
+      for (let i = 0; i < this.summary.openQuestions.length; i++) {
+        const qWords = this.summary.openQuestions[i]!
+          .toLowerCase().split(/\s+/).filter(w => w.length > 3);
+        const overlap = qWords.filter(w => answerWords.has(w)).length;
+        if (overlap > bestOverlap) {
+          bestOverlap = overlap;
+          bestIdx = i;
+        }
+      }
+      if (bestIdx >= 0) {
+        // Remove the matched question
+        this.summary.openQuestions.splice(bestIdx, 1);
+      } else {
+        // Fallback: remove the most recent question (assumes sequential Q&A)
+        this.summary.openQuestions.pop();
+      }
     }
   }
 
