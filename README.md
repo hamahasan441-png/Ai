@@ -33,6 +33,108 @@ npm install
 npm test
 ```
 
+## ✨ What's New in v2.2
+
+### 📋 Structured Logging (NEW)
+Production-ready structured logging with log levels, correlation IDs, and child loggers:
+```ts
+import { logger, createLogger } from './utils/logger.js'
+
+// Default app logger
+logger.info('Server started', { port: 3000 })
+logger.error('Request failed', { userId: 123, error: 'timeout' })
+
+// Child logger with inherited context
+const cacheLog = logger.child({ service: 'cache' })
+cacheLog.debug('Cache miss', { key: 'user:123' })
+
+// Correlation ID tracking
+logger.setCorrelationId('req-abc-123')
+logger.info('Processing request')  // All entries tagged with correlationId
+```
+- **6 log levels**: trace, debug, info, warn, error, fatal
+- **JSON output** in production, pretty-print in development
+- **Correlation IDs** for distributed tracing
+- **Child loggers** with inherited context
+
+### 🛡️ Input Validation Framework (NEW)
+Unified security validation layer for all tool inputs:
+```ts
+import { validateToolInput, detectSqlInjection, compose, maxLength } from './utils/inputValidation.js'
+
+// Validate tool inputs before execution
+const result = validateToolInput('database', {
+  command: 'query',
+  connection_string: 'sqlite:///data.db',
+  sql: userInput,  // Automatically checked for SQL injection
+})
+if (!result.valid) throw result.errors[0]
+
+// Composable validators
+const validateQuery = compose(isNonEmptyString, maxLength(10000), detectSqlInjection)
+```
+- **SQL injection** detection (14 patterns)
+- **Command injection** prevention (6 patterns)
+- **Path traversal** blocking
+- **Schema-based** validation for all tool inputs
+
+### 🔄 API Retry & Circuit Breaker (NEW)
+Resilient API call wrapper with exponential backoff:
+```ts
+import { RetryPolicy, CircuitBreaker, withResilience } from './services/apiRetry.js'
+
+// Retry with exponential backoff + jitter
+const retry = new RetryPolicy({ maxRetries: 3, baseDelayMs: 1000 })
+const result = await retry.execute(() => callClaudeAPI(prompt))
+
+// Circuit breaker prevents cascading failures
+const breaker = new CircuitBreaker({ failureThreshold: 5, resetTimeoutMs: 30000 })
+const data = await breaker.execute(() => externalService())
+```
+
+### 🧩 Plugin SDK (NEW)
+Full plugin development kit with lifecycle management:
+```ts
+import { PluginSDK, definePlugin } from './plugins/PluginSDK.js'
+
+const sdk = new PluginSDK()
+sdk.register(definePlugin({
+  manifest: {
+    id: 'my-translator',
+    name: 'Translator Plugin',
+    version: '1.0.0',
+    description: 'Translates text',
+    permissions: ['services:api', 'knowledge:write'],
+  },
+  tools: [{ name: 'translate', description: 'Translate text', execute: async (input) => ... }],
+  knowledge: [{ category: 'translation', keywords: 'translate language', content: '...' }],
+}))
+await sdk.activate('my-translator')
+```
+- **Manifest schema** with validation
+- **Lifecycle hooks** (onInstall, onActivate, onDeactivate, onUninstall)
+- **11 permission types** for sandboxed execution
+- **Dependency resolution** between plugins
+- **Plugin-provided** tools, commands, and knowledge
+
+### 📊 Observability & Metrics (NEW)
+OpenTelemetry-compatible metrics collection:
+```ts
+import { metrics } from './services/metrics.js'
+
+metrics.counter('requests_total', 'Total requests').inc({ method: 'chat' })
+metrics.histogram('response_time_ms', 'Latency').observe(42, { endpoint: '/chat' })
+metrics.gauge('active_sessions', 'Sessions').set(sessionCount)
+
+const snapshot = metrics.snapshot()  // All metrics as JSON
+```
+- **Counter**, **Gauge**, **Histogram** metric types
+- **Labeled dimensions** for multi-dimensional analysis
+- **Percentiles** (P50, P95, P99) for histograms
+- **JSON export** for dashboards
+
+---
+
 ## ✨ What's New in v2
 
 ### 🗄️ DatabaseTool (NEW)

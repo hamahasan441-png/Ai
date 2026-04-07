@@ -5,6 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-04-07
+
+### Added
+- **Structured Logging System** (`src/utils/logger.ts`)
+  - Pino-inspired lightweight logger with log levels (trace → fatal)
+  - JSON output for production, pretty-print for development
+  - Correlation IDs for request tracing
+  - Child loggers with inherited context
+  - Configurable transports (console, file, buffer)
+  - 22 unit tests
+- **Input Validation Framework** (`src/utils/inputValidation.ts`)
+  - SQL injection detection (14 patterns)
+  - Command injection detection (6 patterns)
+  - Path traversal prevention (7 patterns)
+  - Schema-based validation with composable validators
+  - Tool-specific validation schemas (database, file_read, file_write)
+  - 48 unit tests
+- **API Retry & Circuit Breaker** (`src/services/apiRetry.ts`)
+  - Exponential backoff with jitter to prevent thundering herd
+  - Circuit breaker pattern (closed → open → half-open states)
+  - Configurable retry policies per error type (HTTP status, network errors)
+  - Abort signal support for cancellation
+  - State change callbacks for monitoring
+  - 23 unit tests
+- **Plugin SDK** (`src/plugins/PluginSDK.ts`)
+  - Plugin manifest schema with metadata validation
+  - Full lifecycle hooks (onInstall, onActivate, onDeactivate, onUninstall, onUpdate)
+  - Permission scoping (11 permission types)
+  - Dependency resolution between plugins
+  - Per-plugin storage and logging context
+  - Plugin-provided tools, commands, and knowledge entries
+  - 23 unit tests
+- **Observability & Metrics** (`src/services/metrics.ts`)
+  - Counter, Gauge, and Histogram metric types
+  - Labeled metrics with dimension support
+  - Histogram percentiles (P50, P95, P99) and bucket aggregation
+  - MetricsRegistry with prefix support and JSON export
+  - 27 unit tests
+- **Integration Test Suite** (`src/__tests__/Integration.test.ts`)
+  - Cache + Validation + Logging pipeline tests
+  - Retry + CircuitBreaker + Metrics integration tests
+  - Plugin SDK full lifecycle tests
+  - Validation security tests (SQL injection, path traversal)
+  - 11 integration tests
+- **Automated Release Workflow** (`.github/workflows/release.yml`)
+  - Tag-based release creation (`v*` tags)
+  - Full CI checks before release (lint, typecheck, test)
+  - Automated release notes from git commits
+
+### Changed
+- **Docker Optimization**
+  - Added `.dockerignore` to exclude tests, dev files, docs
+  - Build stage now compiles TypeScript with `tsc`
+  - Production stage only copies dist/, node_modules, and source
+  - Updated entrypoint to use `npx tsx` for TypeScript execution
+
 ## [2.1.0] - 2026-04-07
 
 ### Added
@@ -67,6 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MCP server integration
 - Plugin system foundation
 
+[2.2.0]: https://github.com/hamahasan441-png/Ai/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/hamahasan441-png/Ai/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/hamahasan441-png/Ai/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/hamahasan441-png/Ai/releases/tag/v1.0.0
