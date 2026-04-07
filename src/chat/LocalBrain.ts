@@ -615,8 +615,8 @@ function buildKnowledgeBase(): KnowledgeEntry[] {
   add('math', ['probability', 'bayes', 'conditional', 'random variable', 'distribution'],
     'Probability: P(A) = favorable outcomes / total outcomes, range [0,1]. P(A∪B) = P(A) + P(B) - P(A∩B). P(A|B) = P(A∩B)/P(B). Independent: P(A∩B) = P(A)·P(B). Bayes\' theorem: P(A|B) = P(B|A)·P(A)/P(B). Binomial: P(k successes in n trials) = C(n,k)·pᵏ(1-p)ⁿ⁻ᵏ. Expected value: E[X] = Σxᵢ·P(xᵢ). Poisson: P(k) = λᵏe⁻λ/k!. Normal distribution: bell curve, defined by μ and σ. Central Limit Theorem: sample means → normal as n→∞.', 1.3)
 
-  add('math', ['combinatorics', 'permutation', 'combination', 'counting'],
-    'Combinatorics: Permutations (order matters): P(n,r) = n!/(n-r)!. Combinations (order doesn\'t): C(n,r) = n!/(r!(n-r)!). Factorial: n! = n·(n-1)·...·1, 0!=1. Multiplication principle: if task A has m ways and B has n ways → m·n total. Addition principle: if A or B, m+n ways (if disjoint). Pigeonhole principle: if n items in m boxes and n>m, some box has ≥2 items. Stars and bars: distributing n identical items into k bins = C(n+k-1,k-1). Inclusion-exclusion: |A∪B∪C| = |A|+|B|+|C|-|A∩B|-|A∩C|-|B∩C|+|A∩B∩C|.', 1.2)
+  add('math', ['combinatorics', 'permutation', 'permutations', 'combination', 'combinations', 'counting', 'factorial'],
+    'Combinatorics: Permutations (order matters): P(n,r) = n!/(n-r)!. Combinations (order doesn\'t): C(n,r) = n!/(r!(n-r)!). Factorial: n! = n·(n-1)·...·1, 0!=1. Multiplication principle: if task A has m ways and B has n ways → m·n total. Addition principle: if A or B, m+n ways (if disjoint). Pigeonhole principle: if n items in m boxes and n>m, some box has ≥2 items. Stars and bars: distributing n identical items into k bins = C(n+k-1,k-1). Inclusion-exclusion: |A∪B∪C| = |A|+|B|+|C|-|A∩B|-|A∩C|-|B∩C|+|A∩B∩C|.', 1.3)
 
   // ── Number Theory ──
   add('math', ['number theory', 'prime', 'divisibility', 'modular arithmetic', 'gcd'],
@@ -3413,7 +3413,27 @@ function buildResponse(
   conversationHistory: ApiMessage[],
   creativity: number,
 ): string {
-  // Check learned patterns first (self-learning has priority)
+  // Build from knowledge base
+  if (knowledgeResults.length > 0) {
+    const topResult = knowledgeResults[0]!
+
+    // Very strong KB match (high precision multi-keyword match) — always prefer KB
+    if (topResult.score >= 8) {
+      let response = topResult.entry.content
+
+      // If multiple strong results, combine them (only from different categories)
+      if (knowledgeResults.length > 1 && knowledgeResults[1]!.score >= topResult.score * 0.6) {
+        const additional = knowledgeResults[1]!.entry.content
+        if (knowledgeResults[1]!.entry.category !== topResult.entry.category) {
+          response += '\n\n' + additional
+        }
+      }
+
+      return response
+    }
+  }
+
+  // Check learned patterns (self-learning has priority for weaker KB matches)
   const matchedPattern = findBestLearnedPattern(message, learnedPatterns)
   if (matchedPattern && matchedPattern.confidence >= 0.7) {
     return matchedPattern.response
