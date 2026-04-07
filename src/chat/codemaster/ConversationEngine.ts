@@ -220,6 +220,25 @@ const EXPERTISE_PATTERNS: Record<string, Record<string, string[]>> = {
   },
 }
 
+const SENTIMENT_KEYWORDS: Record<ConversationSentiment, string[]> = {
+  frustrated: ['not working', 'broken', 'stuck', 'error again'],
+  positive: ['thanks', 'great', 'perfect', 'awesome', 'works', 'nice'],
+  curious: ['how', 'what', 'explain', 'tell me', 'show me'],
+  confused: ["don't understand", 'unclear', 'confused', 'what do you mean', 'lost'],
+  neutral: [],
+}
+
+// Understanding score weights (sum to 1.0)
+const UNDERSTANDING_WEIGHTS = {
+  intentClarity: 0.3,
+  codeRefDensity: 0.25,
+  topicConsistency: 0.25,
+  sentimentTracking: 0.2,
+}
+
+// Expect at least 1 topic per 2 user messages for full topic consistency score
+const TOPIC_TO_MESSAGE_RATIO = 0.5
+
 // ══════════════════════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
@@ -710,20 +729,15 @@ export class ConversationEngine {
   analyzeSentiment(content: string): ConversationSentiment {
     const lower = content.toLowerCase()
 
-    const frustratedKw = ['not working', 'broken', 'stuck', 'error again']
-    const positiveKw = ['thanks', 'great', 'perfect', 'awesome', 'works', 'nice']
-    const curiousKw = ['how', 'what', 'explain', 'tell me', 'show me']
-    const confusedKw = ["don't understand", 'unclear', 'confused', 'what do you mean', 'lost']
-
     let frustratedScore = 0
     let positiveScore = 0
     let curiousScore = 0
     let confusedScore = 0
 
-    for (const kw of frustratedKw) { if (lower.includes(kw)) frustratedScore++ }
-    for (const kw of positiveKw) { if (lower.includes(kw)) positiveScore++ }
-    for (const kw of curiousKw) { if (lower.includes(kw)) curiousScore++ }
-    for (const kw of confusedKw) { if (lower.includes(kw)) confusedScore++ }
+    for (const kw of SENTIMENT_KEYWORDS.frustrated) { if (lower.includes(kw)) frustratedScore++ }
+    for (const kw of SENTIMENT_KEYWORDS.positive) { if (lower.includes(kw)) positiveScore++ }
+    for (const kw of SENTIMENT_KEYWORDS.curious) { if (lower.includes(kw)) curiousScore++ }
+    for (const kw of SENTIMENT_KEYWORDS.confused) { if (lower.includes(kw)) confusedScore++ }
 
     if (frustratedScore > 0 && frustratedScore >= confusedScore) return 'frustrated'
     if (confusedScore > 0) return 'confused'
@@ -865,7 +879,7 @@ export class ConversationEngine {
       : 0
 
     const topicConsistency = userMsgs.length > 0
-      ? Math.round(Math.min(this.state.topics.size / Math.max(userMsgs.length * 0.5, 1), 1) * 100)
+      ? Math.round(Math.min(this.state.topics.size / Math.max(userMsgs.length * TOPIC_TO_MESSAGE_RATIO, 1), 1) * 100)
       : 0
 
     let sentimentTracking = 0
@@ -884,10 +898,10 @@ export class ConversationEngine {
     }
 
     const score = Math.round(
-      intentClarity * 0.3 +
-      codeRefDensity * 0.25 +
-      topicConsistency * 0.25 +
-      sentimentTracking * 0.2,
+      intentClarity * UNDERSTANDING_WEIGHTS.intentClarity +
+      codeRefDensity * UNDERSTANDING_WEIGHTS.codeRefDensity +
+      topicConsistency * UNDERSTANDING_WEIGHTS.topicConsistency +
+      sentimentTracking * UNDERSTANDING_WEIGHTS.sentimentTracking,
     )
 
     return { score: Math.min(score, 100), breakdown }
