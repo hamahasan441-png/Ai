@@ -9,10 +9,15 @@
  *   • API retry behavior
  *   • Plugin SDK lifecycle
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import * as fs from 'fs'
 import * as os from 'os'
 import * as path from 'path'
+
+vi.mock('@anthropic-ai/sdk', () => ({
+  APIUserAbortError: class APIUserAbortError extends Error {},
+}))
+
 import { CacheService } from '../services/cache/CacheService.js'
 import { validateToolInput, detectSqlInjection, detectPathTraversal, validateSchema } from '../utils/inputValidation.js'
 import { Logger, LogLevel, bufferTransport, generateCorrelationId, type LogEntry } from '../utils/logger.js'
@@ -25,7 +30,6 @@ import { PluginSDK, definePlugin } from '../plugins/PluginSDK.js'
 let tmpDir: string
 
 // Mock the disk cache path module
-import { vi } from 'vitest'
 vi.mock('../utils/paths.js', () => ({
   getDiskCachePath: () => tmpDir,
   ensureDir: (dir: string) => {

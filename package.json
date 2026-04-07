@@ -1,7 +1,7 @@
 {
   "name": "ai",
-  "version": "2.1.0",
-  "description": "**1,886+ source files · 36+ modules · 39 tools · 50+ commands — ALL connected into one AI.** Now with DatabaseTool, CachingLayer, and Self-Learning v2.",
+  "version": "2.2.0",
+  "description": "**1,886+ source files · 36+ modules · 39 tools · 50+ commands — ALL connected into one AI.** Now with Structured Logging, Input Validation, API Retry, Plugin SDK, and Observability.",
   "main": "src/chat/index.ts",
   "bin": {
     "ai": "./src/entrypoints/cli.tsx"
