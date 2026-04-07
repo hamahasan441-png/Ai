@@ -13,6 +13,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
+    "build": "tsc",
     "start": "npx tsx src/entrypoints/cli.tsx",
     "dev": "npx tsx src/entrypoints/cli.tsx",
     "postinstall": "node scripts/postinstall.js",
@@ -49,6 +50,7 @@
     "eslint": "^9.0.0",
     "prettier": "^3.3.0",
     "typescript-eslint": "^8.0.0",
+    "typescript": "^5.5.0",
     "vitest": "^4.1.2"
   },
   "optionalDependencies": {
