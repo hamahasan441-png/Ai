@@ -1328,6 +1328,17 @@ export type {
   KurdishSentimentConfig,
 } from './KurdishSentimentAnalyzer.js'
 
+// ── Kurdish Language Utils (Proverbs, Numbers, Greetings, Dialects) ──
+
+export { KurdishLanguageUtils } from './KurdishLanguageUtils.js'
+
+export type {
+  KurdishProverb,
+  DialectComparison,
+  KurdishDay,
+  KurdishMonth,
+} from './KurdishLanguageUtils.js'
+
 // ── Hypothesis Engine (Scientific Reasoning) ──
 
 export { HypothesisEngine, DEFAULT_HYPOTHESIS_ENGINE_CONFIG } from './HypothesisEngine.js'

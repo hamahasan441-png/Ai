@@ -43,6 +43,11 @@ const LANGUAGE_MARKERS: Record<string, { words: Set<string>; script: string }> =
       'لەسەر', 'وەک', 'چۆن', 'کێ', 'چی', 'بەڵام', 'یان', 'هەموو',
       'ئێمە', 'ئێوە', 'ئەوان', 'دەبێت', 'بوو', 'هەبوو', 'نەبوو',
       'سلاو', 'سوپاس', 'باشە', 'بەڵێ', 'نەخێر', 'زۆر', 'کەم',
+      'دەکرێت', 'ناکرێت', 'هیچ', 'چەند', 'خۆش', 'باش', 'خراپ',
+      'ڕۆژ', 'شەو', 'ئەمڕۆ', 'ئێستا', 'سبەی', 'دوێنێ', 'ماڵ',
+      'خوا', 'خودا', 'منداڵ', 'ژنان', 'پیاوان', 'کوردستان', 'کورد',
+      'دەست', 'دڵ', 'چاو', 'سەر', 'گوێ', 'ناو', 'لای',
+      'دەوڵەت', 'گەلەک', 'هاوڕێ', 'خێزان', 'بەرنامە', 'پەروەردە',
     ]),
     script: 'arabic',
   },
@@ -222,6 +227,52 @@ export class LanguageDetector {
     if (max === devanagari) return 'devanagari';
     if (max === hangul) return 'hangul';
     return 'latin';
+  }
+
+  /**
+   * Check if text contains Kurdish-specific characters not found in standard Arabic.
+   * Kurdish Sorani uses unique letters: ڤ (ve), پ (pe), چ (che), ژ (zhe),
+   * گ (ga), ۆ (o), ێ (ê), ڕ (rr), ڵ (ll), ە (e)
+   */
+  hasKurdishCharacters(text: string): boolean {
+    // Kurdish-specific characters: ڤ ۆ ێ ڕ ڵ ە پ چ ژ گ
+    return /[\u06A4\u06C6\u06CE\u0695\u06B5\u06D5\u067E\u0686\u0698\u06AF]/.test(text);
+  }
+
+  /**
+   * Detect whether Arabic-script text is likely Kurdish or Arabic.
+   * Uses Kurdish-unique characters and word patterns for disambiguation.
+   * @returns 'ku' for Kurdish, 'ar' for Arabic, 'unknown' if undetermined
+   */
+  detectKurdishVsArabic(text: string): 'ku' | 'ar' | 'unknown' {
+    if (!text || text.trim().length === 0) return 'unknown';
+
+    let kurdishSignals = 0;
+    let arabicSignals = 0;
+
+    // Kurdish-unique characters: ڤ ۆ ێ ڕ ڵ ە
+    const kurdishUniqueChars = /[\u06A4\u06C6\u06CE\u0695\u06B5\u06D5]/g;
+    const kurdishMatches = text.match(kurdishUniqueChars);
+    if (kurdishMatches) kurdishSignals += kurdishMatches.length * 2;
+
+    // Arabic-unique features: tashkeel (diacritics), taa marbuta, alif hamza forms
+    const arabicUniqueChars = /[\u0629\u0623\u0625\u0622\u064B-\u065E]/g;
+    const arabicMatches = text.match(arabicUniqueChars);
+    if (arabicMatches) arabicSignals += arabicMatches.length * 2;
+
+    // Check word markers
+    const words = text.split(/\s+/);
+    const kuMarkers = LANGUAGE_MARKERS.ku;
+    const arMarkers = LANGUAGE_MARKERS.ar;
+    for (const word of words) {
+      if (kuMarkers && kuMarkers.words.has(word)) kurdishSignals += 3;
+      if (arMarkers && arMarkers.words.has(word)) arabicSignals += 3;
+    }
+
+    if (kurdishSignals === 0 && arabicSignals === 0) return 'unknown';
+    if (kurdishSignals > arabicSignals) return 'ku';
+    if (arabicSignals > kurdishSignals) return 'ar';
+    return 'unknown';
   }
 
   /**

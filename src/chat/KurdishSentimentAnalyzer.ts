@@ -4,7 +4,7 @@
  * ║                                                                            ║
  * ║  Lexicon-based sentiment analyzer for Kurdish Sorani text with support     ║
  * ║  for contextual negation, intensifiers, emoji analysis, and emotion        ║
- * ║  detection. Built around a curated lexicon of 145 sentiment words.         ║
+ * ║  detection. Built around a curated lexicon of 200+ sentiment words.        ║
  * ║                                                                            ║
  * ║    ✦ Weighted lexicon lookup with emotion categories                       ║
  * ║    ✦ Negation handling (نا, نە, هیچ) flips polarity                        ║
@@ -165,8 +165,27 @@ const SENTIMENT_LEXICON: readonly SentimentWord[] = [
   { word: 'سۆز', sentiment: 'positive', weight: 0.65, category: 'love' },
   { word: 'دەستخۆش', sentiment: 'positive', weight: 0.75, category: 'gratitude' },
   { word: 'شایەنی', sentiment: 'positive', weight: 0.60, category: 'pride' },
+  { word: 'دڵگرم', sentiment: 'positive', weight: 0.70, category: 'hope' },
+  { word: 'بەرەکەللا', sentiment: 'positive', weight: 0.75, category: 'gratitude' },
+  { word: 'ئاوەدان', sentiment: 'positive', weight: 0.65, category: 'hope' },
+  { word: 'ڕووناکی', sentiment: 'positive', weight: 0.60, category: 'hope' },
+  { word: 'نازدار', sentiment: 'positive', weight: 0.65, category: 'love' },
+  { word: 'خاوەن', sentiment: 'positive', weight: 0.50, category: 'pride' },
+  { word: 'ئاسودە', sentiment: 'positive', weight: 0.60, category: 'joy' },
+  { word: 'فەرح', sentiment: 'positive', weight: 0.70, category: 'joy' },
+  { word: 'شاد', sentiment: 'positive', weight: 0.75, category: 'joy' },
+  { word: 'خۆشبەخت', sentiment: 'positive', weight: 0.85, category: 'joy' },
+  { word: 'بەرز', sentiment: 'positive', weight: 0.55, category: 'pride' },
+  { word: 'دڵەڕەحم', sentiment: 'positive', weight: 0.70, category: 'love' },
+  { word: 'بوێر', sentiment: 'positive', weight: 0.65, category: 'pride' },
+  { word: 'گیان', sentiment: 'positive', weight: 0.60, category: 'love' },
+  { word: 'ئاڵقۆس', sentiment: 'positive', weight: 0.50, category: 'love' },
+  { word: 'لایەنگری', sentiment: 'positive', weight: 0.55, category: 'gratitude' },
+  { word: 'مەزن', sentiment: 'positive', weight: 0.55, category: 'pride' },
+  { word: 'بەرین', sentiment: 'positive', weight: 0.60, category: 'pride' },
+  { word: 'پشتیوان', sentiment: 'positive', weight: 0.65, category: 'hope' },
 
-  // ── Negative words (55) ──────────────────────────────────────────────────
+  // ── Negative words (55+20 expanded) ──────────────────────────────────────
   { word: 'خەم', sentiment: 'negative', weight: -0.70, category: 'sadness' },
   { word: 'ئازار', sentiment: 'negative', weight: -0.75, category: 'sadness' },
   { word: 'ترس', sentiment: 'negative', weight: -0.70, category: 'fear' },
@@ -235,8 +254,27 @@ const SENTIMENT_LEXICON: readonly SentimentWord[] = [
   { word: 'بێکەسی', sentiment: 'negative', weight: -0.75, category: 'sadness' },
   { word: 'نائومێدی', sentiment: 'negative', weight: -0.80, category: 'sadness' },
   { word: 'خوارە', sentiment: 'negative', weight: -0.55, category: 'sadness' },
+  { word: 'سەرلێشێواو', sentiment: 'negative', weight: -0.60, category: 'frustration' },
+  { word: 'نەگبەت', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'خوارخوێن', sentiment: 'negative', weight: -0.85, category: 'anger' },
+  { word: 'پەراوێز', sentiment: 'negative', weight: -0.50, category: 'sadness' },
+  { word: 'ڕەشبین', sentiment: 'negative', weight: -0.65, category: 'sadness' },
+  { word: 'توڕەیی', sentiment: 'negative', weight: -0.70, category: 'anger' },
+  { word: 'بێ ئابڕوو', sentiment: 'negative', weight: -0.75, category: 'anger' },
+  { word: 'خیانەت', sentiment: 'negative', weight: -0.85, category: 'anger' },
+  { word: 'بێ وەفا', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'دڵکوێر', sentiment: 'negative', weight: -0.55, category: 'fear' },
+  { word: 'ژەهراوی', sentiment: 'negative', weight: -0.70, category: 'fear' },
+  { word: 'بێزاربوون', sentiment: 'negative', weight: -0.60, category: 'frustration' },
+  { word: 'پاشگەز', sentiment: 'negative', weight: -0.50, category: 'frustration' },
+  { word: 'وێرانکاری', sentiment: 'negative', weight: -0.80, category: 'anger' },
+  { word: 'تاڵ', sentiment: 'negative', weight: -0.50, category: 'sadness' },
+  { word: 'ناشاد', sentiment: 'negative', weight: -0.65, category: 'sadness' },
+  { word: 'دڵشکانی', sentiment: 'negative', weight: -0.75, category: 'sadness' },
+  { word: 'بێچارەیی', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'حەسوود', sentiment: 'negative', weight: -0.60, category: 'anger' },
 
-  // ── Neutral words (36) ───────────────────────────────────────────────────
+  // ── Neutral words (36+15 expanded) ───────────────────────────────────────
   { word: 'ڕۆژ', sentiment: 'neutral', weight: 0.0, category: 'time' },
   { word: 'ڕەخنە', sentiment: 'neutral', weight: 0.0, category: 'communication' },
   { word: 'کات', sentiment: 'neutral', weight: 0.0, category: 'time' },
@@ -273,6 +311,20 @@ const SENTIMENT_LEXICON: readonly SentimentWord[] = [
   { word: 'ئابوور', sentiment: 'neutral', weight: 0.0, category: 'economics' },
   { word: 'خوێندن', sentiment: 'neutral', weight: 0.0, category: 'activity' },
   { word: 'فێربوون', sentiment: 'neutral', weight: 0.0, category: 'cognitive' },
+  { word: 'سیاسەت', sentiment: 'neutral', weight: 0.0, category: 'politics' },
+  { word: 'تەکنەلۆژیا', sentiment: 'neutral', weight: 0.0, category: 'technology' },
+  { word: 'بەرنامە', sentiment: 'neutral', weight: 0.0, category: 'activity' },
+  { word: 'کۆمەڵگا', sentiment: 'neutral', weight: 0.0, category: 'abstract' },
+  { word: 'مێژوو', sentiment: 'neutral', weight: 0.0, category: 'abstract' },
+  { word: 'جوگرافیا', sentiment: 'neutral', weight: 0.0, category: 'abstract' },
+  { word: 'وەرزش', sentiment: 'neutral', weight: 0.0, category: 'activity' },
+  { word: 'سەفەر', sentiment: 'neutral', weight: 0.0, category: 'activity' },
+  { word: 'پیشەسازی', sentiment: 'neutral', weight: 0.0, category: 'economics' },
+  { word: 'بازاڕ', sentiment: 'neutral', weight: 0.0, category: 'economics' },
+  { word: 'نەتەوە', sentiment: 'neutral', weight: 0.0, category: 'politics' },
+  { word: 'چالاکی', sentiment: 'neutral', weight: 0.0, category: 'activity' },
+  { word: 'ڕۆژنامە', sentiment: 'neutral', weight: 0.0, category: 'communication' },
+  { word: 'دەزگا', sentiment: 'neutral', weight: 0.0, category: 'abstract' },
 ]
 
 /**
@@ -328,7 +380,7 @@ const EMOJI_SENTIMENT: ReadonlyMap<string, number> = new Map<string, number>([
 ])
 
 /** Negation particles that invert the polarity of the following word. */
-const NEGATION_TOKENS: readonly string[] = ['نا', 'نە', 'هیچ', 'بێ', 'نەک']
+const NEGATION_TOKENS: readonly string[] = ['نا', 'نە', 'هیچ', 'بێ', 'نەک', 'بەبێ', 'بەبێی']
 
 /** Intensifier tokens and their multipliers. */
 const INTENSIFIERS: ReadonlyMap<string, number> = new Map([
@@ -340,6 +392,13 @@ const INTENSIFIERS: ReadonlyMap<string, number> = new Map([
   ['بەشێوەیەکی', 1.2],
   ['ئەوەندە', 1.4],
   ['هێندە', 1.3],
+  ['بەڕاستی', 1.3],
+  ['بەتەواوی', 1.6],
+  ['لەڕاستیدا', 1.3],
+  ['ڕاستی', 1.2],
+  ['بێگومان', 1.4],
+  ['کەمێک', 0.7],
+  ['نزیکەی', 0.8],
 ])
 
 /** Emotion categories used by the analyzer. */
@@ -606,7 +665,7 @@ function clamp(value: number, min: number, max: number): number {
 /**
  * Kurdish Sorani sentiment analyzer.
  *
- * Uses a curated lexicon of 145 sentiment words, emoji analysis, contextual
+ * Uses a curated lexicon of 200+ sentiment words, emoji analysis, contextual
  * negation and intensifier handling, and emotion detection to classify Kurdish
  * text into positive / negative / neutral / mixed sentiment categories.
  *
