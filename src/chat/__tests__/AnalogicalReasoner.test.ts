@@ -1,13 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   AnalogicalReasoner,
-  type AnalogyResult,
   type StructureElement,
-  type StructureMapping,
-  type AnalogyPattern,
-  type TransferResult,
-  type AnalogicalReasonerConfig,
-  type AnalogicalReasonerStats,
 } from '../AnalogicalReasoner'
 
 // ── Constructor Tests ──

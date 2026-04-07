@@ -534,7 +534,7 @@ export class LogicalProofEngine {
   private hasQuantifierContradiction(s1: string, s2: string): boolean {
     const allPattern = /\b(all|every|each)\b/
     const nonePattern = /\b(no|none|never)\b/
-    const somePattern = /\b(some|few|most)\b/
+    const _somePattern = /\b(some|few|most)\b/
 
     // "All X are Y" vs "No X are Y"
     if ((allPattern.test(s1) && nonePattern.test(s2)) ||

@@ -1,16 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   SentimentAnalyzer,
-  type SentimentAnalyzerConfig,
-  type SentimentAnalyzerStats,
-  type SentimentAnalysisResult,
-  type SentenceSentiment,
-  type SentimentScore,
-  type EmotionScore,
-  type AspectSentiment,
-  type SubjectivityScore,
-  type OpinionInfo,
-  type SentimentLabel,
 } from '../SentimentAnalyzer'
 
 // ── Constructor Tests ──

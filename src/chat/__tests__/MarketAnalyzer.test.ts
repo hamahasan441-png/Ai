@@ -1,16 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   MarketAnalyzer,
-  type MarketAnalyzerConfig,
-  type MarketAnalyzerStats,
-  type SentimentResult,
-  type TrendResult,
-  type VolatilityResult,
-  type CorrelationMatrix,
-  type MarketBreadth,
-  type NewsImpact,
-  type AnomalyResult,
-  type MarketSummary,
 } from '../MarketAnalyzer'
 
 // ── Helpers: reusable data generators ──

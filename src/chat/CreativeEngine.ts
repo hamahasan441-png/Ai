@@ -461,7 +461,7 @@ function round2(n: number): number {
 function tokenize(text: string): string[] {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s\-]/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, ' ')
     .split(/\s+/)
     .filter(w => w.length > 1 && !STOP_WORDS.has(w));
 }
@@ -1819,7 +1819,7 @@ export class CreativeEngine {
   }
 
   /** Apply one evolution step to an idea using the specified technique. */
-  private applyEvolutionStep(idea: CreativeIdea, technique: string, iteration: number): CreativeIdea {
+  private applyEvolutionStep(idea: CreativeIdea, technique: string, _iteration: number): CreativeIdea {
     const tokens = tokenize(idea.description);
 
     let evolvedDescription: string;

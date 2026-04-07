@@ -1,11 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   IntelligentRefactorer,
-  type RefactoringPlan,
-  type ExtractMethodResult,
-  type RenameResult,
-  type SimplificationResult,
-  type DuplicateBlock,
   type RefactoringSuggestion,
 } from '../IntelligentRefactorer.js'
 

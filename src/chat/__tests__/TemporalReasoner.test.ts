@@ -4,7 +4,7 @@ import { TemporalReasoner } from '../TemporalReasoner.js'
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const HOUR = 3_600_000
-const MINUTE = 60_000
+const _MINUTE = 60_000
 
 /** Shortcut to add an event and assert it was created. */
 function addEvent(
@@ -177,9 +177,9 @@ describe('TemporalReasoner', () => {
 
     it('removes event from sequences, deleting short sequences', () => {
       const a = addEvent(tr, 'X', 0, 10)
-      const b = addEvent(tr, 'X', 20, 30)
-      const c = addEvent(tr, 'X', 40, 50)
-      const d = addEvent(tr, 'X', 60, 70)
+      const _b = addEvent(tr, 'X', 20, 30)
+      const _c = addEvent(tr, 'X', 40, 50)
+      const _d = addEvent(tr, 'X', 60, 70)
       // Detect sequences so internal state is populated
       tr.detectSequences()
       tr.removeEvent(a.id)

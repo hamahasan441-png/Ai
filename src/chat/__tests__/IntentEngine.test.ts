@@ -1,14 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   IntentEngine,
-  type IntentLabel,
-  type EntityType,
-  type DetectedIntent,
-  type ExtractedEntity,
-  type IntentResult,
   type ConversationTurn,
-  type ResolvedIntent,
-  type IntentEngineConfig,
 } from '../IntentEngine'
 
 // ── Constructor Tests ──

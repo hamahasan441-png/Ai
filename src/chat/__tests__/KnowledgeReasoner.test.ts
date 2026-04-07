@@ -1,15 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   KnowledgeReasoner,
-  type KnowledgeReasonerConfig,
-  type KnowledgeReasonerStats,
   type KnowledgeFact,
   type InferenceChain,
-  type ComposedAnswer,
-  type Contradiction,
-  type ExplanationResult,
-  type ExplanationPath,
-  type Hypothesis,
 } from '../KnowledgeReasoner'
 
 // ── Constructor Tests ──

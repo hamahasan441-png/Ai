@@ -273,7 +273,7 @@ export class SemanticBridge {
 
     // Extract name (use original description to preserve casing)
     const nameMatch = description.match(/(?:called|named|for)\s+['"]?(\w+)['"]?/i)
-    let name = nameMatch?.[1] ?? this.inferName(lower, structureType)
+    const name = nameMatch?.[1] ?? this.inferName(lower, structureType)
 
     // Extract parameters
     const params = this.extractParams(lower, lang)

@@ -1,15 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   CurriculumOptimizer,
-  type CurriculumOptimizerConfig,
-  type CurriculumOptimizerStats,
   type Skill,
-  type SkillMastery,
-  type KnowledgeGap,
-  type LearningPath,
-  type LearningStep,
-  type ReviewRecommendation,
-  type LearningVelocity,
 } from '../CurriculumOptimizer'
 
 // ── Helpers ──
@@ -772,7 +764,7 @@ describe('getPrerequisiteChain', () => {
     const a = addSkill(co, 'CycA')
     const b = co.registerSkill('CycB', 'g', 0.5, [a.id])
     // Mutate A's prerequisites to include B (simulating a cycle)
-    const rawA = co.getSkill(a.id)!
+    const _rawA = co.getSkill(a.id)!
     // Since getSkill returns the stored object, we need to re-register
     // Actually we can't mutate directly — but the visited set in DFS
     // prevents infinite loops even if prereq references are broken.

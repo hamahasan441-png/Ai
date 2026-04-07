@@ -255,7 +255,7 @@ describe('Clear Conversation', () => {
   })
 
   it('should keep last N messages', () => {
-    const before = brain.getConversationStats().totalMessages
+    const _before = brain.getConversationStats().totalMessages
     brain.clearConversation(2)
     expect(brain.getConversationStats().totalMessages).toBe(2)
   })

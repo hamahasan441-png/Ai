@@ -2,13 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   ReasoningEngine,
   type ReasoningContext,
-  type ReasoningStep2,
-  type ChainOfThoughtResult,
-  type Constraint,
-  type ConstraintType,
-  type SubProblem,
-  type SolutionScore,
-  type ReasoningEngineConfig,
 } from '../ReasoningEngine'
 
 // ── Constructor Tests ──

@@ -248,7 +248,7 @@ function autoCorrelation(data: number[], lag: number): number {
   return num / denom;
 }
 
-function movingAverage(data: number[], window: number): number[] {
+function _movingAverage(data: number[], window: number): number[] {
   const result: number[] = [];
   for (let i = 0; i < data.length; i++) {
     const start = Math.max(0, i - Math.floor(window / 2));

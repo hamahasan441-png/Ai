@@ -4,7 +4,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 import { describe, it, expect, beforeEach } from 'vitest'
-import { ReplayStore, DEFAULT_STORE_CONFIG } from '../pipeline/ReplayStore.js'
+import { ReplayStore } from '../pipeline/ReplayStore.js'
 import { PipelinePhase } from '../pipeline/PipelineContract.js'
 import type { ReplaySession, ReplayDecision } from '../pipeline/ReplayEngine.js'
 

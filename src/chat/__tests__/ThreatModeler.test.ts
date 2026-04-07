@@ -1,17 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   ThreatModeler,
-  type ThreatModelerConfig,
-  type ThreatModelerStats,
-  type ThreatModel,
   type Asset,
   type DataFlow,
-  type TrustBoundary,
   type Threat,
-  type DreadScore,
-  type AttackTree,
-  type Mitigation,
-  type ThreatIntelEntry,
 } from '../ThreatModeler'
 
 // ── Constructor Tests ──

@@ -4,7 +4,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 import { describe, it, expect, beforeEach } from 'vitest'
-import { DocumentAnalyzer, DEFAULT_DOC_ANALYZER_CONFIG } from '../DocumentAnalyzer.js'
+import { DocumentAnalyzer } from '../DocumentAnalyzer.js'
 
 // ── Test Documents ──
 

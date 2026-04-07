@@ -736,14 +736,14 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-function generateId(prefix: string): string {
+function _generateId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 function tokenize(text: string): string[] {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s\-]/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, ' ')
     .split(/\s+/)
     .filter(w => w.length > 1);
 }

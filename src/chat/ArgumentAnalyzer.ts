@@ -883,7 +883,7 @@ export class ArgumentAnalyzer {
     if (!arg) return null;
 
     const weakLinks: string[] = [];
-    let chainLength = arg.premises.length;
+    const chainLength = arg.premises.length;
 
     // Check for gaps: premises that don't connect to conclusion
     const conclusionTokens = new Set(tokenize(arg.conclusion.text));

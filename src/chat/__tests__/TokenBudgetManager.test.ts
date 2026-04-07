@@ -5,7 +5,6 @@ import {
 } from '../TokenBudgetManager'
 import type {
   TokenBudgetConfig,
-  BudgetReport,
 } from '../TokenBudgetManager'
 
 describe('TokenBudgetManager', () => {

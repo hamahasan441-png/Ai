@@ -1,14 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   SemanticTrainer,
-  type DomainType,
-  type TrainingExample,
-  type TrainingSnapshot,
   type FeedbackSignal,
-  type DomainProfile,
-  type TrainerStats,
-  type SemanticTrainerConfig,
-  type VocabularyEntry,
 } from '../SemanticTrainer'
 
 describe('SemanticTrainer', () => {
@@ -161,7 +154,7 @@ describe('SemanticTrainer', () => {
       const entryA = vocabBefore.find((e) => e.word === 'react')!
       const entryB = vocabBefore.find((e) => e.word === 'component')!
       const vecABefore = [...entryA.vector]
-      const vecBBefore = [...entryB.vector]
+      const _vecBBefore = [...entryB.vector]
 
       const result = trainer.adjustSimilarity('react', 'component', 1.0)
       expect(result).toBe(true)

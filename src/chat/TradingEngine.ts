@@ -1049,7 +1049,7 @@ export class TradingEngine {
   private detectHeadAndShoulders(
     pivotHighs: Array<{ index: number; value: number }>,
     _pivotLows: Array<{ index: number; value: number }>,
-    closes: number[],
+    _closes: number[],
   ): ChartPattern | null {
     if (pivotHighs.length < 3) return null;
 
@@ -1084,7 +1084,7 @@ export class TradingEngine {
   private detectInverseHeadAndShoulders(
     _pivotHighs: Array<{ index: number; value: number }>,
     pivotLows: Array<{ index: number; value: number }>,
-    closes: number[],
+    _closes: number[],
   ): ChartPattern | null {
     if (pivotLows.length < 3) return null;
 

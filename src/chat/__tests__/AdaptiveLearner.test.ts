@@ -1,15 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   AdaptiveLearner,
-  type AdaptiveLearnerConfig,
-  type AdaptiveLearnerStats,
-  type ExtractedFact,
   type Example,
-  type GeneralizedRule,
-  type TransferResult,
-  type MistakeLesson,
   type PredictionRecord,
-  type CalibrationReport,
 } from '../AdaptiveLearner'
 
 // ── Constructor Tests ──

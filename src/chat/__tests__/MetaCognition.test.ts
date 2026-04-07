@@ -1,11 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   MetaCognition,
-  type ConfidenceAssessment,
-  type EpistemicState,
-  type KnowledgeGap,
-  type ReflectionResult,
-  type MetaCognitionStats,
   type MetaCognitionConfig,
 } from '../MetaCognition'
 
@@ -191,7 +186,7 @@ describe('recordOutcome', () => {
     }
 
     const before = new MetaCognition({ minSamplesForCalibration: 3 })
-    const resultBefore = before.assessConfidence('Test query', 'Test answer', 'testing')
+    const _resultBefore = before.assessConfidence('Test query', 'Test answer', 'testing')
 
     const resultAfter = mc2.assessConfidence('Test query', 'Test answer', 'testing')
 
@@ -355,7 +350,7 @@ describe('detectKnowledgeGaps', () => {
     ]
     const gaps = mc.detectKnowledgeGaps(queries)
     if (gaps.length > 0) {
-      const targetGap = gaps.find(g => g.topic === 'biology-genetics-overview'
+      const _targetGap = gaps.find(g => g.topic === 'biology-genetics-overview'
         || g.topic === 'biology-genetics-details'
         || g.topic.startsWith('biology'))
       // Queries with identical first 3 words share a domain

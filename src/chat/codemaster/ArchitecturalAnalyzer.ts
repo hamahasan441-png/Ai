@@ -386,7 +386,7 @@ export class ArchitecturalAnalyzer {
         }
 
         // Count members (properties and methods)
-        if (j > i && /^\s+\w+[\s?:(\[]/.test(lines[j]) && !/\/\//.test(lines[j])) {
+        if (j > i && /^\s+\w+[\s?:([]/.test(lines[j]) && !/\/\//.test(lines[j])) {
           memberCount++
         }
       }

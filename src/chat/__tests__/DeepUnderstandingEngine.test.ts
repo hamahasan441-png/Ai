@@ -1,16 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   DeepUnderstandingEngine,
-  type DeepUnderstandingConfig,
-  type DeepUnderstandingStats,
   type ConversationTurn,
-  type SimilarityMatch,
-  type ParsedIntent,
-  type AmbiguityResult,
-  type ExtractedEntity,
-  type EntityRelation,
-  type ContextualClassification,
-  type UnderstandingResult,
 } from '../DeepUnderstandingEngine'
 
 // ── Constructor Tests ──
