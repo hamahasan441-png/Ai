@@ -21,7 +21,7 @@ describe('Advanced EA Features Knowledge', () => {
 
   it('explains EA dashboard panel development', async () => {
     const r = await brain.chat('How to create an EA dashboard panel HUD with MQL graphical interface?')
-    expect(r.text.toLowerCase()).toMatch(/objectcreate|panel|label|rectangle|dashboard|display|balance|cappDialog/i)
+    expect(r.text.toLowerCase()).toMatch(/objectcreate|panel|label|rectangle|dashboard|display|balance|cappdialog/)
   })
 
   describe('Semantic Memory', () => {

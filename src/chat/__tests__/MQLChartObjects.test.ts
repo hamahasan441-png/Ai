@@ -22,7 +22,7 @@ describe('MQL Chart Objects & GUI Knowledge', () => {
 
     it('covers MQL5 canvas and CDialog panels', async () => {
       const r = await brain.chat('How to use MQL5 CCanvas drawing and CDialog custom panel?')
-      expect(r.text.toLowerCase()).toMatch(/canvas|ccanvas|cgraphic|cappd?ialog|bitmap|pixel/)
+      expect(r.text.toLowerCase()).toMatch(/canvas|ccanvas|cgraphic|cappdialog|cdialog|bitmap|pixel/)
     })
   })
 
