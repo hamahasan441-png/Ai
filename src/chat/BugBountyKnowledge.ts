@@ -186,6 +186,12 @@ const DEFAULT_CONFIG: BugBountyKnowledgeConfig = {
   ],
 };
 
+/** Minimum token-similarity score for search results. */
+const MIN_SIMILARITY_THRESHOLD = 0.15;
+
+/** Minimum score for vulnerability classification matches. */
+const MIN_CLASSIFICATION_SCORE = 0.1;
+
 // ── Database builders ────────────────────────────────────────────
 
 function buildPlatformDatabase(): BugBountyPlatform[] {
@@ -985,7 +991,7 @@ export class BugBountyKnowledge {
   searchVulnClasses(query: string): VulnClassForBounty[] {
     this.totalVulnLookups++;
     return this.vulnClasses
-      .filter(v => tokenSimilarity(query, `${v.name} ${v.owasp} ${v.cwe} ${v.commonTargets.join(' ')}`) > 0.15)
+      .filter(v => tokenSimilarity(query, `${v.name} ${v.owasp} ${v.cwe} ${v.commonTargets.join(' ')}`) > MIN_SIMILARITY_THRESHOLD)
       .sort((a, b) => {
         const sa = tokenSimilarity(query, `${a.name} ${a.owasp} ${a.commonTargets.join(' ')}`);
         const sb = tokenSimilarity(query, `${b.name} ${b.owasp} ${b.commonTargets.join(' ')}`);
@@ -1573,7 +1579,7 @@ export class BugBountyKnowledge {
     });
 
     return scored
-      .filter(s => s.score > 0.1)
+      .filter(s => s.score > MIN_CLASSIFICATION_SCORE)
       .sort((a, b) => b.score - a.score)
       .slice(0, 5)
       .map(s => s.vuln);
