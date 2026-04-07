@@ -182,9 +182,11 @@ describe('Telemetry', () => {
 
       const span = new Span('test', 't1', 's1')
       processor.onEnd(span.end())
-      processor.shutdown()
-
+      
+      // Manually flush to verify buffering works
+      processor.flush()
       expect(exporter.getSpans().length).toBe(1)
+      processor.shutdown()
     })
   })
 

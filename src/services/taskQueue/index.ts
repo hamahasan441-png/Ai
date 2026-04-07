@@ -351,12 +351,19 @@ export class TaskQueue {
   // ── Private methods ──
 
   private process(): void {
+    let skipped = 0
     while (this.runningCount < this.opts.concurrency && this.pendingQueue.length > 0) {
+      // Prevent infinite loop when all remaining tasks have unmet dependencies
+      if (skipped >= this.pendingQueue.length) break
+
       const taskId = this.pendingQueue.shift()
       if (!taskId) break
 
       const task = this.tasks.get(taskId)
-      if (!task || task.status !== 'pending') continue
+      if (!task || task.status !== 'pending') {
+        skipped = 0 // Non-pending tasks don't count
+        continue
+      }
 
       // Check dependencies
       if (task.options.dependsOn && task.options.dependsOn.length > 0) {
@@ -368,10 +375,12 @@ export class TaskQueue {
         if (!allDepsComplete) {
           // Re-enqueue at end
           this.pendingQueue.push(taskId)
+          skipped++
           continue
         }
       }
 
+      skipped = 0
       this.runTask(task)
     }
   }
