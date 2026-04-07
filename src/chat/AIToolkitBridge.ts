@@ -1,7 +1,7 @@
 /**
  * 🎨 AIToolkitBridge — TypeScript bridge to the Ostris AI Toolkit
  *
- * Integrates with the Python-based ai-toolkit (https://github.com/hamahasan441-png/ai-toolkit)
+ * Integrates with the Python-based ai-toolkit (https://github.com/ostris/ai-toolkit)
  * to provide image generation, video generation, LoRA training, model management,
  * and more from within the Ai system.
  *
@@ -39,7 +39,7 @@
  * ```
  */
 
-import { execSync, spawn, type ChildProcess } from 'child_process'
+import { execFileSync, spawn, type ChildProcess } from 'child_process'
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs'
 import { join, resolve } from 'path'
 
@@ -613,7 +613,7 @@ config:
     const runScript = join(this.config.toolkitPath, 'run.py')
 
     try {
-      const stdout = execSync(`"${pythonCmd}" "${runScript}" "${configPath}"`, {
+      const stdout = execFileSync(pythonCmd, [runScript, configPath], {
         cwd: this.config.toolkitPath,
         timeout: timeoutMs,
         env: {
@@ -746,7 +746,7 @@ config:
       anime: 'realistic, photo, photograph, 3d, western',
       general: 'watermark, text, signature, logo',
     }
-    const extra = style ? styleNeg[style] ?? '' : styleNeg.general!
+    const extra = style ? (styleNeg[style] ?? '') : (styleNeg.general ?? '')
     return [baseNeg, extra].filter(Boolean).join(', ')
   }
 
@@ -754,7 +754,7 @@ config:
 
   /** Execute a Python command and return stdout */
   private execPython(code: string): string {
-    return execSync(`"${this.config.pythonPath}" -c "${code.replace(/"/g, '\\"')}"`, {
+    return execFileSync(this.config.pythonPath, ['-c', code], {
       encoding: 'utf-8',
       timeout: 10_000,
     }).trim()
@@ -864,6 +864,13 @@ export function recommendModel(useCase: 'fast-image' | 'quality-image' | 'video'
     'editing': 'black-forest-labs/FLUX.1-Kontext-dev',
     'low-vram': 'stable-diffusion-v1-5/stable-diffusion-v1-5',
   }
-  const modelId = recommendations[useCase]!
-  return SUPPORTED_MODELS.find(m => m.id === modelId)!
+  const modelId = recommendations[useCase]
+  if (!modelId) {
+    throw new Error(`Unknown use case: ${useCase}`)
+  }
+  const model = SUPPORTED_MODELS.find(m => m.id === modelId)
+  if (!model) {
+    throw new Error(`Model not found in registry: ${modelId}`)
+  }
+  return model
 }
