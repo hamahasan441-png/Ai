@@ -1372,7 +1372,7 @@ export class KnowledgeReasoner {
    */
   private generateAbductiveHypotheses(
     entities: string[],
-    question: string,
+    _question: string,
   ): Hypothesis[] {
     const hypotheses: Hypothesis[] = [];
 

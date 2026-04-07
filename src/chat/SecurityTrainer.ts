@@ -736,7 +736,7 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-function generateId(prefix: string): string {
+function _generateId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 

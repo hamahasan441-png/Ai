@@ -364,7 +364,7 @@ function buildSeedRelations(): SeedRelation[] {
 // ── Inverse relation helpers ────────────────────────────────────────────────
 
 const HIERARCHY_UP: ReadonlySet<RelationType> = new Set(['is_a', 'part_of']);
-const HIERARCHY_DOWN_MAP: ReadonlyMap<RelationType, RelationType> = new Map([
+const _HIERARCHY_DOWN_MAP: ReadonlyMap<RelationType, RelationType> = new Map([
   ['is_a', 'is_a'],
   ['part_of', 'part_of'],
 ]);
@@ -916,8 +916,8 @@ export class ConceptMapper {
     }
 
     // Jaccard-like similarity score
-    const totalPropsA = conceptA.properties.size;
-    const totalPropsB = conceptB.properties.size;
+    const _totalPropsA = conceptA.properties.size;
+    const _totalPropsB = conceptB.properties.size;
     const propUnion = new Set([
       ...Array.from(conceptA.properties.keys()),
       ...Array.from(conceptB.properties.keys()),
@@ -1078,7 +1078,7 @@ export class ConceptMapper {
       return results;
     }
 
-    const concept = this.concepts.get(conceptId)!;
+    const _concept = this.concepts.get(conceptId)!;
 
     // Rule 1: Transitive is_a  (A is_a B ∧ B is_a C → A is_a C)
     this.inferTransitive(conceptId, 'is_a', results);

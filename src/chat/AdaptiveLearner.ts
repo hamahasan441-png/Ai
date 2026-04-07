@@ -203,7 +203,7 @@ interface AdaptiveLearnerState {
 }
 
 /** Serializable version of CalibrationReport (Maps → plain objects). */
-interface SerializableCalibrationReport {
+interface _SerializableCalibrationReport {
   brierScore: number;
   overconfidence: number;
   underconfidence: number;

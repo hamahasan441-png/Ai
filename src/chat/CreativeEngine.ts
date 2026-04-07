@@ -1819,7 +1819,7 @@ export class CreativeEngine {
   }
 
   /** Apply one evolution step to an idea using the specified technique. */
-  private applyEvolutionStep(idea: CreativeIdea, technique: string, iteration: number): CreativeIdea {
+  private applyEvolutionStep(idea: CreativeIdea, technique: string, _iteration: number): CreativeIdea {
     const tokens = tokenize(idea.description);
 
     let evolvedDescription: string;

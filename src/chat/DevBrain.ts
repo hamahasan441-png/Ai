@@ -52,10 +52,8 @@ import type {
 } from './types.js'
 
 import {
-  estimateComplexity,
   isSupportedImageType,
   validateImageData,
-  parseImageAnalysis,
 } from './types.js'
 
 import { LocalBrain } from './LocalBrain.js'
@@ -657,7 +655,7 @@ export class DevBrain implements BrainInterface {
 
     const localStats = this.localBrain.getStats() as LocalBrainStats
     const patternCount = this.localBrain.getLearnedPatternCount()
-    const knowledgeSize = this.localBrain.getKnowledgeBaseSize()
+    const _knowledgeSize = this.localBrain.getKnowledgeBaseSize()
     const totalInteractions = localStats.totalChats + localStats.totalCodeGenerations + localStats.totalCodeReviews
 
     // Determine skill level based on interaction depth

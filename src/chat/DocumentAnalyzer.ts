@@ -636,7 +636,7 @@ export class DocumentAnalyzer {
 
   // ── Content Analysis ───────────────────────────────────────────────────────
 
-  private analyzeContent(content: string, metadata: DocumentMetadata): ContentAnalysis {
+  private analyzeContent(content: string, _metadata: DocumentMetadata): ContentAnalysis {
     const words = this.tokenize(content)
     const sentences = this.splitSentences(content)
 
@@ -773,7 +773,7 @@ export class DocumentAnalyzer {
     const syllables = words * 1.5 // Approximate
     const complexPercentage = content.complexWordPercentage
     const chars = metadata.charCount
-    const avgSentLen = content.avgSentenceLength
+    const _avgSentLen = content.avgSentenceLength
 
     // Flesch-Kincaid Reading Ease
     const fleschKincaid = Math.round(
@@ -918,7 +918,7 @@ export class DocumentAnalyzer {
 
   // ── Keywords ───────────────────────────────────────────────────────────────
 
-  private extractKeywords(content: string, metadata: DocumentMetadata): KeywordResult[] {
+  private extractKeywords(content: string, _metadata: DocumentMetadata): KeywordResult[] {
     const words = this.tokenize(content)
     const freq = this.computeWordFrequency(words)
 
@@ -1147,7 +1147,7 @@ export class DocumentAnalyzer {
     structure: DocumentStructure,
     keywords: readonly KeywordResult[],
   ): string {
-    const qLower = question.toLowerCase()
+    const _qLower = question.toLowerCase()
     const qWords = this.tokenize(question).map(w => w.toLowerCase()).filter(w => !STOP_WORDS.has(w))
 
     // Find most relevant section
@@ -1196,7 +1196,7 @@ export class DocumentAnalyzer {
     readability: ReadabilityMetrics,
     keywords: readonly KeywordResult[],
     sentiment: DocumentSentiment,
-    question?: string,
+    _question?: string,
   ): string {
     const parts: string[] = []
 

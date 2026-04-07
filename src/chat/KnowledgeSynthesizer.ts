@@ -293,7 +293,7 @@ function tokenize(text: string): string[] {
     .filter(w => w.length > 1 && !STOP_WORDS.has(w));
 }
 
-function generateId(prefix: string): string {
+function _generateId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 

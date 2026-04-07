@@ -175,7 +175,7 @@ export class CoreferenceResolver {
    */
   private findReplacements(
     text: string,
-    entities: Map<string, string[]>
+    _entities: Map<string, string[]>
   ): CoreferenceReplacement[] {
     const replacements: CoreferenceReplacement[] = [];
     const lowerText = text.toLowerCase();

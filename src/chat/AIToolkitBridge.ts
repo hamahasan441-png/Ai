@@ -41,7 +41,7 @@
 
 import { execFileSync, spawn, type ChildProcess } from 'child_process'
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs'
-import { join, resolve } from 'path'
+import { join } from 'path'
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §1  TYPES & INTERFACES                                                     ║

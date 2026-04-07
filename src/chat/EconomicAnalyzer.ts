@@ -163,7 +163,7 @@ const DEFAULT_CONFIG: EconomicAnalyzerConfig = {
 
 // ── Sector Definitions ──────────────────────────────────────────────────────
 
-const SECTORS = [
+const _SECTORS = [
   'technology', 'healthcare', 'energy', 'finance',
   'consumer_discretionary', 'consumer_staples', 'industrials',
   'materials', 'real_estate', 'utilities', 'communications',
@@ -484,7 +484,7 @@ export class EconomicAnalyzer {
     const gdpValues = snapshots.map(s => s.gdpGrowth);
     const inflationValues = snapshots.map(s => s.inflation);
     const unemploymentValues = snapshots.map(s => s.unemployment);
-    const rateValues = snapshots.map(s => s.interestRate);
+    const _rateValues = snapshots.map(s => s.interestRate);
 
     const gdpTrend = linearRegression(gdpValues);
     const inflTrend = linearRegression(inflationValues);
@@ -911,7 +911,7 @@ export class EconomicAnalyzer {
 
     // Run sub-analyses
     const cycle = this.detectBusinessCycle(snapshots);
-    const indicators = this.analyzeIndicators(latest);
+    const _indicators = this.analyzeIndicators(latest);
     const yieldCurve = latest.interestRate > 0
       ? this.analyzeYieldCurve(latest.interestRate, latest.interestRate + 1.5)
       : undefined;

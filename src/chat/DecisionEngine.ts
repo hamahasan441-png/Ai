@@ -613,7 +613,7 @@ export class DecisionEngine {
     const breakpoints: number[] = [];
 
     const baseOutcome = scoreFn(baseValue);
-    let prevOutcome = NaN;
+    let _prevOutcome = NaN;
     let prevSign = 0;
 
     for (let i = 0; i <= steps; i++) {
@@ -629,7 +629,7 @@ export class DecisionEngine {
         breakpoints.push(round2(param - step / 2));
       }
       prevSign = sign;
-      prevOutcome = outcome;
+      _prevOutcome = outcome;
     }
 
     // Robustness = 1 - normalized variance of outcomes
@@ -745,7 +745,7 @@ export class DecisionEngine {
       }
     }
 
-    const maxCopeland = Math.max(...copeland, 1);
+    const _maxCopeland = Math.max(...copeland, 1);
     const ranking = alternativeIds.map((id, idx) => ({
       alternativeId: id,
       score: round2((copeland[idx] + (n - 1)) / (2 * (n - 1) || 1)),
