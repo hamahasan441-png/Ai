@@ -289,3 +289,15 @@ Scala, Lua, Haskell, Elixir
 ## Image Analysis (Vision AI)
 
 Supported formats: PNG, JPEG, GIF, WebP
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding standards, and pull request guidelines.
+
+## Security
+
+To report security vulnerabilities, see [SECURITY.md](SECURITY.md).
+
+## License
+
+This project is licensed under the [ISC License](LICENSE).
