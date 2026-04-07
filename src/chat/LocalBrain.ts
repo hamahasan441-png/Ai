@@ -5033,7 +5033,7 @@ export class LocalBrain {
             smartAugmentation += `\n\n**🔍 Advanced Search (${searchResult.strategiesUsed.length} strategies, ${(searchResult.confidence * 100).toFixed(0)}% confidence):**\n\n*Thinking process:*\n${thinkingReport}\n\n*Top results:*\n${topResults}`
           }
         }
-      } catch (e) { moduleFailures.push('config: ' + (e instanceof Error ? e.message : String(e))) }
+      } catch (e) { moduleFailures.push('advancedSearchEngine: ' + (e instanceof Error ? e.message : String(e))) }
     }
 
     // ── ConfidenceGate: quality control ──────────────────────────────────────
@@ -7007,7 +7007,6 @@ export class LocalBrain {
 
     // Check for deep nesting
     let maxNesting = 0
-    const _nestLevel = 0
     let maxNestLine = 0
     for (let i = 0; i < lines.length; i++) {
       const leadingSpaces = (lines[i]!.match(/^(\s*)/) ?? [''])[0]!.length

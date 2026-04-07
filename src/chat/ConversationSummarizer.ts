@@ -248,7 +248,7 @@ export class ConversationSummarizer {
     } else if (role === 'assistant' && this.summary.openQuestions.length > 0) {
       // Match the answer to the best-matching open question using keyword overlap
       // Strip punctuation from words to avoid "authentication," vs "authentication" mismatches
-      const stripPunct = (w: string) => w.replace(/[^a-z0-9]/g, '');
+      const stripPunct = (w: string) => w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
       const answerWords = new Set(
         content.toLowerCase().split(/\s+/).map(stripPunct).filter(w => w.length > 3)
       );
