@@ -17,10 +17,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { CodeAgent } from '../CodeAgent.js'
 import type {
   ProjectTemplate,
-  ScaffoldResult,
-  CreateFileRequest,
-  AddToFileRequest,
-  ExportFromFileRequest,
 } from '../CodeAgent.js'
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗

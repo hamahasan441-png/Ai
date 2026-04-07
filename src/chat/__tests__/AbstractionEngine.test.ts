@@ -2,15 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   AbstractionEngine,
   createProgrammingAbstractionEngine,
-  type AbstractionEngineConfig,
-  type AbstractionEngineStats,
-  type PatternAbstraction,
-  type GeneralizationResult,
-  type SpecializationResult,
-  type ConceptHierarchy,
-  type AbstractionMapping,
-  type PrototypeEntry,
-  type AbstractConcept,
 } from '../AbstractionEngine'
 
 // ── Constructor Tests ──

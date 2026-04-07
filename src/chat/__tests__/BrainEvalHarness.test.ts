@@ -9,7 +9,7 @@ import {
   GOLDEN_CASES,
   DEFAULT_EVAL_CONFIG,
 } from '../BrainEvalHarness.js'
-import type { EvalCase, EvalTarget, EvalReport } from '../BrainEvalHarness.js'
+import type { EvalCase, EvalTarget } from '../BrainEvalHarness.js'
 
 // ── Mock Brain ──
 

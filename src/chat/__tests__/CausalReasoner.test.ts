@@ -1,16 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   CausalReasoner,
-  type CausalReasonerConfig,
-  type CausalReasonerStats,
   type CausalGraph,
   type CausalNode,
   type CausalEdge,
-  type CausalChain,
-  type CausalInference,
-  type CounterfactualResult,
-  type RootCauseResult,
-  type InterventionResult,
 } from '../CausalReasoner'
 
 // ── Helper: build a simple graph for reuse in tests ──

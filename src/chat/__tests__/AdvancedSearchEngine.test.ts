@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { AdvancedSearchEngine } from '../AdvancedSearchEngine.js'
-import type { SearchDocument, SearchConfig } from '../AdvancedSearchEngine.js'
+import type { SearchDocument } from '../AdvancedSearchEngine.js'
 
 // ── Helper: build a small corpus for testing ──
 
