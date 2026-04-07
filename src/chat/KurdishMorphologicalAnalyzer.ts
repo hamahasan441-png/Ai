@@ -72,8 +72,6 @@ const PREFIXES: ReadonlyMap<string, string> = new Map([
   ['پێ', 'with/to'],
   ['تێ', 'through/into'],
   ['لێ', 'from/at'],
-  ['سەر', 'on/over'],
-  ['بەر', 'toward/before'],
 ])
 
 /** Kurdish suffix definitions: form → label. */
@@ -221,6 +219,31 @@ export class KurdishMorphologicalAnalyzer {
     }
 
     this.analyzedCount++
+
+    // Fast path: if the whole word is a known root, return it directly
+    // This prevents false affix stripping on words like باران, من, دایک
+    if (this.roots.has(trimmed)) {
+      const entry = this.roots.get(trimmed)!
+      const result: MorphemeAnalysis = {
+        word: trimmed,
+        morphemes: [trimmed],
+        root: trimmed,
+        prefixes: [],
+        suffixes: [],
+        pattern: 'ROOT',
+        pos: entry.pos,
+      }
+
+      if (this.config.enableCache) {
+        if (this.cache.size >= this.config.maxCacheSize) {
+          const firstKey = this.cache.keys().next().value
+          if (firstKey !== undefined) this.cache.delete(firstKey)
+        }
+        this.cache.set(trimmed, result)
+      }
+
+      return result
+    }
 
     const prefixes = this.extractPrefixes(trimmed)
     const withoutPrefixes = this.stripPrefixes(trimmed, prefixes)
