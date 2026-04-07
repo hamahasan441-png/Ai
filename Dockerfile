@@ -44,6 +44,10 @@ RUN mkdir -p /root/.local/share/ai \
 # Environment
 ENV NODE_ENV=production
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD node -e "process.exit(0)" || exit 1
+
 # Default entrypoint
 ENTRYPOINT ["node", "src/entrypoints/cli.tsx"]
 CMD ["--help"]

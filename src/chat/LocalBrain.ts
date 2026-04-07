@@ -615,8 +615,8 @@ function buildKnowledgeBase(): KnowledgeEntry[] {
   add('math', ['probability', 'bayes', 'conditional', 'random variable', 'distribution'],
     'Probability: P(A) = favorable outcomes / total outcomes, range [0,1]. P(A∪B) = P(A) + P(B) - P(A∩B). P(A|B) = P(A∩B)/P(B). Independent: P(A∩B) = P(A)·P(B). Bayes\' theorem: P(A|B) = P(B|A)·P(A)/P(B). Binomial: P(k successes in n trials) = C(n,k)·pᵏ(1-p)ⁿ⁻ᵏ. Expected value: E[X] = Σxᵢ·P(xᵢ). Poisson: P(k) = λᵏe⁻λ/k!. Normal distribution: bell curve, defined by μ and σ. Central Limit Theorem: sample means → normal as n→∞.', 1.3)
 
-  add('math', ['combinatorics', 'permutation', 'combination', 'counting'],
-    'Combinatorics: Permutations (order matters): P(n,r) = n!/(n-r)!. Combinations (order doesn\'t): C(n,r) = n!/(r!(n-r)!). Factorial: n! = n·(n-1)·...·1, 0!=1. Multiplication principle: if task A has m ways and B has n ways → m·n total. Addition principle: if A or B, m+n ways (if disjoint). Pigeonhole principle: if n items in m boxes and n>m, some box has ≥2 items. Stars and bars: distributing n identical items into k bins = C(n+k-1,k-1). Inclusion-exclusion: |A∪B∪C| = |A|+|B|+|C|-|A∩B|-|A∩C|-|B∩C|+|A∩B∩C|.', 1.2)
+  add('math', ['combinatorics', 'permutation', 'permutations', 'combination', 'combinations', 'counting', 'factorial'],
+    'Combinatorics: Permutations (order matters): P(n,r) = n!/(n-r)!. Combinations (order doesn\'t): C(n,r) = n!/(r!(n-r)!). Factorial: n! = n·(n-1)·...·1, 0!=1. Multiplication principle: if task A has m ways and B has n ways → m·n total. Addition principle: if A or B, m+n ways (if disjoint). Pigeonhole principle: if n items in m boxes and n>m, some box has ≥2 items. Stars and bars: distributing n identical items into k bins = C(n+k-1,k-1). Inclusion-exclusion: |A∪B∪C| = |A|+|B|+|C|-|A∩B|-|A∩C|-|B∩C|+|A∩B∩C|.', 1.3)
 
   // ── Number Theory ──
   add('math', ['number theory', 'prime', 'divisibility', 'modular arithmetic', 'gcd'],
@@ -737,8 +737,8 @@ function buildKnowledgeBase(): KnowledgeEntry[] {
   add('logic', ['boolean algebra', 'boolean', 'logic gate', 'and gate', 'or gate', 'nand', 'xor'],
     'Boolean algebra: Values: 0 (false) and 1 (true). Operations: AND (·), OR (+), NOT (\'). Laws: identity (a·1=a, a+0=a), null (a·0=0, a+1=1), idempotent (a·a=a, a+a=a), complement (a·a\'=0, a+a\'=1), commutative, associative, distributive, De Morgan (a·b)\' = a\'+b\', (a+b)\' = a\'·b\'. Logic gates: AND, OR, NOT, NAND (universal), NOR (universal), XOR (exclusive or), XNOR. NAND is functionally complete — any circuit can be built from NANDs alone. Karnaugh maps: simplify boolean expressions visually.', 1.3)
 
-  add('logic', ['logical fallacy', 'fallacy', 'invalid argument', 'cognitive bias'],
-    'Logical fallacies — Formal: affirming the consequent (if p→q and q, concluding p), denying the antecedent (if p→q and ¬p, concluding ¬q). Informal: ad hominem (attack person not argument), straw man (misrepresent argument), false dichotomy (only two options), slippery slope (chain of unlikely consequences), appeal to authority, appeal to emotion, circular reasoning (begging the question), hasty generalization (small sample), red herring (irrelevant distraction), tu quoque (you too), bandwagon, post hoc ergo propter hoc (after therefore because of).', 1.3)
+  add('logic', ['logical fallacy', 'fallacy', 'invalid argument', 'cognitive bias', 'ad hominem', 'straw man', 'red herring', 'slippery slope', 'fallacies'],
+    'Logical fallacies — Formal: affirming the consequent (if p→q and q, concluding p), denying the antecedent (if p→q and ¬p, concluding ¬q). Informal: ad hominem (attack person not argument), straw man (misrepresent argument), false dichotomy (only two options), slippery slope (chain of unlikely consequences), appeal to authority, appeal to emotion, circular reasoning (begging the question), hasty generalization (small sample), red herring (irrelevant distraction), tu quoque (you too), bandwagon, post hoc ergo propter hoc (after therefore because of).', 1.5)
 
   // ── Proof Techniques ──
   add('logic', ['proof', 'direct proof', 'contradiction', 'contrapositive', 'proof technique'],
@@ -2138,8 +2138,8 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('data_science_ml', ['gradient boosting xgboost lightgbm catboost', 'ensemble methods boosting bagging', 'kaggle competition winning model'],
     'Gradient Boosting: Sequential ensemble that corrects predecessor errors. XGBoost: regularized gradient boosting, handles missing values, parallel tree construction, dominant in Kaggle competitions. Hyperparameters: n_estimators, max_depth, learning_rate, subsample, colsample_bytree. LightGBM: leaf-wise growth (faster), histogram-based splitting, native categorical support. CatBoost: ordered boosting, automatic categorical encoding, GPU training. Tuning: GridSearchCV/RandomizedSearchCV/Optuna for hyperparameter optimization. Stacking: train meta-model on base model predictions. Feature importance: SHAP values for interpretable ML explanations.', 0.9)
 
-  add('data_science_ml', ['reinforcement learning q-learning policy gradient', 'reward optimization agent environment', 'openai gym reinforcement'],
-    'Reinforcement Learning: Agent learns optimal policy through environment interaction. Framework: state → action → reward → next state (MDP). Value-based: Q-Learning (tabular), DQN (neural network Q-function, experience replay, target network). Policy-based: REINFORCE (Monte Carlo policy gradient), PPO (proximal policy optimization, clipped objective). Actor-Critic: A2C/A3C (parallel environments), SAC (soft actor-critic, entropy regularization). Environments: OpenAI Gym/Gymnasium, MuJoCo (physics), Atari (games). Applications: game AI, robotics, recommendation systems, resource allocation. Challenges: sample efficiency, reward shaping, exploration-exploitation tradeoff.', 0.85)
+  add('data_science_ml', ['reinforcement learning', 'q-learning', 'dqn', 'policy gradient', 'reward', 'openai gym', 'reinforcement'],
+    'Reinforcement Learning: Agent learns optimal policy through environment interaction. Framework: state → action → reward → next state (MDP). Value-based: Q-Learning (tabular), DQN (neural network Q-function, experience replay, target network). Policy-based: REINFORCE (Monte Carlo policy gradient), PPO (proximal policy optimization, clipped objective). Actor-Critic: A2C/A3C (parallel environments), SAC (soft actor-critic, entropy regularization). Environments: OpenAI Gym/Gymnasium, MuJoCo (physics), Atari (games). Applications: game AI, robotics, recommendation systems, resource allocation. Challenges: sample efficiency, reward shaping, exploration-exploitation tradeoff.', 1.1)
 
   add('data_science_ml', ['time series forecasting arima lstm', 'sequential data prediction temporal', 'prophet seasonal decomposition'],
     'Time series forecasting: Predicting future values from temporal data. Classical: ARIMA (AutoRegressive Integrated Moving Average) — stationary series, (p,d,q) parameters. Seasonal: SARIMA adds seasonal components. Exponential smoothing: simple, double (Holt), triple (Holt-Winters). Modern: Prophet (Facebook, handles holidays/seasonality), LSTM networks (long-term dependencies), Temporal Fusion Transformers. Decomposition: trend + seasonality + residual (additive/multiplicative). Evaluation: RMSE, MAE, MAPE, walk-forward validation. Stationarity: ADF test, differencing. Feature engineering: lag features, rolling statistics, Fourier terms for seasonality.', 0.85)
@@ -2598,8 +2598,8 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('bioinformatics', ['genomics transcriptomics rna seq gene expression', 'single cell sequencing scrna seq analysis', 'variant calling snp mutation genotype analysis'],
     'Omics data analysis: Genomics — whole genome sequencing (WGS), variant calling (GATK: BWA alignment → MarkDuplicates → HaplotypeCaller), SNP/indel detection, structural variants. Transcriptomics — RNA-seq: read alignment (STAR, HISAT2) → quantification (featureCounts, Salmon) → differential expression (DESeq2, edgeR). Single-cell RNA-seq: 10x Genomics, cell clustering (Seurat, Scanpy), UMAP/t-SNE visualization, trajectory analysis. Epigenomics: ChIP-seq (histone marks, TF binding), ATAC-seq (chromatin accessibility), methylation (bisulfite sequencing).', 0.85)
 
-  add('bioinformatics', ['biopython bioconductor bioinformatics library', 'phylogenetic tree evolution molecular clock', 'metagenomics microbiome 16s amplicon analysis'],
-    'Bioinformatics tools & analysis: BioPython (sequence I/O, BLAST, PDB parsing), Bioconductor (R packages for genomics), Galaxy (web-based workflow platform). Phylogenetics: evolutionary trees from sequence data. Methods: maximum likelihood (RAxML, IQ-TREE), Bayesian (MrBayes, BEAST), neighbor-joining. Molecular clock: estimate divergence times. Metagenomics: study microbial communities. 16S rRNA amplicon sequencing (QIIME2, DADA2), shotgun metagenomics (Kraken2, MetaPhlAn). Microbiome: diversity metrics (Shannon, Simpson), beta diversity (UniFrac, Bray-Curtis), taxonomic profiling.', 0.85)
+  add('bioinformatics', ['biopython', 'bioconductor', 'bioinformatics', 'phylogenetic', 'phylogenetics', 'metagenomics', 'microbiome', '16s amplicon'],
+    'Bioinformatics tools & analysis: BioPython (sequence I/O, BLAST, PDB parsing), Bioconductor (R packages for genomics), Galaxy (web-based workflow platform). Phylogenetics: evolutionary trees from sequence data. Methods: maximum likelihood (RAxML, IQ-TREE), Bayesian (MrBayes, BEAST), neighbor-joining. Molecular clock: estimate divergence times. Metagenomics: study microbial communities. 16S rRNA amplicon sequencing (QIIME2, DADA2), shotgun metagenomics (Kraken2, MetaPhlAn). Microbiome: diversity metrics (Shannon, Simpson), beta diversity (UniFrac, Bray-Curtis), taxonomic profiling.', 1.1)
 
   add('bioinformatics', ['machine learning genomics deep learning biology', 'protein language model esm transformer', 'biomarker discovery feature selection omics'],
     'ML in biology: Deep learning for genomics — CNNs for motif detection (DeepBind), RNNs for sequence classification, transformers for gene expression (Enformer). Protein language models: ESM (Meta, attention-based, embeddings for structure/function prediction), ProtTrans, protein representation learning. Biomarker discovery: feature selection from high-dimensional omics data (LASSO, random forest importance, differential analysis). Drug response prediction. Graph neural networks for molecular property prediction. AlphaFold, RFdiffusion (protein design). Foundation models: scGPT (single-cell), Evo (DNA language model). Data: FASTA, FASTQ, BAM/SAM, VCF, GFF/GTF file formats.', 0.8)
@@ -2687,8 +2687,8 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('llm_prompt_engineering', ['rag retrieval augmented generation knowledge base', 'vector database embedding similarity search', 'langchain llamaindex llm framework orchestration'],
     'RAG (Retrieval-Augmented Generation): retrieve relevant documents → augment prompt → generate answer. Pipeline: query → embed → vector search → top-k retrieval → rerank → prompt construction → LLM generation. Vector databases: Pinecone (managed), Weaviate (open-source, GraphQL), ChromaDB (lightweight), Qdrant (Rust, fast), Milvus (scalable), pgvector (PostgreSQL extension). Embeddings: OpenAI text-embedding-3, sentence-transformers, BGE, E5. Frameworks: LangChain (chains, agents, tools, memory), LlamaIndex (data connectors, indexing strategies), Haystack (NLP pipelines). Chunking strategies: fixed-size, recursive, semantic.', 0.9)
 
-  add('llm_prompt_engineering', ['fine tuning lora qlora peft parameter efficient', 'instruction tuning sft supervised dataset', 'rlhf reinforcement learning human feedback dpo'],
-    'LLM fine-tuning: Full fine-tuning — update all parameters (expensive, needs lots of data). LoRA (Low-Rank Adaptation): add trainable low-rank matrices to frozen model, 10-100x fewer parameters. QLoRA: quantized LoRA (4-bit base model, train LoRA adapters). PEFT (Parameter-Efficient Fine-Tuning): LoRA, prefix-tuning, prompt-tuning. SFT (Supervised Fine-Tuning): instruction-response pairs, Alpaca/ShareGPT format. RLHF: train reward model from human preferences → PPO optimization. DPO (Direct Preference Optimization): simpler alternative to RLHF. Tools: Hugging Face Transformers, PEFT, TRL (Transformer Reinforcement Learning), Axolotl, Unsloth (fast LoRA).', 0.85)
+  add('llm_prompt_engineering', ['fine-tuning', 'lora', 'qlora', 'peft', 'parameter efficient', 'rlhf', 'dpo', 'instruction tuning', 'sft'],
+    'LLM fine-tuning: Full fine-tuning — update all parameters (expensive, needs lots of data). LoRA (Low-Rank Adaptation): add trainable low-rank matrices to frozen model, 10-100x fewer parameters. QLoRA: quantized LoRA (4-bit base model, train LoRA adapters). PEFT (Parameter-Efficient Fine-Tuning): LoRA, prefix-tuning, prompt-tuning. SFT (Supervised Fine-Tuning): instruction-response pairs, Alpaca/ShareGPT format. RLHF: train reward model from human preferences → PPO optimization. DPO (Direct Preference Optimization): simpler alternative to RLHF. Tools: Hugging Face Transformers, PEFT, TRL (Transformer Reinforcement Learning), Axolotl, Unsloth (fast LoRA).', 1.1)
 
   add('llm_prompt_engineering', ['ai agent tool use function calling automation', 'multi agent system collaboration orchestration', 'llm evaluation benchmark hallucination detection'],
     'AI agents & evaluation: Function calling — LLM selects and calls tools (APIs, databases, code execution). Agent frameworks: AutoGPT, CrewAI (multi-agent, roles), LangGraph (stateful workflows), Semantic Kernel (Microsoft). Multi-agent: specialized agents collaborate (researcher, coder, reviewer). Planning: ReAct, Plan-and-Execute. Memory: short-term (conversation), long-term (vector store). Guardrails: content filtering, output validation, rate limiting. Evaluation: MMLU (knowledge), HumanEval (coding), MT-Bench (conversation), HELM. Hallucination detection: factual consistency, source attribution, confidence calibration. Safety: red teaming, adversarial testing.', 0.85)
@@ -3361,14 +3361,21 @@ function searchKnowledge(
 
     for (const keyword of keywords) {
       for (const entryKeyword of entry.keywords) {
-        // Exact match
+        // Exact match (highest priority)
         if (keyword === entryKeyword) {
           score += 3 * entry.weight
           matchedKeywords.push(keyword)
         }
-        // Partial match (keyword contains entry keyword or vice versa)
-        else if (keyword.includes(entryKeyword) || entryKeyword.includes(keyword)) {
+        // Entry keyword contains query keyword (e.g., entry "reinforcement learning" matches query "reinforcement")
+        // Min length 3 prevents short words like "is", "at", "to" from triggering false partial matches
+        else if (entryKeyword.includes(keyword) && keyword.length >= 3) {
           score += 1.5 * entry.weight
+          matchedKeywords.push(keyword)
+        }
+        // Query keyword contains entry keyword (less specific, lower score)
+        // Min length 3 on entry keyword prevents short entry keywords from matching everything
+        else if (keyword.includes(entryKeyword) && entryKeyword.length >= 3) {
+          score += 1.0 * entry.weight
           matchedKeywords.push(keyword)
         }
       }
@@ -3383,7 +3390,10 @@ function searchKnowledge(
     if (score > 0) {
       // Boost entries that have been useful before
       const useBoost = Math.min(entry.useCount * 0.1, 1)
-      results.push({ entry, score: score + useBoost, matchedKeywords: [...new Set(matchedKeywords)] })
+      // Precision boost: reward entries that match MORE of the query keywords
+      const uniqueMatches = new Set(matchedKeywords).size
+      const precisionBoost = uniqueMatches >= 3 ? uniqueMatches * 0.3 : 0
+      results.push({ entry, score: score + useBoost + precisionBoost, matchedKeywords: [...new Set(matchedKeywords)] })
     }
   }
 
@@ -3405,30 +3415,55 @@ function buildResponse(
   conversationHistory: ApiMessage[],
   creativity: number,
 ): string {
-  // Check learned patterns first (self-learning has priority)
+  // Check learned patterns
   const matchedPattern = findBestLearnedPattern(message, learnedPatterns)
-  if (matchedPattern && matchedPattern.confidence >= 0.7) {
-    return matchedPattern.response
-  }
 
   // Build from knowledge base
   if (knowledgeResults.length > 0) {
     const topResult = knowledgeResults[0]!
 
-    // If high score, use the knowledge directly
+    // If KB has a very strong match, prefer it over learned patterns
+    // This handles keyword collision resolution where the KB entry is clearly the right answer
     if (topResult.score >= 3) {
-      let response = topResult.entry.content
+      // If we also have a learned pattern, check if KB is significantly more specific
+      if (matchedPattern && matchedPattern.confidence >= 0.7) {
+        // Count how many query keywords are exact-matched by the KB entry keywords
+        const msgKeywords = extractKeywords(message)
+        const kbExactMatches = msgKeywords.filter(kw =>
+          topResult.entry.keywords.some(ek => ek === kw)
+        ).length
+        const patternExactMatches = msgKeywords.filter(kw =>
+          matchedPattern.keywords.some(pk => pk === kw)
+        ).length
+        // KB wins if it has more exact keyword matches than the learned pattern
+        if (kbExactMatches > patternExactMatches) {
+          let response = topResult.entry.content
+          if (knowledgeResults.length > 1 && knowledgeResults[1]!.score >= 2) {
+            const additional = knowledgeResults[1]!.entry.content
+            if (knowledgeResults[1]!.entry.category !== topResult.entry.category) {
+              response += '\n\n' + additional
+            }
+          }
+          return response
+        }
+        // Otherwise, learned pattern wins (it's from a previous successful interaction)
+        return matchedPattern.response
+      }
 
-      // If multiple strong results, combine them
+      // No competing learned pattern — use KB directly
+      let response = topResult.entry.content
       if (knowledgeResults.length > 1 && knowledgeResults[1]!.score >= 2) {
         const additional = knowledgeResults[1]!.entry.content
-        // Only add if from different category to avoid repetition
         if (knowledgeResults[1]!.entry.category !== topResult.entry.category) {
           response += '\n\n' + additional
         }
       }
-
       return response
+    }
+
+    // For weaker KB matches, prefer learned patterns
+    if (matchedPattern && matchedPattern.confidence >= 0.7) {
+      return matchedPattern.response
     }
 
     // Medium score — use knowledge but indicate uncertainty
@@ -4960,7 +4995,9 @@ export class LocalBrain {
           const searchResult = this.advancedSearchEngine.searchWithThinking(userMessage)
           if (searchResult.results.length > 0) {
             // Learn from search results so the brain gets smarter over time
-            this.learnFromSearchResults(userMessage, searchResult)
+            if (this.config.enableAutoLearning && this.config.learningEnabled) {
+              this.learnFromSearchResults(userMessage, searchResult)
+            }
 
             const thinkingReport = searchResult.thinkingSteps
               .map(s => `${s.step}. [${s.strategy}] ${s.thought} — ${s.detail}`)
