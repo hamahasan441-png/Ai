@@ -138,9 +138,9 @@ describe('RetryPolicy', () => {
         maxRetries: 3,
       })
 
-      expect(retry._calculateDelay(0)).toBe(100)
-      expect(retry._calculateDelay(1)).toBe(200)
-      expect(retry._calculateDelay(2)).toBe(400)
+      expect(retry.calculateDelay(0)).toBe(100)
+      expect(retry.calculateDelay(1)).toBe(200)
+      expect(retry.calculateDelay(2)).toBe(400)
     })
 
     it('clamps delay to maxDelayMs', () => {
@@ -152,7 +152,7 @@ describe('RetryPolicy', () => {
         maxRetries: 3,
       })
 
-      expect(retry._calculateDelay(3)).toBe(5000)
+      expect(retry.calculateDelay(3)).toBe(5000)
     })
 
     it('applies jitter when enabled', () => {
@@ -164,7 +164,7 @@ describe('RetryPolicy', () => {
         maxRetries: 3,
       })
 
-      const delay = retry._calculateDelay(0)
+      const delay = retry.calculateDelay(0)
       expect(delay).toBeGreaterThanOrEqual(0)
       expect(delay).toBeLessThanOrEqual(1000)
     })

@@ -135,7 +135,7 @@ export class RetryPolicy {
         if (!this._isRetryable(error)) break
 
         // Calculate delay with exponential backoff
-        const delay = this._calculateDelay(attempt)
+        const delay = this.calculateDelay(attempt)
 
         // Notify retry callback
         this.config.onRetry?.(attempt + 1, error, delay)
@@ -149,7 +149,7 @@ export class RetryPolicy {
   }
 
   /** Calculate delay for the given attempt using exponential backoff + jitter. */
-  _calculateDelay(attempt: number): number {
+  calculateDelay(attempt: number): number {
     const exponentialDelay = this.config.baseDelayMs * Math.pow(this.config.backoffMultiplier, attempt)
     const clampedDelay = Math.min(exponentialDelay, this.config.maxDelayMs)
 
