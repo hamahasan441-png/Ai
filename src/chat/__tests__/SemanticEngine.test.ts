@@ -2,10 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   SemanticEngine,
   cosineSimilarity,
-  type SemanticConfig,
   type SemanticDocument,
-  type SimilarityResult,
-  type WordVector,
 } from '../SemanticEngine'
 
 // ── cosineSimilarity (standalone export) ──

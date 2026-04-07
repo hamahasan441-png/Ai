@@ -2,15 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   SemanticMemory,
   createProgrammingKnowledgeGraph,
-  type ConceptNode,
-  type ConceptEdge,
   type RelationType,
-  type SemanticMemoryConfig,
-  type ActivationResult,
-  type ConceptCluster,
-  type Neighborhood,
-  type ExtractedRelationship,
-  type SemanticMemoryStats,
 } from '../SemanticMemory'
 
 // ── Constructor Tests ──
@@ -111,13 +103,13 @@ describe('addRelation', () => {
   let mem: SemanticMemory
   let jsId: string
   let tsId: string
-  let reactId: string
+  let _reactId: string
 
   beforeEach(() => {
     mem = new SemanticMemory()
     jsId = mem.addConcept('JavaScript', 'language')
     tsId = mem.addConcept('TypeScript', 'language')
-    reactId = mem.addConcept('React', 'framework')
+    _reactId = mem.addConcept('React', 'framework')
   })
 
   it('creates edge between two concepts', () => {
@@ -674,7 +666,7 @@ describe('serialize / deserialize', () => {
 
     const restored = SemanticMemory.deserialize(mem.serialize())
     // Can add new concepts
-    const c = restored.addConcept('C', 'test')
+    const _c = restored.addConcept('C', 'test')
     expect(restored.getStats().nodeCount).toBe(3)
     // Can find related
     const conceptA = restored.findConceptByName('A')

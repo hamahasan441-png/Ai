@@ -2,16 +2,10 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   StrategyEngine,
   type StrategyEngineConfig,
-  type StrategyEngineStats,
   type Strategy,
   type StrategyRule,
   type RiskRule,
   type BacktestResult,
-  type TradeRecord,
-  type SignalEvent,
-  type StrategyComparison,
-  type MonteCarloResult,
-  type StrategyOptimizationResult,
 } from '../StrategyEngine'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────

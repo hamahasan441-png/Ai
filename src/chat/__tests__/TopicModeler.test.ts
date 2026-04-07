@@ -1,14 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   TopicModeler,
-  type Topic,
-  type TopicAssignment,
-  type DocumentTopics,
-  type TopicDrift,
-  type UserInterestProfile,
-  type TopicHierarchy,
-  type TopicModelerConfig,
-  type TopicModelerStats,
 } from '../TopicModeler'
 
 // ── Helpers ──────────────────────────────────────────────────────────────

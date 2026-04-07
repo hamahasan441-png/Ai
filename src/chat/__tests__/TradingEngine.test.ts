@@ -1,16 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   TradingEngine,
-  type TradingEngineConfig,
-  type TradingEngineStats,
   type OHLCV,
-  type TechnicalIndicators,
-  type TradeSignal,
-  type TrendAnalysis,
-  type CandlestickPattern,
-  type ChartPattern,
-  type RiskMetrics,
-  type MarketRegime,
 } from '../TradingEngine'
 
 // ── Helpers: generate synthetic OHLCV data ──
