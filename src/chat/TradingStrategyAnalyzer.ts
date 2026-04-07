@@ -472,7 +472,7 @@ export class TradingStrategyAnalyzer {
 
     // Max lot size detection
     let maxLotSize: number | null = null
-    const lotMatch = code.match(/(?:lot|LotSize|InpLotSize)\s*[=:]\s*([\d.]+)/i)
+    const lotMatch = code.match(/(?:lots?|LotSize|InpLotSize|InpStartLot)\s*[=:]\s*([\d.]+)/i)
     if (lotMatch) {
       maxLotSize = parseFloat(lotMatch[1])
       if (maxLotSize > 1.0) {
@@ -589,7 +589,7 @@ export class TradingStrategyAnalyzer {
 
     // Resource cleanup (MQL)
     const hasResourceCleanup = language === 'pinescript' ? true :
-      /\b(?:deinit|OnDeinit|ObjectDelete|IndicatorRelease|ArrayFree|Comment\(""))\b/.test(code)
+      /\b(?:deinit|OnDeinit|ObjectDelete|IndicatorRelease|ArrayFree|Comment)\b/.test(code)
     if (!hasResourceCleanup && (language === 'mql4' || language === 'mql5')) {
       issues.push({
         severity: 'low',
@@ -854,7 +854,7 @@ export class TradingStrategyAnalyzer {
       suggestions.push('⚠️ Martingale strategies have a mathematical certainty of account blow-up given enough trades. Consider fixed-risk alternatives.')
     }
 
-    if (patterns.includes('grid') && !issues.some(i => i.message.includes('drawdown'))) {
+    if (patterns.includes('grid')) {
       suggestions.push('💡 Grid strategies can accumulate large drawdowns. Consider implementing max grid levels and equity-based stop.')
     }
 
