@@ -247,14 +247,16 @@ export class ConversationSummarizer {
       }
     } else if (role === 'assistant' && this.summary.openQuestions.length > 0) {
       // Match the answer to the best-matching open question using keyword overlap
+      // Strip punctuation from words to avoid "authentication," vs "authentication" mismatches
+      const stripPunct = (w: string) => w.replace(/[^a-z0-9]/g, '');
       const answerWords = new Set(
-        content.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+        content.toLowerCase().split(/\s+/).map(stripPunct).filter(w => w.length > 3)
       );
       let bestIdx = -1;
       let bestOverlap = 0;
       for (let i = 0; i < this.summary.openQuestions.length; i++) {
         const qWords = this.summary.openQuestions[i]!
-          .toLowerCase().split(/\s+/).filter(w => w.length > 3);
+          .toLowerCase().split(/\s+/).map(stripPunct).filter(w => w.length > 3);
         const overlap = qWords.filter(w => answerWords.has(w)).length;
         if (overlap > bestOverlap) {
           bestOverlap = overlap;
