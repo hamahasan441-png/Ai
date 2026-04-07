@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      # Run full CI checks
+      - name: Lint
+        run: npx eslint . --max-warnings 0
+
+      - name: Type Check
+        run: npx tsc --noEmit
+
+      - name: Test
+        run: npm test
+
+      # Build
+      - name: Build
+        run: npm run build
+
+      # Generate release notes from commits since last tag
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            NOTES=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          else
+            NOTES=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
+          fi
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # Create GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## Changes
+
+            ${{ steps.release_notes.outputs.notes }}
+
+            ## Installation
+
+            ```bash
+            git clone https://github.com/hamahasan441-png/Ai.git
+            cd Ai
+            npm install
+            ```
+
+            ## Docker
+
+            ```bash
+            docker build -t ai .
+            docker run -it --rm -e ANTHROPIC_API_KEY=your-key ai
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
