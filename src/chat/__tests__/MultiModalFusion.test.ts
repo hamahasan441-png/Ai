@@ -1,13 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   MultiModalFusion,
-  type MultiModalFusionConfig,
-  type MultiModalFusionStats,
-  type IntelligenceSource,
   type SourceOutput,
-  type FusionResult,
   type FusionConflict,
-  type CrossDomainInsight,
 } from '../MultiModalFusion'
 
 // ── Helpers ──
@@ -22,7 +17,7 @@ function makeOutput(overrides: Partial<SourceOutput> = {}): SourceOutput {
   }
 }
 
-function registerAndOutput(
+function _registerAndOutput(
   fusion: MultiModalFusion,
   name: string,
   domain: string,
@@ -326,7 +321,7 @@ describe('MultiModalFusion fuse', () => {
     const f = new MultiModalFusion({ enableCrossDomain: false })
     const s1 = f.registerSource('s1', 'ai')
     const s2 = f.registerSource('s2', 'biology')
-    const result = f.fuse([
+    const _result = f.fuse([
       makeOutput({ sourceId: s1.id, content: 'Neural networks model brain patterns', confidence: 0.9, domain: 'ai' }),
       makeOutput({ sourceId: s2.id, content: 'Neurons fire in brain patterns', confidence: 0.85, domain: 'biology' }),
     ])
@@ -906,7 +901,7 @@ describe('MultiModalFusion provideFeedback', () => {
     const s2 = fusion.registerSource('s2', 'ai', 0.7)
     const o1 = makeOutput({ sourceId: s1.id, content: 'Attention mechanisms are powerful models', confidence: 0.9 })
     const o2 = makeOutput({ sourceId: s2.id, content: 'Transformers use attention mechanisms effectively', confidence: 0.85 })
-    const result = fusion.fuse([o1, o2])
+    const _result = fusion.fuse([o1, o2])
 
     // Get a fusion ID from the log by providing feedback with known key
     // Use the internal mechanism: fuse() logs it, provideFeedback looks it up
@@ -1007,7 +1002,7 @@ describe('MultiModalFusion getStats / getSources / getConfig / reset', () => {
   it('reset allows starting fresh', () => {
     fusion.registerSource('s1', 'ai')
     fusion.reset()
-    const s = fusion.registerSource('s2', 'nlp')
+    const _s = fusion.registerSource('s2', 'nlp')
     expect(fusion.getSources()).toHaveLength(1)
     expect(fusion.getSources()[0].name).toBe('s2')
   })
@@ -1141,7 +1136,7 @@ describe('MultiModalFusion integration scenarios', () => {
 
   it('source eviction under maxSources pressure', () => {
     const f = new MultiModalFusion({ maxSources: 3 })
-    const s1 = f.registerSource('s1', 'ai')
+    const _s1 = f.registerSource('s1', 'ai')
     const s2 = f.registerSource('s2', 'nlp')
     const s3 = f.registerSource('s3', 'cv')
 
@@ -1285,7 +1280,7 @@ describe('MultiModalFusion integration scenarios', () => {
   it('fuse with unregistered source ids still works for valid outputs', () => {
     const f = new MultiModalFusion()
     const s1 = f.registerSource('s1', 'ai')
-    const s2 = f.registerSource('s2', 'ai')
+    const _s2 = f.registerSource('s2', 'ai')
     const result = f.fuse([
       makeOutput({ sourceId: s1.id, content: 'Optimization algorithms find minimum loss values', confidence: 0.9 }),
       makeOutput({ sourceId: 'unregistered-id', content: 'Learning rate schedules adapt training speed', confidence: 0.8 }),

@@ -6,14 +6,10 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   KurdishSentimentAnalyzer,
-  DEFAULT_SENTIMENT_CONFIG,
 } from '../KurdishSentimentAnalyzer.js'
 import type {
   SentimentLabel,
   SentimentResult,
-  SentimentWord,
-  SentimentCorpusSample,
-  KurdishSentimentConfig,
 } from '../KurdishSentimentAnalyzer.js'
 import { LocalBrain } from '../LocalBrain.js'
 import { SemanticMemory, createProgrammingKnowledgeGraph } from '../SemanticMemory.js'

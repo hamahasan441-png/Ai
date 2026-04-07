@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock the types imports since they're not available in test context
 vi.mock('../types', () => ({
@@ -46,7 +46,6 @@ vi.mock('path', () => ({
 }))
 
 import { LocalBrain } from '../LocalBrain'
-import type { LearnedPattern, LocalBrainConfig } from '../LocalBrain'
 
 describe('LocalBrain', () => {
   let brain: LocalBrain
@@ -994,7 +993,7 @@ function process(data) {
     })
 
     it('updates lastUpdated on preference change', () => {
-      const before = brain.getUserPreferences().lastUpdated
+      const _before = brain.getUserPreferences().lastUpdated
       brain.setUserPreference('quotes', 'double')
       const after = brain.getUserPreferences().lastUpdated
       expect(after).toBeDefined()

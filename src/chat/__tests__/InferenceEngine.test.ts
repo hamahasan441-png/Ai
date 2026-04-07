@@ -1,15 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   InferenceEngine,
-  type InferenceEngineConfig,
-  type InferenceEngineStats,
-  type Proposition,
-  type Rule,
-  type InferenceStep,
-  type InferenceChain,
-  type QueryResult,
-  type TruthTable,
-  type Conflict,
 } from '../InferenceEngine'
 
 // ── Constructor Tests ──
@@ -77,7 +68,7 @@ describe('InferenceEngine fact management', () => {
   })
 
   it('addFact updates an existing proposition when name already exists', () => {
-    const first = engine.addFact('uses_async', false, 0.5)
+    const _first = engine.addFact('uses_async', false, 0.5)
     const second = engine.addFact('uses_async', true, 0.9)
     expect(second.value).toBe(true)
     expect(second.confidence).toBe(0.9)

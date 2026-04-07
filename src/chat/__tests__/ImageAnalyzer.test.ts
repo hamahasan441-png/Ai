@@ -4,7 +4,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 import { describe, it, expect, beforeEach } from 'vitest'
-import { ImageAnalyzer, DEFAULT_ANALYZER_CONFIG } from '../ImageAnalyzer.js'
+import { ImageAnalyzer } from '../ImageAnalyzer.js'
 
 // Small valid base64 PNG signature (1x1 pixel PNG)
 const TINY_PNG_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
