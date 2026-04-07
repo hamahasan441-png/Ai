@@ -15,9 +15,22 @@ import { AiError, AiErrorCode } from '../utils/errors.js'
 
 function getPackageVersion(): string {
   try {
-    const pkgPath = path.resolve(__dirname, '../../package.json')
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
-    return pkg.version ?? '0.0.0'
+    // Works in CommonJS (__dirname is available)
+    // Also handles execution from dist/ directory
+    const candidates = [
+      path.resolve(__dirname, '../../package.json'),
+      path.resolve(__dirname, '../package.json'),
+      path.resolve(process.cwd(), 'package.json'),
+    ]
+    for (const pkgPath of candidates) {
+      try {
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
+        if (pkg.name === 'ai' && pkg.version) return pkg.version
+      } catch {
+        // try next candidate
+      }
+    }
+    return '0.0.0'
   } catch {
     return '0.0.0'
   }

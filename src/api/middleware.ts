@@ -62,6 +62,8 @@ export function requestIdMiddleware(): Middleware {
 export interface RateLimitOptions {
   windowMs: number
   maxRequests: number
+  /** Trust X-Forwarded-For header for client IP. Only enable behind a trusted reverse proxy. Default: false */
+  trustProxy?: boolean
 }
 
 interface TokenBucket {
@@ -72,13 +74,14 @@ interface TokenBucket {
 export function rateLimitMiddleware(options: RateLimitOptions): Middleware {
   const buckets = new Map<string, TokenBucket>()
 
-  // NOTE: X-Forwarded-For can be spoofed by clients. Only rely on this
-  // header when the server is behind a trusted reverse proxy that
-  // overwrites or sanitizes it before forwarding.
+  // Only use X-Forwarded-For when trustProxy is explicitly enabled.
+  // Without a trusted proxy, clients can spoof this header to bypass rate limits.
   function getClientIp(req: ApiRequest): string {
-    const forwarded = req.headers['x-forwarded-for']
-    if (typeof forwarded === 'string') {
-      return forwarded.split(',')[0]!.trim()
+    if (options.trustProxy) {
+      const forwarded = req.headers['x-forwarded-for']
+      if (typeof forwarded === 'string') {
+        return forwarded.split(',')[0]!.trim()
+      }
     }
     return req.socket?.remoteAddress ?? 'unknown'
   }
