@@ -120,6 +120,29 @@ export type {
 } from './codemaster/types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
+// AI TOOLKIT BRIDGE — Diffusion model image/video generation (src/chat/AIToolkitBridge.ts)
+// ══════════════════════════════════════════════════════════════════════════════
+export { AIToolkitBridge, SUPPORTED_MODELS, quickImageConfig, quickLoRAConfig, listModels, recommendModel } from './AIToolkitBridge.js'
+
+export type {
+  ImageModel,
+  ImageEditModel,
+  VideoModel,
+  ModelDtype,
+  JobType,
+  TrainProcessType,
+  LoRATrainConfig,
+  GenerateConfig,
+  VideoGenerateConfig,
+  ExtractConfig,
+  AIToolkitBridgeConfig,
+  AIToolkitStatus,
+  JobResult,
+  ActiveJob,
+  ModelInfo,
+} from './AIToolkitBridge.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
 // INTELLIGENCE MODULES — Advanced cognitive capabilities (src/chat/)
 // ══════════════════════════════════════════════════════════════════════════════
 
