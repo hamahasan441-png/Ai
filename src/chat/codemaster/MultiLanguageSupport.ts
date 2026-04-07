@@ -1,10 +1,10 @@
 /**
- * 🌐 MultiLanguageSupport — 24-Language Write & Fix Engine
+ * 🌐 MultiLanguageSupport — 27-Language Write & Fix Engine
  *
- * CodeMaster can write and fix code in all 24 supported programming languages:
+ * CodeMaster can write and fix code in all 27 supported programming languages:
  *   TypeScript, JavaScript, Python, Rust, Go, Java, C, C++, C#, Swift,
  *   Kotlin, Ruby, PHP, HTML, CSS, SQL, Bash, PowerShell, R, Dart,
- *   Scala, Lua, Haskell, Elixir
+ *   Scala, Lua, Haskell, Elixir, MQL4, MQL5, PineScript
  *
  * Each language has:
  *   • Code templates (hello world, function, class, module)
@@ -78,11 +78,12 @@ const EXTENSION_MAP: Record<SupportedLanguage, string> = {
   kotlin: '.kt', ruby: '.rb', php: '.php', html: '.html', css: '.css',
   sql: '.sql', bash: '.sh', powershell: '.ps1', r: '.R', dart: '.dart',
   scala: '.scala', lua: '.lua', haskell: '.hs', elixir: '.ex',
+  mql4: '.mq4', mql5: '.mq5', pinescript: '.pine',
 }
 
 // ── Language Profiles ──
 
-const LANGUAGE_PROFILES: Map<SupportedLanguage, LanguageProfile> = new Map([
+const LANGUAGE_PROFILES: Map<SupportedLanguage, LanguageProfile> = new Map<SupportedLanguage, LanguageProfile>([
   ['typescript', {
     language: 'typescript',
     displayName: 'TypeScript',
@@ -667,6 +668,129 @@ const LANGUAGE_PROFILES: Map<SupportedLanguage, LanguageProfile> = new Map([
       },
     ],
   }],
+  ['mql4', {
+    language: 'mql4',
+    displayName: 'MQL4',
+    fileExtensions: ['.mq4', '.mqh'],
+    packageManager: null,
+    commentStyle: { line: '//', blockStart: '/*', blockEnd: '*/' },
+    namingConvention: 'camelCase',
+    typingSystem: 'static',
+    paradigms: ['procedural', 'event-driven'],
+    templates: {
+      'hello-world': '#property copyright "MyExpert"\n#property link      ""\n#property version   "1.00"\n#property strict\n\nint init() {\n  Print("Hello, MQL4 World!");\n  return(INIT_SUCCEEDED);\n}\n\nint start() {\n  return(0);\n}\n\nint deinit() {\n  return(0);\n}',
+      'function': '//+------------------------------------------------------------------+\n//| {description}\n//+------------------------------------------------------------------+\nvoid {name}() {\n  // TODO: implement\n}',
+      'class': '#property copyright "MyExpert"\n#property link      ""\n#property version   "1.00"\n#property strict\n\nextern double LotSize = 0.1;\nextern int StopLoss = 50;\nextern int TakeProfit = 100;\n\nint init() {\n  return(INIT_SUCCEEDED);\n}\n\nint start() {\n  // Trading logic here\n  return(0);\n}\n\nint deinit() {\n  return(0);\n}',
+      'module': '#property copyright "MyIndicator"\n#property link      ""\n#property version   "1.00"\n#property strict\n#property indicator_chart_window\n#property indicator_buffers 1\n\ndouble Buffer0[];\n\nint init() {\n  SetIndexBuffer(0, Buffer0);\n  SetIndexStyle(0, DRAW_LINE);\n  return(0);\n}\n\nint start() {\n  int counted = IndicatorCounted();\n  int limit = Bars - counted;\n  for (int i = 0; i < limit; i++) {\n    Buffer0[i] = Close[i];\n  }\n  return(0);\n}',
+    },
+    commonFixes: [
+      {
+        name: 'add-strict-mode',
+        description: 'Add #property strict for better error checking',
+        pattern: /^#property\s+copyright/gm,
+        fix: (_match, line) => line,
+        language: 'mql4',
+      },
+      {
+        name: 'use-predefined-constants',
+        description: 'Replace magic numbers with predefined constants',
+        pattern: /return\s*\(\s*0\s*\)\s*;/g,
+        fix: (_match, line) => line.replace(/return\s*\(\s*0\s*\)\s*;/, 'return(INIT_SUCCEEDED);'),
+        language: 'mql4',
+      },
+      {
+        name: 'check-order-send',
+        description: 'Check OrderSend return value for errors',
+        pattern: /OrderSend\s*\(.+\)\s*;/g,
+        fix: (_match, line) => line.replace(
+          /OrderSend\s*\((.+)\)\s*;/,
+          'int ticket = OrderSend($1);\n  if (ticket < 0) Print("OrderSend failed: ", GetLastError());',
+        ),
+        language: 'mql4',
+      },
+    ],
+  }],
+  ['mql5', {
+    language: 'mql5',
+    displayName: 'MQL5',
+    fileExtensions: ['.mq5', '.mqh'],
+    packageManager: null,
+    commentStyle: { line: '//', blockStart: '/*', blockEnd: '*/' },
+    namingConvention: 'camelCase',
+    typingSystem: 'static',
+    paradigms: ['object-oriented', 'event-driven'],
+    templates: {
+      'hello-world': '#property copyright "MyExpert"\n#property link      ""\n#property version   "1.00"\n\nint OnInit() {\n  Print("Hello, MQL5 World!");\n  return(INIT_SUCCEEDED);\n}\n\nvoid OnTick() {\n  // Called on every tick\n}\n\nvoid OnDeinit(const int reason) {\n  Print("Expert removed, reason: ", reason);\n}',
+      'function': '//+------------------------------------------------------------------+\n//| {description}\n//+------------------------------------------------------------------+\nvoid {name}() {\n  // TODO: implement\n}',
+      'class': '#property copyright "MyExpert"\n#property link      ""\n#property version   "1.00"\n\n#include <Trade\\Trade.mqh>\n\ninput double InpLotSize = 0.1;\ninput int    InpStopLoss = 50;\ninput int    InpTakeProfit = 100;\n\nCTrade trade;\n\nint OnInit() {\n  trade.SetExpertMagicNumber(12345);\n  return(INIT_SUCCEEDED);\n}\n\nvoid OnTick() {\n  // Trading logic here\n}\n\nvoid OnDeinit(const int reason) {\n}',
+      'module': '#property copyright "MyIndicator"\n#property link      ""\n#property version   "1.00"\n#property indicator_chart_window\n#property indicator_buffers 1\n#property indicator_plots   1\n\ndouble Buffer0[];\n\nint OnInit() {\n  SetIndexBuffer(0, Buffer0, INDICATOR_DATA);\n  PlotIndexSetInteger(0, PLOT_DRAW_TYPE, DRAW_LINE);\n  return(INIT_SUCCEEDED);\n}\n\nint OnCalculate(const int rates_total, const int prev_calculated,\n                const datetime &time[], const double &open[],\n                const double &high[], const double &low[],\n                const double &close[], const long &tick_volume[],\n                const long &volume[], const int &spread[]) {\n  for (int i = prev_calculated; i < rates_total; i++) {\n    Buffer0[i] = close[i];\n  }\n  return(rates_total);\n}',
+    },
+    commonFixes: [
+      {
+        name: 'use-input-keyword',
+        description: 'Replace extern with input keyword in MQL5',
+        pattern: /\bextern\s+(double|int|string|bool|color|datetime)\s+/g,
+        fix: (_match, line) => line.replace(/\bextern\b/, 'input'),
+        language: 'mql5',
+      },
+      {
+        name: 'use-ctrade-class',
+        description: 'Suggest CTrade class instead of direct OrderSend',
+        pattern: /OrderSend\s*\(/g,
+        fix: (_match, line) => `// Consider using CTrade class: trade.Buy() / trade.Sell()\n  ${line}`,
+        language: 'mql5',
+      },
+      {
+        name: 'check-result-retcode',
+        description: 'Check trade result retcode after operations',
+        pattern: /trade\.(Buy|Sell|PositionClose)\s*\([^)]*\)\s*;/g,
+        fix: (_match, line) => line,
+        language: 'mql5',
+      },
+    ],
+  }],
+  ['pinescript', {
+    language: 'pinescript',
+    displayName: 'PineScript',
+    fileExtensions: ['.pine'],
+    packageManager: null,
+    commentStyle: { line: '//' },
+    namingConvention: 'camelCase',
+    typingSystem: 'gradual',
+    paradigms: ['declarative', 'functional'],
+    templates: {
+      'hello-world': '//@version=5\nindicator("Hello World", overlay=true)\n\nplot(close, title="Close Price", color=color.blue)',
+      'function': '//@version=5\n\n// {description}\n{name}(src, length) =>\n    // TODO: implement\n    ta.sma(src, length)',
+      'class': '//@version=5\nstrategy("{name}", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=10)\n\n// Inputs\nlength = input.int(14, title="Length")\nsrc = input.source(close, title="Source")\n\n// Calculate\nsmaValue = ta.sma(src, length)\nemaValue = ta.ema(src, length)\n\n// Conditions\nlongCondition = ta.crossover(smaValue, emaValue)\nshortCondition = ta.crossunder(smaValue, emaValue)\n\n// Execute\nif longCondition\n    strategy.entry("Long", strategy.long)\nif shortCondition\n    strategy.entry("Short", strategy.short)\n\n// Plot\nplot(smaValue, title="SMA", color=color.blue)\nplot(emaValue, title="EMA", color=color.red)',
+      'module': '//@version=5\nindicator("{name}", overlay=false)\n\n// Inputs\nlength = input.int(14, title="Length")\nsrc = input.source(close, title="Source")\n\n// Calculations\nrsiValue = ta.rsi(src, length)\n\n// Levels\nhline(70, "Overbought", color=color.red)\nhline(30, "Oversold", color=color.green)\n\n// Plot\nplot(rsiValue, title="RSI", color=color.purple)',
+    },
+    commonFixes: [
+      {
+        name: 'add-version-annotation',
+        description: 'Add //@version=5 annotation at the top',
+        pattern: /^(?!\/\/@version)/m,
+        fix: (_match, line) => line,
+        language: 'pinescript',
+      },
+      {
+        name: 'use-ta-namespace',
+        description: 'Use ta. namespace for built-in functions (v5)',
+        pattern: /\b(sma|ema|rsi|macd|stoch|atr|crossover|crossunder)\s*\(/g,
+        fix: (_match, line) => line.replace(
+          /\b(sma|ema|rsi|macd|stoch|atr|crossover|crossunder)\s*\(/g,
+          'ta.$1(',
+        ),
+        language: 'pinescript',
+      },
+      {
+        name: 'use-input-functions',
+        description: 'Use input.int/input.float/input.string instead of input()',
+        pattern: /\binput\s*\(\s*\d+/g,
+        fix: (_match, line) => line.replace(/\binput\s*\(/, 'input.int('),
+        language: 'pinescript',
+      },
+    ],
+  }],
 ])
 
 // ── Main Class ──
@@ -678,13 +802,13 @@ export class MultiLanguageSupport {
     this.profiles = LANGUAGE_PROFILES
   }
 
-  /** Get all 24 supported languages. */
+  /** Get all 27 supported languages. */
   getSupportedLanguages(): SupportedLanguage[] {
     return [...this.profiles.keys()]
   }
 
-  /** Get the language count (always 24). */
-  getLanguageCount(): number { return 24 }
+  /** Get the language count (always 27). */
+  getLanguageCount(): number { return 27 }
 
   /** Get a language profile by key. */
   getProfile(language: SupportedLanguage): LanguageProfile | undefined {
