@@ -582,6 +582,22 @@ export type {
   MarketRegime,
 } from './TradingEngine.js'
 
+// ── Trading Strategy Analyzer — MQL4/MQL5/PineScript strategy analysis ──
+export { TradingStrategyAnalyzer } from './TradingStrategyAnalyzer.js'
+
+export type {
+  TradingLanguage,
+  StrategyPattern,
+  StrategyIssue,
+  RiskAssessment,
+  CodeQualityResult,
+  PerformanceResult,
+  BacktestQuality,
+  StrategyAnalysis,
+  TradingStrategyAnalyzerConfig,
+  TradingStrategyAnalyzerStats,
+} from './TradingStrategyAnalyzer.js'
+
 // ── Decision Engine — Multi-criteria decision making, Bayesian inference, game theory ──
 export { DecisionEngine } from './DecisionEngine.js'
 
