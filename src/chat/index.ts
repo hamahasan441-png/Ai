@@ -90,6 +90,13 @@ export { CodeFixer } from './codemaster/CodeFixer.js'
 export { ProblemDecomposer } from './codemaster/ProblemDecomposer.js'
 export { LearningEngine } from './codemaster/LearningEngine.js'
 
+// CODEMASTER v3 — Copilot-Agent-Level Intelligence
+export { CodePlanner } from './codemaster/CodePlanner.js'
+export { AutoRefactorer } from './codemaster/AutoRefactorer.js'
+export { ContextGatherer } from './codemaster/ContextGatherer.js'
+export { CodeGenerator } from './codemaster/CodeGenerator.js'
+export { DiffEngine } from './codemaster/DiffEngine.js'
+
 // ══════════════════════════════════════════════════════════════════════════════
 // CODE AGENT — Smart coding engineer (file creation, scaffolding, exports)
 // ══════════════════════════════════════════════════════════════════════════════
