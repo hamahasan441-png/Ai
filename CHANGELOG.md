@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Feature availability warnings for missing optional vars
   - Sensitive value masking (API keys, DB connection strings)
   - Safe environment snapshot for logging
-  - 45 unit tests
+  - 53 unit tests
 - **CI Security Audit** — Added `npm audit --audit-level=high` step to CI pipeline
 - **README Badges** — CI status, Node.js version, license, TypeScript, version badges
 
