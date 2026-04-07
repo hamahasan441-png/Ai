@@ -26,6 +26,11 @@ import {
   shortErrorStack,
   classifyAxiosError,
   getErrnoPath,
+  AiError,
+  AiErrorCode,
+  ToolError,
+  BrainError,
+  ServiceError,
 } from '../errors.js'
 
 import { APIUserAbortError } from '@anthropic-ai/sdk'
@@ -318,5 +323,107 @@ describe('classifyAxiosError', () => {
   it('returns "http" for axios error without status or code', () => {
     const e = { isAxiosError: true, message: 'unknown' }
     expect(classifyAxiosError(e).kind).toBe('http')
+  })
+})
+
+// ── Structured Error Hierarchy ──
+
+describe('AiError', () => {
+  it('creates with default code', () => {
+    const err = new AiError('test error')
+    expect(err.message).toBe('test error')
+    expect(err.code).toBe(AiErrorCode.UNKNOWN)
+    expect(err.name).toBe('AiError')
+    expect(err.timestamp).toBeGreaterThan(0)
+    expect(err.context).toBeUndefined()
+  })
+
+  it('creates with custom code and context', () => {
+    const err = new AiError('not found', AiErrorCode.NOT_FOUND, { path: '/test' })
+    expect(err.code).toBe(AiErrorCode.NOT_FOUND)
+    expect(err.context).toEqual({ path: '/test' })
+  })
+
+  it('is an instance of Error', () => {
+    const err = new AiError('test')
+    expect(err).toBeInstanceOf(Error)
+    expect(err).toBeInstanceOf(AiError)
+  })
+
+  it('serializes to JSON', () => {
+    const err = new AiError('test', AiErrorCode.TIMEOUT, { ms: 5000 })
+    const json = err.toJSON()
+    expect(json.name).toBe('AiError')
+    expect(json.message).toBe('test')
+    expect(json.code).toBe(AiErrorCode.TIMEOUT)
+    expect(json.context).toEqual({ ms: 5000 })
+    expect(json.timestamp).toBeGreaterThan(0)
+  })
+})
+
+describe('ToolError', () => {
+  it('includes tool name in message', () => {
+    const err = new ToolError('bash', 'Command failed')
+    expect(err.message).toBe('[bash] Command failed')
+    expect(err.toolName).toBe('bash')
+    expect(err.name).toBe('ToolError')
+    expect(err.code).toBe(AiErrorCode.TOOL_EXECUTION_FAILED)
+  })
+
+  it('extends AiError', () => {
+    const err = new ToolError('grep', 'No matches', AiErrorCode.TOOL_NOT_FOUND)
+    expect(err).toBeInstanceOf(AiError)
+    expect(err).toBeInstanceOf(Error)
+    expect(err.code).toBe(AiErrorCode.TOOL_NOT_FOUND)
+  })
+
+  it('includes tool name in context', () => {
+    const err = new ToolError('database', 'Query failed', AiErrorCode.TOOL_EXECUTION_FAILED, { sql: 'SELECT 1' })
+    expect(err.context).toEqual({ sql: 'SELECT 1', toolName: 'database' })
+  })
+})
+
+describe('BrainError', () => {
+  it('creates with default code', () => {
+    const err = new BrainError('Query failed')
+    expect(err.name).toBe('BrainError')
+    expect(err.code).toBe(AiErrorCode.BRAIN_QUERY_FAILED)
+  })
+
+  it('extends AiError', () => {
+    const err = new BrainError('Learning failed', AiErrorCode.BRAIN_LEARNING_FAILED)
+    expect(err).toBeInstanceOf(AiError)
+    expect(err.code).toBe(AiErrorCode.BRAIN_LEARNING_FAILED)
+  })
+})
+
+describe('ServiceError', () => {
+  it('includes service name in message', () => {
+    const err = new ServiceError('cache', 'Disk write failed')
+    expect(err.message).toBe('[cache] Disk write failed')
+    expect(err.serviceName).toBe('cache')
+    expect(err.name).toBe('ServiceError')
+    expect(err.code).toBe(AiErrorCode.SERVICE_UNAVAILABLE)
+  })
+
+  it('extends AiError', () => {
+    const err = new ServiceError('api', 'Rate limited', AiErrorCode.API_ERROR)
+    expect(err).toBeInstanceOf(AiError)
+    expect(err.code).toBe(AiErrorCode.API_ERROR)
+  })
+
+  it('includes service name in context', () => {
+    const err = new ServiceError('mcp', 'Connection failed', AiErrorCode.MCP_ERROR, { url: 'ws://localhost' })
+    expect(err.context).toEqual({ url: 'ws://localhost', serviceName: 'mcp' })
+  })
+})
+
+describe('AiErrorCode', () => {
+  it('has expected ranges', () => {
+    expect(AiErrorCode.UNKNOWN).toBe(1000)
+    expect(AiErrorCode.TOOL_EXECUTION_FAILED).toBe(2000)
+    expect(AiErrorCode.BRAIN_QUERY_FAILED).toBe(3000)
+    expect(AiErrorCode.SERVICE_UNAVAILABLE).toBe(4000)
+    expect(AiErrorCode.PLUGIN_LOAD_ERROR).toBe(5000)
   })
 })

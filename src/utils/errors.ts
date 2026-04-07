@@ -236,3 +236,134 @@ export function classifyAxiosError(e: unknown): {
   }
   return { kind: 'http', status, message }
 }
+
+// ── Structured Error Hierarchy ──
+
+/**
+ * Error codes for structured error handling across the AI system.
+ * Each module has a numeric range:
+ *  - 1xxx: Core/general errors
+ *  - 2xxx: Tool errors
+ *  - 3xxx: Brain/knowledge errors
+ *  - 4xxx: Service errors
+ *  - 5xxx: Plugin errors
+ */
+export enum AiErrorCode {
+  // 1xxx — Core
+  UNKNOWN = 1000,
+  INVALID_INPUT = 1001,
+  TIMEOUT = 1002,
+  NOT_FOUND = 1003,
+  PERMISSION_DENIED = 1004,
+  CONFIGURATION_ERROR = 1005,
+
+  // 2xxx — Tools
+  TOOL_EXECUTION_FAILED = 2000,
+  TOOL_NOT_FOUND = 2001,
+  TOOL_INVALID_INPUT = 2002,
+  TOOL_PERMISSION_DENIED = 2003,
+  TOOL_TIMEOUT = 2004,
+
+  // 3xxx — Brain/Knowledge
+  BRAIN_QUERY_FAILED = 3000,
+  BRAIN_LEARNING_FAILED = 3001,
+  BRAIN_PERSISTENCE_ERROR = 3002,
+  KNOWLEDGE_NOT_FOUND = 3003,
+  CLASSIFIER_ERROR = 3004,
+
+  // 4xxx — Services
+  SERVICE_UNAVAILABLE = 4000,
+  API_ERROR = 4001,
+  CACHE_ERROR = 4002,
+  DATABASE_ERROR = 4003,
+  MCP_ERROR = 4004,
+
+  // 5xxx — Plugins
+  PLUGIN_LOAD_ERROR = 5000,
+  PLUGIN_EXECUTION_ERROR = 5001,
+}
+
+/**
+ * Base error class for the AI system.
+ * All domain-specific errors should extend this class.
+ *
+ * @example
+ * ```ts
+ * throw new AiError('Something went wrong', AiErrorCode.UNKNOWN, { query: 'test' })
+ * ```
+ */
+export class AiError extends Error {
+  readonly code: AiErrorCode
+  readonly context?: Record<string, unknown>
+  readonly timestamp: number
+
+  constructor(message: string, code: AiErrorCode = AiErrorCode.UNKNOWN, context?: Record<string, unknown>) {
+    super(message)
+    this.name = 'AiError'
+    this.code = code
+    this.context = context
+    this.timestamp = Date.now()
+  }
+
+  /** Convert to a plain object for serialization/logging. */
+  toJSON(): Record<string, unknown> {
+    return {
+      name: this.name,
+      message: this.message,
+      code: this.code,
+      context: this.context,
+      timestamp: this.timestamp,
+    }
+  }
+}
+
+/**
+ * Error thrown by tool execution.
+ *
+ * @example
+ * ```ts
+ * throw new ToolError('bash', 'Command failed', AiErrorCode.TOOL_EXECUTION_FAILED)
+ * ```
+ */
+export class ToolError extends AiError {
+  readonly toolName: string
+
+  constructor(toolName: string, message: string, code: AiErrorCode = AiErrorCode.TOOL_EXECUTION_FAILED, context?: Record<string, unknown>) {
+    super(`[${toolName}] ${message}`, code, { ...context, toolName })
+    this.name = 'ToolError'
+    this.toolName = toolName
+  }
+}
+
+/**
+ * Error thrown by the brain/knowledge system.
+ *
+ * @example
+ * ```ts
+ * throw new BrainError('Knowledge base query failed', AiErrorCode.BRAIN_QUERY_FAILED, { query: 'test' })
+ * ```
+ */
+export class BrainError extends AiError {
+  constructor(message: string, code: AiErrorCode = AiErrorCode.BRAIN_QUERY_FAILED, context?: Record<string, unknown>) {
+    super(message, code, context)
+    this.name = 'BrainError'
+  }
+}
+
+/**
+ * Error thrown by services (API, cache, database, MCP).
+ *
+ * @example
+ * ```ts
+ * throw new ServiceError('cache', 'Disk write failed', AiErrorCode.CACHE_ERROR)
+ * ```
+ */
+export class ServiceError extends AiError {
+  readonly serviceName: string
+
+  constructor(serviceName: string, message: string, code: AiErrorCode = AiErrorCode.SERVICE_UNAVAILABLE, context?: Record<string, unknown>) {
+    super(`[${serviceName}] ${message}`, code, { ...context, serviceName })
+    this.name = 'ServiceError'
+    this.serviceName = serviceName
+  }
+}
