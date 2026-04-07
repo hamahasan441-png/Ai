@@ -242,7 +242,7 @@ export class KurdishLanguageUtils {
 
   /** Get all proverb categories. */
   getProverbCategories(): string[] {
-    return [...new Set(PROVERBS.map(p => p.category))]
+    return Array.from(new Set(PROVERBS.map(p => p.category)))
   }
 
   /** Get a random proverb. */
