@@ -860,9 +860,7 @@ export class TradingStrategyAnalyzer {
 
     // Language-specific suggestions
     if (language === 'mql4') {
-      if (!/#property\s+strict/.test('')) { // Always suggest for MQL4
-        suggestions.push('💡 MQL4: Consider migrating to MQL5 for better object-oriented design and hedging support.')
-      }
+      suggestions.push('💡 MQL4: Consider migrating to MQL5 for better object-oriented design and hedging support.')
     }
 
     if (language === 'pinescript') {
