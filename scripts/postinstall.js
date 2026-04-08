@@ -136,15 +136,16 @@ try {
         console.log('    ollama pull qwen2.5-coder:7b')
         console.log('')
         console.log('  Auto-downloading Qwen2.5-Coder 7B via Ollama...')
+        console.log('  (This may take several minutes. If it times out, run manually: ollama pull qwen2.5-coder:7b)')
         try {
-          // Attempt auto-download (non-blocking — if it fails, user can do it manually)
+          // Attempt auto-download — 2 minute timeout to avoid blocking install too long
           execSync('ollama pull qwen2.5-coder:7b', {
             stdio: 'inherit',
-            timeout: 600000, // 10 minute timeout
+            timeout: 120000, // 2 minute timeout — user can finish manually if needed
           })
           console.log('  ✓ Qwen2.5-Coder 7B downloaded successfully!')
         } catch (pullErr) {
-          console.log('  ℹ Auto-download did not complete. You can download manually:')
+          console.log('  ℹ Auto-download did not complete within timeout. Download manually:')
           console.log('    ollama pull qwen2.5-coder:7b')
         }
       }
