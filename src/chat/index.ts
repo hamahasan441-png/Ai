@@ -2079,3 +2079,50 @@ export {
   // UserPreferences — already exported from LocalBrain
   type UserProfile,
 } from './UserProfileModel.js'
+
+// ── Exploit Search Engine — CVE/exploit/vulnerability search & intelligence ──
+export {
+  ExploitSearchEngine,
+  type ExploitSearchConfig,
+  type ExploitSearchStats,
+  type SeverityLevel,
+  type ExploitAvailability,
+  type CVSSv3,
+  type CVEEntry,
+  type AffectedProduct,
+  type CWEEntry,
+  // VulnCategory — conflicts with VulnerabilityScanner
+  type ExploitEntry,
+  type ExploitType,
+  type SearchQuery,
+  type SearchResult,
+  type VulnDiscoveryPattern,
+  type ExploitChain,
+  type ExploitChainStep,
+  type TrendAnalysis,
+} from './ExploitSearchEngine.js'
+
+// ── Buffer Overflow Debugger — Overflow analysis, ROP, heap exploitation ─────
+export {
+  BufferOverflowDebugger,
+  type OverflowDebuggerConfig,
+  type OverflowDebuggerStats,
+  type Architecture,
+  type Platform,
+  type OverflowType,
+  type BinaryProtections,
+  type CrashInfo,
+  type MemoryRegion,
+  type OverflowAnalysis,
+  type DebugCommand,
+  type ROPGadget,
+  type GadgetType,
+  type ROPChain,
+  type ROPObjective,
+  type HeapAnalysis,
+  type HeapCorruptionType,
+  type HeapChunk,
+  type FuzzStrategy,
+  type FormatStringAnalysis,
+  type OverflowPattern,
+} from './BufferOverflowDebugger.js'

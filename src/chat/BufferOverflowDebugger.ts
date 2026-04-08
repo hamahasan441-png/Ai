@@ -559,14 +559,14 @@ export class BufferOverflowDebugger {
       return 'format_string';
     }
 
+    // Check for double-free (more specific — must come before UAF)
+    if (crash.signal === 'SIGABRT' && crash.backtrace.some(l => l.includes('double free'))) {
+      return 'double_free';
+    }
+
     // Check for UAF indicators
     if (crash.backtrace.some(l => l.includes('free') || l.includes('_int_free') || l.includes('tcache'))) {
       return 'use_after_free';
-    }
-
-    // Check for double-free
-    if (crash.signal === 'SIGABRT' && crash.backtrace.some(l => l.includes('double free'))) {
-      return 'double_free';
     }
 
     // Integer overflow leads to small allocation
@@ -1270,7 +1270,7 @@ export class BufferOverflowDebugger {
         '== Format String Exploitation ==',
         '',
         '1. LEAK: Use %p or %lx to read stack values',
-        `   Payload: ${'%p.'repeat(20)}`,
+        '   Payload: ' + '%p.'.repeat(20),
         `   Find your input at offset ${offset} from format string`,
         '',
         '2. READ: Use %s to dereference and read memory at an address',
