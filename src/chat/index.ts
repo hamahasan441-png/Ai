@@ -1410,3 +1410,25 @@ export type {
   EthicalPrinciple,
   EthicalReasonerConfig,
 } from './EthicalReasoner.js'
+
+// ── Bug Bounty Knowledge — Bug bounty methodology, platforms, recon, reporting, payouts ──
+export { BugBountyKnowledge } from './BugBountyKnowledge.js'
+
+export type {
+  BugBountyKnowledgeConfig,
+  BugBountyKnowledgeStats,
+  BugBountyPlatform,
+  BountyProgram,
+  BountyScope,
+  BountyScopeTarget,
+  ReconTechnique,
+  VulnClassForBounty,
+  BountyReport,
+  PayoutEstimate,
+  HunterProfile,
+  MethodologyPhase,
+  BountyMethodology,
+  ResponsibleDisclosure,
+  DuplicateStrategy,
+  BugBountyTip,
+} from './BugBountyKnowledge.js'
