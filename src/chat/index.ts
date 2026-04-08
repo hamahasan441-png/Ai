@@ -1561,3 +1561,24 @@ export {
   type WeaponizationPipeline,
   type SmartAttackSelection,
 } from './ExploitWriter.js'
+
+// ── Python BlackHat Engine ───────────────────────────────────────────────────
+export {
+  PythonBlackHat,
+  DEFAULT_PYTHON_BLACKHAT_CONFIG,
+  type PythonBlackHatConfig,
+  type PythonBlackHatStats,
+  type AttackDomain,
+  type Difficulty,
+  type TargetOS,
+  type PythonTool,
+  type PythonLibraryProfile,
+  type ExploitDevTechnique,
+  type MalwareTechnique,
+  type NetworkAttack,
+  type WebExploit,
+  type PrivEscPath,
+  type C2Config,
+  type EvasionMethod,
+  type ReconTechnique,
+} from './PythonBlackHat.js'
