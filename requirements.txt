@@ -1,0 +1,46 @@
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║  AI — Termux Installation Requirements                                      ║
+# ║                                                                              ║
+# ║  Install all packages on Termux (Android) with:                              ║
+# ║    pkg update && pkg install -y $(grep -v '^\s*#' requirements.txt |         ║
+# ║      grep -v '^\s*$' | grep -v '^pip ' | tr '\n' ' ')                       ║
+# ║                                                                              ║
+# ║  Or install manually one by one:                                             ║
+# ║    pkg install <package-name>                                                ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+# ── Core Runtime (Required) ──────────────────────────────────────────────────
+nodejs-lts
+git
+
+# ── Build Tools (Required for native modules) ────────────────────────────────
+build-essential
+python
+make
+clang
+
+# ── Optional: Database Support ───────────────────────────────────────────────
+# SQLite (for DatabaseTool with better-sqlite3)
+libsqlite
+
+# PostgreSQL client library (for pg driver)
+# pkg install postgresql
+
+# ── Optional: Audio / Voice Input ────────────────────────────────────────────
+# SoX audio tool (for voice input features)
+sox
+
+# ── Optional: Networking & Security Tools ────────────────────────────────────
+openssl
+curl
+wget
+net-tools
+nmap
+
+# ── Optional: Utilities ──────────────────────────────────────────────────────
+tmux
+ripgrep
+
+# ── Python Packages (install with pip) ───────────────────────────────────────
+# Required if using PythonBlackHat or Python-based features:
+#   pip install requests scapy paramiko cryptography beautifulsoup4 nmap

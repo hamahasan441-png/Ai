@@ -25,6 +25,23 @@ curl -fsSL https://raw.githubusercontent.com/hamahasan441-png/Ai/main/scripts/in
 irm https://raw.githubusercontent.com/hamahasan441-png/Ai/main/scripts/install-windows.ps1 | iex
 ```
 
+### Termux (Android)
+```bash
+curl -fsSL https://raw.githubusercontent.com/hamahasan441-png/Ai/main/scripts/install-termux.sh | bash
+```
+
+With all optional features:
+```bash
+curl -fsSL https://raw.githubusercontent.com/hamahasan441-png/Ai/main/scripts/install-termux.sh | bash -s -- --full
+```
+
+Or install dependencies manually using `requirements.txt`:
+```bash
+pkg update && pkg install -y nodejs-lts git build-essential python make clang
+git clone https://github.com/hamahasan441-png/Ai.git && cd Ai
+npm install
+```
+
 ### Docker
 ```bash
 docker build -t ai .
