@@ -1,7 +1,7 @@
-export const PR_TITLE = 'Add Claude Code GitHub Workflow'
+export const PR_TITLE = 'Add Local AI GitHub Workflow'
 
 export const GITHUB_ACTION_SETUP_DOCS_URL =
-  'https://github.com/anthropics/claude-code-action/blob/main/docs/setup.md'
+  'https://github.com/hamahasan441-png/Ai/blob/main/docs/setup.md'
 
 export const WORKFLOW_CONTENT = `name: Claude Code
 
