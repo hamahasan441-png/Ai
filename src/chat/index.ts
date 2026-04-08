@@ -1518,3 +1518,46 @@ export type {
   ScanReport,
   ScanProgress,
 } from './TargetScanner.js'
+
+// ── Attack Chain Engine ──────────────────────────────────────────────────────
+export {
+  AttackChainEngine,
+  DEFAULT_ATTACK_CHAIN_ENGINE_CONFIG,
+  type AttackChainEngineConfig,
+  type AttackChainEngineStats,
+  type KillChainPhase,
+  type MitreAttackTactic,
+  type AttackerSkillLevel,
+  type AttackerMotivation,
+  type AttackerProfile,
+  type AttackTechnique,
+  type LateralMovementPath,
+  type PersistenceMechanism,
+  type EvasionTechnique,
+  type C2Channel,
+  type ExfiltrationMethod,
+  type PostExploitAction,
+  type AttackChainStep,
+  type AttackChainResult,
+} from './AttackChainEngine.js'
+
+// ── Exploit Writer ───────────────────────────────────────────────────────────
+export {
+  ExploitWriter,
+  DEFAULT_EXPLOIT_WRITER_CONFIG,
+  type ExploitWriterConfig,
+  type ExploitWriterStats,
+  type VulnerabilityClass,
+  type PayloadType,
+  type Platform,
+  type Architecture,
+  type VulnAnalysis,
+  type ExploitStrategy,
+  type ExploitTemplate,
+  type CraftedPayload,
+  type ShellcodeTemplate,
+  type ObfuscationPass,
+  type SecurityBypass,
+  type WeaponizationPipeline,
+  type SmartAttackSelection,
+} from './ExploitWriter.js'
