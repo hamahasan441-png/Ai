@@ -133,9 +133,9 @@ fi
 # ── Step 6: Install optional - Extra tools ──
 if [ "$WITH_TOOLS" = true ]; then
   info "Installing extra tools (tmux, ripgrep, curl, wget, nmap, openssl, net-tools)..."
-  pkg install -y tmux ripgrep curl wget openssl net-tools nmap 2>/dev/null || {
-    warn "Some tools failed to install. Install them individually with: pkg install <name>"
-  }
+  for tool in tmux ripgrep curl wget openssl net-tools nmap; do
+    pkg install -y "$tool" 2>/dev/null || warn "Failed to install $tool — install manually with: pkg install $tool"
+  done
   ok "Extra tools installed"
 fi
 
@@ -158,22 +158,20 @@ if [ "$DEV_MODE" = true ]; then
   npm install
   ok "Development installation complete at $INSTALL_DIR"
 else
-  info "Installing via npm..."
+  info "Installing from source..."
+  INSTALL_DIR="$HOME/Ai"
 
-  npm install -g ai@latest 2>/dev/null || {
-    info "Global npm install not available. Cloning from source..."
-    INSTALL_DIR="$HOME/Ai"
+  if [ -d "$INSTALL_DIR" ]; then
+    info "Updating existing installation at $INSTALL_DIR..."
+    cd "$INSTALL_DIR" && git pull
+  else
+    git clone https://github.com/hamahasan441-png/Ai.git "$INSTALL_DIR"
+    cd "$INSTALL_DIR"
+  fi
 
-    if [ -d "$INSTALL_DIR" ]; then
-      cd "$INSTALL_DIR" && git pull
-    else
-      git clone https://github.com/hamahasan441-png/Ai.git "$INSTALL_DIR"
-      cd "$INSTALL_DIR"
-    fi
-
-    npm install
-    ok "Installed from source at $INSTALL_DIR"
-  }
+  info "Running npm install (this may take a few minutes on Termux)..."
+  npm install
+  ok "Installed from source at $INSTALL_DIR"
 fi
 
 # ── Step 8: Create data directories ──
