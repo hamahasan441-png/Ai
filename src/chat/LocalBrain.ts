@@ -177,6 +177,13 @@ import { FactVerificationEngine } from './FactVerificationEngine.js'
 import { ExplanationEngine } from './ExplanationEngine.js'
 import { FeedbackLearner } from './FeedbackLearner.js'
 
+// Advanced reasoning & autonomy modules (Phase 14)
+import { WorkingMemoryEngine } from './WorkingMemoryEngine.js'
+import { GoalManager } from './GoalManager.js'
+import { StrategicPlanner } from './StrategicPlanner.js'
+import { SelfModelEngine } from './SelfModelEngine.js'
+import { CollaborationEngine } from './CollaborationEngine.js'
+
 // Smart coding agent
 import { CodeAgent } from './CodeAgent.js'
 import type {
@@ -4257,6 +4264,13 @@ export class LocalBrain {
   private explanationEngine: ExplanationEngine | null = null
   private feedbackLearnerEngine: FeedbackLearner | null = null
 
+  // Advanced reasoning & autonomy modules (Phase 14)
+  private workingMemoryEngine: WorkingMemoryEngine | null = null
+  private goalManager: GoalManager | null = null
+  private strategicPlanner: StrategicPlanner | null = null
+  private selfModelEngine: SelfModelEngine | null = null
+  private collaborationEngine: CollaborationEngine | null = null
+
   // Smart coding agent
   private codeAgent: CodeAgent
 
@@ -4433,6 +4447,13 @@ export class LocalBrain {
       this.factVerificationEngine = new FactVerificationEngine()
       this.explanationEngine = new ExplanationEngine()
       this.feedbackLearnerEngine = new FeedbackLearner()
+
+      // Advanced reasoning & autonomy modules (Phase 14)
+      this.workingMemoryEngine = new WorkingMemoryEngine()
+      this.goalManager = new GoalManager()
+      this.strategicPlanner = new StrategicPlanner()
+      this.selfModelEngine = new SelfModelEngine()
+      this.collaborationEngine = new CollaborationEngine()
     }
 
     // Initialize CodeAgent (always available — no external deps)

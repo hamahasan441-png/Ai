@@ -1648,3 +1648,89 @@ export type {
   FeedbackLearnerConfig,
   FeedbackLearnerStats,
 } from './FeedbackLearner.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PHASE 14 — ADVANCED REASONING & AUTONOMY MODULES
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Working Memory Engine — Active thought management & scratchpad ──
+export { WorkingMemoryEngine, DEFAULT_WORKING_MEMORY_CONFIG } from './WorkingMemoryEngine.js'
+
+export type {
+  MemorySlotType,
+  AttentionLevel,
+  MemorySlot,
+  MemoryChunk,
+  ScratchpadEntry,
+  AttentionSnapshot,
+  InterferenceResult,
+  WorkingMemoryEngineConfig,
+  WorkingMemoryEngineStats,
+} from './WorkingMemoryEngine.js'
+
+// ── Goal Manager — Autonomous goal tracking & replanning ──
+export { GoalManager, DEFAULT_GOAL_MANAGER_CONFIG } from './GoalManager.js'
+
+export type {
+  GoalStatus,
+  GoalPriority,
+  GoalDefinition,
+  GoalConflict,
+  GoalMilestone,
+  GoalReplanResult,
+  GoalTreeNode,
+  GoalManagerConfig,
+  GoalManagerStats,
+} from './GoalManager.js'
+
+// ── Strategic Planner — Long-horizon planning with Monte Carlo ──
+export { StrategicPlanner, DEFAULT_STRATEGIC_PLANNER_CONFIG } from './StrategicPlanner.js'
+
+export type {
+  PlanStepStatus,
+  StrategicStep,
+  ContingencyBranch,
+  StrategicPlan,
+  MonteCarloResult,
+  PlanRepairResult,
+  ScenarioAnalysis,
+  PlanComparison,
+  ResourceEstimate,
+  StrategicPlannerConfig,
+  StrategicPlannerStats,
+} from './StrategicPlanner.js'
+
+// ── Self-Model Engine — Introspective self-awareness & capability mapping ──
+export { SelfModelEngine, DEFAULT_SELF_MODEL_CONFIG } from './SelfModelEngine.js'
+
+export type {
+  ProficiencyLevel,
+  KnowledgeState,
+  Capability as SelfModelCapability,
+  KnowledgeBoundary,
+  Limitation,
+  LimitationCategory,
+  CompetenceEstimate,
+  UncertaintyMap,
+  GrowthRecord,
+  SelfAssessment,
+  SelfModelEngineConfig,
+  SelfModelEngineStats,
+} from './SelfModelEngine.js'
+
+// ── Collaboration Engine — Multi-module orchestration & synthesis ──
+export { CollaborationEngine, DEFAULT_COLLABORATION_CONFIG } from './CollaborationEngine.js'
+
+export type {
+  AgentRole,
+  AgentDescriptor,
+  CollaborationTask,
+  AgentResponse as CollaborationAgentResponse,
+  SynthesizedResult,
+  ConflictRecord,
+  DelegationPlan,
+  CollaborationMessage,
+  EnsembleDecision,
+  CollaborationEngineConfig,
+  CollaborationEngineStats,
+} from './CollaborationEngine.js'
