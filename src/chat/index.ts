@@ -1938,6 +1938,10 @@ export {
   type C2Config,
   type EvasionMethod,
   type ReconTechnique,
+  type CryptoAttack,
+  type SocialEngineeringAttack,
+  type ForensicsEvasionTechnique,
+  type ReverseEngineeringTechnique,
 } from './PythonBlackHat.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
