@@ -117,13 +117,13 @@ function pdId(prefix: string): string {
 
 function classifyProblem(description: string): ProblemType {
   const lower = description.toLowerCase()
-  if (/\b(optimiz|improv|faster|efficien|reduc|minimi|maximi)\b/.test(lower)) return 'optimization'
-  if (/\b(design|architect|build|creat|plan|structure)\b/.test(lower)) return 'design'
-  if (/\b(bug|error|fix|debug|crash|fail|broken)\b/.test(lower)) return 'debugging'
-  if (/\b(analyz|understand|evaluat|assess|measur|inspect)\b/.test(lower)) return 'analysis'
-  if (/\b(decide|choose|select|compar|option|tradeoff)\b/.test(lower)) return 'decision'
-  if (/\b(integrat|connect|combin|merg|unif|link)\b/.test(lower)) return 'integration'
-  if (/\b(transform|convert|migrat|refactor|chang|adapt)\b/.test(lower)) return 'transformation'
+  if (/\b(optimiz|improv|faster|efficien|reduc|minimi|maximi)/i.test(lower)) return 'optimization'
+  if (/\b(design|architect|build|creat|plan|structure)/i.test(lower)) return 'design'
+  if (/\b(bug|error|fix|debug|crash|fail|broken)/i.test(lower)) return 'debugging'
+  if (/\b(analyz|understand|evaluat|assess|measur|inspect)/i.test(lower)) return 'analysis'
+  if (/\b(decid|choos|select|compar|option|tradeoff)/i.test(lower)) return 'decision'
+  if (/\b(integrat|connect|combin|merg|unif|link)/i.test(lower)) return 'integration'
+  if (/\b(transform|convert|migrat|refactor|chang|adapt)/i.test(lower)) return 'transformation'
   return 'research'
 }
 

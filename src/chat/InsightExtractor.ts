@@ -198,10 +198,20 @@ export class InsightExtractor {
     const cv = m !== 0 ? sd / Math.abs(m) : 0
 
     let direction: TrendDirection
-    if (cv > 0.5) direction = 'volatile'
-    else if (Math.abs(slope) < sd * 0.1) direction = 'stable'
-    else if (slope > 0) direction = 'increasing'
-    else direction = 'decreasing'
+    if (sd === 0) {
+      direction = 'stable'
+    } else if (r2 > 0.7) {
+      // Strong linear fit — it's a clear trend
+      direction = slope > 0 ? 'increasing' : slope < 0 ? 'decreasing' : 'stable'
+    } else if (cv > 0.5 && r2 < 0.5) {
+      direction = 'volatile'
+    } else if (Math.abs(slope) < sd * 0.1) {
+      direction = 'stable'
+    } else if (slope > 0) {
+      direction = 'increasing'
+    } else {
+      direction = 'decreasing'
+    }
 
     return { direction, slope, confidence: Math.abs(r2), startValue, endValue, changePercent, dataPoints: values.length }
   }
