@@ -77,7 +77,20 @@ npm run build:apk
 npm run build:android
 ```
 
-#### Option 2: Local Build
+#### Option 2: Debug APK (for debugging)
+
+```bash
+# Build debug APK with full debugging support
+npm run build:debug
+
+# This builds with:
+# - debuggable=true
+# - Metro bundler support
+# - Source maps
+# - APK Debugger screen enabled
+```
+
+#### Option 3: Local Build
 
 ```bash
 # Generate native Android project
@@ -87,11 +100,15 @@ npm run prebuild
 cd android
 ./gradlew assembleRelease
 
+# Build debug APK locally
+./gradlew assembleDebug
+
 # APK will be at:
 # android/app/build/outputs/apk/release/app-release.apk
+# android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-#### Option 3: Expo Local Build
+#### Option 4: Expo Local Build
 
 ```bash
 # Build APK locally with Expo
@@ -105,6 +122,7 @@ npx expo run:android --variant release
 | `npm start` | Start Expo dev server |
 | `npm run android` | Run on Android device/emulator |
 | `npm run build:apk` | Build APK via EAS |
+| `npm run build:debug` | Build debug APK via EAS |
 | `npm run build:android` | Build AAB via EAS (production) |
 | `npm run build:preview` | Build preview APK |
 | `npm run prebuild` | Generate native Android project |
@@ -115,10 +133,10 @@ npx expo run:android --variant release
 
 ```
 ai-android-app/
-├── App.tsx                 # Main app entry with navigation
+├── App.tsx                 # Main app entry with navigation + ErrorBoundary
 ├── index.js                # React Native entry point
 ├── app.json                # Expo configuration
-├── eas.json                # EAS Build configuration
+├── eas.json                # EAS Build configuration (debug/preview/apk/production)
 ├── package.json            # Dependencies and scripts
 ├── tsconfig.json           # TypeScript configuration
 ├── babel.config.js         # Babel configuration
@@ -130,15 +148,18 @@ ai-android-app/
 │   │   ├── ChatInput.tsx       # Text input with send button
 │   │   ├── SuggestionChips.tsx # Quick suggestion buttons
 │   │   ├── ModuleCard.tsx      # AI module display card
-│   │   └── TypingIndicator.tsx # Animated typing dots
+│   │   ├── TypingIndicator.tsx # Animated typing dots
+│   │   └── ErrorBoundary.tsx   # Error boundary for crash recovery
 │   ├── screens/            # App screens
 │   │   ├── ChatScreen.tsx      # Main chat interface
 │   │   ├── ModulesScreen.tsx   # Browse/manage AI modules
 │   │   ├── SettingsScreen.tsx  # App settings
-│   │   └── AboutScreen.tsx     # App information
+│   │   ├── AboutScreen.tsx     # App information
+│   │   └── DebugScreen.tsx     # APK Debugger interface
 │   ├── services/           # Core services
 │   │   ├── AIEngine.ts         # AI processing engine (120 modules)
-│   │   └── StorageService.ts   # Persistent storage
+│   │   ├── StorageService.ts   # Persistent storage
+│   │   └── APKDebugger.ts      # Debugging engine
 │   └── assets/             # Icons and images
 ├── android/                # Native Android project
 │   ├── app/
@@ -159,7 +180,8 @@ ai-android-app/
 │   ├── settings.gradle         # Project settings
 │   └── gradle.properties       # Gradle properties
 └── __tests__/              # Test files
-    └── AIEngine.test.ts        # AI engine tests
+    ├── AIEngine.test.ts        # AI engine tests
+    └── APKDebugger.test.ts     # APK debugger tests
 ```
 
 ## 🔧 Configuration
@@ -212,11 +234,40 @@ npm test
 
 ## 🔒 Security
 
-- **No Internet Permission** — The app explicitly blocks internet access
+- **No Internet Permission** — The app explicitly restricts network access
 - **No External APIs** — Zero network calls
 - **Local Storage Only** — All data stays on device
 - **ProGuard Enabled** — Code obfuscation in release builds
 - **Network Security Config** — Restricts all network access
+
+## 🐛 APK Debugger
+
+The app includes a built-in APK Debugger accessible from **Settings → 🐛 APK Debugger**.
+
+### Debugger Features
+
+| Tab | Features |
+|-----|----------|
+| 📱 **Info** | App version, package name, build type, module stats, runtime uptime, memory usage |
+| 🏥 **Health** | Module health check — validates all 120 modules, detects disabled/broken modules |
+| ⚡ **Perf** | Performance benchmarks — module routing speed, message processing, rapid queries |
+| 📝 **Logs** | Real-time debug log viewer with error/warning/info/debug levels |
+
+### Using the Debugger
+
+1. Open the app → Settings → 🐛 APK Debugger
+2. **Info tab**: View build info and runtime stats
+3. **Health tab**: Tap "Run Health Check" to validate all modules
+4. **Perf tab**: Tap "Run Benchmarks" to test AI engine performance
+5. **Logs tab**: View all debug logs, errors, and warnings
+6. **Full Report**: Tap "📋 Full Report" on the Info tab for a complete diagnostic report
+
+### Error Boundary
+
+The app includes an ErrorBoundary that catches JavaScript errors and displays a recovery screen instead of crashing. If the app encounters an error:
+1. An error details screen is shown with the error message and component stack
+2. Tap "🔄 Try Again" to recover
+3. The error is automatically logged to the APK Debugger
 
 ## 📝 Relationship to Main AI Project
 

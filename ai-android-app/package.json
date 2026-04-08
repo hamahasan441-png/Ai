@@ -13,6 +13,7 @@
     "build:android": "eas build --platform android --profile production",
     "build:android:local": "npx expo run:android --variant release",
     "build:apk": "eas build --platform android --profile apk",
+    "build:debug": "eas build --platform android --profile debug",
     "build:preview": "eas build --platform android --profile preview",
     "prebuild": "expo prebuild --platform android",
     "typecheck": "tsc --noEmit"
