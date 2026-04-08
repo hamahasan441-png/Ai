@@ -1387,16 +1387,7 @@ export type {
   KurdishMonth,
 } from './KurdishLanguageUtils.js'
 
-// ── Hypothesis Engine (Scientific Reasoning) ──
-
-export { HypothesisEngine, DEFAULT_HYPOTHESIS_ENGINE_CONFIG } from './HypothesisEngine.js'
-
-export type {
-  Evidence as HypothesisEngineEvidence,
-  Hypothesis as HypothesisEngineHypothesis,
-  HypothesisTestResult,
-  HypothesisEngineConfig,
-} from './HypothesisEngine.js'
+// ── Hypothesis Engine — already exported above (line ~1204) ──
 
 // ── Ethical Reasoner (Moral Analysis) ──
 
@@ -1800,7 +1791,7 @@ export type {
 } from './AnalyticalReasoner.js'
 
 // ── ProblemDecomposer — Complex problem breakdown & solution synthesis ──
-export { ProblemDecomposer, DEFAULT_PROBLEM_DECOMPOSER_CONFIG } from './ProblemDecomposer.js'
+export { ProblemDecomposer as ChatProblemDecomposer, DEFAULT_PROBLEM_DECOMPOSER_CONFIG } from './ProblemDecomposer.js'
 
 export type {
   ProblemType,
@@ -1927,3 +1918,160 @@ export type {
   CodeOptimizerConfig,
   CodeOptimizerStats,
 } from './CodeOptimizer.js'
+
+// ── Python BlackHat Engine ───────────────────────────────────────────────────
+export {
+  PythonBlackHat,
+  DEFAULT_PYTHON_BLACKHAT_CONFIG,
+  type PythonBlackHatConfig,
+  type PythonBlackHatStats,
+  type AttackDomain,
+  type Difficulty,
+  type TargetOS,
+  type PythonTool,
+  type PythonLibraryProfile,
+  type ExploitDevTechnique,
+  type MalwareTechnique,
+  type NetworkAttack,
+  type WebExploit,
+  type PrivEscPath,
+  type C2Config,
+  type EvasionMethod,
+  type ReconTechnique,
+} from './PythonBlackHat.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MISSING MODULE EXPORTS — Modules present in src/chat/ but not yet re-exported
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Advanced Search Engine — Search with thinking steps and strategies ────────
+export {
+  AdvancedSearchEngine,
+  type SearchStrategy,
+  type ThinkingStep,
+  type SearchResultItem,
+  type SearchWithThinkingResult,
+  type SearchDocument,
+  type SearchConfig,
+} from './AdvancedSearchEngine.js'
+
+// ── Anomaly Detector — Data anomaly detection and pattern profiling ───────────
+export {
+  AnomalyDetector,
+  // AnomalyResult — already exported from MarketAnalyzer
+  // AnomalyType — already exported from NetworkForensics
+  type DataPoint,
+  type PatternProfile,
+} from './AnomalyDetector.js'
+
+// ── Contextual Memory Engine — Context-aware memory storage and retrieval ─────
+export {
+  ContextualMemoryEngine,
+  type ContextMemory,
+  type MemoryContext,
+  type MemorySearchResult,
+  type MemoryStats,
+} from './ContextualMemoryEngine.js'
+
+// ── Conversation Summarizer — Conversation summarization ─────────────────────
+export {
+  ConversationSummarizer,
+  type ConversationSummary,
+} from './ConversationSummarizer.js'
+
+// ── Coreference Resolver — Entity mention and coreference resolution ─────────
+export {
+  CoreferenceResolver,
+  type CoreferenceReplacement,
+  type CoreferenceResult,
+  type EntityMention,
+} from './CoreferenceResolver.js'
+
+// ── Counterfactual Reasoner — What-if counterfactual analysis ────────────────
+export {
+  CounterfactualReasoner,
+  // CounterfactualResult — already exported from CausalReasoner
+} from './CounterfactualReasoner.js'
+
+// ── Creative Problem Solver — Creative methods (SCAMPER, analogies, first principles) ──
+export {
+  CreativeProblemSolver,
+  type ProblemDefinition,
+  type CreativeSolution,
+  type CreativityMethod,
+  type ScamperAction,
+  type AnalogySuggestion,
+  type FirstPrinciplesAnalysis,
+} from './CreativeProblemSolver.js'
+
+// ── Cross-Domain Transfer — Cross-domain knowledge transfer ──────────────────
+export {
+  CrossDomainTransfer,
+  type CrossDomainResult,
+} from './CrossDomainTransfer.js'
+
+// ── Dialogue Act Recognizer — Dialogue act classification ────────────────────
+export {
+  DialogueActRecognizer,
+  // DialogueAct — already exported from DialogueManager
+  type DialogueActResult,
+} from './DialogueActRecognizer.js'
+
+// ── Emotional Intelligence — Emotion detection and tone analysis ─────────────
+export {
+  EmotionalIntelligence,
+  type Emotion,
+  // EmotionScore — already exported from SentimentAnalyzer
+  type EmotionalAnalysis,
+  type ToneType,
+  type ToneAnalysis,
+} from './EmotionalIntelligence.js'
+
+// ── Language Detector — Language detection and identification ─────────────────
+export {
+  LanguageDetector,
+  type LanguageDetectionResult,
+} from './LanguageDetector.js'
+
+// ── Logical Proof Engine — Formal logic, syllogisms, fallacy detection ───────
+export {
+  LogicalProofEngine,
+  type LogicalProposition,
+  type Syllogism,
+  type SyllogismResult,
+  type FallacyResult,
+  type DetectedFallacy,
+  // TruthTableRow — already exported from InferenceEngine
+  type ArgumentStructure,
+} from './LogicalProofEngine.js'
+
+// ── Multi-Format Generator — Format detection and output generation ──────────
+export {
+  MultiFormatGenerator,
+  type FormatType,
+  type FormatDetection,
+} from './MultiFormatGenerator.js'
+
+// ── Query Decomposer — Query decomposition into sub-questions ────────────────
+export {
+  QueryDecomposer,
+  type DecompositionStrategy,
+  type SubQuestion,
+  type DecompositionResult,
+} from './QueryDecomposer.js'
+
+// ── Response Quality Scorer — Response quality evaluation ────────────────────
+export {
+  ResponseQualityScorer,
+  type QualityScore,
+  type QualitySuggestion,
+} from './ResponseQualityScorer.js'
+
+// ── User Profile Model — User profiling and skill tracking ───────────────────
+export {
+  UserProfileModel,
+  type SkillLevel,
+  type DomainSkill,
+  // UserPreferences — already exported from LocalBrain
+  type UserProfile,
+} from './UserProfileModel.js'
