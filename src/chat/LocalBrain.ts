@@ -170,6 +170,13 @@ import { CreativeProblemSolver } from './CreativeProblemSolver.js'
 import { AdvancedSearchEngine } from './AdvancedSearchEngine.js'
 import type { SearchWithThinkingResult } from './AdvancedSearchEngine.js'
 
+// Meta-intelligence modules (Phase 13)
+import { SelfReflectionEngine } from './SelfReflectionEngine.js'
+import { ToolReasoningEngine } from './ToolReasoningEngine.js'
+import { FactVerificationEngine } from './FactVerificationEngine.js'
+import { ExplanationEngine } from './ExplanationEngine.js'
+import { FeedbackLearner } from './FeedbackLearner.js'
+
 // Smart coding agent
 import { CodeAgent } from './CodeAgent.js'
 import type {
@@ -4243,6 +4250,13 @@ export class LocalBrain {
   private creativeProblemSolver: CreativeProblemSolver | null = null
   private advancedSearchEngine: AdvancedSearchEngine | null = null
 
+  // Meta-intelligence modules (Phase 13)
+  private selfReflectionEngine: SelfReflectionEngine | null = null
+  private toolReasoningEngine: ToolReasoningEngine | null = null
+  private factVerificationEngine: FactVerificationEngine | null = null
+  private explanationEngine: ExplanationEngine | null = null
+  private feedbackLearnerEngine: FeedbackLearner | null = null
+
   // Smart coding agent
   private codeAgent: CodeAgent
 
@@ -4412,6 +4426,13 @@ export class LocalBrain {
           weight: entry.weight,
         }))
       )
+
+      // Meta-intelligence modules (Phase 13)
+      this.selfReflectionEngine = new SelfReflectionEngine()
+      this.toolReasoningEngine = new ToolReasoningEngine()
+      this.factVerificationEngine = new FactVerificationEngine()
+      this.explanationEngine = new ExplanationEngine()
+      this.feedbackLearnerEngine = new FeedbackLearner()
     }
 
     // Initialize CodeAgent (always available — no external deps)

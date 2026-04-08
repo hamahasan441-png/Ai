@@ -1561,3 +1561,90 @@ export {
   type WeaponizationPipeline,
   type SmartAttackSelection,
 } from './ExploitWriter.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PHASE 13 — META-INTELLIGENCE & SELF-IMPROVEMENT MODULES
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Self-Reflection Engine — Meta-cognitive self-evaluation & improvement ──
+export { SelfReflectionEngine, DEFAULT_SELF_REFLECTION_CONFIG } from './SelfReflectionEngine.js'
+
+export type {
+  QualityDimension,
+  DimensionScore,
+  OutputEvaluation,
+  ErrorPattern,
+  ErrorCategory,
+  BlindSpot,
+  ImprovementStrategy,
+  PerformanceTrend,
+  SelfReflectionEngineConfig,
+  SelfReflectionEngineStats,
+} from './SelfReflectionEngine.js'
+
+// ── Tool Reasoning Engine — Intelligent tool selection & orchestration ──
+export { ToolReasoningEngine, DEFAULT_TOOL_REASONING_CONFIG } from './ToolReasoningEngine.js'
+
+export type {
+  ToolDescriptor,
+  TaskRequirement,
+  TaskConstraint,
+  ToolMatch,
+  PipelineStep as ToolPipelineStep,
+  ToolPipeline,
+  StepExecutionResult,
+  ToolUsageRecord,
+  InferredParameter,
+  ToolReasoningEngineConfig,
+  ToolReasoningEngineStats,
+} from './ToolReasoningEngine.js'
+
+// ── Fact Verification Engine — Claim verification & source reliability ──
+export { FactVerificationEngine, DEFAULT_FACT_VERIFICATION_CONFIG } from './FactVerificationEngine.js'
+
+export type {
+  Claim,
+  VerificationEvidence,
+  Verdict,
+  VerificationResult,
+  KnownFact,
+  SourceProfile,
+  Contradiction as FactContradiction,
+  FactVerificationEngineConfig,
+  FactVerificationEngineStats,
+} from './FactVerificationEngine.js'
+
+// ── Explanation Engine — Multi-level explanation & teaching engine ──
+export { ExplanationEngine, DEFAULT_EXPLANATION_ENGINE_CONFIG } from './ExplanationEngine.js'
+
+export type {
+  ExpertiseLevel,
+  AbstractionLevel as ExplanationAbstractionLevel,
+  LevelExplanation,
+  MultiLevelExplanation,
+  ExplanationStep,
+  StepByStepBreakdown,
+  Analogy,
+  AudienceProfile,
+  UnderstandingProgress,
+  Prerequisite,
+  ExplanationEngineConfig,
+  ExplanationEngineStats,
+} from './ExplanationEngine.js'
+
+// ── Feedback Learner — RLHF-like feedback integration & preference modeling ──
+export { FeedbackLearner, DEFAULT_FEEDBACK_LEARNER_CONFIG } from './FeedbackLearner.js'
+
+export type {
+  FeedbackSignalType,
+  FeedbackSignal as FeedbackLearnerSignal,
+  CorrectionLesson,
+  CorrectionCategory,
+  PreferenceModel,
+  TrackedMistake,
+  CalibrationRecord as FeedbackCalibrationRecord,
+  CalibrationSummary,
+  RewardSummary,
+  FeedbackLearnerConfig,
+  FeedbackLearnerStats,
+} from './FeedbackLearner.js'
