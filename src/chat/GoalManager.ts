@@ -634,7 +634,7 @@ export class GoalManager {
   }
 
   /** Get achievement history. */
-  getAchievementHistory(): readonly Array<{ goalId: string; title: string; completedAt: number }> {
+  getAchievementHistory(): ReadonlyArray<{ goalId: string; title: string; completedAt: number }> {
     return [...this.achievementHistory]
   }
 
