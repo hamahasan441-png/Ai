@@ -1734,3 +1734,100 @@ export type {
   CollaborationEngineConfig,
   CollaborationEngineStats,
 } from './CollaborationEngine.js'
+
+// ── Phase 15 — Knowledge Engineering & Reasoning Depth ──────────────────────
+
+// ── KnowledgeGraphEngine — Graph-based knowledge representation & inference ──
+export { KnowledgeGraphEngine, DEFAULT_KNOWLEDGE_GRAPH_CONFIG } from './KnowledgeGraphEngine.js'
+
+export type {
+  EntityType,
+  RelationType,
+  KGEntity,
+  KGRelation,
+  GraphPath,
+  Subgraph,
+  TripleQuery,
+  TripleResult,
+  EntitySimilarity,
+  InferredRelation,
+  GraphTopology,
+  KnowledgeGraphEngineConfig,
+  KnowledgeGraphEngineStats,
+} from './KnowledgeGraphEngine.js'
+
+// ── DebateEngine — Structured argumentation & dialectical reasoning ──
+export { DebateEngine, DEFAULT_DEBATE_ENGINE_CONFIG } from './DebateEngine.js'
+
+export type {
+  ArgumentSide,
+  ArgumentStrength,
+  EvidenceType,
+  FallacyType,
+  Argument,
+  Evidence,
+  DetectedFallacy,
+  Rebuttal,
+  DebateRound,
+  DebateVerdict,
+  Debate,
+  DebateEngineConfig,
+  DebateEngineStats,
+} from './DebateEngine.js'
+
+// ── AnalyticalReasoner — Multi-framework analytical reasoning engine ──
+export { AnalyticalReasoner, DEFAULT_ANALYTICAL_REASONER_CONFIG } from './AnalyticalReasoner.js'
+
+export type {
+  FrameworkType,
+  SWOTAnalysis,
+  FiveWhyAnalysis,
+  WhyStep,
+  FishboneDiagram,
+  FishboneCategory,
+  PESTAnalysis,
+  PESTFactor,
+  PorterAnalysis,
+  ForceAssessment,
+  DecisionMatrix,
+  WeightedCriterion,
+  MatrixOption,
+  CostBenefitAnalysis,
+  CBAItem,
+  AnalysisResult,
+  AnalyticalReasonerConfig,
+  AnalyticalReasonerStats,
+} from './AnalyticalReasoner.js'
+
+// ── ProblemDecomposer — Complex problem breakdown & solution synthesis ──
+export { ProblemDecomposer, DEFAULT_PROBLEM_DECOMPOSER_CONFIG } from './ProblemDecomposer.js'
+
+export type {
+  ProblemType,
+  ComplexityLevel,
+  ApproachStrategy,
+  Problem,
+  SubProblem,
+  SolutionApproach,
+  DependencyGraph,
+  IntegratedSolution,
+  ProblemDecomposerConfig,
+  ProblemDecomposerStats,
+} from './ProblemDecomposer.js'
+
+// ── InsightExtractor — Pattern discovery, trend detection & insight ranking ──
+export { InsightExtractor, DEFAULT_INSIGHT_EXTRACTOR_CONFIG } from './InsightExtractor.js'
+
+export type {
+  InsightCategory,
+  SignificanceLevel,
+  TrendDirection,
+  Insight,
+  TrendResult,
+  AnomalyResult,
+  PatternResult,
+  InsightReport,
+  TextInsight,
+  InsightExtractorConfig,
+  InsightExtractorStats,
+} from './InsightExtractor.js'

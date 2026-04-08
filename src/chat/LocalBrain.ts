@@ -184,6 +184,13 @@ import { StrategicPlanner } from './StrategicPlanner.js'
 import { SelfModelEngine } from './SelfModelEngine.js'
 import { CollaborationEngine } from './CollaborationEngine.js'
 
+// Phase 15 — Knowledge Engineering & Reasoning Depth
+import { KnowledgeGraphEngine } from './KnowledgeGraphEngine.js'
+import { DebateEngine } from './DebateEngine.js'
+import { AnalyticalReasoner } from './AnalyticalReasoner.js'
+import { ProblemDecomposer as ProblemDecomposerEngine } from './ProblemDecomposer.js'
+import { InsightExtractor } from './InsightExtractor.js'
+
 // Smart coding agent
 import { CodeAgent } from './CodeAgent.js'
 import type {
@@ -4271,6 +4278,13 @@ export class LocalBrain {
   private selfModelEngine: SelfModelEngine | null = null
   private collaborationEngine: CollaborationEngine | null = null
 
+  // Knowledge engineering & reasoning depth modules (Phase 15)
+  private knowledgeGraphEngine: KnowledgeGraphEngine | null = null
+  private debateEngine: DebateEngine | null = null
+  private analyticalReasoner: AnalyticalReasoner | null = null
+  private problemDecomposerEngine: ProblemDecomposerEngine | null = null
+  private insightExtractor: InsightExtractor | null = null
+
   // Smart coding agent
   private codeAgent: CodeAgent
 
@@ -4454,6 +4468,13 @@ export class LocalBrain {
       this.strategicPlanner = new StrategicPlanner()
       this.selfModelEngine = new SelfModelEngine()
       this.collaborationEngine = new CollaborationEngine()
+
+      // Knowledge engineering & reasoning depth modules (Phase 15)
+      this.knowledgeGraphEngine = new KnowledgeGraphEngine()
+      this.debateEngine = new DebateEngine()
+      this.analyticalReasoner = new AnalyticalReasoner()
+      this.problemDecomposerEngine = new ProblemDecomposerEngine()
+      this.insightExtractor = new InsightExtractor()
     }
 
     // Initialize CodeAgent (always available — no external deps)
