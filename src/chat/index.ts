@@ -1938,6 +1938,10 @@ export {
   type C2Config,
   type EvasionMethod,
   type ReconTechnique,
+  type CryptoAttack,
+  type SocialEngineeringAttack,
+  type ForensicsEvasionTechnique,
+  type ReverseEngineeringTechnique,
 } from './PythonBlackHat.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2075,3 +2079,76 @@ export {
   // UserPreferences — already exported from LocalBrain
   type UserProfile,
 } from './UserProfileModel.js'
+
+// ── Exploit Search Engine — CVE/exploit/vulnerability search & intelligence ──
+export {
+  ExploitSearchEngine,
+  type ExploitSearchConfig,
+  type ExploitSearchStats,
+  type SeverityLevel,
+  type ExploitAvailability,
+  type CVSSv3,
+  type CVEEntry,
+  type AffectedProduct,
+  type CWEEntry,
+  // VulnCategory — conflicts with VulnerabilityScanner
+  type ExploitEntry,
+  type ExploitType,
+  type SearchQuery,
+  type SearchResult,
+  type VulnDiscoveryPattern,
+  type ExploitChain,
+  type ExploitChainStep,
+  type TrendAnalysis,
+} from './ExploitSearchEngine.js'
+
+// ── Buffer Overflow Debugger — Overflow analysis, ROP, heap exploitation ─────
+export {
+  BufferOverflowDebugger,
+  type OverflowDebuggerConfig,
+  type OverflowDebuggerStats,
+  type Architecture,
+  type Platform,
+  type OverflowType,
+  type BinaryProtections,
+  type CrashInfo,
+  type MemoryRegion,
+  type OverflowAnalysis,
+  type DebugCommand,
+  type ROPGadget,
+  type GadgetType,
+  type ROPChain,
+  type ROPObjective,
+  type HeapAnalysis,
+  type HeapCorruptionType,
+  type HeapChunk,
+  type FuzzStrategy,
+  type FormatStringAnalysis,
+  type OverflowPattern,
+} from './BufferOverflowDebugger.js'
+
+// ── Qwen Local LLM — Local inference engine with Qwen2.5-Coder 7B ──────────
+export {
+  QwenLocalLLM,
+  type QuantizationLevel,
+  type InferenceBackend,
+  type ModelInfo,
+  type DownloadProgress,
+  type InferenceRequest,
+  type InferenceResponse,
+  type ChatMessage,
+  type ServerStatus,
+  type QwenLLMConfig,
+  type QwenLLMStats,
+} from './QwenLocalLLM.js'
+
+// ── Local LLM Bridge — Connects QwenLocalLLM ↔ LocalBrain for smart routing ─
+export {
+  LocalLLMBridge,
+  type QueryIntent,
+  type RoutingTarget,
+  type BridgeConfig,
+  type RoutingDecision,
+  type BridgeResponse,
+  type BridgeStats,
+} from './LocalLLMBridge.js'

@@ -43,4 +43,55 @@ ripgrep
 
 # ── Python Packages (install with pip) ───────────────────────────────────────
 # Required if using PythonBlackHat or Python-based features:
-#   pip install requests scapy paramiko cryptography beautifulsoup4 nmap
+#   pip install -r requirements-blackhat.txt
+#
+# Or install all at once:
+#   pip install requests scapy paramiko pycryptodome beautifulsoup4 python-nmap \
+#     pwntools boofuzz impacket mitmproxy dnspython pyjwt flask selenium \
+#     lxml pyyaml ldap3 pysnmp pynput tweepy websockets pillow ropper \
+#     NetfilterQueue keystone-engine dnslib networkx sqlmap
+
+# ── PythonBlackHat — Core Libraries ─────────────────────────────────────────
+# pip install requests                # HTTP requests, web exploitation, API attacks
+# pip install scapy                   # Packet crafting, ARP spoof, DNS spoof, sniffing
+# pip install paramiko                # SSH brute force, worm propagation, remote access
+# pip install pycryptodome            # AES/RSA encryption, ransomware sim, encrypted C2
+# pip install beautifulsoup4          # HTML parsing, web scraping, XSS testing
+# pip install python-nmap             # Port scanning, service enumeration, vuln scanning
+
+# ── PythonBlackHat — Exploitation & Binary ──────────────────────────────────
+# pip install pwntools                # Buffer overflow, ROP chains, shellcraft, format strings
+# pip install ropper                  # ROP gadget finding for exploit development
+# pip install keystone-engine         # Assembler for shellcode generation
+# pip install boofuzz                 # Protocol fuzzing, crash detection
+
+# ── PythonBlackHat — Network Attacks ────────────────────────────────────────
+# pip install impacket                # SMB/LDAP/NTLM attacks, LLMNR poisoning, relay attacks
+# pip install mitmproxy               # Man-in-the-middle proxy, SSL stripping, traffic interception
+# pip install dnspython               # DNS enumeration, zone transfers, DNS cache snooping
+# pip install dnslib                  # DNS tunneling C2, custom DNS server/client
+# pip install NetfilterQueue          # Inline packet modification, DNS spoofing
+# pip install websockets              # WebSocket-based C2, real-time bidirectional comms
+# pip install ldap3                   # LDAP enumeration, Active Directory attacks
+# pip install pysnmp                  # SNMP enumeration, MIB walking, community string attacks
+
+# ── PythonBlackHat — Web Application Attacks ────────────────────────────────
+# pip install flask                   # C2 web server, captive portals, HTTP C2 channels
+# pip install selenium                # Browser automation, JavaScript-heavy XSS testing
+# pip install lxml                    # XXE exploitation, XML parsing attacks
+# pip install pyjwt                   # JWT token attacks — algorithm confusion, claim tampering
+# pip install pyyaml                  # YAML deserialization attacks
+# pip install sqlmap                  # Automated SQL injection detection and exploitation
+
+# ── PythonBlackHat — OSINT & Reconnaissance ─────────────────────────────────
+# pip install tweepy                  # Twitter/X API OSINT, social media intelligence
+# pip install networkx                # Network topology mapping, graph-based analysis
+
+# ── PythonBlackHat — Malware Development (Educational) ──────────────────────
+# pip install pynput                  # Keylogger — keystroke capture, input monitoring
+# pip install pillow                  # Screenshot capture for RAT functionality
+# pip install dropbox                 # Cloud service C2 — Dropbox API for command delivery
+
+# ── PythonBlackHat — Python Standard Library (no install needed) ────────────
+# socket, subprocess, threading, os, glob, ctypes, ssl, smtplib, email,
+# imaplib, sqlite3, pickle, asyncio, concurrent.futures, code, win32gui, win32crypt

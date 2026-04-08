@@ -1,11 +1,13 @@
 /**
- * Environment variables that control inference routing: which provider to use,
- * which endpoint to hit, and which model IDs to send.
+ * Environment variables that control inference routing.
+ *
+ * NOTE: This AI system is configured for LOCAL-ONLY use.
+ * No external API keys (Anthropic, Claude, etc.) are required.
+ * All chat modules in src/chat/ work fully offline with zero dependencies.
  *
  * When CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST is truthy in the spawn env, these
  * are stripped from settings-sourced env so the host's routing config isn't
- * overridden by a user's ~/.claude/settings.json — e.g. a Bedrock setup for
- * terminal CLI that would break a host that only supports first-party auth.
+ * overridden by a user's ~/.claude/settings.json.
  *
  * @[MODEL LAUNCH]: New models usually don't need changes here —
  * VERTEX_REGION_CLAUDE_* is prefix-matched. New providers or new routing

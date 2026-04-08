@@ -80,26 +80,24 @@ type OauthConfig = {
   MCP_PROXY_PATH: string
 }
 
-// Production OAuth configuration - Used in normal operation
+// Production OAuth configuration — redirected to local for offline use
 const PROD_OAUTH_CONFIG = {
-  BASE_API_URL: 'https://api.anthropic.com',
-  CONSOLE_AUTHORIZE_URL: 'https://platform.claude.com/oauth/authorize',
-  // Bounces through claude.com/cai/* so CLI sign-ins connect to claude.com
-  // visits for attribution. 307s to claude.ai/oauth/authorize in two hops.
-  CLAUDE_AI_AUTHORIZE_URL: 'https://claude.com/cai/oauth/authorize',
-  CLAUDE_AI_ORIGIN: 'https://claude.ai',
-  TOKEN_URL: 'https://platform.claude.com/v1/oauth/token',
-  API_KEY_URL: 'https://api.anthropic.com/api/oauth/claude_cli/create_api_key',
-  ROLES_URL: 'https://api.anthropic.com/api/oauth/claude_cli/roles',
+  BASE_API_URL: 'http://localhost:8000',
+  CONSOLE_AUTHORIZE_URL: 'http://localhost:3000/oauth/authorize',
+  CLAUDE_AI_AUTHORIZE_URL: 'http://localhost:4000/oauth/authorize',
+  CLAUDE_AI_ORIGIN: 'http://localhost:4000',
+  TOKEN_URL: 'http://localhost:8000/v1/oauth/token',
+  API_KEY_URL: 'http://localhost:8000/api/oauth/create_api_key',
+  ROLES_URL: 'http://localhost:8000/api/oauth/roles',
   CONSOLE_SUCCESS_URL:
-    'https://platform.claude.com/buy_credits?returnUrl=/oauth/code/success%3Fapp%3Dclaude-code',
+    'http://localhost:3000/oauth/code/success?app=local-ai',
   CLAUDEAI_SUCCESS_URL:
-    'https://platform.claude.com/oauth/code/success?app=claude-code',
-  MANUAL_REDIRECT_URL: 'https://platform.claude.com/oauth/code/callback',
+    'http://localhost:3000/oauth/code/success?app=local-ai',
+  MANUAL_REDIRECT_URL: 'http://localhost:3000/oauth/code/callback',
   CLIENT_ID: '9d1c250a-e61b-44d9-88ed-5944d1962f5e',
   // No suffix for production config
   OAUTH_FILE_SUFFIX: '',
-  MCP_PROXY_URL: 'https://mcp-proxy.anthropic.com',
+  MCP_PROXY_URL: 'http://localhost:8205',
   MCP_PROXY_PATH: '/v1/mcp/{server_id}',
 } as const
 
@@ -111,7 +109,7 @@ const PROD_OAUTH_CONFIG = {
  * See: https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00
  */
 export const MCP_CLIENT_METADATA_URL =
-  'https://claude.ai/oauth/claude-code-client-metadata'
+  'http://localhost:4000/oauth/client-metadata'
 
 // Staging OAuth configuration - only included in ant builds with staging flag
 // Uses literal check for dead code elimination

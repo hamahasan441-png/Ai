@@ -88,6 +88,10 @@ import { KnowledgeSynthesizer } from './KnowledgeSynthesizer.js'
 import { EconomicAnalyzer } from './EconomicAnalyzer.js'
 import { SecurityTrainer } from './SecurityTrainer.js'
 
+// Local LLM — Qwen2.5-Coder integration
+import { QwenLocalLLM } from './QwenLocalLLM.js'
+import { LocalLLMBridge } from './LocalLLMBridge.js'
+
 // Semantic intelligence modules (Phase 5)
 import { EmotionEngine } from './EmotionEngine.js'
 import { TemporalReasoner } from './TemporalReasoner.js'
@@ -2736,6 +2740,9 @@ add('language', ['sorani translation history', 'kurdish history translation', 't
   add('llm_prompt_engineering', ['local llm inference ollama llama cpp gguf', 'model quantization int8 int4 gptq awq', 'llm deployment serving vllm tgi inference'],
     'Local LLM & deployment: Ollama — run LLMs locally (pull models, API server, Modelfile). llama.cpp — C++ inference, GGUF format (quantized models), CPU/GPU. Quantization: INT8 (8-bit), INT4 (4-bit) — reduce memory/speed with minimal quality loss. Methods: GPTQ (post-training, GPU), AWQ (activation-aware), GGUF (llama.cpp, CPU-friendly), bitsandbytes (on-the-fly). Serving: vLLM (PagedAttention, continuous batching, high throughput), TGI (Hugging Face Text Generation Inference), TensorRT-LLM (NVIDIA, optimized). Deployment: API endpoint, streaming (SSE), OpenAI-compatible API. Scaling: KV-cache optimization, speculative decoding, prefix caching.', 0.85)
 
+  add('llm_prompt_engineering', ['qwen qwen2 qwen2.5 coder local model', 'qwen2.5 coder 7b instruct coding assistant', 'local ai brain qwen inference ollama'],
+    'Qwen2.5-Coder 7B — Alibaba Cloud\'s code-specialized LLM. This AI uses Qwen2.5-Coder 7B as its local inference engine. Setup: 1) Install Ollama (curl -fsSL https://ollama.ai/install.sh | sh), 2) Pull model: ollama pull qwen2.5-coder:7b, 3) Server starts automatically at localhost:11434. The LocalLLMBridge connects Qwen to the LocalBrain for enhanced: code generation (template + LLM), vulnerability search (CVE DB + LLM analysis), overflow debugging (BufferOverflowDebugger + LLM reasoning), code review (rules + LLM insights). Quantization options: Q2_K (2.9GB), Q3_K_M (3.6GB), Q4_K_M (4.4GB — recommended), Q5_K_M (5.3GB), Q8_0 (7.7GB). Context window: 32768 tokens. Supports chat format with system prompts. Alternative backend: llama.cpp with GGUF files.', 1.4)
+
   // ── Geospatial & GIS ──────────────────────────────────────────────────
   add('geospatial_gis', ['leaflet mapbox openlayers interactive web map', 'google maps api maplibre geolocation mapping', 'cesium deck gl 3d globe visualization tiles'],
     'Web mapping libraries: Leaflet — lightweight, open-source, tiles (OpenStreetMap, Mapbox), markers, popups, GeoJSON layers, plugins ecosystem. Mapbox GL JS — vector tiles, custom styles (Mapbox Studio), 3D terrain, data-driven styling. MapLibre GL — open-source fork of Mapbox GL. OpenLayers — full-featured, OGC standards support (WMS, WFS, WMTS). Google Maps API — Places, Directions, Geocoding, Street View. Deck.gl (Uber): WebGL-powered large-scale data visualization on maps. CesiumJS — 3D globes, terrain, 3D Tiles (buildings, point clouds). Tile formats: raster (PNG/JPEG), vector (MVT/PBF). Styling: SLD, Mapbox Style Spec.', 0.9)
@@ -4196,6 +4203,10 @@ export class LocalBrain {
   private economicAnalyzer: EconomicAnalyzer | null = null
   private securityTrainer: SecurityTrainer | null = null
 
+  // ── Local LLM — Qwen2.5-Coder 7B ──
+  private qwenLLM: QwenLocalLLM | null = null
+  private llmBridge: LocalLLMBridge | null = null
+
   // Semantic intelligence modules (Phase 5)
   private emotionEngine: EmotionEngine | null = null
   private temporalReasoner: TemporalReasoner | null = null
@@ -4381,6 +4392,10 @@ export class LocalBrain {
       this.knowledgeSynthesizer = new KnowledgeSynthesizer()
       this.economicAnalyzer = new EconomicAnalyzer()
       this.securityTrainer = new SecurityTrainer()
+
+      // Local LLM — Qwen2.5-Coder 7B
+      this.qwenLLM = new QwenLocalLLM()
+      this.llmBridge = new LocalLLMBridge()
 
       // Phase 5 — Semantic intelligence modules
       this.emotionEngine = new EmotionEngine()
@@ -5806,7 +5821,7 @@ export class LocalBrain {
   private isLLMPromptQuery(msg: string): boolean {
     const llmPattern = /\b(large\s+language\s+model\s+(gpt|claude|llama|gemini)|transformer\s+(attention|mechanism|self.attention)|prompt\s+engineering\s+(chain\s+of\s+thought|few.shot|technique))\b/i
     const ragPattern = /\b(rag\s+(retrieval\s+augmented|generation|knowledge)|vector\s+database\s+(embedding|similarity|search|pinecone|chromadb)|langchain\s+(llamaindex|framework|orchestration|agent))\b/i
-    const finetunePattern = /\b(fine.?tuning\s+(lora|qlora|peft|parameter)|rlhf\s+(reinforcement|learning|human\s+feedback|dpo)|local\s+llm\s+(inference|ollama|llama\.?cpp|gguf)|model\s+quantization\s+(int[48]|gptq|awq))\b/i
+    const finetunePattern = /\b(fine.?tuning\s+(lora|qlora|peft|parameter)|rlhf\s+(reinforcement|learning|human\s+feedback|dpo)|local\s+llm\s+(inference|ollama|llama\.?cpp|gguf)|model\s+quantization\s+(int[48]|gptq|awq)|qwen2?\.?5?\s*(coder|model|local|instruct))\b/i
     return llmPattern.test(msg) || ragPattern.test(msg) || finetunePattern.test(msg)
   }
 
