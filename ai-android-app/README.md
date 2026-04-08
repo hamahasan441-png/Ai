@@ -23,7 +23,7 @@ This is the Android APK version of the AI Assistant project. It wraps all 120+ A
 | 💻 Code & Development | 6 | Code generation, optimization, refactoring |
 | 🧠 Reasoning & Logic | 10 | Logical proofs, causal analysis, Bayesian inference |
 | 📝 Language & NLP | 10 | Language detection, sentiment, dialogue |
-| 🇰🇷 Kurdish Language | 4 | Sorani, Kurmanji, translation, morphology |
+| 🗣️ Kurdish Language | 4 | Sorani, Kurmanji, translation, morphology |
 | 📚 Knowledge & Memory | 10 | Knowledge graphs, memory, fact verification |
 | 📊 Analysis & Decision | 8 | SWOT, debate, economic analysis |
 | 📋 Planning & Goals | 5 | Task planning, goal management, strategy |

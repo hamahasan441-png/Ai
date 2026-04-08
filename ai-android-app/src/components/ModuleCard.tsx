@@ -20,7 +20,7 @@ function ModuleCardComponent({ module, isActive, onToggle }: ModuleCardProps) {
   const getCategoryIcon = (category: string): string => {
     const icons: Record<string, string> = {
       'Language & NLP': '📝',
-      'Kurdish Language': '🇰🇷',
+      'Kurdish Language': '🗣️',
       'Reasoning & Logic': '🧠',
       'Knowledge & Memory': '📚',
       'Analysis & Decision': '📊',

@@ -58,7 +58,7 @@ export default function AboutScreen() {
             { icon: '🔍', text: 'Cybersecurity analysis tools' },
             { icon: '📊', text: 'Trading & financial analysis' },
             { icon: '💻', text: 'Code development assistance' },
-            { icon: '🇰🇷', text: 'Kurdish language support' },
+            { icon: '🗣️', text: 'Kurdish language support' },
             { icon: '🎨', text: 'Creative content generation' },
           ].map((feature, idx) => (
             <View key={idx} style={styles.featureRow}>

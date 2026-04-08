@@ -393,7 +393,7 @@ export class AIEngine {
   }
 
   private getKurdishResponse(query: string, module: AIModule): string {
-    return `🇰🇷 **${module.name}**\n\n${module.description}\n\n**Kurdish Language Support:**\n• Sorani and Kurmanji dialects\n• Morphological analysis\n• Sentiment analysis\n• Translation corpus\n• Text processing utilities\n\nسڵاو! بپرسە لە کوردی.`;
+    return `🗣️ **${module.name}**\n\n${module.description}\n\n**Kurdish Language Support:**\n• Sorani and Kurmanji dialects\n• Morphological analysis\n• Sentiment analysis\n• Translation corpus\n• Text processing utilities\n\nسڵاو! بپرسە لە کوردی.`;
   }
 
   private getKnowledgeResponse(query: string, module: AIModule): string {
@@ -429,7 +429,7 @@ export class AIEngine {
     const queryLower = query.toLowerCase();
 
     if (greetings.some(g => queryLower.includes(g))) {
-      return `👋 **Hello!**\n\nI'm your AI Assistant with **${this.getModuleCount()} modules** running fully offline.\n\n**What I can help with:**\n🔒 Cybersecurity & Exploit Analysis\n📊 Trading & Financial Analysis\n💻 Code Development & Optimization\n🧠 Reasoning & Logic\n📝 Language Processing & NLP\n🎨 Creative Content Generation\n📋 Planning & Goal Management\n📚 Knowledge & Memory\n🇰🇷 Kurdish Language Support\n\nJust ask me anything!`;
+      return `👋 **Hello!**\n\nI'm your AI Assistant with **${this.getModuleCount()} modules** running fully offline.\n\n**What I can help with:**\n🔒 Cybersecurity & Exploit Analysis\n📊 Trading & Financial Analysis\n💻 Code Development & Optimization\n🧠 Reasoning & Logic\n📝 Language Processing & NLP\n🎨 Creative Content Generation\n📋 Planning & Goal Management\n📚 Knowledge & Memory\n🗣️ Kurdish Language Support\n\nJust ask me anything!`;
     }
 
     if (queryLower.includes('help') || queryLower.includes('what can you do')) {
@@ -503,7 +503,7 @@ export class AIEngine {
       'Kurdish Language': [
         'Translate to Kurdish',
         'Kurdish morphology',
-        'Kurdish sentiment',
+        'Kurdish sentiment analysis',
         'وشەی کوردی',
       ],
     };

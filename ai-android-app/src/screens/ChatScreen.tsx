@@ -46,7 +46,7 @@ export default function ChatScreen({ navigation }: ChatScreenProps) {
         const welcomeMsg: ChatMessage = {
           id: 'welcome',
           role: 'assistant',
-          content: `👋 **Welcome to AI Assistant!**\n\n🤖 I have **${aiEngine.getModuleCount()} AI modules** running completely offline.\n\n**What I can help with:**\n🔒 Cybersecurity & Exploits\n📊 Trading & Finance\n💻 Code & Development\n🧠 Reasoning & Logic\n📝 Language Processing\n🎨 Creative Content\n📚 Knowledge & Memory\n🇰🇷 Kurdish Language\n\n💡 Tap a suggestion below or type your question!`,
+          content: `👋 **Welcome to AI Assistant!**\n\n🤖 I have **${aiEngine.getModuleCount()} AI modules** running completely offline.\n\n**What I can help with:**\n🔒 Cybersecurity & Exploits\n📊 Trading & Finance\n💻 Code & Development\n🧠 Reasoning & Logic\n📝 Language Processing\n🎨 Creative Content\n📚 Knowledge & Memory\n🗣️ Kurdish Language\n\n💡 Tap a suggestion below or type your question!`,
           timestamp: Date.now(),
           module: 'LocalBrain',
         };

@@ -61,7 +61,7 @@ export default function ModulesScreen() {
     const icons: Record<string, string> = {
       'All': '📋',
       'Language & NLP': '📝',
-      'Kurdish Language': '🇰🇷',
+      'Kurdish Language': '🗣️',
       'Reasoning & Logic': '🧠',
       'Knowledge & Memory': '📚',
       'Analysis & Decision': '📊',
