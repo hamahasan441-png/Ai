@@ -677,9 +677,9 @@ export class TargetScanner {
     if (protoMatch) protocol = protoMatch[1].toLowerCase()
 
     const afterProto = withProto.replace(/^https?:\/\//i, '')
-    const pathIdx = afterProto.indexOf('/')
-    const hostPart = pathIdx >= 0 ? afterProto.slice(0, pathIdx) : afterProto
-    const pathPart = pathIdx >= 0 ? afterProto.slice(pathIdx) : '/'
+    const pathOrQueryIdx = afterProto.search(/[/?]/)
+    const hostPart = pathOrQueryIdx >= 0 ? afterProto.slice(0, pathOrQueryIdx) : afterProto
+    const pathPart = pathOrQueryIdx >= 0 ? afterProto.slice(pathOrQueryIdx) : '/'
 
     const portMatch = hostPart.match(/:(\d+)$/)
     if (portMatch) {
