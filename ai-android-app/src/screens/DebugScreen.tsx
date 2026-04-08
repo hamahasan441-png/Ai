@@ -23,6 +23,9 @@ import {
   PerformanceBenchmark,
 } from '../services/APKDebugger';
 
+const APP_VERSION = '2.3.0';
+const PACKAGE_NAME = 'com.ai.assistant';
+
 export default function DebugScreen() {
   const aiEngine = getAIEngine();
   const debugger_ = APKDebugger.getInstance();
@@ -46,8 +49,8 @@ export default function DebugScreen() {
   useEffect(() => {
     debugger_.logInfo('Debug screen opened', 'DebugScreen');
     debugger_.validateConfig({
-      appVersion: '2.3.0',
-      packageName: 'com.ai.assistant',
+      appVersion: APP_VERSION,
+      packageName: PACKAGE_NAME,
       moduleCount: aiEngine.getModuleCount(),
     });
     setLogs(debugger_.getLogs());
@@ -110,8 +113,8 @@ export default function DebugScreen() {
 
   const handleGenerateReport = () => {
     const report = debugger_.generateReport({
-      appVersion: '2.3.0',
-      packageName: 'com.ai.assistant',
+      appVersion: APP_VERSION,
+      packageName: PACKAGE_NAME,
       moduleCount: aiEngine.getModuleCount(),
       activeModules: aiEngine.getActiveModuleCount(),
     });
@@ -147,8 +150,8 @@ export default function DebugScreen() {
       {/* App Info Card */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>📱 App Info</Text>
-        <InfoRow label="Version" value="2.3.0" />
-        <InfoRow label="Package" value="com.ai.assistant" />
+        <InfoRow label="Version" value={APP_VERSION} />
+        <InfoRow label="Package" value={PACKAGE_NAME} />
         <InfoRow label="Build Type" value="Debug" highlight />
         <InfoRow label="JS Engine" value="Hermes" />
         <InfoRow label="Platform" value="React Native 0.76" />

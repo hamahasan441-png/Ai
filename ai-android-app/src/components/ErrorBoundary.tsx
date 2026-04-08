@@ -37,9 +37,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({ errorInfo });
-    // Log to APKDebugger if available
+    // Log to APKDebugger
     try {
-      const { APKDebugger } = require('../services/APKDebugger');
+      // Use require to avoid circular dependency issues in error boundary
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { APKDebugger } = require('../services/APKDebugger') as typeof import('../services/APKDebugger');
       APKDebugger.getInstance().logError(error, errorInfo.componentStack || '');
     } catch {
       // APKDebugger not available, silently ignore

@@ -61,6 +61,7 @@ export class APKDebugger {
   private startTime: number = Date.now();
   private maxLogs: number = 500;
   private isRunning: boolean = false;
+  private logCounter: number = 0;
 
   static getInstance(): APKDebugger {
     if (!APKDebugger.instance) {
@@ -107,7 +108,7 @@ export class APKDebugger {
    */
   log(level: DebugLogEntry['level'], message: string, details?: string, source?: string): void {
     const entry: DebugLogEntry = {
-      id: `log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      id: `log_${Date.now()}_${++this.logCounter}_${Math.random().toString(36).substring(2, 7)}`,
       timestamp: Date.now(),
       level,
       message,
@@ -405,7 +406,7 @@ export class APKDebugger {
       timestamp: Date.now(),
       logCount: this.logs.length,
       historySize: this.healthResults.length,
-      estimatedUsageKB: Math.round(totalBytes / 1024 * 10) / 10,
+      estimatedUsageKB: Math.round((totalBytes / 1024) * 10) / 10,
     };
   }
 
@@ -555,6 +556,7 @@ export class APKDebugger {
     this.healthResults = [];
     this.startTime = Date.now();
     this.isRunning = false;
+    this.logCounter = 0;
   }
 }
 
