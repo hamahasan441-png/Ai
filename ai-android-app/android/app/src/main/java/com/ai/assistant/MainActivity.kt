@@ -15,7 +15,7 @@ class MainActivity : ReactActivity() {
     /**
      * Returns the name of the main component registered from JavaScript.
      */
-    override fun getMainComponentName(): String = "ai-android-app"
+    override fun getMainComponentName(): String = "main"
 
     /**
      * Returns the instance of the [ReactActivityDelegate].

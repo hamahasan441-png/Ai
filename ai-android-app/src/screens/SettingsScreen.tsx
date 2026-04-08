@@ -195,6 +195,15 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
         <Text style={styles.aboutButtonText}>About AI Assistant</Text>
         <Ionicons name="chevron-forward" size={18} color="#666" />
       </Pressable>
+
+      <Pressable
+        style={[styles.aboutButton, styles.debugButton]}
+        onPress={() => navigation.navigate('Debug')}
+      >
+        <Ionicons name="bug-outline" size={20} color="#fbbf24" />
+        <Text style={styles.aboutButtonText}>🐛 APK Debugger</Text>
+        <Ionicons name="chevron-forward" size={18} color="#666" />
+      </Pressable>
     </ScrollView>
   );
 }
@@ -313,5 +322,9 @@ const styles = StyleSheet.create({
     color: '#e8e8e8',
     fontSize: 15,
     fontWeight: '500',
+  },
+  debugButton: {
+    marginTop: 8,
+    borderColor: 'rgba(251, 191, 36, 0.3)',
   },
 });

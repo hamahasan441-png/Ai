@@ -21,11 +21,7 @@
       },
       "package": "com.ai.assistant",
       "versionCode": 1,
-      "permissions": [],
-      "blockedPermissions": [
-        "android.permission.INTERNET",
-        "android.permission.ACCESS_NETWORK_STATE"
-      ]
+      "permissions": []
     },
     "plugins": [
       "expo-haptics"
