@@ -1194,7 +1194,9 @@ describe('PythonBlackHat Engine', () => {
       const kStats = engine.getKnowledgeStats();
       const sum = kStats.totalLibraries + kStats.totalExploitDev + kStats.totalMalware +
         kStats.totalNetworkAttacks + kStats.totalWebExploits + kStats.totalRecon +
-        kStats.totalPrivEsc + kStats.totalC2 + kStats.totalEvasion + kStats.totalTools;
+        kStats.totalPrivEsc + kStats.totalC2 + kStats.totalEvasion + kStats.totalTools +
+        kStats.totalCryptoAttacks + kStats.totalSocialEngineering +
+        kStats.totalForensicsEvasion + kStats.totalReverseEngineering;
       expect(kStats.totalKnowledgeItems).toBe(sum);
     });
 
