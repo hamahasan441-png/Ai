@@ -170,6 +170,34 @@ import { CreativeProblemSolver } from './CreativeProblemSolver.js'
 import { AdvancedSearchEngine } from './AdvancedSearchEngine.js'
 import type { SearchWithThinkingResult } from './AdvancedSearchEngine.js'
 
+// Meta-intelligence modules (Phase 13)
+import { SelfReflectionEngine } from './SelfReflectionEngine.js'
+import { ToolReasoningEngine } from './ToolReasoningEngine.js'
+import { FactVerificationEngine } from './FactVerificationEngine.js'
+import { ExplanationEngine } from './ExplanationEngine.js'
+import { FeedbackLearner } from './FeedbackLearner.js'
+
+// Advanced reasoning & autonomy modules (Phase 14)
+import { WorkingMemoryEngine } from './WorkingMemoryEngine.js'
+import { GoalManager } from './GoalManager.js'
+import { StrategicPlanner } from './StrategicPlanner.js'
+import { SelfModelEngine } from './SelfModelEngine.js'
+import { CollaborationEngine } from './CollaborationEngine.js'
+
+// Phase 15 — Knowledge Engineering & Reasoning Depth
+import { KnowledgeGraphEngine } from './KnowledgeGraphEngine.js'
+import { DebateEngine } from './DebateEngine.js'
+import { AnalyticalReasoner } from './AnalyticalReasoner.js'
+import { ProblemDecomposer as ProblemDecomposerEngine } from './ProblemDecomposer.js'
+import { InsightExtractor } from './InsightExtractor.js'
+
+// Phase 16 — Advanced Intelligence & Domain Expertise
+import { NaturalLanguageGenerator } from './NaturalLanguageGenerator.js'
+import { ScientificReasoner } from './ScientificReasoner.js'
+import { DataPipelineEngine } from './DataPipelineEngine.js'
+import { PersonalityEngine } from './PersonalityEngine.js'
+import { CodeOptimizer } from './CodeOptimizer.js'
+
 // Smart coding agent
 import { CodeAgent } from './CodeAgent.js'
 import type {
@@ -4243,6 +4271,34 @@ export class LocalBrain {
   private creativeProblemSolver: CreativeProblemSolver | null = null
   private advancedSearchEngine: AdvancedSearchEngine | null = null
 
+  // Meta-intelligence modules (Phase 13)
+  private selfReflectionEngine: SelfReflectionEngine | null = null
+  private toolReasoningEngine: ToolReasoningEngine | null = null
+  private factVerificationEngine: FactVerificationEngine | null = null
+  private explanationEngine: ExplanationEngine | null = null
+  private feedbackLearnerEngine: FeedbackLearner | null = null
+
+  // Advanced reasoning & autonomy modules (Phase 14)
+  private workingMemoryEngine: WorkingMemoryEngine | null = null
+  private goalManager: GoalManager | null = null
+  private strategicPlanner: StrategicPlanner | null = null
+  private selfModelEngine: SelfModelEngine | null = null
+  private collaborationEngine: CollaborationEngine | null = null
+
+  // Knowledge engineering & reasoning depth modules (Phase 15)
+  private knowledgeGraphEngine: KnowledgeGraphEngine | null = null
+  private debateEngine: DebateEngine | null = null
+  private analyticalReasoner: AnalyticalReasoner | null = null
+  private problemDecomposerEngine: ProblemDecomposerEngine | null = null
+  private insightExtractor: InsightExtractor | null = null
+
+  // Advanced intelligence & domain expertise modules (Phase 16)
+  private naturalLanguageGenerator: NaturalLanguageGenerator | null = null
+  private scientificReasoner: ScientificReasoner | null = null
+  private dataPipelineEngine: DataPipelineEngine | null = null
+  private personalityEngine: PersonalityEngine | null = null
+  private codeOptimizer: CodeOptimizer | null = null
+
   // Smart coding agent
   private codeAgent: CodeAgent
 
@@ -4412,6 +4468,34 @@ export class LocalBrain {
           weight: entry.weight,
         }))
       )
+
+      // Meta-intelligence modules (Phase 13)
+      this.selfReflectionEngine = new SelfReflectionEngine()
+      this.toolReasoningEngine = new ToolReasoningEngine()
+      this.factVerificationEngine = new FactVerificationEngine()
+      this.explanationEngine = new ExplanationEngine()
+      this.feedbackLearnerEngine = new FeedbackLearner()
+
+      // Advanced reasoning & autonomy modules (Phase 14)
+      this.workingMemoryEngine = new WorkingMemoryEngine()
+      this.goalManager = new GoalManager()
+      this.strategicPlanner = new StrategicPlanner()
+      this.selfModelEngine = new SelfModelEngine()
+      this.collaborationEngine = new CollaborationEngine()
+
+      // Knowledge engineering & reasoning depth modules (Phase 15)
+      this.knowledgeGraphEngine = new KnowledgeGraphEngine()
+      this.debateEngine = new DebateEngine()
+      this.analyticalReasoner = new AnalyticalReasoner()
+      this.problemDecomposerEngine = new ProblemDecomposerEngine()
+      this.insightExtractor = new InsightExtractor()
+
+      // Advanced intelligence & domain expertise modules (Phase 16)
+      this.naturalLanguageGenerator = new NaturalLanguageGenerator()
+      this.scientificReasoner = new ScientificReasoner()
+      this.dataPipelineEngine = new DataPipelineEngine()
+      this.personalityEngine = new PersonalityEngine()
+      this.codeOptimizer = new CodeOptimizer()
     }
 
     // Initialize CodeAgent (always available — no external deps)

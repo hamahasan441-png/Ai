@@ -1387,16 +1387,7 @@ export type {
   KurdishMonth,
 } from './KurdishLanguageUtils.js'
 
-// ── Hypothesis Engine (Scientific Reasoning) ──
-
-export { HypothesisEngine, DEFAULT_HYPOTHESIS_ENGINE_CONFIG } from './HypothesisEngine.js'
-
-export type {
-  Evidence as HypothesisEngineEvidence,
-  Hypothesis as HypothesisEngineHypothesis,
-  HypothesisTestResult,
-  HypothesisEngineConfig,
-} from './HypothesisEngine.js'
+// ── Hypothesis Engine — already exported above (line ~1204) ──
 
 // ── Ethical Reasoner (Moral Analysis) ──
 
@@ -1561,6 +1552,372 @@ export {
   type WeaponizationPipeline,
   type SmartAttackSelection,
 } from './ExploitWriter.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PHASE 13 — META-INTELLIGENCE & SELF-IMPROVEMENT MODULES
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Self-Reflection Engine — Meta-cognitive self-evaluation & improvement ──
+export { SelfReflectionEngine, DEFAULT_SELF_REFLECTION_CONFIG } from './SelfReflectionEngine.js'
+
+export type {
+  QualityDimension,
+  DimensionScore,
+  OutputEvaluation,
+  ErrorPattern,
+  ErrorCategory,
+  BlindSpot,
+  ImprovementStrategy,
+  PerformanceTrend,
+  SelfReflectionEngineConfig,
+  SelfReflectionEngineStats,
+} from './SelfReflectionEngine.js'
+
+// ── Tool Reasoning Engine — Intelligent tool selection & orchestration ──
+export { ToolReasoningEngine, DEFAULT_TOOL_REASONING_CONFIG } from './ToolReasoningEngine.js'
+
+export type {
+  ToolDescriptor,
+  TaskRequirement,
+  TaskConstraint,
+  ToolMatch,
+  PipelineStep as ToolPipelineStep,
+  ToolPipeline,
+  StepExecutionResult,
+  ToolUsageRecord,
+  InferredParameter,
+  ToolReasoningEngineConfig,
+  ToolReasoningEngineStats,
+} from './ToolReasoningEngine.js'
+
+// ── Fact Verification Engine — Claim verification & source reliability ──
+export { FactVerificationEngine, DEFAULT_FACT_VERIFICATION_CONFIG } from './FactVerificationEngine.js'
+
+export type {
+  Claim,
+  VerificationEvidence,
+  Verdict,
+  VerificationResult,
+  KnownFact,
+  SourceProfile,
+  Contradiction as FactContradiction,
+  FactVerificationEngineConfig,
+  FactVerificationEngineStats,
+} from './FactVerificationEngine.js'
+
+// ── Explanation Engine — Multi-level explanation & teaching engine ──
+export { ExplanationEngine, DEFAULT_EXPLANATION_ENGINE_CONFIG } from './ExplanationEngine.js'
+
+export type {
+  ExpertiseLevel,
+  AbstractionLevel as ExplanationAbstractionLevel,
+  LevelExplanation,
+  MultiLevelExplanation,
+  ExplanationStep,
+  StepByStepBreakdown,
+  Analogy,
+  AudienceProfile,
+  UnderstandingProgress,
+  Prerequisite,
+  ExplanationEngineConfig,
+  ExplanationEngineStats,
+} from './ExplanationEngine.js'
+
+// ── Feedback Learner — RLHF-like feedback integration & preference modeling ──
+export { FeedbackLearner, DEFAULT_FEEDBACK_LEARNER_CONFIG } from './FeedbackLearner.js'
+
+export type {
+  FeedbackSignalType,
+  FeedbackSignal as FeedbackLearnerSignal,
+  CorrectionLesson,
+  CorrectionCategory,
+  PreferenceModel,
+  TrackedMistake,
+  CalibrationRecord as FeedbackCalibrationRecord,
+  CalibrationSummary,
+  RewardSummary,
+  FeedbackLearnerConfig,
+  FeedbackLearnerStats,
+} from './FeedbackLearner.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PHASE 14 — ADVANCED REASONING & AUTONOMY MODULES
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Working Memory Engine — Active thought management & scratchpad ──
+export { WorkingMemoryEngine, DEFAULT_WORKING_MEMORY_CONFIG } from './WorkingMemoryEngine.js'
+
+export type {
+  MemorySlotType,
+  AttentionLevel,
+  MemorySlot,
+  MemoryChunk,
+  ScratchpadEntry,
+  AttentionSnapshot,
+  InterferenceResult,
+  WorkingMemoryEngineConfig,
+  WorkingMemoryEngineStats,
+} from './WorkingMemoryEngine.js'
+
+// ── Goal Manager — Autonomous goal tracking & replanning ──
+export { GoalManager, DEFAULT_GOAL_MANAGER_CONFIG } from './GoalManager.js'
+
+export type {
+  GoalStatus,
+  GoalPriority,
+  GoalDefinition,
+  GoalConflict,
+  GoalMilestone,
+  GoalReplanResult,
+  GoalTreeNode,
+  GoalManagerConfig,
+  GoalManagerStats,
+} from './GoalManager.js'
+
+// ── Strategic Planner — Long-horizon planning with Monte Carlo ──
+export { StrategicPlanner, DEFAULT_STRATEGIC_PLANNER_CONFIG } from './StrategicPlanner.js'
+
+export type {
+  PlanStepStatus,
+  StrategicStep,
+  ContingencyBranch,
+  StrategicPlan,
+  MonteCarloResult,
+  PlanRepairResult,
+  ScenarioAnalysis,
+  PlanComparison,
+  ResourceEstimate,
+  StrategicPlannerConfig,
+  StrategicPlannerStats,
+} from './StrategicPlanner.js'
+
+// ── Self-Model Engine — Introspective self-awareness & capability mapping ──
+export { SelfModelEngine, DEFAULT_SELF_MODEL_CONFIG } from './SelfModelEngine.js'
+
+export type {
+  ProficiencyLevel,
+  KnowledgeState,
+  Capability as SelfModelCapability,
+  KnowledgeBoundary,
+  Limitation,
+  LimitationCategory,
+  CompetenceEstimate,
+  UncertaintyMap,
+  GrowthRecord,
+  SelfAssessment,
+  SelfModelEngineConfig,
+  SelfModelEngineStats,
+} from './SelfModelEngine.js'
+
+// ── Collaboration Engine — Multi-module orchestration & synthesis ──
+export { CollaborationEngine, DEFAULT_COLLABORATION_CONFIG } from './CollaborationEngine.js'
+
+export type {
+  AgentRole,
+  AgentDescriptor,
+  CollaborationTask,
+  AgentResponse as CollaborationAgentResponse,
+  SynthesizedResult,
+  ConflictRecord,
+  DelegationPlan,
+  CollaborationMessage,
+  EnsembleDecision,
+  CollaborationEngineConfig,
+  CollaborationEngineStats,
+} from './CollaborationEngine.js'
+
+// ── Phase 15 — Knowledge Engineering & Reasoning Depth ──────────────────────
+
+// ── KnowledgeGraphEngine — Graph-based knowledge representation & inference ──
+export { KnowledgeGraphEngine, DEFAULT_KNOWLEDGE_GRAPH_CONFIG } from './KnowledgeGraphEngine.js'
+
+export type {
+  EntityType,
+  RelationType,
+  KGEntity,
+  KGRelation,
+  GraphPath,
+  Subgraph,
+  TripleQuery,
+  TripleResult,
+  EntitySimilarity,
+  InferredRelation,
+  GraphTopology,
+  KnowledgeGraphEngineConfig,
+  KnowledgeGraphEngineStats,
+} from './KnowledgeGraphEngine.js'
+
+// ── DebateEngine — Structured argumentation & dialectical reasoning ──
+export { DebateEngine, DEFAULT_DEBATE_ENGINE_CONFIG } from './DebateEngine.js'
+
+export type {
+  ArgumentSide,
+  ArgumentStrength,
+  EvidenceType,
+  FallacyType,
+  Argument,
+  Evidence,
+  DetectedFallacy,
+  Rebuttal,
+  DebateRound,
+  DebateVerdict,
+  Debate,
+  DebateEngineConfig,
+  DebateEngineStats,
+} from './DebateEngine.js'
+
+// ── AnalyticalReasoner — Multi-framework analytical reasoning engine ──
+export { AnalyticalReasoner, DEFAULT_ANALYTICAL_REASONER_CONFIG } from './AnalyticalReasoner.js'
+
+export type {
+  FrameworkType,
+  SWOTAnalysis,
+  FiveWhyAnalysis,
+  WhyStep,
+  FishboneDiagram,
+  FishboneCategory,
+  PESTAnalysis,
+  PESTFactor,
+  PorterAnalysis,
+  ForceAssessment,
+  DecisionMatrix,
+  WeightedCriterion,
+  MatrixOption,
+  CostBenefitAnalysis,
+  CBAItem,
+  AnalysisResult,
+  AnalyticalReasonerConfig,
+  AnalyticalReasonerStats,
+} from './AnalyticalReasoner.js'
+
+// ── ProblemDecomposer — Complex problem breakdown & solution synthesis ──
+export { ProblemDecomposer as ChatProblemDecomposer, DEFAULT_PROBLEM_DECOMPOSER_CONFIG } from './ProblemDecomposer.js'
+
+export type {
+  ProblemType,
+  ComplexityLevel,
+  ApproachStrategy,
+  Problem,
+  SubProblem,
+  SolutionApproach,
+  DependencyGraph,
+  IntegratedSolution,
+  ProblemDecomposerConfig,
+  ProblemDecomposerStats,
+} from './ProblemDecomposer.js'
+
+// ── InsightExtractor — Pattern discovery, trend detection & insight ranking ──
+export { InsightExtractor, DEFAULT_INSIGHT_EXTRACTOR_CONFIG } from './InsightExtractor.js'
+
+export type {
+  InsightCategory,
+  SignificanceLevel,
+  TrendDirection,
+  Insight,
+  TrendResult,
+  AnomalyResult,
+  PatternResult,
+  InsightReport,
+  TextInsight,
+  InsightExtractorConfig,
+  InsightExtractorStats,
+} from './InsightExtractor.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PHASE 16 — ADVANCED INTELLIGENCE & DOMAIN EXPERTISE
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Natural Language Generator — Template NLG, paraphrasing & style transfer ──
+export { NaturalLanguageGenerator, DEFAULT_NLG_CONFIG } from './NaturalLanguageGenerator.js'
+
+export type {
+  WritingStyle,
+  DiscourseRelation,
+  SentenceType,
+  NLGTemplate,
+  TextPlan,
+  TextSection,
+  ParaphraseResult,
+  StyleTransferResult,
+  ReadabilityScore,
+  SentenceVariety,
+  GeneratedText,
+  NaturalLanguageGeneratorConfig,
+  NaturalLanguageGeneratorStats,
+} from './NaturalLanguageGenerator.js'
+
+// ── Scientific Reasoner — Scientific method & experiment design ──
+export { ScientificReasoner, DEFAULT_SCIENTIFIC_REASONER_CONFIG } from './ScientificReasoner.js'
+
+export type {
+  ResearchMethodology,
+  VariableType,
+  StatisticalTest,
+  BiasType,
+  Hypothesis,
+  Variable,
+  ExperimentDesign,
+  DetectedBias,
+  StatisticalResult,
+  ResearchSummary,
+  ScientificReasonerConfig,
+  ScientificReasonerStats,
+} from './ScientificReasoner.js'
+
+// ── Data Pipeline Engine — ETL design, transformation & data quality ──
+export { DataPipelineEngine, DEFAULT_DATA_PIPELINE_CONFIG } from './DataPipelineEngine.js'
+
+export type {
+  StageType,
+  DataType as PipelineDataType,
+  QualityRuleType,
+  SchemaField,
+  DataSchema,
+  PipelineStage,
+  Pipeline,
+  QualityRule,
+  QualityReport,
+  QualityViolation,
+  LineageNode,
+  PipelineMetrics,
+  DataPipelineEngineConfig,
+  DataPipelineEngineStats,
+} from './DataPipelineEngine.js'
+
+// ── Personality Engine — Communication style & personality modeling ──
+export { PersonalityEngine, DEFAULT_PERSONALITY_CONFIG } from './PersonalityEngine.js'
+
+export type {
+  PersonalityTrait,
+  CommunicationStyle,
+  ToneType,
+  CulturalContext,
+  PersonalityProfile,
+  PersonaTemplate,
+  ToneAnalysis,
+  UserPreference as PersonalityUserPreference,
+  EmpathyResponse,
+  StyleAdaptation,
+  PersonalityEngineConfig,
+  PersonalityEngineStats,
+} from './PersonalityEngine.js'
+
+// ── Code Optimizer — Performance analysis & optimization suggestions ──
+export { CodeOptimizer, DEFAULT_CODE_OPTIMIZER_CONFIG } from './CodeOptimizer.js'
+
+export type {
+  ComplexityClass,
+  OptimizationCategory,
+  Severity as OptimizerSeverity,
+  ComplexityAnalysis,
+  PerformanceIssue,
+  OptimizationSuggestion,
+  CachingOpportunity,
+  MemoryIssue,
+  OptimizationReport,
+  CodeOptimizerConfig,
+  CodeOptimizerStats,
+} from './CodeOptimizer.js'
 
 // ── Python BlackHat Engine ───────────────────────────────────────────────────
 export {
