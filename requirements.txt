@@ -49,7 +49,7 @@ ripgrep
 #   pip install requests scapy paramiko pycryptodome beautifulsoup4 python-nmap \
 #     pwntools boofuzz impacket mitmproxy dnspython pyjwt flask selenium \
 #     lxml pyyaml ldap3 pysnmp pynput tweepy websockets pillow ropper \
-#     netfilterqueue keystone-engine dnslib networkx sqlmap
+#     NetfilterQueue keystone-engine dnslib networkx sqlmap
 
 # ── PythonBlackHat — Core Libraries ─────────────────────────────────────────
 # pip install requests                # HTTP requests, web exploitation, API attacks
@@ -70,7 +70,7 @@ ripgrep
 # pip install mitmproxy               # Man-in-the-middle proxy, SSL stripping, traffic interception
 # pip install dnspython               # DNS enumeration, zone transfers, DNS cache snooping
 # pip install dnslib                  # DNS tunneling C2, custom DNS server/client
-# pip install netfilterqueue          # Inline packet modification, DNS spoofing
+# pip install NetfilterQueue          # Inline packet modification, DNS spoofing
 # pip install websockets              # WebSocket-based C2, real-time bidirectional comms
 # pip install ldap3                   # LDAP enumeration, Active Directory attacks
 # pip install pysnmp                  # SNMP enumeration, MIB walking, community string attacks
