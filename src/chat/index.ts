@@ -2126,3 +2126,29 @@ export {
   type FormatStringAnalysis,
   type OverflowPattern,
 } from './BufferOverflowDebugger.js'
+
+// ── Qwen Local LLM — Local inference engine with Qwen2.5-Coder 7B ──────────
+export {
+  QwenLocalLLM,
+  type QuantizationLevel,
+  type InferenceBackend,
+  type ModelInfo,
+  type DownloadProgress,
+  type InferenceRequest,
+  type InferenceResponse,
+  type ChatMessage,
+  type ServerStatus,
+  type QwenLLMConfig,
+  type QwenLLMStats,
+} from './QwenLocalLLM.js'
+
+// ── Local LLM Bridge — Connects QwenLocalLLM ↔ LocalBrain for smart routing ─
+export {
+  LocalLLMBridge,
+  type QueryIntent,
+  type RoutingTarget,
+  type BridgeConfig,
+  type RoutingDecision,
+  type BridgeResponse,
+  type BridgeStats,
+} from './LocalLLMBridge.js'
