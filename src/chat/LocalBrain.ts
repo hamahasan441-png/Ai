@@ -191,6 +191,13 @@ import { AnalyticalReasoner } from './AnalyticalReasoner.js'
 import { ProblemDecomposer as ProblemDecomposerEngine } from './ProblemDecomposer.js'
 import { InsightExtractor } from './InsightExtractor.js'
 
+// Phase 16 — Advanced Intelligence & Domain Expertise
+import { NaturalLanguageGenerator } from './NaturalLanguageGenerator.js'
+import { ScientificReasoner } from './ScientificReasoner.js'
+import { DataPipelineEngine } from './DataPipelineEngine.js'
+import { PersonalityEngine } from './PersonalityEngine.js'
+import { CodeOptimizer } from './CodeOptimizer.js'
+
 // Smart coding agent
 import { CodeAgent } from './CodeAgent.js'
 import type {
@@ -4285,6 +4292,13 @@ export class LocalBrain {
   private problemDecomposerEngine: ProblemDecomposerEngine | null = null
   private insightExtractor: InsightExtractor | null = null
 
+  // Advanced intelligence & domain expertise modules (Phase 16)
+  private naturalLanguageGenerator: NaturalLanguageGenerator | null = null
+  private scientificReasoner: ScientificReasoner | null = null
+  private dataPipelineEngine: DataPipelineEngine | null = null
+  private personalityEngine: PersonalityEngine | null = null
+  private codeOptimizer: CodeOptimizer | null = null
+
   // Smart coding agent
   private codeAgent: CodeAgent
 
@@ -4475,6 +4489,13 @@ export class LocalBrain {
       this.analyticalReasoner = new AnalyticalReasoner()
       this.problemDecomposerEngine = new ProblemDecomposerEngine()
       this.insightExtractor = new InsightExtractor()
+
+      // Advanced intelligence & domain expertise modules (Phase 16)
+      this.naturalLanguageGenerator = new NaturalLanguageGenerator()
+      this.scientificReasoner = new ScientificReasoner()
+      this.dataPipelineEngine = new DataPipelineEngine()
+      this.personalityEngine = new PersonalityEngine()
+      this.codeOptimizer = new CodeOptimizer()
     }
 
     // Initialize CodeAgent (always available — no external deps)

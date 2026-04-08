@@ -1831,3 +1831,99 @@ export type {
   InsightExtractorConfig,
   InsightExtractorStats,
 } from './InsightExtractor.js'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PHASE 16 — ADVANCED INTELLIGENCE & DOMAIN EXPERTISE
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Natural Language Generator — Template NLG, paraphrasing & style transfer ──
+export { NaturalLanguageGenerator, DEFAULT_NLG_CONFIG } from './NaturalLanguageGenerator.js'
+
+export type {
+  WritingStyle,
+  DiscourseRelation,
+  SentenceType,
+  NLGTemplate,
+  TextPlan,
+  TextSection,
+  ParaphraseResult,
+  StyleTransferResult,
+  ReadabilityScore,
+  SentenceVariety,
+  GeneratedText,
+  NaturalLanguageGeneratorConfig,
+  NaturalLanguageGeneratorStats,
+} from './NaturalLanguageGenerator.js'
+
+// ── Scientific Reasoner — Scientific method & experiment design ──
+export { ScientificReasoner, DEFAULT_SCIENTIFIC_REASONER_CONFIG } from './ScientificReasoner.js'
+
+export type {
+  ResearchMethodology,
+  VariableType,
+  StatisticalTest,
+  BiasType,
+  Hypothesis,
+  Variable,
+  ExperimentDesign,
+  DetectedBias,
+  StatisticalResult,
+  ResearchSummary,
+  ScientificReasonerConfig,
+  ScientificReasonerStats,
+} from './ScientificReasoner.js'
+
+// ── Data Pipeline Engine — ETL design, transformation & data quality ──
+export { DataPipelineEngine, DEFAULT_DATA_PIPELINE_CONFIG } from './DataPipelineEngine.js'
+
+export type {
+  StageType,
+  DataType as PipelineDataType,
+  QualityRuleType,
+  SchemaField,
+  DataSchema,
+  PipelineStage,
+  Pipeline,
+  QualityRule,
+  QualityReport,
+  QualityViolation,
+  LineageNode,
+  PipelineMetrics,
+  DataPipelineEngineConfig,
+  DataPipelineEngineStats,
+} from './DataPipelineEngine.js'
+
+// ── Personality Engine — Communication style & personality modeling ──
+export { PersonalityEngine, DEFAULT_PERSONALITY_CONFIG } from './PersonalityEngine.js'
+
+export type {
+  PersonalityTrait,
+  CommunicationStyle,
+  ToneType,
+  CulturalContext,
+  PersonalityProfile,
+  PersonaTemplate,
+  ToneAnalysis,
+  UserPreference as PersonalityUserPreference,
+  EmpathyResponse,
+  StyleAdaptation,
+  PersonalityEngineConfig,
+  PersonalityEngineStats,
+} from './PersonalityEngine.js'
+
+// ── Code Optimizer — Performance analysis & optimization suggestions ──
+export { CodeOptimizer, DEFAULT_CODE_OPTIMIZER_CONFIG } from './CodeOptimizer.js'
+
+export type {
+  ComplexityClass,
+  OptimizationCategory,
+  Severity as OptimizerSeverity,
+  ComplexityAnalysis,
+  PerformanceIssue,
+  OptimizationSuggestion,
+  CachingOpportunity,
+  MemoryIssue,
+  OptimizationReport,
+  CodeOptimizerConfig,
+  CodeOptimizerStats,
+} from './CodeOptimizer.js'
