@@ -1,0 +1,49 @@
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║  PythonBlackHat — pip Requirements                                          ║
+# ║                                                                              ║
+# ║  Install with:  pip install -r requirements-blackhat.txt                     ║
+# ║                                                                              ║
+# ║  WARNING: These are offensive security tools for educational and authorized  ║
+# ║  penetration testing only. Use responsibly and legally.                      ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+# ── Core Libraries ──────────────────────────────────────────────────────────
+requests>=2.31.0            # HTTP requests, web exploitation, API attacks
+scapy>=2.5.0                # Packet crafting, ARP spoof, DNS spoof, sniffing
+paramiko>=3.4.0             # SSH brute force, worm propagation, remote access
+pycryptodome>=3.20.0        # AES/RSA encryption, ransomware sim, encrypted C2
+beautifulsoup4>=4.12.0      # HTML parsing, web scraping, XSS testing
+python-nmap>=0.7.1          # Port scanning, service enumeration, vuln scanning
+
+# ── Exploitation & Binary ──────────────────────────────────────────────────
+pwntools>=4.12.0            # Buffer overflow, ROP chains, shellcraft, format strings
+ropper>=1.13.0              # ROP gadget finding for exploit development
+keystone-engine>=0.9.2      # Assembler for shellcode generation
+boofuzz>=0.4.1              # Protocol fuzzing, crash detection
+
+# ── Network Attacks ────────────────────────────────────────────────────────
+impacket>=0.11.0            # SMB/LDAP/NTLM attacks, LLMNR poisoning, relay attacks
+mitmproxy>=10.0.0           # MITM proxy, SSL stripping, traffic interception
+dnspython>=2.6.0            # DNS enumeration, zone transfers, DNS cache snooping
+dnslib>=0.9.24              # DNS tunneling C2, custom DNS server/client
+NetfilterQueue>=1.1.0       # Inline packet modification, DNS spoofing
+websockets>=12.0            # WebSocket-based C2, real-time bidirectional comms
+ldap3>=2.9.1                # LDAP enumeration, Active Directory attacks
+pysnmp>=6.1.0               # SNMP enumeration, MIB walking, community string attacks
+
+# ── Web Application Attacks ────────────────────────────────────────────────
+flask>=3.0.0                # C2 web server, captive portals, HTTP C2 channels
+selenium>=4.17.0            # Browser automation, JavaScript-heavy XSS testing
+lxml>=5.1.0                 # XXE exploitation, XML parsing attacks
+PyJWT>=2.8.0                # JWT token attacks — algorithm confusion, claim tampering
+PyYAML>=6.0.1               # YAML deserialization attacks
+sqlmap>=1.8                 # Automated SQL injection detection and exploitation
+
+# ── OSINT & Reconnaissance ─────────────────────────────────────────────────
+tweepy>=4.14.0              # Twitter/X API OSINT, social media intelligence
+networkx>=3.2.0             # Network topology mapping, graph-based analysis
+
+# ── Malware Development (Educational) ──────────────────────────────────────
+pynput>=1.7.6               # Keylogger — keystroke capture, input monitoring
+Pillow>=10.2.0              # Screenshot capture for RAT functionality
+dropbox>=12.0.0             # Cloud service C2 — Dropbox API for command delivery
