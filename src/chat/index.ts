@@ -1432,3 +1432,89 @@ export type {
   DuplicateStrategy,
   BugBountyTip,
 } from './BugBountyKnowledge.js'
+
+// ── Cyber Threat Intelligence (APT tracking, MITRE ATT&CK, IOC, C2, malware) ──
+
+export { CyberThreatIntelligence, DEFAULT_CYBER_THREAT_INTEL_CONFIG } from './CyberThreatIntelligence.js'
+
+export type {
+  CyberThreatIntelConfig,
+  CyberThreatIntelStats,
+  ThreatActor,
+  APTGroup,
+  MitreAttackTechnique,
+  IndicatorOfCompromise,
+  ThreatCampaign,
+  C2Infrastructure,
+  MalwareFamily,
+  ThreatReport,
+} from './CyberThreatIntelligence.js'
+
+// ── Cloud Security Analyzer (AWS/Azure/GCP, K8s, containers, IAM, compliance) ──
+
+export { CloudSecurityAnalyzer, DEFAULT_CLOUD_SECURITY_CONFIG } from './CloudSecurityAnalyzer.js'
+
+export type {
+  CloudProvider,
+  CloudSecurityConfig,
+  CloudSecurityStats,
+  CloudMisconfiguration,
+  IAMPolicyAnalysis,
+  KubernetesSecurityIssue,
+  ContainerSecurityFinding,
+  ServerlessRisk,
+  ComplianceControl,
+  ComplianceFramework,
+  CloudSecurityAssessment,
+} from './CloudSecurityAnalyzer.js'
+
+// ── Advanced Trading Engine (Options, Monte Carlo, GARCH, algo execution, DeFi) ──
+
+export { AdvancedTradingEngine, DEFAULT_ADVANCED_TRADING_CONFIG } from './AdvancedTradingEngine.js'
+
+export type {
+  AdvancedTradingConfig,
+  AdvancedTradingStats,
+  OptionContract,
+  OptionGreeks,
+  OptionPricing,
+  VolatilityModel,
+  MonteCarloResult,
+  AlgoExecution,
+  OrderBookLevel,
+  OrderBookAnalysis,
+  DeFiProtocol,
+  DeFiAnalysis,
+  RiskMetrics,
+} from './AdvancedTradingEngine.js'
+
+// ── Target Scanner (Automated Security Assessment Pipeline) ──
+
+export { TargetScanner, DEFAULT_TARGET_SCANNER_CONFIG } from './TargetScanner.js'
+
+export type {
+  ScanPhase,
+  ScanDepth,
+  AttackUrgency,
+  TargetScannerConfig,
+  TargetScannerStats,
+  TargetInfo,
+  ReconResult,
+  DNSRecord,
+  WhoisInfo,
+  HeaderAnalysis,
+  SecurityHeader,
+  CookieAnalysis,
+  CORSAnalysis,
+  TechFingerprint,
+  PortInfo,
+  SSLInfo,
+  VulnerabilityFinding,
+  ExploitCandidate,
+  AttackChain,
+  AttackPhase,
+  AttackSurface,
+  InputVector,
+  ScanReport,
+  ScanProgress,
+} from './TargetScanner.js'
