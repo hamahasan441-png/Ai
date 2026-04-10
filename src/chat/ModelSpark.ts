@@ -4465,3 +4465,1500 @@ export class UnifiedOrchestrator {
     }
   }
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+//
+//   🔍 SPARK SEARCH ENGINE — Integrated Local Search System
+//
+//   Multi-strategy search combining TF-IDF, fuzzy matching, knowledge graph,
+//   synonym expansion, and contextual re-ranking. Powers the agent's search
+//   capabilities and enriches all AI subsystems.
+//
+//   100% offline. Zero external APIs. Everything local.
+//
+// ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ─── Search Types ────────────────────────────────────────────────────────────
+
+export type SparkSearchStrategy = 'keyword' | 'fuzzy' | 'semantic' | 'synonym' | 'contextual' | 'graph' | 'combined'
+
+export interface SearchDocument {
+  id: string
+  title: string
+  content: string
+  category: string
+  tags: string[]
+  metadata: Record<string, unknown>
+  indexedAt: number
+  accessCount: number
+  lastAccessedAt: number
+}
+
+export interface SearchResult {
+  document: SearchDocument
+  score: number
+  matchedBy: SparkSearchStrategy[]
+  highlights: string[]
+  explanation: string
+}
+
+export interface SearchQuery {
+  text: string
+  strategy?: SparkSearchStrategy
+  maxResults?: number
+  minScore?: number
+  categories?: string[]
+  tags?: string[]
+  recencyWeight?: number
+}
+
+export interface SearchStats {
+  totalDocuments: number
+  totalSearches: number
+  averageResultCount: number
+  averageLatencyMs: number
+  categoryCounts: Record<string, number>
+  strategyUsage: Record<string, number>
+}
+
+export interface SparkSearchConfig {
+  maxDocuments: number
+  defaultMaxResults: number
+  defaultMinScore: number
+  fuzzyThreshold: number
+  semanticWeight: number
+  recencyDecayDays: number
+  enableSynonyms: boolean
+  enableGraph: boolean
+}
+
+export const DEFAULT_SEARCH_CONFIG: SparkSearchConfig = {
+  maxDocuments: 50000,
+  defaultMaxResults: 10,
+  defaultMinScore: 0.1,
+  fuzzyThreshold: 0.6,
+  semanticWeight: 0.4,
+  recencyDecayDays: 30,
+  enableSynonyms: true,
+  enableGraph: true,
+}
+
+// ─── Memory Types ────────────────────────────────────────────────────────────
+
+export interface MemoryEntry {
+  id: string
+  key: string
+  value: string
+  category: string
+  importance: number
+  createdAt: number
+  lastAccessedAt: number
+  accessCount: number
+  decayRate: number
+  associations: string[]
+}
+
+export interface MemorySnapshot {
+  entries: MemoryEntry[]
+  stats: MemoryStats
+  version: number
+  savedAt: number
+}
+
+export interface MemoryStats {
+  totalEntries: number
+  totalAccesses: number
+  categoryCounts: Record<string, number>
+  averageImportance: number
+  oldestEntryAge: number
+  newestEntryAge: number
+}
+
+export interface MemoryConfig {
+  maxEntries: number
+  defaultDecayRate: number
+  minImportance: number
+  consolidationInterval: number
+  enableAssociations: boolean
+}
+
+export const DEFAULT_MEMORY_CONFIG: MemoryConfig = {
+  maxEntries: 10000,
+  defaultDecayRate: 0.01,
+  minImportance: 0.05,
+  consolidationInterval: 100,
+  enableAssociations: true,
+}
+
+// ─── Circuit Breaker Types ───────────────────────────────────────────────────
+
+export interface ToolCircuitState {
+  toolName: string
+  state: 'closed' | 'open' | 'half_open'
+  failures: number
+  successes: number
+  lastFailure: number
+  lastSuccess: number
+  totalCalls: number
+  averageLatencyMs: number
+  failureRate: number
+}
+
+export interface CircuitBreakerConfig {
+  failureThreshold: number
+  resetTimeoutMs: number
+  halfOpenMaxAttempts: number
+  latencyThresholdMs: number
+}
+
+export const DEFAULT_CIRCUIT_BREAKER_CONFIG: CircuitBreakerConfig = {
+  failureThreshold: 3,
+  resetTimeoutMs: 30000,
+  halfOpenMaxAttempts: 2,
+  latencyThresholdMs: 10000,
+}
+
+// ─── Adaptive Selection Types ────────────────────────────────────────────────
+
+export interface ToolPerformanceRecord {
+  toolName: string
+  domain: TaskDomain
+  successRate: number
+  averageConfidence: number
+  averageLatencyMs: number
+  totalCalls: number
+  lastUsed: number
+}
+
+// ─── Parallel Execution Types ────────────────────────────────────────────────
+
+export interface ParallelResult {
+  results: AgentToolResult[]
+  totalDurationMs: number
+  successCount: number
+  failureCount: number
+}
+
+// ─── Dynamic Planning Types ──────────────────────────────────────────────────
+
+export interface PlanStep {
+  id: string
+  description: string
+  tool: string
+  dependencies: string[]
+  status: 'pending' | 'running' | 'complete' | 'failed' | 'skipped'
+  result?: AgentToolResult
+  priority: number
+  retries: number
+  maxRetries: number
+}
+
+export interface DynamicPlan {
+  id: string
+  goal: string
+  constraints: string[]
+  steps: PlanStep[]
+  status: 'planning' | 'executing' | 'replanning' | 'complete' | 'failed'
+  version: number
+  totalDurationMs: number
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   🔍 SPARK SEARCH ENGINE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class SparkSearchEngine {
+  private documents: Map<string, SearchDocument> = new Map()
+  private invertedIndex: Map<string, Set<string>> = new Map()
+  private tfidfCache: Map<string, Map<string, number>> = new Map()
+  private synonyms: Map<string, string[]> = new Map()
+  private graph: Map<string, Set<string>> = new Map()
+  private config: SparkSearchConfig
+  private stats: SearchStats
+
+  constructor(config?: Partial<SparkSearchConfig>) {
+    this.config = { ...DEFAULT_SEARCH_CONFIG, ...config }
+    this.stats = this._initStats()
+    this._initSynonyms()
+  }
+
+  // ── Document Management ────────────────────────────────────────────────────
+
+  /** Index a document for searching */
+  indexDocument(doc: Omit<SearchDocument, 'indexedAt' | 'accessCount' | 'lastAccessedAt'>): SearchDocument {
+    if (this.documents.size >= this.config.maxDocuments) {
+      this._evictLeastUsed()
+    }
+
+    const fullDoc: SearchDocument = {
+      ...doc,
+      indexedAt: Date.now(),
+      accessCount: 0,
+      lastAccessedAt: Date.now(),
+    }
+
+    this.documents.set(doc.id, fullDoc)
+    this._addToInvertedIndex(doc.id, doc.title + ' ' + doc.content)
+    this._addToGraph(doc.id, doc.tags, doc.category)
+    this._invalidateTfidfCache()
+
+    this.stats.totalDocuments = this.documents.size
+    this.stats.categoryCounts[doc.category] = (this.stats.categoryCounts[doc.category] ?? 0) + 1
+
+    return fullDoc
+  }
+
+  /** Bulk index multiple documents */
+  indexDocuments(docs: Array<Omit<SearchDocument, 'indexedAt' | 'accessCount' | 'lastAccessedAt'>>): number {
+    let indexed = 0
+    for (const doc of docs) {
+      this.indexDocument(doc)
+      indexed++
+    }
+    return indexed
+  }
+
+  /** Remove a document */
+  removeDocument(id: string): boolean {
+    const doc = this.documents.get(id)
+    if (!doc) return false
+
+    this.documents.delete(id)
+    this._removeFromInvertedIndex(id)
+    this.graph.delete(id)
+    this._invalidateTfidfCache()
+    this.stats.totalDocuments = this.documents.size
+    this.stats.categoryCounts[doc.category] = Math.max(0, (this.stats.categoryCounts[doc.category] ?? 1) - 1)
+    return true
+  }
+
+  /** Get document by ID */
+  getDocument(id: string): SearchDocument | null {
+    return this.documents.get(id) ?? null
+  }
+
+  /** Get total document count */
+  getDocumentCount(): number {
+    return this.documents.size
+  }
+
+  /** Get all categories */
+  getCategories(): string[] {
+    const cats = new Set<string>()
+    for (const doc of this.documents.values()) cats.add(doc.category)
+    return [...cats]
+  }
+
+  // ── Search Methods ─────────────────────────────────────────────────────────
+
+  /** Search documents using the specified strategy */
+  search(query: SearchQuery): SearchResult[] {
+    const startTime = Date.now()
+    const strategy = query.strategy ?? 'combined'
+    const maxResults = query.maxResults ?? this.config.defaultMaxResults
+    const minScore = query.minScore ?? this.config.defaultMinScore
+
+    this.stats.totalSearches++
+    this.stats.strategyUsage[strategy] = (this.stats.strategyUsage[strategy] ?? 0) + 1
+
+    let results: SearchResult[]
+
+    switch (strategy) {
+      case 'keyword':
+        results = this._keywordSearch(query.text, maxResults)
+        break
+      case 'fuzzy':
+        results = this._fuzzySearch(query.text, maxResults)
+        break
+      case 'semantic':
+        results = this._semanticSearch(query.text, maxResults)
+        break
+      case 'synonym':
+        results = this._synonymSearch(query.text, maxResults)
+        break
+      case 'contextual':
+        results = this._contextualSearch(query.text, maxResults)
+        break
+      case 'graph':
+        results = this._graphSearch(query.text, maxResults)
+        break
+      default: // combined
+        results = this._combinedSearch(query.text, maxResults)
+    }
+
+    // Apply filters
+    if (query.categories?.length) {
+      results = results.filter(r => query.categories!.includes(r.document.category))
+    }
+    if (query.tags?.length) {
+      results = results.filter(r => r.document.tags.some(t => query.tags!.includes(t)))
+    }
+
+    // Apply minimum score
+    results = results.filter(r => r.score >= minScore)
+
+    // Apply recency weighting
+    if (query.recencyWeight && query.recencyWeight > 0) {
+      const now = Date.now()
+      const decayMs = this.config.recencyDecayDays * 24 * 60 * 60 * 1000
+      results = results.map(r => {
+        const age = now - r.document.indexedAt
+        const recencyBoost = Math.exp(-age / decayMs) * query.recencyWeight!
+        return { ...r, score: r.score + recencyBoost }
+      })
+    }
+
+    // Sort by score descending and limit
+    results.sort((a, b) => b.score - a.score)
+    results = results.slice(0, maxResults)
+
+    // Update access counts
+    for (const r of results) {
+      const doc = this.documents.get(r.document.id)
+      if (doc) {
+        doc.accessCount++
+        doc.lastAccessedAt = Date.now()
+      }
+    }
+
+    const duration = Date.now() - startTime
+    this.stats.averageLatencyMs += (duration - this.stats.averageLatencyMs) / this.stats.totalSearches
+    this.stats.averageResultCount += (results.length - this.stats.averageResultCount) / this.stats.totalSearches
+
+    return results
+  }
+
+  /** Quick text search (convenience method) */
+  quickSearch(text: string, maxResults = 5): SearchResult[] {
+    return this.search({ text, maxResults, strategy: 'combined' })
+  }
+
+  // ── Stats ──────────────────────────────────────────────────────────────────
+
+  /** Get search statistics */
+  getStats(): SearchStats {
+    return { ...this.stats, categoryCounts: { ...this.stats.categoryCounts }, strategyUsage: { ...this.stats.strategyUsage } }
+  }
+
+  /** Clear all documents and reset */
+  clear(): void {
+    this.documents.clear()
+    this.invertedIndex.clear()
+    this.tfidfCache.clear()
+    this.graph.clear()
+    this.stats = this._initStats()
+  }
+
+  /** Get config */
+  getConfig(): SparkSearchConfig {
+    return { ...this.config }
+  }
+
+  // ── Private: Search Strategies ─────────────────────────────────────────────
+
+  /** Keyword search using inverted index */
+  private _keywordSearch(queryText: string, maxResults: number): SearchResult[] {
+    const tokens = this._tokenize(queryText)
+    const scores = new Map<string, { score: number; matchedTerms: string[] }>()
+
+    for (const token of tokens) {
+      const docIds = this.invertedIndex.get(token)
+      if (!docIds) continue
+      for (const docId of docIds) {
+        const existing = scores.get(docId) ?? { score: 0, matchedTerms: [] }
+        existing.score += 1.0 / tokens.length
+        existing.matchedTerms.push(token)
+        scores.set(docId, existing)
+      }
+    }
+
+    return this._scoresToResults(scores, 'keyword', maxResults)
+  }
+
+  /** Fuzzy search using edit distance */
+  private _fuzzySearch(queryText: string, maxResults: number): SearchResult[] {
+    const tokens = this._tokenize(queryText)
+    const scores = new Map<string, { score: number; matchedTerms: string[] }>()
+
+    const indexTerms = [...this.invertedIndex.keys()]
+
+    for (const token of tokens) {
+      for (const term of indexTerms) {
+        const similarity = this._stringSimilarity(token, term)
+        if (similarity >= this.config.fuzzyThreshold) {
+          const docIds = this.invertedIndex.get(term)!
+          for (const docId of docIds) {
+            const existing = scores.get(docId) ?? { score: 0, matchedTerms: [] }
+            existing.score += similarity / tokens.length
+            if (!existing.matchedTerms.includes(term)) existing.matchedTerms.push(term)
+            scores.set(docId, existing)
+          }
+        }
+      }
+    }
+
+    return this._scoresToResults(scores, 'fuzzy', maxResults)
+  }
+
+  /** Semantic search using TF-IDF cosine similarity */
+  private _semanticSearch(queryText: string, maxResults: number): SearchResult[] {
+    const queryTfidf = this._computeTfidf(queryText)
+    const scores = new Map<string, { score: number; matchedTerms: string[] }>()
+
+    for (const [docId, doc] of this.documents) {
+      let docTfidf = this.tfidfCache.get(docId)
+      if (!docTfidf) {
+        docTfidf = this._computeDocTfidf(docId, doc.title + ' ' + doc.content)
+        this.tfidfCache.set(docId, docTfidf)
+      }
+      const similarity = this._cosineSimilarity(queryTfidf, docTfidf)
+      if (similarity > 0) {
+        const matchedTerms = [...queryTfidf.keys()].filter(t => docTfidf!.has(t))
+        scores.set(docId, { score: similarity, matchedTerms })
+      }
+    }
+
+    return this._scoresToResults(scores, 'semantic', maxResults)
+  }
+
+  /** Synonym-expanded search */
+  private _synonymSearch(queryText: string, maxResults: number): SearchResult[] {
+    if (!this.config.enableSynonyms) return this._keywordSearch(queryText, maxResults)
+
+    const tokens = this._tokenize(queryText)
+    const expandedTokens = new Set(tokens)
+
+    for (const token of tokens) {
+      const syns = this.synonyms.get(token)
+      if (syns) {
+        for (const syn of syns) expandedTokens.add(syn)
+      }
+    }
+
+    return this._keywordSearch([...expandedTokens].join(' '), maxResults).map(r => ({
+      ...r,
+      matchedBy: ['synonym'] as SparkSearchStrategy[],
+    }))
+  }
+
+  /** Contextual search with recency and frequency boost */
+  private _contextualSearch(queryText: string, maxResults: number): SearchResult[] {
+    const baseResults = this._keywordSearch(queryText, maxResults * 2)
+    const now = Date.now()
+    const decayMs = this.config.recencyDecayDays * 24 * 60 * 60 * 1000
+
+    return baseResults.map(r => {
+      const recencyBoost = Math.exp(-(now - r.document.indexedAt) / decayMs) * 0.2
+      const frequencyBoost = Math.min(r.document.accessCount / 100, 0.1)
+      return {
+        ...r,
+        score: r.score + recencyBoost + frequencyBoost,
+        matchedBy: ['contextual'] as SparkSearchStrategy[],
+        explanation: `${r.explanation} [recency: +${recencyBoost.toFixed(3)}, freq: +${frequencyBoost.toFixed(3)}]`,
+      }
+    }).sort((a, b) => b.score - a.score).slice(0, maxResults)
+  }
+
+  /** Graph-based spreading activation search */
+  private _graphSearch(queryText: string, maxResults: number): SearchResult[] {
+    if (!this.config.enableGraph) return this._keywordSearch(queryText, maxResults)
+
+    // Start with keyword matches
+    const seedResults = this._keywordSearch(queryText, 5)
+    const visited = new Set<string>()
+    const scores = new Map<string, { score: number; matchedTerms: string[] }>()
+
+    // Seed scores from keyword search
+    for (const r of seedResults) {
+      scores.set(r.document.id, { score: r.score, matchedTerms: r.highlights })
+      visited.add(r.document.id)
+    }
+
+    // Spread activation through graph (1 hop)
+    for (const r of seedResults) {
+      const neighbors = this.graph.get(r.document.id)
+      if (!neighbors) continue
+      for (const neighborId of neighbors) {
+        if (visited.has(neighborId)) continue
+        visited.add(neighborId)
+        const existing = scores.get(neighborId) ?? { score: 0, matchedTerms: [] }
+        existing.score += r.score * 0.5 // decay factor
+        existing.matchedTerms.push('(graph-linked)')
+        scores.set(neighborId, existing)
+      }
+    }
+
+    return this._scoresToResults(scores, 'graph', maxResults)
+  }
+
+  /** Combined multi-strategy search */
+  private _combinedSearch(queryText: string, maxResults: number): SearchResult[] {
+    const allScores = new Map<string, { score: number; matchedTerms: string[]; strategies: SparkSearchStrategy[] }>()
+
+    const strategyWeight: Record<string, number> = {
+      keyword: 0.3,
+      semantic: 0.35,
+      fuzzy: 0.15,
+      synonym: 0.1,
+      contextual: 0.1,
+    }
+
+    // Run keyword + semantic + fuzzy in parallel (conceptually)
+    const strategies: Array<{ name: SparkSearchStrategy; weight: number; results: SearchResult[] }> = [
+      { name: 'keyword', weight: strategyWeight.keyword!, results: this._keywordSearch(queryText, maxResults * 2) },
+      { name: 'semantic', weight: strategyWeight.semantic!, results: this._semanticSearch(queryText, maxResults * 2) },
+      { name: 'fuzzy', weight: strategyWeight.fuzzy!, results: this._fuzzySearch(queryText, maxResults) },
+    ]
+
+    if (this.config.enableSynonyms) {
+      strategies.push({ name: 'synonym', weight: strategyWeight.synonym!, results: this._synonymSearch(queryText, maxResults) })
+    }
+
+    // Merge scores
+    for (const strat of strategies) {
+      for (const result of strat.results) {
+        const existing = allScores.get(result.document.id) ?? { score: 0, matchedTerms: [], strategies: [] }
+        existing.score += result.score * strat.weight
+        for (const term of result.highlights) {
+          if (!existing.matchedTerms.includes(term)) existing.matchedTerms.push(term)
+        }
+        if (!existing.strategies.includes(strat.name)) existing.strategies.push(strat.name)
+        allScores.set(result.document.id, existing)
+      }
+    }
+
+    // Multi-strategy bonus: documents found by multiple strategies get a boost
+    const results: SearchResult[] = []
+    for (const [docId, data] of allScores) {
+      const doc = this.documents.get(docId)
+      if (!doc) continue
+      const multiStrategyBonus = (data.strategies.length - 1) * 0.05
+      results.push({
+        document: doc,
+        score: Math.min(data.score + multiStrategyBonus, 1.0),
+        matchedBy: data.strategies,
+        highlights: data.matchedTerms,
+        explanation: `Combined: ${data.strategies.join('+')} (bonus: +${multiStrategyBonus.toFixed(2)})`,
+      })
+    }
+
+    return results.sort((a, b) => b.score - a.score).slice(0, maxResults)
+  }
+
+  // ── Private: Utilities ─────────────────────────────────────────────────────
+
+  /** Tokenize text into lowercase words */
+  private _tokenize(text: string): string[] {
+    return text.toLowerCase().split(/\s+/).filter(w => w.length > 1)
+  }
+
+  /** Build inverted index entry */
+  private _addToInvertedIndex(docId: string, text: string): void {
+    const tokens = this._tokenize(text)
+    for (const token of tokens) {
+      let docSet = this.invertedIndex.get(token)
+      if (!docSet) {
+        docSet = new Set()
+        this.invertedIndex.set(token, docSet)
+      }
+      docSet.add(docId)
+    }
+  }
+
+  /** Remove from inverted index */
+  private _removeFromInvertedIndex(docId: string): void {
+    for (const [, docSet] of this.invertedIndex) {
+      docSet.delete(docId)
+    }
+  }
+
+  /** Add document to graph (connect by shared tags/category) */
+  private _addToGraph(docId: string, tags: string[], category: string): void {
+    if (!this.config.enableGraph) return
+
+    const neighbors = new Set<string>()
+
+    for (const [otherId, otherDoc] of this.documents) {
+      if (otherId === docId) continue
+      // Connect by shared tags
+      if (tags.some(t => otherDoc.tags.includes(t))) {
+        neighbors.add(otherId)
+        const otherNeighbors = this.graph.get(otherId) ?? new Set()
+        otherNeighbors.add(docId)
+        this.graph.set(otherId, otherNeighbors)
+      }
+      // Connect by same category
+      if (otherDoc.category === category) {
+        neighbors.add(otherId)
+        const otherNeighbors = this.graph.get(otherId) ?? new Set()
+        otherNeighbors.add(docId)
+        this.graph.set(otherId, otherNeighbors)
+      }
+    }
+
+    this.graph.set(docId, neighbors)
+  }
+
+  /** Compute TF-IDF for a query string */
+  private _computeTfidf(text: string): Map<string, number> {
+    const tokens = this._tokenize(text)
+    const tf = new Map<string, number>()
+    for (const t of tokens) {
+      tf.set(t, (tf.get(t) ?? 0) + 1)
+    }
+
+    const tfidf = new Map<string, number>()
+    const N = Math.max(this.documents.size, 1)
+
+    for (const [term, count] of tf) {
+      const termFreq = count / tokens.length
+      const docFreq = this.invertedIndex.get(term)?.size ?? 0
+      const idf = Math.log((N + 1) / (docFreq + 1)) + 1
+      tfidf.set(term, termFreq * idf)
+    }
+
+    return tfidf
+  }
+
+  /** Compute TF-IDF for a document */
+  private _computeDocTfidf(docId: string, text: string): Map<string, number> {
+    return this._computeTfidf(text)
+  }
+
+  /** Cosine similarity between two TF-IDF vectors */
+  private _cosineSimilarity(a: Map<string, number>, b: Map<string, number>): number {
+    let dot = 0, magA = 0, magB = 0
+
+    for (const [term, val] of a) {
+      magA += val * val
+      const bVal = b.get(term) ?? 0
+      dot += val * bVal
+    }
+    for (const [, val] of b) {
+      magB += val * val
+    }
+
+    const mag = Math.sqrt(magA) * Math.sqrt(magB)
+    return mag > 0 ? dot / mag : 0
+  }
+
+  /** String similarity (simplified Levenshtein-based) */
+  private _stringSimilarity(a: string, b: string): number {
+    if (a === b) return 1.0
+    if (a.length === 0 || b.length === 0) return 0
+
+    // Use bigram similarity for speed
+    const bigramsA = this._bigrams(a)
+    const bigramsB = this._bigrams(b)
+    if (bigramsA.size === 0 && bigramsB.size === 0) return 1.0
+
+    let intersection = 0
+    for (const bg of bigramsA) {
+      if (bigramsB.has(bg)) intersection++
+    }
+
+    return (2.0 * intersection) / (bigramsA.size + bigramsB.size)
+  }
+
+  /** Get bigrams of a string */
+  private _bigrams(str: string): Set<string> {
+    const result = new Set<string>()
+    for (let i = 0; i < str.length - 1; i++) {
+      result.add(str.slice(i, i + 2))
+    }
+    return result
+  }
+
+  /** Convert score map to SearchResult array */
+  private _scoresToResults(
+    scores: Map<string, { score: number; matchedTerms: string[] }>,
+    strategy: SparkSearchStrategy,
+    maxResults: number,
+  ): SearchResult[] {
+    const results: SearchResult[] = []
+
+    for (const [docId, data] of scores) {
+      const doc = this.documents.get(docId)
+      if (!doc) continue
+      results.push({
+        document: doc,
+        score: Math.min(data.score, 1.0),
+        matchedBy: [strategy],
+        highlights: data.matchedTerms,
+        explanation: `${strategy}: score=${data.score.toFixed(3)}, terms=[${data.matchedTerms.join(', ')}]`,
+      })
+    }
+
+    return results.sort((a, b) => b.score - a.score).slice(0, maxResults)
+  }
+
+  /** Invalidate TF-IDF cache */
+  private _invalidateTfidfCache(): void {
+    this.tfidfCache.clear()
+  }
+
+  /** Evict least-used document when at capacity */
+  private _evictLeastUsed(): void {
+    let minAccess = Infinity
+    let evictId = ''
+    for (const [id, doc] of this.documents) {
+      if (doc.accessCount < minAccess) {
+        minAccess = doc.accessCount
+        evictId = id
+      }
+    }
+    if (evictId) this.removeDocument(evictId)
+  }
+
+  /** Initialize synonym database */
+  private _initSynonyms(): void {
+    const synonymGroups = [
+      ['code', 'program', 'script', 'software', 'implementation'],
+      ['function', 'method', 'procedure', 'routine', 'subroutine'],
+      ['error', 'bug', 'issue', 'defect', 'fault', 'problem'],
+      ['fix', 'repair', 'resolve', 'patch', 'correct', 'debug'],
+      ['security', 'protection', 'defense', 'safety', 'hardening'],
+      ['vulnerability', 'weakness', 'flaw', 'exploit', 'exposure'],
+      ['performance', 'speed', 'efficiency', 'optimization', 'throughput'],
+      ['test', 'check', 'verify', 'validate', 'examine'],
+      ['database', 'storage', 'repository', 'datastore', 'persistence'],
+      ['network', 'connection', 'communication', 'protocol', 'interface'],
+      ['algorithm', 'logic', 'computation', 'process', 'procedure'],
+      ['search', 'find', 'query', 'lookup', 'retrieve', 'discover'],
+      ['create', 'build', 'generate', 'construct', 'produce', 'make'],
+      ['analyze', 'examine', 'inspect', 'evaluate', 'assess', 'review'],
+      ['learn', 'train', 'adapt', 'improve', 'evolve', 'optimize'],
+    ]
+
+    for (const group of synonymGroups) {
+      for (const word of group) {
+        this.synonyms.set(word, group.filter(w => w !== word))
+      }
+    }
+  }
+
+  /** Initialize stats */
+  private _initStats(): SearchStats {
+    return {
+      totalDocuments: 0,
+      totalSearches: 0,
+      averageResultCount: 0,
+      averageLatencyMs: 0,
+      categoryCounts: {},
+      strategyUsage: {},
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   💾 MEMORY MANAGER — Persistent Cross-Session Knowledge Storage
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class MemoryManager {
+  private entries: Map<string, MemoryEntry> = new Map()
+  private config: MemoryConfig
+  private operationCount = 0
+  private stats: MemoryStats
+
+  constructor(config?: Partial<MemoryConfig>) {
+    this.config = { ...DEFAULT_MEMORY_CONFIG, ...config }
+    this.stats = this._initStats()
+  }
+
+  // ── Store & Retrieve ───────────────────────────────────────────────────────
+
+  /** Store a memory entry */
+  store(key: string, value: string, options?: {
+    category?: string
+    importance?: number
+    associations?: string[]
+    decayRate?: number
+  }): MemoryEntry {
+    if (this.entries.size >= this.config.maxEntries) {
+      this._consolidate()
+    }
+
+    const id = `mem_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+    const entry: MemoryEntry = {
+      id,
+      key,
+      value,
+      category: options?.category ?? 'general',
+      importance: options?.importance ?? 0.5,
+      createdAt: Date.now(),
+      lastAccessedAt: Date.now(),
+      accessCount: 0,
+      decayRate: options?.decayRate ?? this.config.defaultDecayRate,
+      associations: options?.associations ?? [],
+    }
+
+    this.entries.set(id, entry)
+    this._updateStats()
+    this._maybeConsolidate()
+
+    return entry
+  }
+
+  /** Retrieve memories by key (exact match) */
+  retrieve(key: string): MemoryEntry[] {
+    const results: MemoryEntry[] = []
+    for (const entry of this.entries.values()) {
+      if (entry.key === key) {
+        entry.accessCount++
+        entry.lastAccessedAt = Date.now()
+        this.stats.totalAccesses++
+        results.push(entry)
+      }
+    }
+    return results.sort((a, b) => b.importance - a.importance)
+  }
+
+  /** Search memories by content similarity */
+  recall(query: string, maxResults = 5): MemoryEntry[] {
+    const queryTokens = new Set(query.toLowerCase().split(/\s+/).filter(w => w.length > 2))
+    const scored: Array<{ entry: MemoryEntry; score: number }> = []
+
+    for (const entry of this.entries.values()) {
+      const entryTokens = new Set(
+        (entry.key + ' ' + entry.value + ' ' + entry.category).toLowerCase().split(/\s+/)
+      )
+
+      let overlap = 0
+      for (const token of queryTokens) {
+        if (entryTokens.has(token)) overlap++
+      }
+
+      if (overlap > 0) {
+        const relevance = queryTokens.size > 0 ? overlap / queryTokens.size : 0
+        const decayedImportance = this._getDecayedImportance(entry)
+        const score = relevance * 0.6 + decayedImportance * 0.4
+        scored.push({ entry, score })
+      }
+    }
+
+    // Update access counts
+    const results = scored.sort((a, b) => b.score - a.score).slice(0, maxResults)
+    for (const { entry } of results) {
+      entry.accessCount++
+      entry.lastAccessedAt = Date.now()
+      this.stats.totalAccesses++
+    }
+
+    return results.map(r => r.entry)
+  }
+
+  /** Get related memories through associations */
+  getAssociated(entryId: string, maxResults = 5): MemoryEntry[] {
+    const entry = this.entries.get(entryId)
+    if (!entry || !this.config.enableAssociations) return []
+
+    const associated: MemoryEntry[] = []
+    for (const assocId of entry.associations) {
+      const assoc = this.entries.get(assocId)
+      if (assoc) associated.push(assoc)
+    }
+
+    // Also find entries that reference this entry
+    for (const other of this.entries.values()) {
+      if (other.id !== entryId && other.associations.includes(entryId)) {
+        if (!associated.find(a => a.id === other.id)) {
+          associated.push(other)
+        }
+      }
+    }
+
+    return associated.slice(0, maxResults)
+  }
+
+  // ── Memory Management ──────────────────────────────────────────────────────
+
+  /** Remove a memory entry */
+  forget(entryId: string): boolean {
+    const deleted = this.entries.delete(entryId)
+    if (deleted) this._updateStats()
+    return deleted
+  }
+
+  /** Strengthen a memory (increase importance) */
+  reinforce(entryId: string, boost = 0.1): boolean {
+    const entry = this.entries.get(entryId)
+    if (!entry) return false
+    entry.importance = Math.min(entry.importance + boost, 1.0)
+    entry.lastAccessedAt = Date.now()
+    return true
+  }
+
+  /** Link two memories as associated */
+  associate(entryId1: string, entryId2: string): boolean {
+    const e1 = this.entries.get(entryId1)
+    const e2 = this.entries.get(entryId2)
+    if (!e1 || !e2) return false
+
+    if (!e1.associations.includes(entryId2)) e1.associations.push(entryId2)
+    if (!e2.associations.includes(entryId1)) e2.associations.push(entryId1)
+    return true
+  }
+
+  // ── Persistence ────────────────────────────────────────────────────────────
+
+  /** Export all memories as a snapshot */
+  save(): MemorySnapshot {
+    return {
+      entries: [...this.entries.values()],
+      stats: { ...this.stats, categoryCounts: { ...this.stats.categoryCounts } },
+      version: 1,
+      savedAt: Date.now(),
+    }
+  }
+
+  /** Load memories from a snapshot */
+  load(snapshot: MemorySnapshot): number {
+    this.entries.clear()
+    for (const entry of snapshot.entries) {
+      this.entries.set(entry.id, { ...entry })
+    }
+    this._updateStats()
+    return snapshot.entries.length
+  }
+
+  // ── Stats ──────────────────────────────────────────────────────────────────
+
+  /** Get memory stats */
+  getStats(): MemoryStats {
+    return { ...this.stats, categoryCounts: { ...this.stats.categoryCounts } }
+  }
+
+  /** Get total entries */
+  getSize(): number {
+    return this.entries.size
+  }
+
+  /** Get all categories */
+  getCategories(): string[] {
+    return Object.keys(this.stats.categoryCounts)
+  }
+
+  /** Clear all memories */
+  clear(): void {
+    this.entries.clear()
+    this.operationCount = 0
+    this.stats = this._initStats()
+  }
+
+  // ── Private ────────────────────────────────────────────────────────────────
+
+  /** Get decayed importance based on time and decay rate */
+  private _getDecayedImportance(entry: MemoryEntry): number {
+    const ageMs = Date.now() - entry.lastAccessedAt
+    const ageDays = ageMs / (24 * 60 * 60 * 1000)
+    return entry.importance * Math.exp(-entry.decayRate * ageDays)
+  }
+
+  /** Consolidate: remove low-importance entries */
+  private _consolidate(): void {
+    const entries = [...this.entries.values()]
+      .map(e => ({ entry: e, effective: this._getDecayedImportance(e) }))
+      .sort((a, b) => a.effective - b.effective)
+
+    // Remove bottom 20% or entries below minimum
+    const toRemove = Math.max(Math.floor(entries.length * 0.2), 1)
+    for (let i = 0; i < toRemove && i < entries.length; i++) {
+      if (entries[i]!.effective < this.config.minImportance) {
+        this.entries.delete(entries[i]!.entry.id)
+      }
+    }
+
+    this._updateStats()
+  }
+
+  /** Maybe consolidate based on operation count */
+  private _maybeConsolidate(): void {
+    this.operationCount++
+    if (this.operationCount >= this.config.consolidationInterval) {
+      this.operationCount = 0
+      this._consolidate()
+    }
+  }
+
+  /** Update stats */
+  private _updateStats(): void {
+    const entries = [...this.entries.values()]
+    const now = Date.now()
+
+    const categoryCounts: Record<string, number> = {}
+    let totalImportance = 0
+    let oldest = now
+    let newest = 0
+
+    for (const e of entries) {
+      categoryCounts[e.category] = (categoryCounts[e.category] ?? 0) + 1
+      totalImportance += e.importance
+      if (e.createdAt < oldest) oldest = e.createdAt
+      if (e.createdAt > newest) newest = e.createdAt
+    }
+
+    this.stats = {
+      totalEntries: entries.length,
+      totalAccesses: this.stats.totalAccesses,
+      categoryCounts,
+      averageImportance: entries.length > 0 ? totalImportance / entries.length : 0,
+      oldestEntryAge: entries.length > 0 ? now - oldest : 0,
+      newestEntryAge: entries.length > 0 ? now - newest : 0,
+    }
+  }
+
+  /** Initialize stats */
+  private _initStats(): MemoryStats {
+    return {
+      totalEntries: 0,
+      totalAccesses: 0,
+      categoryCounts: {},
+      averageImportance: 0,
+      oldestEntryAge: 0,
+      newestEntryAge: 0,
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   ⚡ TOOL CIRCUIT BREAKER — Per-Tool Retry + Fault Tolerance
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class ToolCircuitBreaker {
+  private states: Map<string, ToolCircuitState> = new Map()
+  private config: CircuitBreakerConfig
+
+  constructor(config?: Partial<CircuitBreakerConfig>) {
+    this.config = { ...DEFAULT_CIRCUIT_BREAKER_CONFIG, ...config }
+  }
+
+  /** Check if a tool's circuit is open (should NOT be called) */
+  isOpen(toolName: string): boolean {
+    const state = this.states.get(toolName)
+    if (!state) return false
+
+    if (state.state === 'open') {
+      // Check if enough time has passed to try again
+      if (Date.now() - state.lastFailure > this.config.resetTimeoutMs) {
+        state.state = 'half_open'
+        return false
+      }
+      return true
+    }
+
+    return false
+  }
+
+  /** Record a successful tool call */
+  recordSuccess(toolName: string, latencyMs: number): void {
+    const state = this._getOrCreate(toolName)
+    state.successes++
+    state.totalCalls++
+    state.lastSuccess = Date.now()
+    state.averageLatencyMs += (latencyMs - state.averageLatencyMs) / state.totalCalls
+
+    if (state.state === 'half_open') {
+      state.state = 'closed'
+      state.failures = 0
+    }
+
+    this._updateFailureRate(state)
+  }
+
+  /** Record a failed tool call */
+  recordFailure(toolName: string): void {
+    const state = this._getOrCreate(toolName)
+    state.failures++
+    state.totalCalls++
+    state.lastFailure = Date.now()
+
+    this._updateFailureRate(state)
+
+    if (state.failures >= this.config.failureThreshold) {
+      state.state = 'open'
+    }
+  }
+
+  /** Get the state of a tool's circuit */
+  getState(toolName: string): ToolCircuitState | null {
+    return this.states.get(toolName) ?? null
+  }
+
+  /** Get all circuit states */
+  getAllStates(): ToolCircuitState[] {
+    return [...this.states.values()]
+  }
+
+  /** Reset a tool's circuit breaker */
+  reset(toolName: string): void {
+    this.states.delete(toolName)
+  }
+
+  /** Reset all circuit breakers */
+  resetAll(): void {
+    this.states.clear()
+  }
+
+  /** Get health summary */
+  getHealthSummary(): { healthy: string[]; degraded: string[]; failed: string[] } {
+    const healthy: string[] = []
+    const degraded: string[] = []
+    const failed: string[] = []
+
+    for (const [name, state] of this.states) {
+      if (state.state === 'open') failed.push(name)
+      else if (state.state === 'half_open' || state.failureRate > 0.3) degraded.push(name)
+      else healthy.push(name)
+    }
+
+    return { healthy, degraded, failed }
+  }
+
+  /** Private helpers */
+  private _getOrCreate(toolName: string): ToolCircuitState {
+    let state = this.states.get(toolName)
+    if (!state) {
+      state = {
+        toolName,
+        state: 'closed',
+        failures: 0,
+        successes: 0,
+        lastFailure: 0,
+        lastSuccess: 0,
+        totalCalls: 0,
+        averageLatencyMs: 0,
+        failureRate: 0,
+      }
+      this.states.set(toolName, state)
+    }
+    return state
+  }
+
+  private _updateFailureRate(state: ToolCircuitState): void {
+    state.failureRate = state.totalCalls > 0 ? state.failures / state.totalCalls : 0
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   🎯 ADAPTIVE TOOL SELECTOR — Learning-Based Tool Selection
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class AdaptiveToolSelector {
+  private performanceHistory: Map<string, ToolPerformanceRecord[]> = new Map()
+  private circuitBreaker: ToolCircuitBreaker
+
+  constructor(circuitBreaker: ToolCircuitBreaker) {
+    this.circuitBreaker = circuitBreaker
+  }
+
+  /** Record tool performance for learning */
+  recordPerformance(toolName: string, domain: TaskDomain, result: AgentToolResult): void {
+    const key = `${toolName}:${domain}`
+    let records = this.performanceHistory.get(key)
+    if (!records) {
+      records = []
+      this.performanceHistory.set(key, records)
+    }
+
+    // Keep rolling window of recent records
+    if (records.length >= 100) records.shift()
+
+    const existing = records.find(r => r.toolName === toolName && r.domain === domain)
+    if (existing) {
+      existing.totalCalls++
+      existing.successRate += (((result.success ? 1 : 0) - existing.successRate) / existing.totalCalls)
+      existing.averageConfidence += ((result.confidence - existing.averageConfidence) / existing.totalCalls)
+      existing.averageLatencyMs += ((result.durationMs - existing.averageLatencyMs) / existing.totalCalls)
+      existing.lastUsed = Date.now()
+    } else {
+      records.push({
+        toolName,
+        domain,
+        successRate: result.success ? 1 : 0,
+        averageConfidence: result.confidence,
+        averageLatencyMs: result.durationMs,
+        totalCalls: 1,
+        lastUsed: Date.now(),
+      })
+    }
+  }
+
+  /** Select the best tool for a domain based on historical performance */
+  selectBestTool(candidates: string[], domain: TaskDomain): { toolName: string; score: number; reason: string } {
+    let bestTool = candidates[0] ?? 'spark_general'
+    let bestScore = -1
+    let bestReason = 'default selection'
+
+    for (const toolName of candidates) {
+      // Skip tools with open circuit breakers
+      if (this.circuitBreaker.isOpen(toolName)) continue
+
+      const key = `${toolName}:${domain}`
+      const records = this.performanceHistory.get(key)
+
+      if (!records || records.length === 0) {
+        // Unrecorded tools get a neutral score
+        const score = 0.5
+        if (score > bestScore) {
+          bestScore = score
+          bestTool = toolName
+          bestReason = 'no history (exploration)'
+        }
+        continue
+      }
+
+      const latest = records[records.length - 1]!
+      const score = latest.successRate * 0.4 + latest.averageConfidence * 0.3 +
+        (1 - Math.min(latest.averageLatencyMs / 10000, 1)) * 0.15 +
+        Math.min(latest.totalCalls / 50, 1) * 0.15
+
+      if (score > bestScore) {
+        bestScore = score
+        bestTool = toolName
+        bestReason = `success=${latest.successRate.toFixed(2)}, confidence=${latest.averageConfidence.toFixed(2)}, calls=${latest.totalCalls}`
+      }
+    }
+
+    return { toolName: bestTool, score: Math.max(bestScore, 0), reason: bestReason }
+  }
+
+  /** Get performance summary for a tool */
+  getToolPerformance(toolName: string): ToolPerformanceRecord[] {
+    const results: ToolPerformanceRecord[] = []
+    for (const [key, records] of this.performanceHistory) {
+      if (key.startsWith(toolName + ':')) {
+        results.push(...records)
+      }
+    }
+    return results
+  }
+
+  /** Get all performance data */
+  getAllPerformance(): Map<string, ToolPerformanceRecord[]> {
+    return new Map(this.performanceHistory)
+  }
+
+  /** Clear performance history */
+  clear(): void {
+    this.performanceHistory.clear()
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   ⚡ PARALLEL EXECUTOR — Concurrent Tool Execution
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class ParallelExecutor {
+  private maxConcurrency: number
+
+  constructor(maxConcurrency = 4) {
+    this.maxConcurrency = maxConcurrency
+  }
+
+  /** Execute multiple tool calls in parallel */
+  async executeParallel(
+    tasks: Array<{ toolName: string; input: string; handler: (input: string) => Promise<AgentToolResult> | AgentToolResult }>,
+  ): Promise<ParallelResult> {
+    const startTime = Date.now()
+    const results: AgentToolResult[] = []
+    let successCount = 0
+    let failureCount = 0
+
+    // Process in batches of maxConcurrency
+    for (let i = 0; i < tasks.length; i += this.maxConcurrency) {
+      const batch = tasks.slice(i, i + this.maxConcurrency)
+      const batchResults = await Promise.allSettled(
+        batch.map(async task => {
+          const start = Date.now()
+          try {
+            const result = await task.handler(task.input)
+            return result
+          } catch (err) {
+            return {
+              success: false,
+              output: `Parallel execution error: ${err instanceof Error ? err.message : String(err)}`,
+              confidence: 0,
+              source: task.toolName,
+              durationMs: Date.now() - start,
+            } as AgentToolResult
+          }
+        })
+      )
+
+      for (const result of batchResults) {
+        if (result.status === 'fulfilled') {
+          results.push(result.value)
+          if (result.value.success) successCount++
+          else failureCount++
+        } else {
+          failureCount++
+          results.push({
+            success: false,
+            output: `Task rejected: ${result.reason}`,
+            confidence: 0,
+            source: 'parallel_executor',
+            durationMs: 0,
+          })
+        }
+      }
+    }
+
+    return {
+      results,
+      totalDurationMs: Date.now() - startTime,
+      successCount,
+      failureCount,
+    }
+  }
+
+  /** Get max concurrency */
+  getMaxConcurrency(): number {
+    return this.maxConcurrency
+  }
+
+  /** Set max concurrency */
+  setMaxConcurrency(value: number): void {
+    this.maxConcurrency = Math.max(1, value)
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   📋 DYNAMIC PLANNER — Constraint-Aware Replanning with Dependencies
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class DynamicPlanner {
+  private plans: Map<string, DynamicPlan> = new Map()
+
+  /** Create a dynamic plan from a goal */
+  createPlan(goal: string, steps: Array<{
+    description: string
+    tool: string
+    dependencies?: string[]
+    priority?: number
+    maxRetries?: number
+  }>, constraints?: string[]): DynamicPlan {
+    const planId = `plan_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+
+    const planSteps: PlanStep[] = steps.map((s, i) => ({
+      id: `step_${i}`,
+      description: s.description,
+      tool: s.tool,
+      dependencies: s.dependencies ?? [],
+      status: 'pending' as const,
+      priority: s.priority ?? i,
+      retries: 0,
+      maxRetries: s.maxRetries ?? 2,
+    }))
+
+    const plan: DynamicPlan = {
+      id: planId,
+      goal,
+      constraints: constraints ?? [],
+      steps: planSteps,
+      status: 'planning',
+      version: 1,
+      totalDurationMs: 0,
+    }
+
+    this.plans.set(planId, plan)
+    return plan
+  }
+
+  /** Get ready steps (all dependencies satisfied) */
+  getReadySteps(plan: DynamicPlan): PlanStep[] {
+    return plan.steps.filter(step => {
+      if (step.status !== 'pending') return false
+      return step.dependencies.every(depId => {
+        const dep = plan.steps.find(s => s.id === depId)
+        return dep?.status === 'complete'
+      })
+    }).sort((a, b) => a.priority - b.priority)
+  }
+
+  /** Mark a step as complete */
+  completeStep(plan: DynamicPlan, stepId: string, result: AgentToolResult): void {
+    const step = plan.steps.find(s => s.id === stepId)
+    if (step) {
+      step.status = result.success ? 'complete' : 'failed'
+      step.result = result
+    }
+  }
+
+  /** Check if plan is complete */
+  isPlanComplete(plan: DynamicPlan): boolean {
+    return plan.steps.every(s => s.status === 'complete' || s.status === 'skipped')
+  }
+
+  /** Check if plan has failed (unrecoverable) */
+  isPlanFailed(plan: DynamicPlan): boolean {
+    return plan.steps.some(s => s.status === 'failed' && s.retries >= s.maxRetries)
+  }
+
+  /** Replan: create alternative steps for failed ones */
+  replan(plan: DynamicPlan, failedStepId: string, alternativeDescription: string, alternativeTool: string): PlanStep {
+    const failedStep = plan.steps.find(s => s.id === failedStepId)
+    if (failedStep) {
+      failedStep.retries++
+      if (failedStep.retries <= failedStep.maxRetries) {
+        failedStep.status = 'pending'
+        failedStep.tool = alternativeTool
+        failedStep.description = alternativeDescription
+        plan.version++
+        plan.status = 'replanning'
+        return failedStep
+      }
+    }
+
+    // Create a new alternative step
+    const newStep: PlanStep = {
+      id: `step_alt_${plan.steps.length}`,
+      description: alternativeDescription,
+      tool: alternativeTool,
+      dependencies: failedStep?.dependencies ?? [],
+      status: 'pending',
+      priority: failedStep?.priority ?? plan.steps.length,
+      retries: 0,
+      maxRetries: 2,
+    }
+    plan.steps.push(newStep)
+    plan.version++
+    plan.status = 'replanning'
+    return newStep
+  }
+
+  /** Get topological execution order */
+  getExecutionOrder(plan: DynamicPlan): PlanStep[][] {
+    const levels: PlanStep[][] = []
+    const completed = new Set<string>()
+
+    while (completed.size < plan.steps.length) {
+      const ready = plan.steps.filter(s =>
+        !completed.has(s.id) &&
+        s.dependencies.every(d => completed.has(d))
+      )
+
+      if (ready.length === 0) break // Circular dependency or all done
+      levels.push(ready)
+      for (const step of ready) completed.add(step.id)
+    }
+
+    return levels
+  }
+
+  /** Get plan by ID */
+  getPlan(planId: string): DynamicPlan | null {
+    return this.plans.get(planId) ?? null
+  }
+
+  /** Get all plans */
+  getAllPlans(): DynamicPlan[] {
+    return [...this.plans.values()]
+  }
+
+  /** Clear all plans */
+  clear(): void {
+    this.plans.clear()
+  }
+}

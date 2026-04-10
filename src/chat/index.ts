@@ -2159,6 +2159,16 @@ export { ModelSpark, DEFAULT_MODEL_SPARK_CONFIG } from './ModelSpark.js'
 // ── Spark Unified Orchestration — Brain + Agent + LLM working together ──
 export { SparkBrainConnector, SparkAgent, UnifiedOrchestrator, DEFAULT_AGENT_CONFIG } from './ModelSpark.js'
 
+// ── Spark Search Engine + Memory + Circuit Breaker + Adaptive Selection + Parallel + Dynamic Planning ──
+export {
+  SparkSearchEngine, DEFAULT_SEARCH_CONFIG,
+  MemoryManager, DEFAULT_MEMORY_CONFIG,
+  ToolCircuitBreaker, DEFAULT_CIRCUIT_BREAKER_CONFIG,
+  AdaptiveToolSelector,
+  ParallelExecutor,
+  DynamicPlanner,
+} from './ModelSpark.js'
+
 export type {
   SparkModelFamily,
   InferenceStrategy,
@@ -2206,4 +2216,26 @@ export type {
   OrchestrationDecision,
   OrchestrationResponse,
   OrchestrationStats,
+  // ── Search Engine types ──
+  SparkSearchStrategy,
+  SearchDocument,
+  SearchResult,
+  SearchQuery,
+  SearchStats,
+  SparkSearchConfig,
+  // ── Memory Manager types ──
+  MemoryEntry,
+  MemorySnapshot,
+  MemoryStats,
+  MemoryConfig,
+  // ── Circuit Breaker types ──
+  ToolCircuitState,
+  CircuitBreakerConfig as ToolCircuitBreakerConfig,
+  // ── Adaptive Tool Selection types ──
+  ToolPerformanceRecord,
+  // ── Parallel Execution types ──
+  ParallelResult,
+  // ── Dynamic Planning types ──
+  PlanStep,
+  DynamicPlan,
 } from './ModelSpark.js'
