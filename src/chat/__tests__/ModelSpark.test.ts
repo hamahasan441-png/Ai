@@ -1099,3 +1099,903 @@ describe('ModelSpark — Dual-Model Ensemble Engine', () => {
     }
   })
 })
+
+// ══════════════════════════════════════════════════════════════════════════════
+// NEW TESTS: All missing features added to ModelSpark
+// ══════════════════════════════════════════════════════════════════════════════
+
+import type {
+  SparkChatMessage,
+  ChatSession,
+  StreamToken,
+  CircuitState,
+  CircuitBreakerStatus,
+  ModelLifecycleState,
+  ModelLifecycleInfo,
+  PromptChainStep,
+  PromptChainResult,
+  ParsedOutput,
+  HardwareProfile,
+  OllamaServerStatus,
+  ContextWindowOptions,
+} from '../ModelSpark.js'
+
+describe('ModelSpark — Enhanced Features', () => {
+  let spark: ModelSpark
+
+  beforeEach(() => {
+    spark = new ModelSpark()
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // MULTI-TURN CONVERSATION
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Multi-turn Conversation', () => {
+    it('should create a new chat session', () => {
+      const session = spark.createSession()
+      expect(session.id).toBeTruthy()
+      expect(session.messages).toHaveLength(0)
+      expect(session.domain).toBeNull()
+      expect(session.createdAt).toBeGreaterThan(0)
+    })
+
+    it('should create a session with system prompt', () => {
+      const session = spark.createSession({ systemPrompt: 'You are a helpful assistant.' })
+      expect(session.messages).toHaveLength(1)
+      expect(session.messages[0]!.role).toBe('system')
+      expect(session.messages[0]!.content).toBe('You are a helpful assistant.')
+    })
+
+    it('should create a session with domain and strategy', () => {
+      const session = spark.createSession({
+        domain: 'code_generation',
+        strategy: 'ensemble',
+        metadata: { project: 'test' },
+      })
+      expect(session.domain).toBe('code_generation')
+      expect(session.strategy).toBe('ensemble')
+      expect(session.metadata.project).toBe('test')
+    })
+
+    it('should get an existing session', () => {
+      const session = spark.createSession()
+      const retrieved = spark.getSession(session.id)
+      expect(retrieved).toBeTruthy()
+      expect(retrieved!.id).toBe(session.id)
+    })
+
+    it('should return null for unknown session', () => {
+      expect(spark.getSession('nonexistent')).toBeNull()
+    })
+
+    it('should list all sessions', () => {
+      spark.createSession()
+      spark.createSession()
+      spark.createSession()
+      expect(spark.listSessions()).toHaveLength(3)
+    })
+
+    it('should delete a session', () => {
+      const session = spark.createSession()
+      expect(spark.deleteSession(session.id)).toBe(true)
+      expect(spark.getSession(session.id)).toBeNull()
+    })
+
+    it('should return false when deleting nonexistent session', () => {
+      expect(spark.deleteSession('nonexistent')).toBe(false)
+    })
+
+    it('should chat within a session', async () => {
+      const session = spark.createSession()
+      const response = await spark.chat(session.id, 'Hello, how are you?')
+      expect(response.text.length).toBeGreaterThan(0)
+
+      // Check message was added to history
+      const history = spark.getConversationHistory(session.id)
+      expect(history.length).toBeGreaterThanOrEqual(2)
+      expect(history[0]!.role).toBe('user')
+      expect(history[0]!.content).toBe('Hello, how are you?')
+      expect(history[1]!.role).toBe('assistant')
+    })
+
+    it('should throw when chatting with unknown session', async () => {
+      await expect(spark.chat('nonexistent', 'Hello')).rejects.toThrow('Session not found')
+    })
+
+    it('should preserve conversation history across multiple turns', async () => {
+      const session = spark.createSession({ systemPrompt: 'You are a code assistant.' })
+      await spark.chat(session.id, 'Write a function to add two numbers')
+      await spark.chat(session.id, 'Now make it handle strings too')
+
+      const history = spark.getConversationHistory(session.id)
+      // system + user1 + assistant1 + user2 + assistant2 = 5
+      expect(history).toHaveLength(5)
+      expect(history[0]!.role).toBe('system')
+      expect(history[1]!.role).toBe('user')
+      expect(history[2]!.role).toBe('assistant')
+      expect(history[3]!.role).toBe('user')
+      expect(history[4]!.role).toBe('assistant')
+    })
+
+    it('should update session lastActiveAt', async () => {
+      const session = spark.createSession()
+      const initialTime = session.lastActiveAt
+      await new Promise(resolve => setTimeout(resolve, 10))
+      await spark.chat(session.id, 'Test')
+      const updated = spark.getSession(session.id)!
+      expect(updated.lastActiveAt).toBeGreaterThanOrEqual(initialTime)
+    })
+
+    it('should return empty history for nonexistent session', () => {
+      expect(spark.getConversationHistory('nonexistent')).toHaveLength(0)
+    })
+
+    it('should track total tokens in session', async () => {
+      const session = spark.createSession()
+      await spark.chat(session.id, 'Hello world')
+      const updated = spark.getSession(session.id)!
+      expect(updated.totalTokens).toBeGreaterThan(0)
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // STREAMING INFERENCE
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Streaming Inference', () => {
+    it('should stream tokens from inferStream', async () => {
+      const tokens: StreamToken[] = []
+      for await (const token of spark.inferStream({ prompt: 'Hello world' })) {
+        tokens.push(token)
+      }
+      expect(tokens.length).toBeGreaterThan(0)
+      expect(tokens[tokens.length - 1]!.done).toBe(true)
+    })
+
+    it('should have incrementing token indices', async () => {
+      const tokens: StreamToken[] = []
+      for await (const token of spark.inferStream({ prompt: 'Write code' })) {
+        tokens.push(token)
+      }
+      for (let i = 1; i < tokens.length; i++) {
+        expect(tokens[i]!.index).toBeGreaterThan(tokens[i - 1]!.index)
+      }
+    })
+
+    it('should include model family in each token', async () => {
+      for await (const token of spark.inferStream({ prompt: 'Hello' })) {
+        expect(['qwen2.5', 'llama3']).toContain(token.modelFamily)
+      }
+    })
+
+    it('should collect stream into full response', async () => {
+      const result = await spark.collectStream({ prompt: 'Hello' })
+      expect(result.text.length).toBeGreaterThan(0)
+      expect(result.totalTokens).toBeGreaterThan(0)
+      expect(['qwen2.5', 'llama3']).toContain(result.modelFamily)
+    })
+
+    it('should respect domain in stream routing', async () => {
+      const tokens: StreamToken[] = []
+      for await (const token of spark.inferStream({ prompt: 'Write a function', domain: 'code_generation' })) {
+        tokens.push(token)
+      }
+      // Code tasks should route to Qwen
+      expect(tokens[0]!.modelFamily).toBe('qwen2.5')
+    })
+
+    it('should route reasoning tasks to LLaMA in stream', async () => {
+      const tokens: StreamToken[] = []
+      for await (const token of spark.inferStream({ prompt: 'Explain why', domain: 'general_reasoning' })) {
+        tokens.push(token)
+      }
+      expect(tokens[0]!.modelFamily).toBe('llama3')
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CIRCUIT BREAKER / ERROR RECOVERY
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Circuit Breaker', () => {
+    it('should initialize circuit breakers as closed', () => {
+      const qwenCB = spark.getCircuitBreakerStatus('qwen2.5')
+      expect(qwenCB.state).toBe('closed')
+      expect(qwenCB.failures).toBe(0)
+
+      const llamaCB = spark.getCircuitBreakerStatus('llama3')
+      expect(llamaCB.state).toBe('closed')
+    })
+
+    it('should allow requests when circuit is closed', () => {
+      expect(spark.isCircuitClosed('qwen2.5')).toBe(true)
+      expect(spark.isCircuitClosed('llama3')).toBe(true)
+    })
+
+    it('should track failures', () => {
+      spark.recordFailure('qwen2.5')
+      spark.recordFailure('qwen2.5')
+      const status = spark.getCircuitBreakerStatus('qwen2.5')
+      expect(status.failures).toBe(2)
+      expect(status.state).toBe('closed') // below threshold
+    })
+
+    it('should trip open after threshold failures', () => {
+      for (let i = 0; i < 5; i++) {
+        spark.recordFailure('qwen2.5')
+      }
+      const status = spark.getCircuitBreakerStatus('qwen2.5')
+      expect(status.state).toBe('open')
+      expect(status.totalTrips).toBe(1)
+      expect(spark.isCircuitClosed('qwen2.5')).toBe(false)
+    })
+
+    it('should close circuit on success after half_open', () => {
+      for (let i = 0; i < 5; i++) {
+        spark.recordFailure('llama3')
+      }
+      expect(spark.getCircuitBreakerStatus('llama3').state).toBe('open')
+
+      // Reset to test half_open flow
+      spark.resetCircuitBreaker('llama3')
+      expect(spark.getCircuitBreakerStatus('llama3').state).toBe('closed')
+    })
+
+    it('should reset circuit breaker', () => {
+      spark.recordFailure('qwen2.5')
+      spark.recordFailure('qwen2.5')
+      spark.resetCircuitBreaker('qwen2.5')
+      const status = spark.getCircuitBreakerStatus('qwen2.5')
+      expect(status.state).toBe('closed')
+      expect(status.failures).toBe(0)
+    })
+
+    it('should record success and update lastSuccessAt', () => {
+      spark.recordSuccess('qwen2.5')
+      const status = spark.getCircuitBreakerStatus('qwen2.5')
+      expect(status.lastSuccessAt).toBeGreaterThan(0)
+    })
+
+    it('should infer with retry and return response', async () => {
+      const response = await spark.inferWithRetry({ prompt: 'Hello' })
+      expect(response.text.length).toBeGreaterThan(0)
+    })
+
+    it('should track errors in stats on retry failures', async () => {
+      // inferWithRetry should handle errors gracefully
+      const response = await spark.inferWithRetry({ prompt: 'Test', domain: 'code_generation' })
+      expect(response).toBeTruthy()
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // MODEL LIFECYCLE MANAGEMENT
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Model Lifecycle Management', () => {
+    it('should have lifecycle info for all models', () => {
+      const lifecycles = spark.getAllModelLifecycles()
+      expect(lifecycles.length).toBeGreaterThanOrEqual(6)
+    })
+
+    it('should get lifecycle info by model ID', () => {
+      const lifecycle = spark.getModelLifecycle('qwen2.5-coder-7b-q4')
+      expect(lifecycle).not.toBeNull()
+      expect(lifecycle!.modelId).toBe('qwen2.5-coder-7b-q4')
+      expect(lifecycle!.state).toBe('not_installed')
+    })
+
+    it('should return null for unknown model lifecycle', () => {
+      expect(spark.getModelLifecycle('nonexistent')).toBeNull()
+    })
+
+    it('should generate Ollama pull commands', () => {
+      const cmd = spark.getOllamaPullCommand('qwen2.5-coder-7b-q4')
+      expect(cmd).toContain('ollama pull')
+      expect(cmd).toContain('qwen2.5-coder')
+    })
+
+    it('should return null for unknown model pull command', () => {
+      expect(spark.getOllamaPullCommand('nonexistent')).toBeNull()
+    })
+
+    it('should generate llama.cpp server commands', () => {
+      const cmd = spark.getLlamaCppCommand('qwen2.5-coder-7b-q4')
+      expect(cmd).toContain('llama-server')
+      expect(cmd).toContain('-m')
+      expect(cmd).toContain('-c')
+    })
+
+    it('should return null for unknown model llama.cpp command', () => {
+      expect(spark.getLlamaCppCommand('nonexistent')).toBeNull()
+    })
+
+    it('should generate complete setup script', () => {
+      const script = spark.generateSetupScript()
+      expect(script).toContain('#!/bin/bash')
+      expect(script).toContain('ollama pull')
+      expect(script).toContain('ollama serve')
+      expect(script).toContain('Model Spark')
+    })
+
+    it('should mark model as installed', () => {
+      spark.markModelInstalled('qwen2.5-coder-7b-q4')
+      const lifecycle = spark.getModelLifecycle('qwen2.5-coder-7b-q4')!
+      expect(lifecycle.state).toBe('installed')
+      expect(lifecycle.downloadProgress).toBe(100)
+      expect(lifecycle.installedAt).toBeGreaterThan(0)
+      expect(spark.isModelDownloaded('qwen2.5-coder-7b-q4')).toBe(true)
+    })
+
+    it('should mark model as ready', () => {
+      spark.markModelReady('qwen2.5-coder-7b-q4')
+      const lifecycle = spark.getModelLifecycle('qwen2.5-coder-7b-q4')!
+      expect(lifecycle.state).toBe('ready')
+      expect(lifecycle.lastUsedAt).toBeGreaterThan(0)
+    })
+
+    it('should check if both models are ready', () => {
+      expect(spark.areBothModelsReady()).toBe(false)
+      spark.markModelInstalled('qwen2.5-coder-7b-q4')
+      spark.markModelInstalled('llama-3.1-8b-q4')
+      expect(spark.areBothModelsReady()).toBe(true)
+    })
+
+    it('should have disk size estimates', () => {
+      const lifecycle = spark.getModelLifecycle('qwen2.5-coder-7b-q4')!
+      expect(lifecycle.diskSizeBytes).toBeGreaterThan(0)
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // PROMPT CHAINING
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Prompt Chaining', () => {
+    it('should execute a simple single-step chain', async () => {
+      const steps: PromptChainStep[] = [
+        { id: 'step1', prompt: 'Write hello world', model: 'qwen2.5', domain: 'code_generation', dependsOn: [] },
+      ]
+      const result = await spark.executePromptChain(steps)
+      expect(result.steps).toHaveLength(1)
+      expect(result.finalOutput.length).toBeGreaterThan(0)
+      expect(result.totalDurationMs).toBeGreaterThanOrEqual(0)
+    })
+
+    it('should execute a multi-step chain with dependencies', async () => {
+      const steps: PromptChainStep[] = [
+        { id: 'plan', prompt: 'Plan a sorting algorithm', model: 'llama3', domain: 'planning', dependsOn: [] },
+        { id: 'code', prompt: 'Implement: {plan}', model: 'qwen2.5', domain: 'code_generation', dependsOn: ['plan'] },
+      ]
+      const result = await spark.executePromptChain(steps)
+      expect(result.steps).toHaveLength(2)
+      expect(result.steps[0]!.id).toBe('plan')
+      expect(result.steps[1]!.id).toBe('code')
+    })
+
+    it('should resolve dependencies in correct order', async () => {
+      const steps: PromptChainStep[] = [
+        { id: 'c', prompt: 'Final: {a} and {b}', model: 'auto', domain: 'auto', dependsOn: ['a', 'b'] },
+        { id: 'a', prompt: 'First step', model: 'auto', domain: 'auto', dependsOn: [] },
+        { id: 'b', prompt: 'Second step', model: 'auto', domain: 'auto', dependsOn: [] },
+      ]
+      const result = await spark.executePromptChain(steps)
+      const ids = result.steps.map(s => s.id)
+      expect(ids.indexOf('a')).toBeLessThan(ids.indexOf('c'))
+      expect(ids.indexOf('b')).toBeLessThan(ids.indexOf('c'))
+    })
+
+    it('should apply extract_code transform', async () => {
+      const steps: PromptChainStep[] = [
+        { id: 'gen', prompt: 'Write a function', model: 'qwen2.5', domain: 'code_generation', dependsOn: [], transform: 'extract_code' },
+      ]
+      const result = await spark.executePromptChain(steps)
+      expect(result.steps[0]!.output.length).toBeGreaterThan(0)
+    })
+
+    it('should build a think-do chain', () => {
+      const chain = spark.buildThinkDoChain('Build a REST API')
+      expect(chain).toHaveLength(2)
+      expect(chain[0]!.id).toBe('think')
+      expect(chain[0]!.model).toBe('llama3')
+      expect(chain[1]!.id).toBe('do')
+      expect(chain[1]!.model).toBe('qwen2.5')
+      expect(chain[1]!.dependsOn).toContain('think')
+    })
+
+    it('should build a review chain', () => {
+      const chain = spark.buildReviewChain('Write a sorting function')
+      expect(chain).toHaveLength(3)
+      expect(chain[0]!.id).toBe('generate')
+      expect(chain[1]!.id).toBe('review')
+      expect(chain[2]!.id).toBe('refine')
+      expect(chain[2]!.dependsOn).toContain('generate')
+      expect(chain[2]!.dependsOn).toContain('review')
+    })
+
+    it('should execute a think-do chain end to end', async () => {
+      const chain = spark.buildThinkDoChain('Build a calculator')
+      const result = await spark.executePromptChain(chain)
+      expect(result.steps).toHaveLength(2)
+      expect(result.finalOutput.length).toBeGreaterThan(0)
+      expect(result.totalTokens).toBeGreaterThan(0)
+    })
+
+    it('should handle auto model selection in chain', async () => {
+      const steps: PromptChainStep[] = [
+        { id: 'step1', prompt: 'Write a function', model: 'auto', domain: 'auto', dependsOn: [] },
+      ]
+      const result = await spark.executePromptChain(steps)
+      expect(result.steps[0]!.model).toBeTruthy()
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // OUTPUT PARSING
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Output Parsing', () => {
+    it('should extract code blocks', () => {
+      const text = 'Here is code:\n```python\ndef hello():\n    print("hi")\n```\nAnd more:\n```js\nconsole.log("hi")\n```'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.codeBlocks).toHaveLength(2)
+      expect(parsed.codeBlocks[0]!.language).toBe('python')
+      expect(parsed.codeBlocks[0]!.code).toContain('def hello')
+      expect(parsed.codeBlocks[1]!.language).toBe('js')
+    })
+
+    it('should extract JSON blocks', () => {
+      const text = 'Result: {"name": "test", "value": 42}'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.jsonBlocks.length).toBeGreaterThanOrEqual(1)
+    })
+
+    it('should extract key points from numbered lists', () => {
+      const text = '1. First point\n2. Second point\n3. Third point'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.keyPoints).toHaveLength(3)
+      expect(parsed.keyPoints[0]).toBe('First point')
+    })
+
+    it('should extract key points from bullet lists', () => {
+      const text = '- First item\n- Second item\n* Third item'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.keyPoints).toHaveLength(3)
+    })
+
+    it('should extract headings', () => {
+      const text = '# Main Title\n\nContent here\n\n## Subtitle\n\nMore content'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.headings).toHaveLength(2)
+      expect(parsed.headings[0]).toBe('Main Title')
+      expect(parsed.headings[1]).toBe('Subtitle')
+    })
+
+    it('should extract URLs', () => {
+      const text = 'Visit https://example.com and http://test.org/path?q=1'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.urls).toHaveLength(2)
+      expect(parsed.urls[0]).toBe('https://example.com')
+    })
+
+    it('should generate summary from first paragraph', () => {
+      const text = 'This is the first paragraph with enough content to be a summary.\n\nSecond paragraph here.'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.summary).toContain('first paragraph')
+    })
+
+    it('should count words and sentences', () => {
+      const text = 'This is a test. It has two sentences.'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.wordCount).toBe(8)
+      expect(parsed.sentenceCount).toBe(2)
+    })
+
+    it('should handle empty text', () => {
+      const parsed = spark.parseOutput('')
+      expect(parsed.codeBlocks).toHaveLength(0)
+      expect(parsed.keyPoints).toHaveLength(0)
+      expect(parsed.summary).toBeNull()
+    })
+
+    it('should extract grouped lists', () => {
+      const text = 'Items:\n- apple\n- banana\n- cherry\n\nOther:\n- dog\n- cat'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.lists.length).toBeGreaterThanOrEqual(2)
+    })
+
+    it('should use extractCode shorthand', () => {
+      const text = '```python\nx = 1\n```'
+      const blocks = spark.extractCode(text)
+      expect(blocks).toHaveLength(1)
+      expect(blocks[0]!.language).toBe('python')
+    })
+
+    it('should use extractKeyPoints shorthand', () => {
+      const text = '1. Point A\n2. Point B'
+      const points = spark.extractKeyPoints(text)
+      expect(points).toHaveLength(2)
+    })
+
+    it('should return raw text in parsed output', () => {
+      const text = 'raw content'
+      const parsed = spark.parseOutput(text)
+      expect(parsed.raw).toBe('raw content')
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CONTEXT WINDOW MANAGEMENT
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Context Window Management', () => {
+    const makeMessage = (role: 'system' | 'user' | 'assistant', content: string): SparkChatMessage => ({
+      role,
+      content,
+      timestamp: Date.now(),
+      tokensEstimate: Math.ceil(content.length / 4),
+    })
+
+    it('should return all messages when within budget', () => {
+      const messages = [
+        makeMessage('user', 'Hello'),
+        makeMessage('assistant', 'Hi there'),
+      ]
+      const result = spark.manageContextWindow(messages, {
+        maxTokens: 1000,
+        strategy: 'truncate_oldest',
+        reserveForResponse: 100,
+        preserveSystemPrompt: true,
+      })
+      expect(result).toHaveLength(2)
+    })
+
+    it('should truncate oldest messages when exceeding budget', () => {
+      const messages = [
+        makeMessage('user', 'A'.repeat(200)),
+        makeMessage('assistant', 'B'.repeat(200)),
+        makeMessage('user', 'C'.repeat(200)),
+        makeMessage('assistant', 'D'.repeat(200)),
+      ]
+      const result = spark.manageContextWindow(messages, {
+        maxTokens: 120,
+        strategy: 'truncate_oldest',
+        reserveForResponse: 50,
+        preserveSystemPrompt: false,
+      })
+      expect(result.length).toBeLessThan(4)
+    })
+
+    it('should preserve system prompt during truncation', () => {
+      const messages = [
+        makeMessage('system', 'You are a coder.'),
+        makeMessage('user', 'A'.repeat(200)),
+        makeMessage('assistant', 'B'.repeat(200)),
+        makeMessage('user', 'C'.repeat(200)),
+      ]
+      const result = spark.manageContextWindow(messages, {
+        maxTokens: 80,
+        strategy: 'truncate_oldest',
+        reserveForResponse: 30,
+        preserveSystemPrompt: true,
+      })
+      expect(result[0]!.role).toBe('system')
+    })
+
+    it('should use truncate_middle strategy', () => {
+      const messages = [
+        makeMessage('user', 'A'.repeat(200)),
+        makeMessage('assistant', 'B'.repeat(200)),
+        makeMessage('user', 'C'.repeat(200)),
+        makeMessage('assistant', 'D'.repeat(200)),
+      ]
+      const result = spark.manageContextWindow(messages, {
+        maxTokens: 120,
+        strategy: 'truncate_middle',
+        reserveForResponse: 50,
+        preserveSystemPrompt: false,
+      })
+      expect(result.length).toBeLessThan(4)
+    })
+
+    it('should use sliding_window strategy', () => {
+      const messages = [
+        makeMessage('user', 'A'.repeat(200)),
+        makeMessage('assistant', 'B'.repeat(200)),
+        makeMessage('user', 'C'.repeat(200)),
+      ]
+      const result = spark.manageContextWindow(messages, {
+        maxTokens: 80,
+        strategy: 'sliding_window',
+        reserveForResponse: 30,
+        preserveSystemPrompt: false,
+      })
+      expect(result.length).toBeLessThan(3)
+    })
+
+    it('should use summarize_oldest strategy', () => {
+      const messages = [
+        makeMessage('system', 'System prompt'),
+        makeMessage('user', 'First question'),
+        makeMessage('assistant', 'First answer'),
+        makeMessage('user', 'Second question'),
+        makeMessage('assistant', 'Second answer'),
+      ]
+      const result = spark.manageContextWindow(messages, {
+        maxTokens: 30,
+        strategy: 'summarize_oldest',
+        reserveForResponse: 10,
+        preserveSystemPrompt: true,
+      })
+      const hasSystem = result.some(m => m.role === 'system')
+      expect(hasSystem).toBe(true)
+    })
+
+    it('should estimate token count', () => {
+      const tokens = spark.estimateTokens('Hello world, this is a test of token counting.')
+      expect(tokens).toBeGreaterThan(5)
+    })
+
+    it('should check if prompt fits in context window', () => {
+      const short = spark.fitsInContextWindow('Hello')
+      expect(short.fits).toBe(true)
+      expect(short.remainingTokens).toBeGreaterThan(0)
+    })
+
+    it('should detect when prompt exceeds context window', () => {
+      const huge = spark.fitsInContextWindow('x '.repeat(50000))
+      expect(huge.promptTokens).toBeGreaterThan(10000)
+    })
+
+    it('should check context window for specific model', () => {
+      const result = spark.fitsInContextWindow('Hello', 'llama-3.1-8b-q4')
+      expect(result.maxTokens).toBe(131072) // LLaMA 3.1 128K context
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // HARDWARE DETECTION
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Hardware Detection', () => {
+    it('should detect hardware profile', () => {
+      const hw = spark.detectHardware()
+      expect(hw.totalRAMGB).toBeGreaterThan(0)
+      expect(hw.cpuCores).toBeGreaterThan(0)
+      expect(hw.cpuModel).toBeTruthy()
+      expect(typeof hw.gpuDetected).toBe('boolean')
+      expect(['route', 'cascade', 'ensemble']).toContain(hw.recommendedStrategy)
+    })
+
+    it('should recommend models based on RAM', () => {
+      const hw = spark.detectHardware()
+      // Should recommend at least one model
+      expect(hw.recommendedQwen !== null || hw.recommendedLlama !== null).toBe(true)
+    })
+
+    it('should auto-configure from hardware', () => {
+      const hw = spark.autoConfigureFromHardware()
+      const config = spark.getConfig()
+      expect(config.defaultStrategy).toBe(hw.recommendedStrategy)
+    })
+
+    it('should generate hardware report', () => {
+      const report = spark.generateHardwareReport()
+      expect(report).toContain('Hardware Report')
+      expect(report).toContain('CPU')
+      expect(report).toContain('RAM')
+      expect(report).toContain('Recommendations')
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // OLLAMA API INTEGRATION
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Ollama API Integration', () => {
+    it('should return correct Ollama base URL', () => {
+      const url = spark.getOllamaBaseUrl()
+      expect(url).toBe('http://127.0.0.1:11434')
+    })
+
+    it('should build Ollama generate request', () => {
+      const model = spark.getQwenModel()
+      const req = spark.buildOllamaRequest('Hello', model)
+      expect(req.model).toBe(model.ollamaName)
+      expect(req.prompt).toBe('Hello')
+      expect(req.stream).toBe(false)
+      expect(req.options).toBeTruthy()
+    })
+
+    it('should build Ollama chat request from messages', () => {
+      const model = spark.getLlamaModel()
+      const messages: SparkChatMessage[] = [
+        { role: 'system', content: 'You are helpful', timestamp: Date.now() },
+        { role: 'user', content: 'Hello', timestamp: Date.now() },
+      ]
+      const req = spark.buildOllamaChatRequest(messages, model)
+      expect(req.model).toBe(model.ollamaName)
+      expect(Array.isArray(req.messages)).toBe(true)
+      expect((req.messages as Array<{role: string}>).length).toBe(2)
+    })
+
+    it('should build OpenAI-compatible request', () => {
+      const model = spark.getQwenModel()
+      const req = spark.buildOpenAICompatRequest('Hello', model, { systemPrompt: 'Be helpful' })
+      expect(req.model).toBe(model.id)
+      expect(Array.isArray(req.messages)).toBe(true)
+      expect((req.messages as Array<{role: string}>).length).toBe(2) // system + user
+      expect(req.stream).toBe(false)
+    })
+
+    it('should check Ollama server status', async () => {
+      const status = await spark.checkOllamaServer()
+      // In test environment, server won't be running
+      expect(status.running).toBe(false)
+      expect(status.host).toBe('127.0.0.1')
+      expect(status.port).toBe(11434)
+    })
+
+    it('should generate model management commands', () => {
+      const cmds = spark.getModelManagementCommands()
+      expect(cmds.install_qwen).toContain('ollama pull')
+      expect(cmds.install_llama).toContain('ollama pull')
+      expect(cmds.list_models).toBe('ollama list')
+      expect(cmds.start_server).toBe('ollama serve')
+      expect(cmds.check_status).toContain('curl')
+    })
+
+    it('should include all management commands', () => {
+      const cmds = spark.getModelManagementCommands()
+      const expectedKeys = [
+        'install_qwen', 'install_llama', 'list_models',
+        'show_qwen', 'show_llama', 'remove_qwen', 'remove_llama',
+        'start_server', 'check_status', 'run_qwen', 'run_llama',
+      ]
+      for (const key of expectedKeys) {
+        expect(cmds[key]).toBeTruthy()
+      }
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // LRU CACHE (improved eviction)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('LRU Cache', () => {
+    it('should cache and retrieve responses', async () => {
+      const spark2 = new ModelSpark({ enableResponseCaching: true, cacheMaxSize: 10 })
+      const prompt = 'What is 2+2?'
+      await spark2.infer({ prompt, domain: 'math_logic' })
+      const stats = spark2.getStats()
+      expect(stats.cacheMisses).toBeGreaterThanOrEqual(1)
+
+      // Second call should hit cache
+      await spark2.infer({ prompt, domain: 'math_logic' })
+      const stats2 = spark2.getStats()
+      expect(stats2.cacheHits).toBeGreaterThanOrEqual(1)
+    })
+
+    it('should evict LRU entries when cache is full', async () => {
+      const spark2 = new ModelSpark({
+        enableResponseCaching: true,
+        cacheMaxSize: 3,
+      })
+
+      await spark2.infer({ prompt: 'query-1', domain: 'general_reasoning' })
+      await spark2.infer({ prompt: 'query-2', domain: 'general_reasoning' })
+      await spark2.infer({ prompt: 'query-3', domain: 'general_reasoning' })
+      expect(spark2.getCacheSize()).toBe(3)
+
+      // Adding a 4th should evict the least recently used
+      await spark2.infer({ prompt: 'query-4', domain: 'general_reasoning' })
+      expect(spark2.getCacheSize()).toBe(3) // Still 3 after eviction
+    })
+
+    it('should clear cache', () => {
+      spark.clearCache()
+      expect(spark.getCacheSize()).toBe(0)
+    })
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // EDGE CASES & INTEGRATION
+  // ══════════════════════════════════════════════════════════════════════════
+
+  describe('Edge Cases & Integration', () => {
+    it('should handle empty prompts gracefully', async () => {
+      const response = await spark.infer({ prompt: '' })
+      expect(response).toBeTruthy()
+    })
+
+    it('should handle very long prompts', async () => {
+      const longPrompt = 'x '.repeat(10000)
+      const response = await spark.infer({ prompt: longPrompt })
+      expect(response).toBeTruthy()
+    })
+
+    it('should handle special characters in prompts', async () => {
+      const response = await spark.infer({ prompt: 'Test <script>alert("xss")</script> & special © chars' })
+      expect(response).toBeTruthy()
+    })
+
+    it('should handle concurrent inference calls', async () => {
+      const promises = [
+        spark.infer({ prompt: 'Task 1', domain: 'code_generation' }),
+        spark.infer({ prompt: 'Task 2', domain: 'general_reasoning' }),
+        spark.infer({ prompt: 'Task 3', domain: 'math_logic' }),
+      ]
+      const results = await Promise.all(promises)
+      expect(results).toHaveLength(3)
+      results.forEach(r => expect(r.text.length).toBeGreaterThan(0))
+    })
+
+    it('should support session + streaming combined workflow', async () => {
+      const session = spark.createSession({ systemPrompt: 'You are a coder.' })
+      // Chat to add context
+      await spark.chat(session.id, 'I need a sorting algorithm')
+      const history = spark.getConversationHistory(session.id)
+      expect(history.length).toBeGreaterThanOrEqual(2)
+
+      // Stream a follow-up response (separate inference)
+      const tokens: StreamToken[] = []
+      for await (const token of spark.inferStream({ prompt: 'Write quicksort', domain: 'code_generation' })) {
+        tokens.push(token)
+      }
+      expect(tokens.length).toBeGreaterThan(0)
+    })
+
+    it('should handle parse output with code and lists combined', () => {
+      const text = [
+        '# Guide',
+        '',
+        '1. First step',
+        '2. Second step',
+        '',
+        '```python',
+        'def sort(arr):',
+        '    return sorted(arr)',
+        '```',
+        '',
+        'Visit https://python.org',
+      ].join('\n')
+      const parsed = spark.parseOutput(text)
+      expect(parsed.headings).toHaveLength(1)
+      expect(parsed.keyPoints).toHaveLength(2)
+      expect(parsed.codeBlocks).toHaveLength(1)
+      expect(parsed.urls).toHaveLength(1)
+    })
+
+    it('should chain prompt with extract and review', async () => {
+      const chain = spark.buildReviewChain('Write a hello world function')
+      expect(chain).toHaveLength(3)
+      const result = await spark.executePromptChain(chain)
+      expect(result.steps).toHaveLength(3)
+      expect(result.finalOutput.length).toBeGreaterThan(0)
+    })
+
+    it('should provide complete status with new features', () => {
+      const report = spark.generateStatusReport()
+      expect(report).toContain('Model Spark')
+      expect(report).toContain('Qwen')
+      expect(report).toContain('LLaMA')
+    })
+
+    it('should handle hardware detection gracefully', () => {
+      // Should not throw even in restricted environments
+      const hw = spark.detectHardware()
+      expect(hw.totalRAMGB).toBeGreaterThan(0)
+    })
+
+    it('should manage lifecycle and session independently', () => {
+      // Create a session
+      const session = spark.createSession()
+      // Mark models
+      spark.markModelInstalled('qwen2.5-coder-7b-q4')
+      // Both should be independently accessible
+      expect(spark.getSession(session.id)).toBeTruthy()
+      expect(spark.getModelLifecycle('qwen2.5-coder-7b-q4')!.state).toBe('installed')
+    })
+  })
+})

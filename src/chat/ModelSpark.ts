@@ -237,6 +237,156 @@ export interface ModelSparkStats {
   errors: number
 }
 
+// ─── NEW TYPES: Conversation, Streaming, Lifecycle, Prompt Chain ─────────────
+
+/** Chat message for multi-turn conversations */
+export interface SparkChatMessage {
+  role: 'system' | 'user' | 'assistant'
+  content: string
+  timestamp: number
+  modelFamily?: SparkModelFamily
+  domain?: TaskDomain
+  tokensEstimate?: number
+}
+
+/** Conversation session with history management */
+export interface ChatSession {
+  id: string
+  messages: SparkChatMessage[]
+  domain: TaskDomain | null
+  strategy: InferenceStrategy
+  totalTokens: number
+  createdAt: number
+  lastActiveAt: number
+  metadata: Record<string, string>
+}
+
+/** Streaming token event */
+export interface StreamToken {
+  token: string
+  index: number
+  modelFamily: SparkModelFamily
+  done: boolean
+  totalTokens: number
+}
+
+/** Circuit breaker state */
+export type CircuitState = 'closed' | 'open' | 'half_open'
+
+/** Circuit breaker configuration */
+export interface CircuitBreakerConfig {
+  failureThreshold: number
+  resetTimeoutMs: number
+  halfOpenMaxRequests: number
+}
+
+/** Circuit breaker status */
+export interface CircuitBreakerStatus {
+  state: CircuitState
+  failures: number
+  lastFailureAt: number
+  lastSuccessAt: number
+  totalTrips: number
+}
+
+/** Model lifecycle state */
+export type ModelLifecycleState = 'not_installed' | 'downloading' | 'installed' | 'loading' | 'ready' | 'error'
+
+/** Model lifecycle info */
+export interface ModelLifecycleInfo {
+  modelId: string
+  state: ModelLifecycleState
+  downloadProgress: number
+  installedAt: number | null
+  lastUsedAt: number | null
+  diskSizeBytes: number
+  serverPid: number | null
+}
+
+/** Prompt chain step */
+export interface PromptChainStep {
+  id: string
+  prompt: string
+  model: SparkModelFamily | 'auto'
+  domain: TaskDomain | 'auto'
+  dependsOn: string[]
+  transform?: 'extract_code' | 'extract_json' | 'summarize' | 'key_points' | 'none'
+  maxTokens?: number
+}
+
+/** Prompt chain result */
+export interface PromptChainResult {
+  steps: Array<{
+    id: string
+    input: string
+    output: string
+    model: SparkModelFamily
+    domain: TaskDomain
+    durationMs: number
+    tokensGenerated: number
+  }>
+  finalOutput: string
+  totalDurationMs: number
+  totalTokens: number
+}
+
+/** Parsed output from a model response */
+export interface ParsedOutput {
+  raw: string
+  codeBlocks: Array<{ language: string; code: string }>
+  jsonBlocks: unknown[]
+  keyPoints: string[]
+  summary: string | null
+  headings: string[]
+  lists: string[][]
+  urls: string[]
+  wordCount: number
+  sentenceCount: number
+}
+
+/** Hardware detection result */
+export interface HardwareProfile {
+  totalRAMGB: number
+  availableRAMGB: number
+  cpuCores: number
+  cpuModel: string
+  gpuDetected: boolean
+  gpuName: string | null
+  gpuVRAMGB: number | null
+  recommendedQwen: string | null
+  recommendedLlama: string | null
+  recommendedStrategy: InferenceStrategy
+  canRunBothSimultaneously: boolean
+}
+
+/** Ollama API model info */
+export interface OllamaModelInfo {
+  name: string
+  modifiedAt: string
+  size: number
+  digest: string
+  family: string
+  parameterSize: string
+  quantizationLevel: string
+}
+
+/** Ollama server status */
+export interface OllamaServerStatus {
+  running: boolean
+  version: string | null
+  models: OllamaModelInfo[]
+  host: string
+  port: number
+}
+
+/** Context window management options */
+export interface ContextWindowOptions {
+  maxTokens: number
+  strategy: 'truncate_oldest' | 'truncate_middle' | 'sliding_window' | 'summarize_oldest'
+  reserveForResponse: number
+  preserveSystemPrompt: boolean
+}
+
 // ─── Model Registry ──────────────────────────────────────────────────────────
 
 /** All supported models in the Spark ensemble */
@@ -556,6 +706,7 @@ interface CacheEntry {
   response: SparkResponse
   timestamp: number
   hitCount: number
+  lastAccessedAt: number
 }
 
 // ─── ModelSpark Class ────────────────────────────────────────────────────────
@@ -568,10 +719,19 @@ export class ModelSpark {
   private performanceHistory: Map<string, number[]> = new Map()
   private downloadedModels: Set<string> = new Set()
 
+  // ── New private state ──
+  private sessions: Map<string, ChatSession> = new Map()
+  private circuitBreakers: Map<string, CircuitBreakerStatus> = new Map()
+  private modelLifecycle: Map<string, ModelLifecycleInfo> = new Map()
+  private retryConfig = { maxRetries: 3, baseDelayMs: 500, maxDelayMs: 5000 }
+  private circuitBreakerConfig: CircuitBreakerConfig = { failureThreshold: 5, resetTimeoutMs: 30000, halfOpenMaxRequests: 2 }
+
   constructor(config?: Partial<ModelSparkConfig>) {
     this.config = { ...DEFAULT_MODEL_SPARK_CONFIG, ...config }
     this.stats = this._initStats()
     this._initModelHealth()
+    this._initCircuitBreakers()
+    this._initModelLifecycle()
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -1706,24 +1866,34 @@ export class ModelSpark {
       return null
     }
     entry.hitCount++
+    entry.lastAccessedAt = Date.now()
     return entry.response
   }
 
-  /** Cache a response */
+  /** Cache a response (LRU eviction) */
   private _cacheResponse(prompt: string, response: SparkResponse): void {
-    // Evict old entries if at capacity
+    // LRU eviction: remove least recently accessed entry when at capacity
     if (this.cache.size >= this.config.cacheMaxSize) {
-      const oldestKey = this.cache.keys().next().value
-      if (oldestKey !== undefined) {
-        this.cache.delete(oldestKey)
+      let lruKey: string | null = null
+      let lruTime = Infinity
+      for (const [k, v] of this.cache.entries()) {
+        if (v.lastAccessedAt < lruTime) {
+          lruTime = v.lastAccessedAt
+          lruKey = k
+        }
+      }
+      if (lruKey !== null) {
+        this.cache.delete(lruKey)
       }
     }
 
     const key = this.hashContent(prompt)
+    const now = Date.now()
     this.cache.set(key, {
       response,
-      timestamp: Date.now(),
+      timestamp: now,
       hitCount: 0,
+      lastAccessedAt: now,
     })
   }
 
@@ -1817,5 +1987,967 @@ export class ModelSpark {
       strategyDistribution: {},
       errors: 0,
     }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CONVERSATION / MULTI-TURN CHAT
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Create a new chat session */
+  createSession(options?: {
+    domain?: TaskDomain
+    strategy?: InferenceStrategy
+    systemPrompt?: string
+    metadata?: Record<string, string>
+  }): ChatSession {
+    const id = this.hashContent(`session-${Date.now()}-${Math.random()}`)
+    const now = Date.now()
+    const messages: SparkChatMessage[] = []
+
+    if (options?.systemPrompt) {
+      messages.push({
+        role: 'system',
+        content: options.systemPrompt,
+        timestamp: now,
+        tokensEstimate: Math.ceil(options.systemPrompt.length / 4),
+      })
+    }
+
+    const session: ChatSession = {
+      id,
+      messages,
+      domain: options?.domain ?? null,
+      strategy: options?.strategy ?? this.config.defaultStrategy,
+      totalTokens: messages.reduce((sum, m) => sum + (m.tokensEstimate ?? 0), 0),
+      createdAt: now,
+      lastActiveAt: now,
+      metadata: options?.metadata ?? {},
+    }
+
+    this.sessions.set(id, session)
+    return session
+  }
+
+  /** Get an existing session */
+  getSession(sessionId: string): ChatSession | null {
+    return this.sessions.get(sessionId) ?? null
+  }
+
+  /** List all sessions */
+  listSessions(): ChatSession[] {
+    return [...this.sessions.values()]
+  }
+
+  /** Delete a session */
+  deleteSession(sessionId: string): boolean {
+    return this.sessions.delete(sessionId)
+  }
+
+  /** Multi-turn chat within a session */
+  async chat(sessionId: string, userMessage: string, options?: Partial<SparkRequest>): Promise<SparkResponse> {
+    const session = this.sessions.get(sessionId)
+    if (!session) {
+      throw new Error(`Session not found: ${sessionId}`)
+    }
+
+    const now = Date.now()
+
+    // Add user message to history
+    const userMsg: SparkChatMessage = {
+      role: 'user',
+      content: userMessage,
+      timestamp: now,
+      tokensEstimate: Math.ceil(userMessage.length / 4),
+    }
+    session.messages.push(userMsg)
+    session.totalTokens += userMsg.tokensEstimate!
+
+    // Build context from conversation history
+    const contextMessages = this.manageContextWindow(session.messages, {
+      maxTokens: this.config.maxTokens * 4, // context is bigger than response
+      strategy: 'truncate_oldest',
+      reserveForResponse: this.config.maxTokens,
+      preserveSystemPrompt: true,
+    })
+
+    // Build a single prompt from conversation history
+    const conversationPrompt = contextMessages.map(m => {
+      if (m.role === 'system') return `System: ${m.content}`
+      if (m.role === 'user') return `User: ${m.content}`
+      return `Assistant: ${m.content}`
+    }).join('\n\n') + '\n\nAssistant:'
+
+    // Detect domain from latest message if not set
+    const domain = session.domain ?? options?.domain ?? this.detectDomain(userMessage).domain
+
+    // Infer
+    const response = await this.infer({
+      prompt: conversationPrompt,
+      domain,
+      strategy: session.strategy,
+      ...options,
+    })
+
+    // Add assistant response to history
+    const assistantMsg: SparkChatMessage = {
+      role: 'assistant',
+      content: response.text,
+      timestamp: Date.now(),
+      modelFamily: response.primaryModel,
+      domain: response.domain,
+      tokensEstimate: response.totalTokensGenerated,
+    }
+    session.messages.push(assistantMsg)
+    session.totalTokens += assistantMsg.tokensEstimate!
+    session.lastActiveAt = Date.now()
+
+    return response
+  }
+
+  /** Get conversation history for a session */
+  getConversationHistory(sessionId: string): SparkChatMessage[] {
+    const session = this.sessions.get(sessionId)
+    return session ? [...session.messages] : []
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // STREAMING INFERENCE
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Stream inference tokens (async generator) */
+  async *inferStream(request: SparkRequest): AsyncGenerator<StreamToken, void, unknown> {
+    // Detect domain
+    const domain = request.domain ?? this.detectDomain(request.prompt).domain
+    const routing = this.routeRequest({ ...request, domain })
+    const model = routing.primary === 'qwen2.5' ? this.getQwenModel() : this.getLlamaModel()
+
+    // Build prompt
+    const templateKey = routing.primary === 'qwen2.5' ? 'qwen' : 'llama'
+    const templates = SPARK_PROMPTS[templateKey]!
+    const template = templates[domain] ?? templates['default']!
+    const fullPrompt = template.replace('{prompt}', request.prompt)
+
+    // Simulate streaming by breaking fallback response into tokens
+    let responseText: string
+    try {
+      const result = await this._callModelServer(routing.primary, fullPrompt, request)
+      responseText = result.text
+    } catch {
+      responseText = this._generateFallback(request.prompt, model, domain)
+    }
+
+    // Yield token by token
+    const words = responseText.split(/(\s+)/)
+    let tokenIndex = 0
+    for (let i = 0; i < words.length; i++) {
+      const token = words[i]!
+      if (token.length === 0) continue
+      yield {
+        token,
+        index: tokenIndex++,
+        modelFamily: routing.primary,
+        done: i === words.length - 1,
+        totalTokens: tokenIndex,
+      }
+    }
+  }
+
+  /** Collect all streaming tokens into a full response string */
+  async collectStream(request: SparkRequest): Promise<{ text: string; totalTokens: number; modelFamily: SparkModelFamily }> {
+    const tokens: string[] = []
+    let totalTokens = 0
+    let modelFamily: SparkModelFamily = 'qwen2.5'
+
+    for await (const token of this.inferStream(request)) {
+      tokens.push(token.token)
+      totalTokens = token.totalTokens
+      modelFamily = token.modelFamily
+    }
+
+    return { text: tokens.join(''), totalTokens, modelFamily }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CIRCUIT BREAKER / ERROR RECOVERY
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Get circuit breaker status for a model family */
+  getCircuitBreakerStatus(family: SparkModelFamily): CircuitBreakerStatus {
+    return { ...(this.circuitBreakers.get(family) ?? this._defaultCircuitBreaker()) }
+  }
+
+  /** Check if a model's circuit breaker allows requests */
+  isCircuitClosed(family: SparkModelFamily): boolean {
+    const cb = this.circuitBreakers.get(family)
+    if (!cb) return true
+
+    if (cb.state === 'closed') return true
+    if (cb.state === 'open') {
+      // Check if reset timeout has elapsed → transition to half_open
+      if (Date.now() - cb.lastFailureAt >= this.circuitBreakerConfig.resetTimeoutMs) {
+        cb.state = 'half_open'
+        return true
+      }
+      return false
+    }
+    // half_open: allow limited requests
+    return true
+  }
+
+  /** Record a successful request to the circuit breaker */
+  recordSuccess(family: SparkModelFamily): void {
+    const cb = this.circuitBreakers.get(family)
+    if (!cb) return
+
+    cb.lastSuccessAt = Date.now()
+    if (cb.state === 'half_open') {
+      cb.state = 'closed'
+      cb.failures = 0
+    }
+  }
+
+  /** Record a failed request to the circuit breaker */
+  recordFailure(family: SparkModelFamily): void {
+    const cb = this.circuitBreakers.get(family)
+    if (!cb) return
+
+    cb.failures++
+    cb.lastFailureAt = Date.now()
+
+    if (cb.failures >= this.circuitBreakerConfig.failureThreshold) {
+      cb.state = 'open'
+      cb.totalTrips++
+    }
+  }
+
+  /** Reset circuit breaker for a model */
+  resetCircuitBreaker(family: SparkModelFamily): void {
+    this.circuitBreakers.set(family, this._defaultCircuitBreaker())
+  }
+
+  /** Infer with retry and circuit breaker protection */
+  async inferWithRetry(request: SparkRequest, maxRetries?: number): Promise<SparkResponse> {
+    const retries = maxRetries ?? this.retryConfig.maxRetries
+    let lastError: Error | null = null
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const response = await this.infer(request)
+        return response
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err))
+        this.stats.errors++
+
+        if (attempt < retries) {
+          // Exponential backoff with jitter
+          const delay = Math.min(
+            this.retryConfig.baseDelayMs * Math.pow(2, attempt) + Math.random() * 200,
+            this.retryConfig.maxDelayMs,
+          )
+          await new Promise(resolve => setTimeout(resolve, delay))
+        }
+      }
+    }
+
+    // All retries exhausted — return a graceful error response
+    const domain = request.domain ?? this.detectDomain(request.prompt).domain
+    return {
+      text: `[Model Spark — Error after ${retries + 1} attempts]\n\n${lastError?.message ?? 'Unknown error'}\n\nPlease check that the Ollama server is running:\n\`\`\`bash\nollama serve\n\`\`\``,
+      strategy: request.strategy ?? this.config.defaultStrategy,
+      domain,
+      primaryModel: 'qwen2.5',
+      secondaryModel: null,
+      primaryResponse: {
+        text: '', modelId: '', modelFamily: 'qwen2.5', tokensGenerated: 0,
+        tokensPrompt: 0, durationMs: 0, tokensPerSecond: 0, qualityScore: 0,
+        finishReason: 'error', error: lastError?.message,
+      },
+      secondaryResponse: null,
+      fusedResponse: null,
+      qualityScore: 0,
+      totalTokensGenerated: 0,
+      totalDurationMs: 0,
+      effectiveTokensPerSecond: 0,
+      cached: false,
+      routingReason: `Error: ${lastError?.message}`,
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // MODEL LIFECYCLE MANAGEMENT
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Get lifecycle info for a model */
+  getModelLifecycle(modelId: string): ModelLifecycleInfo | null {
+    return this.modelLifecycle.get(modelId) ?? null
+  }
+
+  /** Get lifecycle info for all models */
+  getAllModelLifecycles(): ModelLifecycleInfo[] {
+    return [...this.modelLifecycle.values()]
+  }
+
+  /** Generate the Ollama pull command for a model */
+  getOllamaPullCommand(modelId: string): string | null {
+    const model = this.getModel(modelId)
+    if (!model) return null
+    return `ollama pull ${model.ollamaName}`
+  }
+
+  /** Generate the llama.cpp server command for a model */
+  getLlamaCppCommand(modelId: string): string | null {
+    const model = this.getModel(modelId)
+    if (!model) return null
+    return [
+      'llama-server',
+      `-m ${this.config.modelsDir}/${model.llamaCppName}`,
+      `-c ${model.contextWindow}`,
+      `-ngl 99`,
+      `--host ${model.family === 'qwen2.5' ? this.config.qwenHost : this.config.llamaHost}`,
+      `--port ${model.family === 'qwen2.5' ? this.config.qwenPort : this.config.llamaPort}`,
+    ].join(' ')
+  }
+
+  /** Generate complete setup script for both models */
+  generateSetupScript(): string {
+    const qwen = this.getQwenModel()
+    const llama = this.getLlamaModel()
+
+    return [
+      '#!/bin/bash',
+      '# ⚡ Model Spark — Automated Setup Script',
+      '# Installs and configures Qwen2.5-Coder + LLaMA for dual-model inference',
+      '',
+      'set -e',
+      '',
+      '# Step 1: Install Ollama',
+      'echo "📦 Installing Ollama..."',
+      'if ! command -v ollama &> /dev/null; then',
+      '  curl -fsSL https://ollama.ai/install.sh | sh',
+      'else',
+      '  echo "Ollama already installed"',
+      'fi',
+      '',
+      '# Step 2: Start Ollama server',
+      'echo "🚀 Starting Ollama server..."',
+      'ollama serve &',
+      'OLLAMA_PID=$!',
+      'sleep 3',
+      '',
+      `# Step 3: Pull ${qwen.name}`,
+      `echo "🟢 Downloading ${qwen.name} (${qwen.fileSizeGB} GB)..."`,
+      `ollama pull ${qwen.ollamaName}`,
+      '',
+      `# Step 4: Pull ${llama.name}`,
+      `echo "🟣 Downloading ${llama.name} (${llama.fileSizeGB} GB)..."`,
+      `ollama pull ${llama.ollamaName}`,
+      '',
+      '# Step 5: Verify',
+      'echo "✅ Model Spark setup complete!"',
+      `echo "  🟢 Qwen: ${qwen.name}"`,
+      `echo "  🟣 LLaMA: ${llama.name}"`,
+      `echo "  Total size: ~${(qwen.fileSizeGB + llama.fileSizeGB).toFixed(1)} GB"`,
+      'echo "  Server running at http://127.0.0.1:11434"',
+      '',
+      '# Keep server running',
+      'wait $OLLAMA_PID',
+    ].join('\n')
+  }
+
+  /** Simulate marking a model as installed */
+  markModelInstalled(modelId: string): void {
+    const lifecycle = this.modelLifecycle.get(modelId)
+    if (lifecycle) {
+      lifecycle.state = 'installed'
+      lifecycle.installedAt = Date.now()
+      lifecycle.downloadProgress = 100
+      this.downloadedModels.add(modelId)
+    }
+  }
+
+  /** Simulate marking a model as ready (loaded in server) */
+  markModelReady(modelId: string): void {
+    const lifecycle = this.modelLifecycle.get(modelId)
+    if (lifecycle) {
+      lifecycle.state = 'ready'
+      lifecycle.lastUsedAt = Date.now()
+    }
+  }
+
+  /** Check if both models are ready */
+  areBothModelsReady(): boolean {
+    const qwen = this.modelLifecycle.get(this.config.qwenModel)
+    const llama = this.modelLifecycle.get(this.config.llamaModel)
+    return (qwen?.state === 'ready' || qwen?.state === 'installed') &&
+           (llama?.state === 'ready' || llama?.state === 'installed')
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // PROMPT CHAINING
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Execute a chain of prompts with dependencies */
+  async executePromptChain(steps: PromptChainStep[]): Promise<PromptChainResult> {
+    const startTime = Date.now()
+    const results: PromptChainResult['steps'] = []
+    const outputMap: Record<string, string> = {}
+
+    // Topological sort: execute steps in dependency order
+    const sorted = this._topologicalSort(steps)
+
+    for (const step of sorted) {
+      // Resolve dependencies — inject previous outputs into prompt
+      let prompt = step.prompt
+      for (const depId of step.dependsOn) {
+        const depOutput = outputMap[depId] ?? ''
+        prompt = prompt.replace(`{${depId}}`, depOutput)
+      }
+
+      // Detect domain and model
+      const domain: TaskDomain = step.domain === 'auto'
+        ? this.detectDomain(prompt).domain
+        : step.domain
+      const family: SparkModelFamily = step.model === 'auto'
+        ? (this.getRoutingRule(domain).preference === 'llama' ? 'llama3' : 'qwen2.5')
+        : step.model
+
+      // Execute
+      const resp = await this.inferOnModel(prompt, family, domain, { maxTokens: step.maxTokens })
+
+      // Post-process output
+      let output = resp.text
+      if (step.transform && step.transform !== 'none') {
+        const parsed = this.parseOutput(resp.text)
+        switch (step.transform) {
+          case 'extract_code':
+            output = parsed.codeBlocks.map(b => b.code).join('\n\n') || resp.text
+            break
+          case 'extract_json':
+            output = parsed.jsonBlocks.length > 0 ? JSON.stringify(parsed.jsonBlocks[0], null, 2) : resp.text
+            break
+          case 'summarize':
+            output = parsed.summary ?? resp.text
+            break
+          case 'key_points':
+            output = parsed.keyPoints.join('\n') || resp.text
+            break
+        }
+      }
+
+      outputMap[step.id] = output
+      results.push({
+        id: step.id,
+        input: prompt,
+        output,
+        model: family,
+        domain,
+        durationMs: resp.durationMs,
+        tokensGenerated: resp.tokensGenerated,
+      })
+    }
+
+    const lastStep = results[results.length - 1]
+    return {
+      steps: results,
+      finalOutput: lastStep?.output ?? '',
+      totalDurationMs: Date.now() - startTime,
+      totalTokens: results.reduce((sum, r) => sum + r.tokensGenerated, 0),
+    }
+  }
+
+  /** Create a simple two-step prompt chain (think → do) */
+  buildThinkDoChain(prompt: string, domain?: TaskDomain): PromptChainStep[] {
+    return [
+      {
+        id: 'think',
+        prompt: `Think step-by-step about how to approach this task:\n\n${prompt}\n\nProvide a detailed plan:`,
+        model: 'llama3',
+        domain: domain ?? 'auto',
+        dependsOn: [],
+      },
+      {
+        id: 'do',
+        prompt: `Based on this plan:\n\n{think}\n\nNow execute and provide the final answer for:\n\n${prompt}`,
+        model: 'qwen2.5',
+        domain: domain ?? 'auto',
+        dependsOn: ['think'],
+      },
+    ]
+  }
+
+  /** Create a review chain (generate → review → refine) */
+  buildReviewChain(prompt: string): PromptChainStep[] {
+    return [
+      {
+        id: 'generate',
+        prompt: prompt,
+        model: 'qwen2.5',
+        domain: 'auto',
+        dependsOn: [],
+      },
+      {
+        id: 'review',
+        prompt: `Review the following output for correctness, completeness, and quality:\n\n{generate}\n\nProvide specific feedback and suggestions for improvement:`,
+        model: 'llama3',
+        domain: 'code_review',
+        dependsOn: ['generate'],
+      },
+      {
+        id: 'refine',
+        prompt: `Given the original task:\n${prompt}\n\nOriginal output:\n{generate}\n\nReview feedback:\n{review}\n\nProduce an improved final version:`,
+        model: 'qwen2.5',
+        domain: 'auto',
+        dependsOn: ['generate', 'review'],
+      },
+    ]
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // OUTPUT PARSING
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Parse structured content from a model response */
+  parseOutput(text: string): ParsedOutput {
+    // Extract code blocks
+    const codeBlocks: Array<{ language: string; code: string }> = []
+    const codeRegex = /```(\w*)\n([\s\S]*?)```/g
+    let codeMatch: RegExpExecArray | null
+    while ((codeMatch = codeRegex.exec(text)) !== null) {
+      codeBlocks.push({
+        language: codeMatch[1] || 'text',
+        code: codeMatch[2]!.trim(),
+      })
+    }
+
+    // Extract JSON blocks
+    const jsonBlocks: unknown[] = []
+    const jsonRegex = /\{[\s\S]*?\}/g
+    let jsonMatch: RegExpExecArray | null
+    while ((jsonMatch = jsonRegex.exec(text)) !== null) {
+      try {
+        const parsed = JSON.parse(jsonMatch[0])
+        jsonBlocks.push(parsed)
+      } catch {
+        // Not valid JSON, skip
+      }
+    }
+
+    // Extract key points (numbered or bulleted lists)
+    const keyPoints: string[] = []
+    const listRegex = /^[\s]*(?:\d+[.)]\s*|[-*•]\s+)(.+)$/gm
+    let listMatch: RegExpExecArray | null
+    while ((listMatch = listRegex.exec(text)) !== null) {
+      keyPoints.push(listMatch[1]!.trim())
+    }
+
+    // Extract headings
+    const headings: string[] = []
+    const headingRegex = /^#{1,6}\s+(.+)$/gm
+    let headingMatch: RegExpExecArray | null
+    while ((headingMatch = headingRegex.exec(text)) !== null) {
+      headings.push(headingMatch[1]!.trim())
+    }
+
+    // Extract lists (groups of consecutive bullet points)
+    const lists: string[][] = []
+    let currentList: string[] = []
+    for (const line of text.split('\n')) {
+      if (/^\s*[-*•]\s+/.test(line) || /^\s*\d+[.)]\s+/.test(line)) {
+        currentList.push(line.replace(/^\s*[-*•\d.)]+\s+/, '').trim())
+      } else if (currentList.length > 0) {
+        lists.push([...currentList])
+        currentList = []
+      }
+    }
+    if (currentList.length > 0) lists.push(currentList)
+
+    // Extract URLs
+    const urls: string[] = []
+    const urlRegex = /https?:\/\/[^\s)>\]]+/g
+    let urlMatch: RegExpExecArray | null
+    while ((urlMatch = urlRegex.exec(text)) !== null) {
+      urls.push(urlMatch[0])
+    }
+
+    // Generate summary (first substantive paragraph)
+    const paragraphs = text.split('\n\n').filter(p => p.trim().length > 20 && !p.startsWith('```'))
+    const summary = paragraphs.length > 0 ? paragraphs[0]!.trim() : null
+
+    // Count words and sentences
+    const words = text.split(/\s+/).filter(w => w.length > 0)
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0)
+
+    return {
+      raw: text,
+      codeBlocks,
+      jsonBlocks,
+      keyPoints,
+      summary,
+      headings,
+      lists,
+      urls,
+      wordCount: words.length,
+      sentenceCount: sentences.length,
+    }
+  }
+
+  /** Extract only code blocks from a response */
+  extractCode(text: string): Array<{ language: string; code: string }> {
+    return this.parseOutput(text).codeBlocks
+  }
+
+  /** Extract only key points from a response */
+  extractKeyPoints(text: string): string[] {
+    return this.parseOutput(text).keyPoints
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CONTEXT WINDOW MANAGEMENT
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Manage context window by trimming messages to fit token budget */
+  manageContextWindow(messages: SparkChatMessage[], options: ContextWindowOptions): SparkChatMessage[] {
+    const maxBudget = options.maxTokens - options.reserveForResponse
+    let totalTokens = messages.reduce((sum, m) => sum + (m.tokensEstimate ?? Math.ceil(m.content.length / 4)), 0)
+
+    if (totalTokens <= maxBudget) return [...messages]
+
+    const result = [...messages]
+
+    switch (options.strategy) {
+      case 'truncate_oldest': {
+        // Keep system prompt + most recent messages
+        while (totalTokens > maxBudget && result.length > 1) {
+          const idx = options.preserveSystemPrompt && result[0]?.role === 'system' ? 1 : 0
+          if (idx >= result.length) break
+          const removed = result.splice(idx, 1)[0]!
+          totalTokens -= removed.tokensEstimate ?? Math.ceil(removed.content.length / 4)
+        }
+        break
+      }
+      case 'truncate_middle': {
+        // Keep system prompt, first user message, and most recent messages
+        while (totalTokens > maxBudget && result.length > 3) {
+          const midIdx = Math.floor(result.length / 2)
+          const removed = result.splice(midIdx, 1)[0]!
+          totalTokens -= removed.tokensEstimate ?? Math.ceil(removed.content.length / 4)
+        }
+        break
+      }
+      case 'sliding_window': {
+        // Keep only the last N messages that fit
+        while (totalTokens > maxBudget && result.length > 1) {
+          const removed = result.shift()!
+          if (options.preserveSystemPrompt && removed.role === 'system') {
+            result.unshift(removed) // put it back
+            if (result.length > 1) {
+              const next = result.splice(1, 1)[0]!
+              totalTokens -= next.tokensEstimate ?? Math.ceil(next.content.length / 4)
+            } else {
+              break
+            }
+          } else {
+            totalTokens -= removed.tokensEstimate ?? Math.ceil(removed.content.length / 4)
+          }
+        }
+        break
+      }
+      case 'summarize_oldest': {
+        // Replace oldest messages with a summary placeholder
+        if (result.length > 3) {
+          const startIdx = options.preserveSystemPrompt && result[0]?.role === 'system' ? 1 : 0
+          const endIdx = Math.max(startIdx + 1, result.length - 2)
+          const oldMessages = result.splice(startIdx, endIdx - startIdx)
+          const summaryContent = `[Summary of ${oldMessages.length} previous messages about: ${oldMessages.map(m => m.content.slice(0, 30)).join(', ')}]`
+          const summaryMsg: SparkChatMessage = {
+            role: 'assistant',
+            content: summaryContent,
+            timestamp: Date.now(),
+            tokensEstimate: Math.ceil(summaryContent.length / 4),
+          }
+          result.splice(startIdx, 0, summaryMsg)
+        }
+        break
+      }
+    }
+
+    return result
+  }
+
+  /** Estimate token count for text */
+  estimateTokens(text: string): number {
+    // Rough estimate: ~4 characters per token for English
+    // Slightly more accurate: count words and special chars
+    const words = text.split(/\s+/).length
+    const specialChars = (text.match(/[^\w\s]/g) ?? []).length
+    return Math.ceil(words * 1.3 + specialChars * 0.5)
+  }
+
+  /** Check if a prompt fits within a model's context window */
+  fitsInContextWindow(prompt: string, modelId?: string): { fits: boolean; promptTokens: number; maxTokens: number; remainingTokens: number } {
+    const model = modelId ? this.getModel(modelId) : this.getQwenModel()
+    const maxTokens = model?.contextWindow ?? 32768
+    const promptTokens = this.estimateTokens(prompt)
+    return {
+      fits: promptTokens < maxTokens - this.config.maxTokens,
+      promptTokens,
+      maxTokens,
+      remainingTokens: maxTokens - promptTokens - this.config.maxTokens,
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // HARDWARE DETECTION
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Detect hardware and recommend best model configuration */
+  detectHardware(): HardwareProfile {
+    // Use os module info (available in Node.js)
+    let totalRAMGB: number
+    let cpuCores: number
+    let cpuModel: string
+
+    try {
+      const os = require('os')
+      totalRAMGB = Math.round(os.totalmem() / (1024 * 1024 * 1024) * 10) / 10
+      cpuCores = os.cpus()?.length ?? 4
+      cpuModel = os.cpus()?.[0]?.model ?? 'Unknown CPU'
+    } catch {
+      // Fallback for environments where os module isn't available
+      totalRAMGB = 8
+      cpuCores = 4
+      cpuModel = 'Unknown CPU'
+    }
+
+    const availableRAMGB = Math.round(totalRAMGB * 0.7 * 10) / 10 // ~70% available
+
+    // GPU detection (basic heuristic — full detection needs system calls)
+    const gpuDetected = false // Would need nvidia-smi or similar
+    const gpuName: string | null = null
+    const gpuVRAMGB: number | null = null
+
+    // Recommend models based on available RAM
+    const pair = this.getBestModelPair(availableRAMGB)
+    const canRunBoth = availableRAMGB >= 12 // Both models need ~12GB+ to run simultaneously
+
+    // Recommend strategy based on hardware
+    let recommendedStrategy: InferenceStrategy = 'route'
+    if (canRunBoth) {
+      recommendedStrategy = 'ensemble'
+    } else if (availableRAMGB >= 8) {
+      recommendedStrategy = 'cascade'
+    } else if (availableRAMGB >= 4) {
+      recommendedStrategy = 'route'
+    }
+
+    return {
+      totalRAMGB,
+      availableRAMGB,
+      cpuCores,
+      cpuModel,
+      gpuDetected,
+      gpuName,
+      gpuVRAMGB,
+      recommendedQwen: pair.qwen?.id ?? null,
+      recommendedLlama: pair.llama?.id ?? null,
+      recommendedStrategy,
+      canRunBothSimultaneously: canRunBoth,
+    }
+  }
+
+  /** Auto-configure ModelSpark based on detected hardware */
+  autoConfigureFromHardware(): HardwareProfile {
+    const hw = this.detectHardware()
+
+    // Apply recommended configuration
+    if (hw.recommendedQwen) this.config.qwenModel = hw.recommendedQwen
+    if (hw.recommendedLlama) this.config.llamaModel = hw.recommendedLlama
+    this.config.defaultStrategy = hw.recommendedStrategy
+
+    // Adjust thread count based on CPU cores
+    // (not directly in config, but useful for llama.cpp commands)
+
+    return hw
+  }
+
+  /** Generate a hardware report */
+  generateHardwareReport(): string {
+    const hw = this.detectHardware()
+
+    return [
+      '╔═══════════════════════════════════════════════════════════════╗',
+      '║           🖥️  Model Spark — Hardware Report                  ║',
+      '╚═══════════════════════════════════════════════════════════════╝',
+      '',
+      `CPU: ${hw.cpuModel}`,
+      `CPU Cores: ${hw.cpuCores}`,
+      `Total RAM: ${hw.totalRAMGB} GB`,
+      `Available RAM: ~${hw.availableRAMGB} GB`,
+      `GPU: ${hw.gpuDetected ? `${hw.gpuName} (${hw.gpuVRAMGB} GB VRAM)` : 'Not detected (CPU inference)'}`,
+      '',
+      '📊 Recommendations:',
+      `  Qwen model: ${hw.recommendedQwen ?? 'None (insufficient RAM)'}`,
+      `  LLaMA model: ${hw.recommendedLlama ?? 'None (insufficient RAM)'}`,
+      `  Strategy: ${hw.recommendedStrategy}`,
+      `  Dual-model simultaneous: ${hw.canRunBothSimultaneously ? '✅ Yes' : '❌ No (models will swap)'}`,
+    ].join('\n')
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // OLLAMA API INTEGRATION
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Get the Ollama API base URL */
+  getOllamaBaseUrl(): string {
+    return `http://${this.config.qwenHost}:${this.config.qwenPort}`
+  }
+
+  /** Build Ollama API generate request body */
+  buildOllamaRequest(prompt: string, model: SparkModel, options?: Partial<SparkRequest>): Record<string, unknown> {
+    return {
+      model: model.ollamaName,
+      prompt,
+      system: options?.systemPrompt ?? '',
+      options: {
+        temperature: options?.temperature ?? this.config.temperature,
+        top_p: options?.topP ?? this.config.topP,
+        num_predict: options?.maxTokens ?? this.config.maxTokens,
+      },
+      stream: false,
+    }
+  }
+
+  /** Build Ollama chat API request body (for multi-turn) */
+  buildOllamaChatRequest(messages: SparkChatMessage[], model: SparkModel, options?: Partial<SparkRequest>): Record<string, unknown> {
+    return {
+      model: model.ollamaName,
+      messages: messages.map(m => ({
+        role: m.role,
+        content: m.content,
+      })),
+      options: {
+        temperature: options?.temperature ?? this.config.temperature,
+        top_p: options?.topP ?? this.config.topP,
+        num_predict: options?.maxTokens ?? this.config.maxTokens,
+      },
+      stream: false,
+    }
+  }
+
+  /** Build OpenAI-compatible API request (for llama.cpp server) */
+  buildOpenAICompatRequest(prompt: string, model: SparkModel, options?: Partial<SparkRequest>): Record<string, unknown> {
+    const messages = []
+    if (options?.systemPrompt) {
+      messages.push({ role: 'system', content: options.systemPrompt })
+    }
+    messages.push({ role: 'user', content: prompt })
+
+    return {
+      model: model.id,
+      messages,
+      temperature: options?.temperature ?? this.config.temperature,
+      top_p: options?.topP ?? this.config.topP,
+      max_tokens: options?.maxTokens ?? this.config.maxTokens,
+      stream: false,
+    }
+  }
+
+  /** Check if Ollama server is accessible (returns status) */
+  async checkOllamaServer(): Promise<OllamaServerStatus> {
+    const host = this.config.qwenHost
+    const port = this.config.qwenPort
+
+    try {
+      // In production: fetch(`http://${host}:${port}/api/tags`)
+      // For offline/testing, return a helpful status
+      throw new Error('Server check not available in offline mode')
+    } catch {
+      return {
+        running: false,
+        version: null,
+        models: [],
+        host,
+        port,
+      }
+    }
+  }
+
+  /** Generate Ollama model management commands */
+  getModelManagementCommands(): Record<string, string> {
+    const qwen = this.getQwenModel()
+    const llama = this.getLlamaModel()
+
+    return {
+      install_qwen: `ollama pull ${qwen.ollamaName}`,
+      install_llama: `ollama pull ${llama.ollamaName}`,
+      list_models: 'ollama list',
+      show_qwen: `ollama show ${qwen.ollamaName}`,
+      show_llama: `ollama show ${llama.ollamaName}`,
+      remove_qwen: `ollama rm ${qwen.ollamaName}`,
+      remove_llama: `ollama rm ${llama.ollamaName}`,
+      start_server: 'ollama serve',
+      check_status: 'curl http://127.0.0.1:11434/api/tags',
+      run_qwen: `ollama run ${qwen.ollamaName}`,
+      run_llama: `ollama run ${llama.ollamaName}`,
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // PRIVATE — NEW INITIALIZERS
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /** Initialize circuit breakers for each model family */
+  private _initCircuitBreakers(): void {
+    this.circuitBreakers.set('qwen2.5', this._defaultCircuitBreaker())
+    this.circuitBreakers.set('llama3', this._defaultCircuitBreaker())
+  }
+
+  /** Default circuit breaker state */
+  private _defaultCircuitBreaker(): CircuitBreakerStatus {
+    return {
+      state: 'closed',
+      failures: 0,
+      lastFailureAt: 0,
+      lastSuccessAt: 0,
+      totalTrips: 0,
+    }
+  }
+
+  /** Initialize model lifecycle tracking */
+  private _initModelLifecycle(): void {
+    for (const model of SPARK_MODEL_REGISTRY) {
+      this.modelLifecycle.set(model.id, {
+        modelId: model.id,
+        state: 'not_installed',
+        downloadProgress: 0,
+        installedAt: null,
+        lastUsedAt: null,
+        diskSizeBytes: Math.round(model.fileSizeGB * 1024 * 1024 * 1024),
+        serverPid: null,
+      })
+    }
+  }
+
+  /** Topological sort for prompt chain steps */
+  private _topologicalSort(steps: PromptChainStep[]): PromptChainStep[] {
+    const visited = new Set<string>()
+    const sorted: PromptChainStep[] = []
+    const stepMap = new Map(steps.map(s => [s.id, s]))
+
+    const visit = (step: PromptChainStep) => {
+      if (visited.has(step.id)) return
+      visited.add(step.id)
+      for (const depId of step.dependsOn) {
+        const dep = stepMap.get(depId)
+        if (dep) visit(dep)
+      }
+      sorted.push(step)
+    }
+
+    for (const step of steps) {
+      visit(step)
+    }
+
+    return sorted
   }
 }
