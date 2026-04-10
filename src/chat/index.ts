@@ -2152,3 +2152,25 @@ export {
   type BridgeResponse,
   type BridgeStats,
 } from './LocalLLMBridge.js'
+
+// ── Model Spark — Dual-Model Ensemble (Qwen2.5 + LLaMA) for best performance ──
+export { ModelSpark, DEFAULT_MODEL_SPARK_CONFIG } from './ModelSpark.js'
+
+export type {
+  SparkModelFamily,
+  InferenceStrategy,
+  TaskDomain,
+  ModelPreference,
+  SparkModel,
+  ModelSparkConfig,
+  SparkRequest,
+  ModelResponse as SparkModelResponse,
+  SparkResponse,
+  RoutingRule as SparkRoutingRule,
+  ModelHealth,
+  EnsembleVote,
+  SpeculativeResult,
+  FusionResult,
+  BenchmarkResult,
+  ModelSparkStats,
+} from './ModelSpark.js'
