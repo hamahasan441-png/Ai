@@ -1262,13 +1262,13 @@ export class ModelSpark {
   /** Run speculative decoding */
   speculativeDecode(
     draftText: string,
-    _verifiedText: string,
+    verifiedText: string,
     draftFamily: SparkModelFamily,
     verifierFamily: SparkModelFamily,
   ): SpeculativeResult {
     // Compare draft vs verified token by token (word-level approximation)
     const draftTokens = draftText.split(/\s+/)
-    const verifiedTokens = _verifiedText.split(/\s+/)
+    const verifiedTokens = verifiedText.split(/\s+/)
     let accepted = 0
     let rejected = 0
 
@@ -1291,7 +1291,7 @@ export class ModelSpark {
       draftModel: draftFamily,
       verifierModel: verifierFamily,
       draftText,
-      verifiedText: _verifiedText,
+      verifiedText,
       acceptanceRate,
       speedupFactor,
       tokensAccepted: accepted,
