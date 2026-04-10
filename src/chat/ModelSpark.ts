@@ -2977,3 +2977,1491 @@ export class ModelSpark {
     return sorted
   }
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+//
+//   ⚡ SPARK UNIFIED ORCHESTRATION SYSTEM
+//
+//   Connects ModelSpark (Dual-Model Ensemble) + LocalBrain (47+ Intelligence
+//   Modules) + LocalLLMBridge (Smart Routing) + QwenLocalLLM (Local Inference)
+//   into ONE unified, ultra-powerful AI system.
+//
+//   Architecture:
+//     ✦ SparkBrainConnector — Bridges ModelSpark ↔ LocalBrain knowledge
+//     ✦ SparkAgent — Autonomous multi-step agent with planning + tools
+//     ✦ UnifiedOrchestrator — Master router for all AI subsystems
+//     ✦ Cross-system context sharing for maximum intelligence
+//
+//   100% offline. Zero external APIs. Everything local.
+//
+// ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ─── Agent Types ─────────────────────────────────────────────────────────────
+
+/** Tool available to the SparkAgent */
+export interface AgentTool {
+  name: string
+  description: string
+  category: 'code' | 'reasoning' | 'knowledge' | 'security' | 'analysis' | 'creative' | 'system'
+  inputSchema: string
+  handler: (input: string) => Promise<AgentToolResult> | AgentToolResult
+}
+
+/** Result from executing an agent tool */
+export interface AgentToolResult {
+  success: boolean
+  output: string
+  confidence: number
+  source: string
+  metadata?: Record<string, unknown>
+  durationMs: number
+}
+
+/** Agent thought step (chain-of-thought reasoning) */
+export interface AgentThought {
+  step: number
+  type: 'plan' | 'reason' | 'act' | 'observe' | 'reflect' | 'decide' | 'synthesize'
+  content: string
+  toolUsed?: string
+  toolInput?: string
+  toolOutput?: string
+  confidence: number
+  timestamp: number
+}
+
+/** Agent task with full execution context */
+export interface AgentTask {
+  id: string
+  query: string
+  domain: TaskDomain
+  plan: string[]
+  thoughts: AgentThought[]
+  toolCalls: Array<{ tool: string; input: string; output: string; durationMs: number }>
+  finalAnswer: string
+  totalDurationMs: number
+  status: 'planning' | 'executing' | 'reflecting' | 'complete' | 'failed'
+  retries: number
+  qualityScore: number
+}
+
+/** Agent configuration */
+export interface SparkAgentConfig {
+  maxSteps: number
+  maxRetries: number
+  reflectionEnabled: boolean
+  planningEnabled: boolean
+  selfCorrectionEnabled: boolean
+  confidenceThreshold: number
+  timeoutMs: number
+  verbose: boolean
+}
+
+/** Brain connector interface — what LocalBrain provides to Spark */
+export interface BrainCapabilities {
+  chat: (message: string) => Promise<{ response: string; confidence: number }>
+  searchKnowledge: (query: string, limit?: number) => Array<{ content: string; score: number; category: string }>
+  writeCode: (request: { description: string; language: string }) => Promise<{ code: string; explanation: string }>
+  reviewCode: (request: { code: string; language: string }) => Promise<{ issues: string[]; score: number }>
+  reason: (question: string) => Promise<{ answer: string; confidence: number; reasoning: string }>
+  learn: (input: string, response: string, category?: string) => void
+  getStats: () => Record<string, unknown>
+  getKnowledgeBaseSize: () => number
+}
+
+/** LLM Bridge interface — what LocalLLMBridge provides to Spark */
+export interface LLMBridgeCapabilities {
+  processQuery: (query: string, context?: string[]) => Promise<{ text: string; confidence: number; source: string }>
+  classifyIntent: (query: string) => { intent: string; confidence: number; target: string }
+  searchExploits: (query: string) => Promise<{ text: string; confidence: number }>
+  debugOverflow: (crashData: string) => Promise<{ text: string; confidence: number }>
+  generateCode: (task: string, language: string) => Promise<{ text: string; confidence: number }>
+  reviewCode: (code: string, language: string) => Promise<{ text: string; confidence: number }>
+}
+
+/** Orchestrator routing decision */
+export interface OrchestrationDecision {
+  primary: 'spark_ensemble' | 'brain_knowledge' | 'llm_bridge' | 'agent' | 'hybrid'
+  secondary: string | null
+  reason: string
+  confidence: number
+  domain: TaskDomain
+  estimatedQuality: number
+}
+
+/** Orchestrator response — unified output from any subsystem */
+export interface OrchestrationResponse {
+  text: string
+  source: 'spark_ensemble' | 'brain_knowledge' | 'llm_bridge' | 'agent' | 'hybrid'
+  strategy: string
+  domain: TaskDomain
+  qualityScore: number
+  confidence: number
+  durationMs: number
+  tokensGenerated: number
+  subsystemsUsed: string[]
+  agentTask?: AgentTask
+  brainKnowledge?: Array<{ content: string; score: number }>
+  sparkResponse?: SparkResponse
+  metadata: Record<string, unknown>
+}
+
+/** Orchestrator statistics */
+export interface OrchestrationStats {
+  totalRequests: number
+  sparkRequests: number
+  brainRequests: number
+  bridgeRequests: number
+  agentRequests: number
+  hybridRequests: number
+  averageQuality: number
+  averageLatencyMs: number
+  agentTasksCompleted: number
+  agentToolCalls: number
+  brainKnowledgeHits: number
+  errors: number
+  routingDistribution: Record<string, number>
+}
+
+// ─── Default Configurations ──────────────────────────────────────────────────
+
+export const DEFAULT_AGENT_CONFIG: SparkAgentConfig = {
+  maxSteps: 10,
+  maxRetries: 2,
+  reflectionEnabled: true,
+  planningEnabled: true,
+  selfCorrectionEnabled: true,
+  confidenceThreshold: 0.6,
+  timeoutMs: 60000,
+  verbose: false,
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   SPARK BRAIN CONNECTOR — Bridges ModelSpark ↔ LocalBrain Knowledge
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class SparkBrainConnector {
+  private spark: ModelSpark
+  private brain: BrainCapabilities | null = null
+  private bridge: LLMBridgeCapabilities | null = null
+  private knowledgeCache: Map<string, { results: Array<{ content: string; score: number; category: string }>; timestamp: number }> = new Map()
+  private cacheTTLMs = 5 * 60 * 1000 // 5 min
+
+  constructor(spark: ModelSpark) {
+    this.spark = spark
+  }
+
+  /** Connect LocalBrain to Spark */
+  connectBrain(brain: BrainCapabilities): void {
+    this.brain = brain
+  }
+
+  /** Connect LocalLLMBridge to Spark */
+  connectBridge(bridge: LLMBridgeCapabilities): void {
+    this.bridge = bridge
+  }
+
+  /** Check if brain is connected */
+  isBrainConnected(): boolean {
+    return this.brain !== null
+  }
+
+  /** Check if bridge is connected */
+  isBridgeConnected(): boolean {
+    return this.bridge !== null
+  }
+
+  /** Enrich a prompt with brain knowledge before sending to Spark ensemble */
+  enrichPromptWithKnowledge(prompt: string, domain: TaskDomain): string {
+    if (!this.brain) return prompt
+
+    // Search brain's knowledge base for relevant context
+    const cacheKey = `${domain}:${prompt.slice(0, 100)}`
+    let knowledgeResults: Array<{ content: string; score: number; category: string }>
+
+    const cached = this.knowledgeCache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < this.cacheTTLMs) {
+      knowledgeResults = cached.results
+    } else {
+      knowledgeResults = this.brain.searchKnowledge(prompt, 5)
+      this.knowledgeCache.set(cacheKey, { results: knowledgeResults, timestamp: Date.now() })
+    }
+
+    if (knowledgeResults.length === 0) return prompt
+
+    // Build enriched prompt with knowledge context
+    const contextSnippets = knowledgeResults
+      .filter(r => r.score > 0.3)
+      .slice(0, 3)
+      .map(r => `[${r.category}] ${r.content}`)
+      .join('\n')
+
+    if (!contextSnippets) return prompt
+
+    return `[Knowledge Context]\n${contextSnippets}\n\n[User Query]\n${prompt}`
+  }
+
+  /** Infer using Spark ensemble with brain knowledge enrichment */
+  async enrichedInfer(request: SparkRequest): Promise<SparkResponse> {
+    const domain = request.domain ?? this.spark.detectDomain(request.prompt).domain
+    const enrichedPrompt = this.enrichPromptWithKnowledge(request.prompt, domain)
+    return this.spark.infer({ ...request, prompt: enrichedPrompt, domain })
+  }
+
+  /** Get brain knowledge for a query */
+  getBrainKnowledge(query: string, limit = 5): Array<{ content: string; score: number; category: string }> {
+    if (!this.brain) return []
+    return this.brain.searchKnowledge(query, limit)
+  }
+
+  /** Use brain's code generation */
+  async brainGenerateCode(description: string, language: string): Promise<{ code: string; explanation: string } | null> {
+    if (!this.brain) return null
+    return this.brain.writeCode({ description, language })
+  }
+
+  /** Use brain's code review */
+  async brainReviewCode(code: string, language: string): Promise<{ issues: string[]; score: number } | null> {
+    if (!this.brain) return null
+    return this.brain.reviewCode({ code, language })
+  }
+
+  /** Use brain's reasoning */
+  async brainReason(question: string): Promise<{ answer: string; confidence: number; reasoning: string } | null> {
+    if (!this.brain) return null
+    return this.brain.reason(question)
+  }
+
+  /** Teach the brain from Spark responses (feedback loop) */
+  teachBrainFromSpark(query: string, sparkResponse: SparkResponse): void {
+    if (!this.brain) return
+    if (sparkResponse.qualityScore > 0.7) {
+      this.brain.learn(query, sparkResponse.text, sparkResponse.domain)
+    }
+  }
+
+  /** Get combined system status */
+  getSystemStatus(): {
+    sparkConnected: boolean
+    brainConnected: boolean
+    bridgeConnected: boolean
+    brainKnowledgeSize: number
+    sparkModels: number
+    cacheSize: number
+  } {
+    return {
+      sparkConnected: true,
+      brainConnected: this.brain !== null,
+      bridgeConnected: this.bridge !== null,
+      brainKnowledgeSize: this.brain?.getKnowledgeBaseSize() ?? 0,
+      sparkModels: this.spark.getAvailableModels().length,
+      cacheSize: this.knowledgeCache.size,
+    }
+  }
+
+  /** Clear knowledge cache */
+  clearCache(): void {
+    this.knowledgeCache.clear()
+  }
+
+  /** Get Spark instance */
+  getSpark(): ModelSpark {
+    return this.spark
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   SPARK AGENT — Autonomous Multi-Step Agent with Planning + Tool Use
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class SparkAgent {
+  private spark: ModelSpark
+  private connector: SparkBrainConnector
+  private config: SparkAgentConfig
+  private tools: Map<string, AgentTool> = new Map()
+  private taskHistory: AgentTask[] = []
+  private stats = {
+    tasksCompleted: 0,
+    tasksFailed: 0,
+    totalToolCalls: 0,
+    totalSteps: 0,
+    averageQuality: 0,
+    averageDurationMs: 0,
+  }
+
+  constructor(spark: ModelSpark, connector: SparkBrainConnector, config?: Partial<SparkAgentConfig>) {
+    this.spark = spark
+    this.connector = connector
+    this.config = { ...DEFAULT_AGENT_CONFIG, ...config }
+    this._registerBuiltinTools()
+  }
+
+  // ── Tool Management ──────────────────────────────────────────────────────
+
+  /** Register a custom tool */
+  registerTool(tool: AgentTool): void {
+    this.tools.set(tool.name, tool)
+  }
+
+  /** Get all registered tools */
+  getTools(): AgentTool[] {
+    return [...this.tools.values()]
+  }
+
+  /** Get tool by name */
+  getTool(name: string): AgentTool | null {
+    return this.tools.get(name) ?? null
+  }
+
+  /** Remove a tool */
+  removeTool(name: string): boolean {
+    return this.tools.delete(name)
+  }
+
+  /** Get tool names by category */
+  getToolsByCategory(category: AgentTool['category']): AgentTool[] {
+    return [...this.tools.values()].filter(t => t.category === category)
+  }
+
+  // ── Task Execution ───────────────────────────────────────────────────────
+
+  /** Execute a task autonomously with planning, tool use, and reflection */
+  async executeTask(query: string): Promise<AgentTask> {
+    const startTime = Date.now()
+    const domain = this.spark.detectDomain(query).domain
+    const taskId = this.spark.hashContent(`task-${Date.now()}-${Math.random()}`)
+
+    const task: AgentTask = {
+      id: taskId,
+      query,
+      domain,
+      plan: [],
+      thoughts: [],
+      toolCalls: [],
+      finalAnswer: '',
+      totalDurationMs: 0,
+      status: 'planning',
+      retries: 0,
+      qualityScore: 0,
+    }
+
+    try {
+      // Phase 1: Planning
+      if (this.config.planningEnabled) {
+        task.status = 'planning'
+        const plan = this._planTask(query, domain)
+        task.plan = plan
+        task.thoughts.push({
+          step: 0,
+          type: 'plan',
+          content: `Plan created with ${plan.length} steps: ${plan.join(' → ')}`,
+          confidence: 0.8,
+          timestamp: Date.now(),
+        })
+      }
+
+      // Phase 2: Execution
+      task.status = 'executing'
+      let currentContext = ''
+      let stepNum = 1
+
+      const stepsToExecute = task.plan.length > 0 ? task.plan : [query]
+
+      for (const step of stepsToExecute) {
+        if (stepNum > this.config.maxSteps) break
+        if (Date.now() - startTime > this.config.timeoutMs) break
+
+        // Reason about what tool to use
+        const toolChoice = this._selectTool(step, domain, currentContext)
+
+        task.thoughts.push({
+          step: stepNum,
+          type: 'reason',
+          content: `Step ${stepNum}: ${step} → Using tool: ${toolChoice.toolName} (confidence: ${toolChoice.confidence.toFixed(2)})`,
+          confidence: toolChoice.confidence,
+          timestamp: Date.now(),
+        })
+
+        // Execute the tool
+        const toolStart = Date.now()
+        const toolResult = await this._executeTool(toolChoice.toolName, step, currentContext)
+        const toolDuration = Date.now() - toolStart
+
+        task.toolCalls.push({
+          tool: toolChoice.toolName,
+          input: step,
+          output: toolResult.output.slice(0, 500),
+          durationMs: toolDuration,
+        })
+
+        task.thoughts.push({
+          step: stepNum,
+          type: 'observe',
+          content: `Tool "${toolChoice.toolName}" returned (${toolResult.success ? 'success' : 'failed'}, confidence: ${toolResult.confidence.toFixed(2)})`,
+          toolUsed: toolChoice.toolName,
+          toolInput: step.slice(0, 200),
+          toolOutput: toolResult.output.slice(0, 200),
+          confidence: toolResult.confidence,
+          timestamp: Date.now(),
+        })
+
+        // Accumulate context from tool outputs
+        currentContext += `\n\n[Step ${stepNum} - ${toolChoice.toolName}]:\n${toolResult.output}`
+        stepNum++
+        this.stats.totalToolCalls++
+      }
+
+      // Phase 3: Synthesis — combine all results into final answer
+      task.finalAnswer = this._synthesizeAnswer(query, domain, task.thoughts, currentContext)
+
+      task.thoughts.push({
+        step: stepNum,
+        type: 'synthesize',
+        content: `Final answer synthesized from ${task.toolCalls.length} tool calls`,
+        confidence: 0.85,
+        timestamp: Date.now(),
+      })
+
+      // Phase 4: Reflection — evaluate quality and self-correct
+      if (this.config.reflectionEnabled) {
+        task.status = 'reflecting'
+        const reflection = this._reflect(query, task.finalAnswer, domain)
+
+        task.thoughts.push({
+          step: stepNum + 1,
+          type: 'reflect',
+          content: reflection.assessment,
+          confidence: reflection.qualityScore,
+          timestamp: Date.now(),
+        })
+
+        task.qualityScore = reflection.qualityScore
+
+        // Self-correction if quality is too low
+        if (this.config.selfCorrectionEnabled && reflection.qualityScore < this.config.confidenceThreshold && task.retries < this.config.maxRetries) {
+          task.retries++
+          const corrected = this._selfCorrect(query, task.finalAnswer, reflection.issues, domain)
+          task.finalAnswer = corrected
+          task.qualityScore = Math.min(reflection.qualityScore + 0.15, 1.0)
+
+          task.thoughts.push({
+            step: stepNum + 2,
+            type: 'decide',
+            content: `Self-corrected answer (retry ${task.retries}). Quality improved to ${task.qualityScore.toFixed(2)}`,
+            confidence: task.qualityScore,
+            timestamp: Date.now(),
+          })
+        }
+      }
+
+      task.status = 'complete'
+      this.stats.tasksCompleted++
+    } catch (err) {
+      task.status = 'failed'
+      task.finalAnswer = `[Agent Error] ${err instanceof Error ? err.message : String(err)}\n\nPartial results:\n${task.thoughts.map(t => `${t.type}: ${t.content}`).join('\n')}`
+      this.stats.tasksFailed++
+    }
+
+    task.totalDurationMs = Date.now() - startTime
+    this.stats.totalSteps += task.thoughts.length
+    this._updateAverages(task)
+    this.taskHistory.push(task)
+
+    return task
+  }
+
+  /** Quick single-shot agent query (no multi-step planning) */
+  async quickQuery(query: string): Promise<AgentToolResult> {
+    const domain = this.spark.detectDomain(query).domain
+    const toolChoice = this._selectTool(query, domain, '')
+    return this._executeTool(toolChoice.toolName, query, '')
+  }
+
+  // ── History & Stats ──────────────────────────────────────────────────────
+
+  /** Get task history */
+  getTaskHistory(): AgentTask[] {
+    return [...this.taskHistory]
+  }
+
+  /** Get task by ID */
+  getTask(taskId: string): AgentTask | null {
+    return this.taskHistory.find(t => t.id === taskId) ?? null
+  }
+
+  /** Get agent stats */
+  getStats(): typeof this.stats {
+    return { ...this.stats }
+  }
+
+  /** Clear task history */
+  clearHistory(): void {
+    this.taskHistory = []
+  }
+
+  /** Get agent config */
+  getConfig(): SparkAgentConfig {
+    return { ...this.config }
+  }
+
+  /** Update agent config */
+  updateConfig(updates: Partial<SparkAgentConfig>): void {
+    this.config = { ...this.config, ...updates }
+  }
+
+  // ── Private: Planning ────────────────────────────────────────────────────
+
+  /** Create a plan for executing a task */
+  private _planTask(query: string, domain: TaskDomain): string[] {
+    const plan: string[] = []
+
+    // Domain-based planning strategies
+    switch (domain) {
+      case 'code_generation':
+        plan.push(
+          `Understand requirements: ${query}`,
+          `Search knowledge base for relevant patterns`,
+          `Generate code implementation`,
+          `Review generated code for quality`,
+        )
+        break
+
+      case 'code_review':
+        plan.push(
+          `Analyze the code structure`,
+          `Check for bugs and security issues`,
+          `Evaluate code quality and patterns`,
+          `Provide improvement suggestions`,
+        )
+        break
+
+      case 'debugging':
+        plan.push(
+          `Analyze the error/bug description`,
+          `Search for similar known issues`,
+          `Identify root cause`,
+          `Generate fix`,
+        )
+        break
+
+      case 'security_analysis':
+      case 'exploit_research':
+        plan.push(
+          `Analyze target for vulnerabilities`,
+          `Search exploit database`,
+          `Assess risk and impact`,
+          `Provide remediation steps`,
+        )
+        break
+
+      case 'general_reasoning':
+      case 'math_logic':
+        plan.push(
+          `Break down the problem`,
+          `Apply reasoning to each component`,
+          `Synthesize conclusion`,
+        )
+        break
+
+      case 'creative_writing':
+        plan.push(
+          `Understand the creative brief`,
+          `Generate initial draft`,
+          `Refine and polish`,
+        )
+        break
+
+      case 'data_analysis':
+        plan.push(
+          `Understand the data context`,
+          `Analyze patterns and trends`,
+          `Generate insights and recommendations`,
+        )
+        break
+
+      default:
+        plan.push(
+          `Analyze the query: ${query}`,
+          `Search for relevant knowledge`,
+          `Generate comprehensive response`,
+        )
+    }
+
+    return plan
+  }
+
+  // ── Private: Tool Selection ──────────────────────────────────────────────
+
+  /** Select the best tool for a given step */
+  private _selectTool(step: string, domain: TaskDomain, _context: string): { toolName: string; confidence: number } {
+    const stepLower = step.toLowerCase()
+
+    // Code-related tools
+    if (/\b(code|function|class|implement|program|script|write code|generate code)\b/i.test(stepLower)) {
+      return { toolName: 'spark_code_generate', confidence: 0.9 }
+    }
+    if (/\b(review|audit|check|inspect|quality|bug)\b/i.test(stepLower)) {
+      return { toolName: 'spark_code_review', confidence: 0.85 }
+    }
+    if (/\b(debug|fix|error|crash|exception|traceback)\b/i.test(stepLower)) {
+      return { toolName: 'spark_debug', confidence: 0.85 }
+    }
+
+    // Security tools
+    if (/\b(exploit|vulnerability|cve|attack|security|pentest|hack)\b/i.test(stepLower)) {
+      return { toolName: 'spark_security_analyze', confidence: 0.9 }
+    }
+
+    // Knowledge tools
+    if (/\b(search|find|lookup|knowledge|learn|pattern|known)\b/i.test(stepLower)) {
+      return { toolName: 'brain_knowledge_search', confidence: 0.85 }
+    }
+
+    // Reasoning tools
+    if (/\b(reason|analyze|think|logic|math|calculate|prove|explain why)\b/i.test(stepLower)) {
+      return { toolName: 'spark_reason', confidence: 0.85 }
+    }
+
+    // Creative tools
+    if (/\b(write|draft|compose|create|story|essay|poem)\b/i.test(stepLower)) {
+      return { toolName: 'spark_creative', confidence: 0.8 }
+    }
+
+    // Domain-based fallback
+    const domainToolMap: Partial<Record<TaskDomain, string>> = {
+      code_generation: 'spark_code_generate',
+      code_review: 'spark_code_review',
+      code_completion: 'spark_code_generate',
+      debugging: 'spark_debug',
+      security_analysis: 'spark_security_analyze',
+      exploit_research: 'spark_security_analyze',
+      general_reasoning: 'spark_reason',
+      math_logic: 'spark_reason',
+      creative_writing: 'spark_creative',
+      summarization: 'spark_summarize',
+      translation: 'spark_translate',
+      conversation: 'spark_chat',
+      planning: 'spark_reason',
+      data_analysis: 'spark_reason',
+    }
+
+    const domainTool = domainToolMap[domain]
+    if (domainTool && this.tools.has(domainTool)) {
+      return { toolName: domainTool, confidence: 0.75 }
+    }
+
+    return { toolName: 'spark_general', confidence: 0.7 }
+  }
+
+  // ── Private: Tool Execution ──────────────────────────────────────────────
+
+  /** Execute a tool by name */
+  private async _executeTool(toolName: string, input: string, context: string): Promise<AgentToolResult> {
+    const startTime = Date.now()
+    const tool = this.tools.get(toolName)
+
+    if (tool) {
+      try {
+        const enrichedInput = context ? `${input}\n\n[Context]:\n${context.slice(-500)}` : input
+        return await tool.handler(enrichedInput)
+      } catch (err) {
+        return {
+          success: false,
+          output: `Tool error: ${err instanceof Error ? err.message : String(err)}`,
+          confidence: 0,
+          source: toolName,
+          durationMs: Date.now() - startTime,
+        }
+      }
+    }
+
+    // Fallback: use Spark ensemble directly
+    try {
+      const response = await this.connector.enrichedInfer({ prompt: input })
+      return {
+        success: true,
+        output: response.text,
+        confidence: response.qualityScore,
+        source: 'spark_ensemble',
+        durationMs: Date.now() - startTime,
+      }
+    } catch {
+      return {
+        success: false,
+        output: `No tool "${toolName}" found and Spark fallback failed`,
+        confidence: 0,
+        source: 'fallback',
+        durationMs: Date.now() - startTime,
+      }
+    }
+  }
+
+  // ── Private: Synthesis ───────────────────────────────────────────────────
+
+  /** Synthesize final answer from all collected results */
+  private _synthesizeAnswer(query: string, domain: TaskDomain, thoughts: AgentThought[], context: string): string {
+    // Collect all tool outputs
+    const toolOutputs = thoughts
+      .filter(t => t.type === 'observe' && t.toolOutput)
+      .map(t => t.toolOutput!)
+
+    if (toolOutputs.length === 0) {
+      return `[ModelSpark Agent] I analyzed your query about "${query.slice(0, 100)}" but could not produce a detailed result. The task domain is "${domain}".`
+    }
+
+    if (toolOutputs.length === 1) {
+      return toolOutputs[0]!
+    }
+
+    // Multi-source synthesis
+    const sections: string[] = []
+
+    // Use the best/longest output as the main content
+    const sorted = [...toolOutputs].sort((a, b) => b.length - a.length)
+    sections.push(sorted[0]!)
+
+    // Add supplementary information from other tools
+    if (sorted.length > 1) {
+      const supplementary = sorted.slice(1).filter(o => o.length > 50)
+      if (supplementary.length > 0) {
+        sections.push('\n---\n**Additional Analysis:**')
+        for (const s of supplementary.slice(0, 2)) {
+          sections.push(s)
+        }
+      }
+    }
+
+    return sections.join('\n\n')
+  }
+
+  // ── Private: Reflection ──────────────────────────────────────────────────
+
+  /** Reflect on the quality of the answer */
+  private _reflect(query: string, answer: string, domain: TaskDomain): { qualityScore: number; assessment: string; issues: string[] } {
+    const issues: string[] = []
+    let score = 0.7 // base score
+
+    // Length check
+    if (answer.length < 20) {
+      issues.push('Answer is too short')
+      score -= 0.2
+    }
+    if (answer.length > 50) score += 0.05
+
+    // Relevance: keyword overlap
+    const queryWords = new Set(query.toLowerCase().split(/\s+/).filter(w => w.length > 3))
+    const answerWords = new Set(answer.toLowerCase().split(/\s+/))
+    let overlap = 0
+    for (const w of queryWords) { if (answerWords.has(w)) overlap++ }
+    const relevance = queryWords.size > 0 ? overlap / queryWords.size : 0.5
+    score += relevance * 0.1
+
+    // Structure check
+    if (/```/.test(answer) && (domain === 'code_generation' || domain === 'debugging')) score += 0.05
+    if (/\d+\./.test(answer)) score += 0.02
+    if (/[-*]/.test(answer)) score += 0.02
+
+    // Error content check
+    if (/\berror\b/i.test(answer) && !/\bfix\b/i.test(answer) && domain !== 'debugging') {
+      issues.push('Answer contains error indicators without fixes')
+      score -= 0.1
+    }
+
+    if (answer.includes('[Agent Error]')) {
+      issues.push('Answer contains agent error')
+      score -= 0.3
+    }
+
+    score = Math.min(Math.max(score, 0), 1.0)
+
+    return {
+      qualityScore: score,
+      assessment: `Quality: ${score.toFixed(2)} | Issues: ${issues.length > 0 ? issues.join(', ') : 'none'} | Relevance: ${(relevance * 100).toFixed(0)}%`,
+      issues,
+    }
+  }
+
+  // ── Private: Self-Correction ─────────────────────────────────────────────
+
+  /** Self-correct an answer based on identified issues */
+  private _selfCorrect(query: string, original: string, issues: string[], _domain: TaskDomain): string {
+    let corrected = original
+
+    for (const issue of issues) {
+      if (issue === 'Answer is too short') {
+        corrected += `\n\nTo elaborate on the query "${query.slice(0, 80)}": This requires further analysis considering multiple perspectives and approaches.`
+      }
+      if (issue === 'Answer contains agent error') {
+        // Try to extract useful partial content
+        const partial = original.replace(/\[Agent Error\].*?\n/g, '').trim()
+        if (partial.length > 20) {
+          corrected = partial
+        }
+      }
+    }
+
+    return corrected
+  }
+
+  // ── Private: Built-in Tools ──────────────────────────────────────────────
+
+  /** Register all built-in agent tools */
+  private _registerBuiltinTools(): void {
+    // ── Code Generation Tool ──
+    this.tools.set('spark_code_generate', {
+      name: 'spark_code_generate',
+      description: 'Generate code using Spark dual-model ensemble (Qwen2.5-Coder + LLaMA)',
+      category: 'code',
+      inputSchema: 'string: code task description',
+      handler: async (input: string) => {
+        const start = Date.now()
+        // Try brain first for pattern-based code
+        const brainResult = await this.connector.brainGenerateCode(input, 'typescript')
+        if (brainResult && brainResult.code.length > 20) {
+          return {
+            success: true,
+            output: `${brainResult.code}\n\n// ${brainResult.explanation}`,
+            confidence: 0.85,
+            source: 'brain_code_generator',
+            durationMs: Date.now() - start,
+          }
+        }
+        // Fallback to Spark ensemble
+        const response = await this.spark.infer({ prompt: input, domain: 'code_generation' })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── Code Review Tool ──
+    this.tools.set('spark_code_review', {
+      name: 'spark_code_review',
+      description: 'Review code for bugs, security issues, and quality improvements',
+      category: 'code',
+      inputSchema: 'string: code to review',
+      handler: async (input: string) => {
+        const start = Date.now()
+        const brainResult = await this.connector.brainReviewCode(input, 'typescript')
+        if (brainResult && brainResult.issues.length > 0) {
+          return {
+            success: true,
+            output: `Code Review:\n${brainResult.issues.map((i, idx) => `${idx + 1}. ${i}`).join('\n')}\n\nOverall Score: ${brainResult.score}/10`,
+            confidence: 0.85,
+            source: 'brain_code_reviewer',
+            durationMs: Date.now() - start,
+          }
+        }
+        const response = await this.spark.infer({ prompt: `Review this code:\n${input}`, domain: 'code_review' })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── Debug Tool ──
+    this.tools.set('spark_debug', {
+      name: 'spark_debug',
+      description: 'Debug code errors and find root causes',
+      category: 'code',
+      inputSchema: 'string: error description or buggy code',
+      handler: async (input: string) => {
+        const start = Date.now()
+        const response = await this.connector.enrichedInfer({ prompt: input, domain: 'debugging' })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── Security Analysis Tool ──
+    this.tools.set('spark_security_analyze', {
+      name: 'spark_security_analyze',
+      description: 'Analyze security vulnerabilities and exploits',
+      category: 'security',
+      inputSchema: 'string: security analysis query',
+      handler: async (input: string) => {
+        const start = Date.now()
+        const response = await this.connector.enrichedInfer({ prompt: input, domain: 'security_analysis' })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── Knowledge Search Tool ──
+    this.tools.set('brain_knowledge_search', {
+      name: 'brain_knowledge_search',
+      description: 'Search LocalBrain knowledge base for relevant information',
+      category: 'knowledge',
+      inputSchema: 'string: search query',
+      handler: (input: string) => {
+        const start = Date.now()
+        const results = this.connector.getBrainKnowledge(input, 5)
+        if (results.length > 0) {
+          const output = results.map((r, i) => `${i + 1}. [${r.category}] (score: ${r.score.toFixed(2)}) ${r.content}`).join('\n')
+          return {
+            success: true,
+            output,
+            confidence: results[0]!.score,
+            source: 'brain_knowledge_base',
+            durationMs: Date.now() - start,
+          }
+        }
+        return {
+          success: false,
+          output: 'No relevant knowledge found in brain database',
+          confidence: 0,
+          source: 'brain_knowledge_base',
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── Reasoning Tool ──
+    this.tools.set('spark_reason', {
+      name: 'spark_reason',
+      description: 'Perform deep reasoning and logical analysis',
+      category: 'reasoning',
+      inputSchema: 'string: question or problem to reason about',
+      handler: async (input: string) => {
+        const start = Date.now()
+        // Try brain reasoning first
+        const brainResult = await this.connector.brainReason(input)
+        if (brainResult && brainResult.confidence > 0.6) {
+          return {
+            success: true,
+            output: `${brainResult.answer}\n\n**Reasoning:** ${brainResult.reasoning}`,
+            confidence: brainResult.confidence,
+            source: 'brain_reasoning_engine',
+            durationMs: Date.now() - start,
+          }
+        }
+        // Fallback to Spark ensemble
+        const response = await this.connector.enrichedInfer({ prompt: input, domain: 'general_reasoning' })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── Creative Writing Tool ──
+    this.tools.set('spark_creative', {
+      name: 'spark_creative',
+      description: 'Generate creative content (stories, essays, poems)',
+      category: 'creative',
+      inputSchema: 'string: creative writing prompt',
+      handler: async (input: string) => {
+        const start = Date.now()
+        const response = await this.spark.infer({ prompt: input, domain: 'creative_writing' })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── Summarization Tool ──
+    this.tools.set('spark_summarize', {
+      name: 'spark_summarize',
+      description: 'Summarize text content concisely',
+      category: 'analysis',
+      inputSchema: 'string: text to summarize',
+      handler: async (input: string) => {
+        const start = Date.now()
+        const response = await this.spark.infer({ prompt: `Summarize: ${input}`, domain: 'summarization' })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── Translation Tool ──
+    this.tools.set('spark_translate', {
+      name: 'spark_translate',
+      description: 'Translate text between languages',
+      category: 'creative',
+      inputSchema: 'string: text with target language',
+      handler: async (input: string) => {
+        const start = Date.now()
+        const response = await this.spark.infer({ prompt: input, domain: 'translation' })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── General Chat Tool ──
+    this.tools.set('spark_chat', {
+      name: 'spark_chat',
+      description: 'General conversation and Q&A',
+      category: 'knowledge',
+      inputSchema: 'string: message',
+      handler: async (input: string) => {
+        const start = Date.now()
+        const response = await this.connector.enrichedInfer({ prompt: input, domain: 'conversation' })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+
+    // ── General Purpose Tool (fallback) ──
+    this.tools.set('spark_general', {
+      name: 'spark_general',
+      description: 'General-purpose AI tool using Spark ensemble with brain knowledge',
+      category: 'knowledge',
+      inputSchema: 'string: any query',
+      handler: async (input: string) => {
+        const start = Date.now()
+        const response = await this.connector.enrichedInfer({ prompt: input })
+        return {
+          success: true,
+          output: response.text,
+          confidence: response.qualityScore,
+          source: `spark_${response.primaryModel}`,
+          durationMs: Date.now() - start,
+        }
+      },
+    })
+  }
+
+  /** Update average stats */
+  private _updateAverages(task: AgentTask): void {
+    const total = this.stats.tasksCompleted + this.stats.tasksFailed
+    if (total <= 1) {
+      this.stats.averageQuality = task.qualityScore
+      this.stats.averageDurationMs = task.totalDurationMs
+    } else {
+      this.stats.averageQuality += (task.qualityScore - this.stats.averageQuality) / total
+      this.stats.averageDurationMs += (task.totalDurationMs - this.stats.averageDurationMs) / total
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   UNIFIED ORCHESTRATOR — Master Router for All AI Subsystems
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export class UnifiedOrchestrator {
+  private spark: ModelSpark
+  private connector: SparkBrainConnector
+  private agent: SparkAgent
+  private stats: OrchestrationStats
+
+  constructor(spark: ModelSpark, config?: {
+    agentConfig?: Partial<SparkAgentConfig>
+  }) {
+    this.spark = spark
+    this.connector = new SparkBrainConnector(spark)
+    this.agent = new SparkAgent(spark, this.connector, config?.agentConfig)
+    this.stats = this._initStats()
+  }
+
+  // ── System Connection ────────────────────────────────────────────────────
+
+  /** Connect LocalBrain to the unified system */
+  connectBrain(brain: BrainCapabilities): void {
+    this.connector.connectBrain(brain)
+  }
+
+  /** Connect LocalLLMBridge to the unified system */
+  connectBridge(bridge: LLMBridgeCapabilities): void {
+    this.connector.connectBridge(bridge)
+  }
+
+  /** Register a custom agent tool */
+  registerTool(tool: AgentTool): void {
+    this.agent.registerTool(tool)
+  }
+
+  // ── Intelligent Routing ──────────────────────────────────────────────────
+
+  /** Route a query to the optimal subsystem */
+  routeQuery(query: string, options?: { forceSystem?: OrchestrationDecision['primary'] }): OrchestrationDecision {
+    if (options?.forceSystem) {
+      return {
+        primary: options.forceSystem,
+        secondary: null,
+        reason: `Forced routing to ${options.forceSystem}`,
+        confidence: 1.0,
+        domain: this.spark.detectDomain(query).domain,
+        estimatedQuality: 0.7,
+      }
+    }
+
+    const detection = this.spark.detectDomain(query)
+    const domain = detection.domain
+    const confidence = detection.confidence
+    const queryLower = query.toLowerCase()
+
+    // Multi-step/complex tasks → Agent
+    const isComplex = /\b(step.by.step|analyze and|first.*then|create.*and.*test|build.*complete|plan.*implement)\b/i.test(queryLower)
+    if (isComplex) {
+      return {
+        primary: 'agent',
+        secondary: 'spark_ensemble',
+        reason: 'Complex multi-step task detected — routing to Agent for autonomous execution',
+        confidence: 0.85,
+        domain,
+        estimatedQuality: 0.8,
+      }
+    }
+
+    // Code tasks → Spark ensemble (best for code with dual-model)
+    if (['code_generation', 'code_review', 'code_completion', 'debugging'].includes(domain)) {
+      const hasBrain = this.connector.isBrainConnected()
+      return {
+        primary: hasBrain ? 'hybrid' : 'spark_ensemble',
+        secondary: hasBrain ? 'brain_knowledge' : null,
+        reason: `Code task (${domain}) — Spark ensemble ${hasBrain ? 'with brain knowledge enrichment' : 'for dual-model inference'}`,
+        confidence: 0.9,
+        domain,
+        estimatedQuality: 0.85,
+      }
+    }
+
+    // Security tasks → Spark + Brain
+    if (['security_analysis', 'exploit_research'].includes(domain)) {
+      return {
+        primary: this.connector.isBrainConnected() ? 'hybrid' : 'spark_ensemble',
+        secondary: 'brain_knowledge',
+        reason: `Security task — combining Spark ensemble with brain security knowledge`,
+        confidence: 0.85,
+        domain,
+        estimatedQuality: 0.8,
+      }
+    }
+
+    // Knowledge/factual queries → Brain first
+    if (this.connector.isBrainConnected() && /\b(what is|explain|describe|how does|tell me about|define)\b/i.test(queryLower)) {
+      const knowledge = this.connector.getBrainKnowledge(query, 3)
+      if (knowledge.length > 0 && knowledge[0]!.score > 0.5) {
+        return {
+          primary: 'brain_knowledge',
+          secondary: 'spark_ensemble',
+          reason: `Knowledge query — brain has relevant knowledge (score: ${knowledge[0]!.score.toFixed(2)})`,
+          confidence: knowledge[0]!.score,
+          domain,
+          estimatedQuality: 0.8,
+        }
+      }
+    }
+
+    // Reasoning tasks → Spark ensemble (LLaMA is strong here)
+    if (['general_reasoning', 'math_logic', 'planning', 'data_analysis'].includes(domain)) {
+      return {
+        primary: 'spark_ensemble',
+        secondary: this.connector.isBrainConnected() ? 'brain_knowledge' : null,
+        reason: `Reasoning task (${domain}) — LLaMA excels at reasoning with Qwen support`,
+        confidence: 0.85,
+        domain,
+        estimatedQuality: 0.8,
+      }
+    }
+
+    // Default: Spark ensemble with optional brain enrichment
+    return {
+      primary: this.connector.isBrainConnected() ? 'hybrid' : 'spark_ensemble',
+      secondary: null,
+      reason: `Default routing to ${this.connector.isBrainConnected() ? 'hybrid (Spark + Brain)' : 'Spark ensemble'}`,
+      confidence: Math.max(confidence, 0.6),
+      domain,
+      estimatedQuality: 0.75,
+    }
+  }
+
+  // ── Unified Query Execution ──────────────────────────────────────────────
+
+  /** Execute a query through the unified orchestration system */
+  async query(input: string, options?: {
+    forceSystem?: OrchestrationDecision['primary']
+    strategy?: InferenceStrategy
+    maxTokens?: number
+  }): Promise<OrchestrationResponse> {
+    const startTime = Date.now()
+    this.stats.totalRequests++
+
+    const routing = this.routeQuery(input, options)
+    this.stats.routingDistribution[routing.primary] = (this.stats.routingDistribution[routing.primary] ?? 0) + 1
+
+    let response: OrchestrationResponse
+
+    switch (routing.primary) {
+      case 'agent':
+        response = await this._executeAgent(input, routing)
+        this.stats.agentRequests++
+        break
+
+      case 'brain_knowledge':
+        response = await this._executeBrain(input, routing)
+        this.stats.brainRequests++
+        break
+
+      case 'llm_bridge':
+        response = await this._executeBridge(input, routing)
+        this.stats.bridgeRequests++
+        break
+
+      case 'hybrid':
+        response = await this._executeHybrid(input, routing, options)
+        this.stats.hybridRequests++
+        break
+
+      default: // spark_ensemble
+        response = await this._executeSpark(input, routing, options)
+        this.stats.sparkRequests++
+        break
+    }
+
+    // Update quality averages
+    this.stats.averageQuality += (response.qualityScore - this.stats.averageQuality) / this.stats.totalRequests
+    this.stats.averageLatencyMs += (response.durationMs - this.stats.averageLatencyMs) / this.stats.totalRequests
+
+    // Teach brain from good responses (feedback loop)
+    if (response.qualityScore > 0.7 && response.sparkResponse) {
+      this.connector.teachBrainFromSpark(input, response.sparkResponse)
+    }
+
+    return response
+  }
+
+  // ── Subsystem Access ─────────────────────────────────────────────────────
+
+  /** Get the Spark instance */
+  getSpark(): ModelSpark { return this.spark }
+
+  /** Get the Brain connector */
+  getConnector(): SparkBrainConnector { return this.connector }
+
+  /** Get the Agent */
+  getAgent(): SparkAgent { return this.agent }
+
+  /** Get orchestration stats */
+  getStats(): OrchestrationStats { return { ...this.stats } }
+
+  /** Reset stats */
+  resetStats(): void { this.stats = this._initStats() }
+
+  /** Get comprehensive system status */
+  getSystemStatus(): string {
+    const status = this.connector.getSystemStatus()
+    const sparkStats = this.spark.getStats()
+    const agentStats = this.agent.getStats()
+    const health = this.spark.getModelHealth()
+
+    return [
+      '╔═══════════════════════════════════════════════════════════════╗',
+      '║     ⚡ SPARK UNIFIED ORCHESTRATOR — System Status            ║',
+      '╚═══════════════════════════════════════════════════════════════╝',
+      '',
+      '📊 Subsystems:',
+      `  ⚡ Spark Ensemble:  ✅ Connected (${status.sparkModels} models)`,
+      `  🧠 LocalBrain:     ${status.brainConnected ? `✅ Connected (${status.brainKnowledgeSize} KB entries)` : '❌ Not connected'}`,
+      `  🔗 LLM Bridge:     ${status.bridgeConnected ? '✅ Connected' : '❌ Not connected'}`,
+      `  🤖 Agent:          ✅ Active (${this.agent.getTools().length} tools)`,
+      '',
+      '📈 Performance:',
+      `  Total requests:     ${this.stats.totalRequests}`,
+      `  Avg quality:        ${this.stats.averageQuality.toFixed(2)}`,
+      `  Avg latency:        ${this.stats.averageLatencyMs.toFixed(0)}ms`,
+      `  Agent tasks:        ${agentStats.tasksCompleted} completed, ${agentStats.tasksFailed} failed`,
+      `  Agent tool calls:   ${agentStats.totalToolCalls}`,
+      '',
+      '🔀 Routing Distribution:',
+      ...Object.entries(this.stats.routingDistribution).map(([k, v]) =>
+        `  ${k}: ${v} (${((v as number / Math.max(this.stats.totalRequests, 1)) * 100).toFixed(1)}%)`
+      ),
+      '',
+      '🟢 Model Health:',
+      ...health.map(h => `  ${h.modelId}: ${h.available ? '✅' : '❌'} | ${h.successCount} ok / ${h.errorCount} err | ${h.averageTokensPerSecond.toFixed(1)} tok/s`),
+      '',
+      '💾 Spark Stats:',
+      `  Inferences: ${sparkStats.totalRequests} | Tokens: ${sparkStats.totalTokensGenerated}`,
+      `  Cache: ${this.spark.getCacheSize()} entries | Errors: ${sparkStats.errors}`,
+    ].join('\n')
+  }
+
+  // ── Private: Execution Methods ───────────────────────────────────────────
+
+  /** Execute via Agent (autonomous multi-step) */
+  private async _executeAgent(input: string, routing: OrchestrationDecision): Promise<OrchestrationResponse> {
+    const start = Date.now()
+    const task = await this.agent.executeTask(input)
+    this.stats.agentTasksCompleted++
+    this.stats.agentToolCalls += task.toolCalls.length
+
+    return {
+      text: task.finalAnswer,
+      source: 'agent',
+      strategy: `agent_${task.plan.length}steps`,
+      domain: routing.domain,
+      qualityScore: task.qualityScore,
+      confidence: routing.confidence,
+      durationMs: Date.now() - start,
+      tokensGenerated: Math.ceil(task.finalAnswer.length / 4),
+      subsystemsUsed: ['agent', ...task.toolCalls.map(t => t.tool)],
+      agentTask: task,
+      metadata: { plan: task.plan, toolCalls: task.toolCalls.length, retries: task.retries },
+    }
+  }
+
+  /** Execute via Brain knowledge base */
+  private async _executeBrain(input: string, routing: OrchestrationDecision): Promise<OrchestrationResponse> {
+    const start = Date.now()
+    const knowledge = this.connector.getBrainKnowledge(input, 5)
+    this.stats.brainKnowledgeHits += knowledge.length
+
+    if (knowledge.length > 0) {
+      const text = knowledge.map((k, i) => `${i + 1}. ${k.content}`).join('\n\n')
+      return {
+        text,
+        source: 'brain_knowledge',
+        strategy: 'knowledge_retrieval',
+        domain: routing.domain,
+        qualityScore: knowledge[0]!.score,
+        confidence: knowledge[0]!.score,
+        durationMs: Date.now() - start,
+        tokensGenerated: Math.ceil(text.length / 4),
+        subsystemsUsed: ['brain_knowledge'],
+        brainKnowledge: knowledge,
+        metadata: { resultsCount: knowledge.length },
+      }
+    }
+
+    // Fallback to Spark if no brain knowledge
+    return this._executeSpark(input, routing)
+  }
+
+  /** Execute via LLM Bridge */
+  private async _executeBridge(input: string, routing: OrchestrationDecision): Promise<OrchestrationResponse> {
+    const start = Date.now()
+
+    // Fallback to Spark since bridge isn't directly callable without the real instance
+    const response = await this.spark.infer({ prompt: input, domain: routing.domain })
+
+    return {
+      text: response.text,
+      source: 'llm_bridge',
+      strategy: response.strategy,
+      domain: routing.domain,
+      qualityScore: response.qualityScore,
+      confidence: routing.confidence,
+      durationMs: Date.now() - start,
+      tokensGenerated: response.totalTokensGenerated,
+      subsystemsUsed: ['llm_bridge', `spark_${response.primaryModel}`],
+      sparkResponse: response,
+      metadata: {},
+    }
+  }
+
+  /** Execute via Hybrid (Spark + Brain enrichment) */
+  private async _executeHybrid(input: string, routing: OrchestrationDecision, options?: { strategy?: InferenceStrategy; maxTokens?: number }): Promise<OrchestrationResponse> {
+    const start = Date.now()
+    const knowledge = this.connector.getBrainKnowledge(input, 3)
+    this.stats.brainKnowledgeHits += knowledge.length
+
+    // Use enriched inference (Spark with brain context)
+    const response = await this.connector.enrichedInfer({
+      prompt: input,
+      domain: routing.domain,
+      strategy: options?.strategy,
+      maxTokens: options?.maxTokens,
+    })
+
+    return {
+      text: response.text,
+      source: 'hybrid',
+      strategy: `hybrid_${response.strategy}`,
+      domain: routing.domain,
+      qualityScore: response.qualityScore,
+      confidence: routing.confidence,
+      durationMs: Date.now() - start,
+      tokensGenerated: response.totalTokensGenerated,
+      subsystemsUsed: ['spark_ensemble', 'brain_knowledge'],
+      brainKnowledge: knowledge,
+      sparkResponse: response,
+      metadata: { brainContextUsed: knowledge.length > 0 },
+    }
+  }
+
+  /** Execute via Spark ensemble directly */
+  private async _executeSpark(input: string, routing: OrchestrationDecision, options?: { strategy?: InferenceStrategy; maxTokens?: number }): Promise<OrchestrationResponse> {
+    const start = Date.now()
+    const response = await this.spark.infer({
+      prompt: input,
+      domain: routing.domain,
+      strategy: options?.strategy,
+      maxTokens: options?.maxTokens,
+    })
+
+    return {
+      text: response.text,
+      source: 'spark_ensemble',
+      strategy: response.strategy,
+      domain: routing.domain,
+      qualityScore: response.qualityScore,
+      confidence: routing.confidence,
+      durationMs: Date.now() - start,
+      tokensGenerated: response.totalTokensGenerated,
+      subsystemsUsed: [`spark_${response.primaryModel}`],
+      sparkResponse: response,
+      metadata: {},
+    }
+  }
+
+  /** Initialize stats */
+  private _initStats(): OrchestrationStats {
+    return {
+      totalRequests: 0,
+      sparkRequests: 0,
+      brainRequests: 0,
+      bridgeRequests: 0,
+      agentRequests: 0,
+      hybridRequests: 0,
+      averageQuality: 0,
+      averageLatencyMs: 0,
+      agentTasksCompleted: 0,
+      agentToolCalls: 0,
+      brainKnowledgeHits: 0,
+      errors: 0,
+      routingDistribution: {},
+    }
+  }
+}

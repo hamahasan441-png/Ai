@@ -2156,6 +2156,9 @@ export {
 // ── Model Spark — Dual-Model Ensemble (Qwen2.5 + LLaMA) for best performance ──
 export { ModelSpark, DEFAULT_MODEL_SPARK_CONFIG } from './ModelSpark.js'
 
+// ── Spark Unified Orchestration — Brain + Agent + LLM working together ──
+export { SparkBrainConnector, SparkAgent, UnifiedOrchestrator, DEFAULT_AGENT_CONFIG } from './ModelSpark.js'
+
 export type {
   SparkModelFamily,
   InferenceStrategy,
@@ -2192,4 +2195,15 @@ export type {
   OllamaGenerateRequest,
   OllamaChatRequest,
   OpenAICompatRequest,
+  // ── Unified Orchestration types ──
+  AgentTool,
+  AgentToolResult,
+  AgentThought,
+  AgentTask,
+  SparkAgentConfig,
+  BrainCapabilities,
+  LLMBridgeCapabilities,
+  OrchestrationDecision,
+  OrchestrationResponse,
+  OrchestrationStats,
 } from './ModelSpark.js'
