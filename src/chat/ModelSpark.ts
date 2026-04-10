@@ -26,6 +26,7 @@
  */
 
 import { createHash } from 'crypto'
+import * as os from 'os'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -385,6 +386,33 @@ export interface ContextWindowOptions {
   strategy: 'truncate_oldest' | 'truncate_middle' | 'sliding_window' | 'summarize_oldest'
   reserveForResponse: number
   preserveSystemPrompt: boolean
+}
+
+/** Ollama generate API request body */
+export interface OllamaGenerateRequest {
+  model: string
+  prompt: string
+  system: string
+  options: { temperature: number; top_p: number; num_predict: number }
+  stream: boolean
+}
+
+/** Ollama chat API request body */
+export interface OllamaChatRequest {
+  model: string
+  messages: Array<{ role: string; content: string }>
+  options: { temperature: number; top_p: number; num_predict: number }
+  stream: boolean
+}
+
+/** OpenAI-compatible API request body (for llama.cpp) */
+export interface OpenAICompatRequest {
+  model: string
+  messages: Array<{ role: string; content: string }>
+  temperature: number
+  top_p: number
+  max_tokens: number
+  stream: boolean
 }
 
 // ─── Model Registry ──────────────────────────────────────────────────────────
@@ -2702,13 +2730,11 @@ export class ModelSpark {
 
   /** Detect hardware and recommend best model configuration */
   detectHardware(): HardwareProfile {
-    // Use os module info (available in Node.js)
     let totalRAMGB: number
     let cpuCores: number
     let cpuModel: string
 
     try {
-      const os = require('os')
       totalRAMGB = Math.round(os.totalmem() / (1024 * 1024 * 1024) * 10) / 10
       cpuCores = os.cpus()?.length ?? 4
       cpuModel = os.cpus()?.[0]?.model ?? 'Unknown CPU'
@@ -2803,7 +2829,7 @@ export class ModelSpark {
   }
 
   /** Build Ollama API generate request body */
-  buildOllamaRequest(prompt: string, model: SparkModel, options?: Partial<SparkRequest>): Record<string, unknown> {
+  buildOllamaRequest(prompt: string, model: SparkModel, options?: Partial<SparkRequest>): OllamaGenerateRequest {
     return {
       model: model.ollamaName,
       prompt,
@@ -2818,7 +2844,7 @@ export class ModelSpark {
   }
 
   /** Build Ollama chat API request body (for multi-turn) */
-  buildOllamaChatRequest(messages: SparkChatMessage[], model: SparkModel, options?: Partial<SparkRequest>): Record<string, unknown> {
+  buildOllamaChatRequest(messages: SparkChatMessage[], model: SparkModel, options?: Partial<SparkRequest>): OllamaChatRequest {
     return {
       model: model.ollamaName,
       messages: messages.map(m => ({
@@ -2835,8 +2861,8 @@ export class ModelSpark {
   }
 
   /** Build OpenAI-compatible API request (for llama.cpp server) */
-  buildOpenAICompatRequest(prompt: string, model: SparkModel, options?: Partial<SparkRequest>): Record<string, unknown> {
-    const messages = []
+  buildOpenAICompatRequest(prompt: string, model: SparkModel, options?: Partial<SparkRequest>): OpenAICompatRequest {
+    const messages: Array<{ role: string; content: string }> = []
     if (options?.systemPrompt) {
       messages.push({ role: 'system', content: options.systemPrompt })
     }

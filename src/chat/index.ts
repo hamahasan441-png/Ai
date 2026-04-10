@@ -2189,4 +2189,7 @@ export type {
   OllamaModelInfo,
   OllamaServerStatus,
   ContextWindowOptions,
+  OllamaGenerateRequest,
+  OllamaChatRequest,
+  OpenAICompatRequest,
 } from './ModelSpark.js'
