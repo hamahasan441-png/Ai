@@ -2152,3 +2152,90 @@ export {
   type BridgeResponse,
   type BridgeStats,
 } from './LocalLLMBridge.js'
+
+// ── Model Spark — Dual-Model Ensemble (Qwen2.5 + LLaMA) for best performance ──
+export { ModelSpark, DEFAULT_MODEL_SPARK_CONFIG } from './ModelSpark.js'
+
+// ── Spark Unified Orchestration — Brain + Agent + LLM working together ──
+export { SparkBrainConnector, SparkAgent, UnifiedOrchestrator, DEFAULT_AGENT_CONFIG } from './ModelSpark.js'
+
+// ── Spark Search Engine + Memory + Circuit Breaker + Adaptive Selection + Parallel + Dynamic Planning ──
+export {
+  SparkSearchEngine, DEFAULT_SEARCH_CONFIG,
+  MemoryManager, DEFAULT_MEMORY_CONFIG,
+  ToolCircuitBreaker, DEFAULT_CIRCUIT_BREAKER_CONFIG,
+  AdaptiveToolSelector,
+  ParallelExecutor,
+  DynamicPlanner,
+} from './ModelSpark.js'
+
+export type {
+  SparkModelFamily,
+  InferenceStrategy,
+  TaskDomain,
+  ModelPreference,
+  SparkModel,
+  ModelSparkConfig,
+  SparkRequest,
+  ModelResponse as SparkModelResponse,
+  SparkResponse,
+  RoutingRule as SparkRoutingRule,
+  ModelHealth,
+  EnsembleVote,
+  SpeculativeResult,
+  FusionResult,
+  BenchmarkResult,
+  ModelSparkStats,
+  // ── New types added to ModelSpark ──
+  SparkChatMessage,
+  ChatSession,
+  StreamToken,
+  CircuitState,
+  CircuitBreakerConfig,
+  CircuitBreakerStatus,
+  ModelLifecycleState,
+  ModelLifecycleInfo,
+  PromptChainStep,
+  PromptChainResult,
+  ParsedOutput,
+  HardwareProfile,
+  OllamaModelInfo,
+  OllamaServerStatus,
+  ContextWindowOptions,
+  OllamaGenerateRequest,
+  OllamaChatRequest,
+  OpenAICompatRequest,
+  // ── Unified Orchestration types ──
+  AgentTool,
+  AgentToolResult,
+  AgentThought,
+  AgentTask,
+  SparkAgentConfig,
+  BrainCapabilities,
+  LLMBridgeCapabilities,
+  OrchestrationDecision,
+  OrchestrationResponse,
+  OrchestrationStats,
+  // ── Search Engine types ──
+  SparkSearchStrategy,
+  SearchDocument,
+  SearchResult,
+  SearchQuery,
+  SearchStats,
+  SparkSearchConfig,
+  // ── Memory Manager types ──
+  MemoryEntry,
+  MemorySnapshot,
+  MemoryStats,
+  MemoryConfig,
+  // ── Circuit Breaker types ──
+  ToolCircuitState,
+  CircuitBreakerConfig as ToolCircuitBreakerConfig,
+  // ── Adaptive Tool Selection types ──
+  ToolPerformanceRecord,
+  // ── Parallel Execution types ──
+  ParallelResult,
+  // ── Dynamic Planning types ──
+  PlanStep,
+  DynamicPlan,
+} from './ModelSpark.js'
