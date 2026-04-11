@@ -165,10 +165,21 @@ const MODEL_REGISTRY: ModelInfo[] = [
     quantization: 'Q4_K_M',
     fileSizeGB: 4.4,
     contextWindow: 32768,
-    downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf',
+    downloadUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf',
     sha256: 'qwen2.5-coder-7b-instruct-q4_k_m-sha256',
-    description: 'Qwen2.5-Coder 7B — optimized for code generation, debugging, and analysis. Q4_K_M quantization balances quality and speed.',
-    capabilities: ['code_generation', 'code_completion', 'debugging', 'code_review', 'explanation', 'refactoring', 'exploit_analysis', 'vulnerability_search'],
+    description:
+      'Qwen2.5-Coder 7B — optimized for code generation, debugging, and analysis. Q4_K_M quantization balances quality and speed.',
+    capabilities: [
+      'code_generation',
+      'code_completion',
+      'debugging',
+      'code_review',
+      'explanation',
+      'refactoring',
+      'exploit_analysis',
+      'vulnerability_search',
+    ],
     minRAMGB: 6,
     recommendedRAMGB: 8,
     gpuLayers: 33,
@@ -181,10 +192,21 @@ const MODEL_REGISTRY: ModelInfo[] = [
     quantization: 'Q5_K_M',
     fileSizeGB: 5.3,
     contextWindow: 32768,
-    downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q5_k_m.gguf',
+    downloadUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q5_k_m.gguf',
     sha256: 'qwen2.5-coder-7b-instruct-q5_k_m-sha256',
-    description: 'Qwen2.5-Coder 7B — higher quality quantization (Q5_K_M). Better accuracy, more RAM needed.',
-    capabilities: ['code_generation', 'code_completion', 'debugging', 'code_review', 'explanation', 'refactoring', 'exploit_analysis', 'vulnerability_search'],
+    description:
+      'Qwen2.5-Coder 7B — higher quality quantization (Q5_K_M). Better accuracy, more RAM needed.',
+    capabilities: [
+      'code_generation',
+      'code_completion',
+      'debugging',
+      'code_review',
+      'explanation',
+      'refactoring',
+      'exploit_analysis',
+      'vulnerability_search',
+    ],
     minRAMGB: 8,
     recommendedRAMGB: 10,
     gpuLayers: 33,
@@ -197,10 +219,21 @@ const MODEL_REGISTRY: ModelInfo[] = [
     quantization: 'Q8_0',
     fileSizeGB: 7.7,
     contextWindow: 32768,
-    downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q8_0.gguf',
+    downloadUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q8_0.gguf',
     sha256: 'qwen2.5-coder-7b-instruct-q8_0-sha256',
-    description: 'Qwen2.5-Coder 7B — highest quality quantization (Q8_0). Near-lossless, needs 10GB+ RAM.',
-    capabilities: ['code_generation', 'code_completion', 'debugging', 'code_review', 'explanation', 'refactoring', 'exploit_analysis', 'vulnerability_search'],
+    description:
+      'Qwen2.5-Coder 7B — highest quality quantization (Q8_0). Near-lossless, needs 10GB+ RAM.',
+    capabilities: [
+      'code_generation',
+      'code_completion',
+      'debugging',
+      'code_review',
+      'explanation',
+      'refactoring',
+      'exploit_analysis',
+      'vulnerability_search',
+    ],
     minRAMGB: 10,
     recommendedRAMGB: 12,
     gpuLayers: 33,
@@ -213,10 +246,19 @@ const MODEL_REGISTRY: ModelInfo[] = [
     quantization: 'Q3_K_M',
     fileSizeGB: 3.6,
     contextWindow: 32768,
-    downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q3_k_m.gguf',
+    downloadUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q3_k_m.gguf',
     sha256: 'qwen2.5-coder-7b-instruct-q3_k_m-sha256',
-    description: 'Qwen2.5-Coder 7B — compact quantization (Q3_K_M). Lower RAM, slightly reduced quality.',
-    capabilities: ['code_generation', 'code_completion', 'debugging', 'code_review', 'explanation', 'refactoring'],
+    description:
+      'Qwen2.5-Coder 7B — compact quantization (Q3_K_M). Lower RAM, slightly reduced quality.',
+    capabilities: [
+      'code_generation',
+      'code_completion',
+      'debugging',
+      'code_review',
+      'explanation',
+      'refactoring',
+    ],
     minRAMGB: 4,
     recommendedRAMGB: 6,
     gpuLayers: 33,
@@ -229,9 +271,11 @@ const MODEL_REGISTRY: ModelInfo[] = [
     quantization: 'Q2_K',
     fileSizeGB: 2.9,
     contextWindow: 32768,
-    downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q2_k.gguf',
+    downloadUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q2_k.gguf',
     sha256: 'qwen2.5-coder-7b-instruct-q2_k-sha256',
-    description: 'Qwen2.5-Coder 7B — smallest quantization (Q2_K). Minimal RAM, most quality reduction.',
+    description:
+      'Qwen2.5-Coder 7B — smallest quantization (Q2_K). Minimal RAM, most quality reduction.',
     capabilities: ['code_generation', 'code_completion', 'debugging', 'explanation'],
     minRAMGB: 4,
     recommendedRAMGB: 5,
@@ -387,8 +431,7 @@ export class QwenLocalLLM {
 
   /** Get the default model */
   getDefaultModel(): ModelInfo {
-    return MODEL_REGISTRY.find(m => m.id === this.config.defaultModel)
-      ?? MODEL_REGISTRY[0]!
+    return MODEL_REGISTRY.find(m => m.id === this.config.defaultModel) ?? MODEL_REGISTRY[0]!
   }
 
   /** Get models filtered by quantization level */
@@ -398,8 +441,9 @@ export class QwenLocalLLM {
 
   /** Get models that fit within a RAM budget */
   getModelsForRAM(availableRAMGB: number): ModelInfo[] {
-    return MODEL_REGISTRY.filter(m => m.minRAMGB <= availableRAMGB)
-      .sort((a, b) => b.fileSizeGB - a.fileSizeGB) // prefer higher quality
+    return MODEL_REGISTRY.filter(m => m.minRAMGB <= availableRAMGB).sort(
+      (a, b) => b.fileSizeGB - a.fileSizeGB,
+    ) // prefer higher quality
   }
 
   /** Check if a model is downloaded */
@@ -536,7 +580,7 @@ export class QwenLocalLLM {
     }
 
     const durationMs = Date.now() - start
-    const tokensPerSecond = durationMs > 0 ? (tokensGenerated / (durationMs / 1000)) : 0
+    const tokensPerSecond = durationMs > 0 ? tokensGenerated / (durationMs / 1000) : 0
 
     // Update stats
     this.stats.totalInferences++
@@ -558,7 +602,10 @@ export class QwenLocalLLM {
   }
 
   /** Chat-style inference with message history */
-  async chat(messages: ChatMessage[], options?: Partial<InferenceRequest>): Promise<InferenceResponse> {
+  async chat(
+    messages: ChatMessage[],
+    options?: Partial<InferenceRequest>,
+  ): Promise<InferenceResponse> {
     // Convert chat messages to a single prompt
     const systemMsg = messages.find(m => m.role === 'system')
     const conversationParts: string[] = []
@@ -583,9 +630,10 @@ export class QwenLocalLLM {
 
   /** Generate code using the code generation template */
   async generateCode(task: string, language: string): Promise<InferenceResponse> {
-    const prompt = PROMPT_TEMPLATES['code_generation']!
-      .replace('{task}', task)
-      .replace('{language}', language)
+    const prompt = PROMPT_TEMPLATES['code_generation']!.replace('{task}', task).replace(
+      '{language}',
+      language,
+    )
 
     return this.generate({
       prompt,
@@ -596,9 +644,10 @@ export class QwenLocalLLM {
 
   /** Review code using the code review template */
   async reviewCode(code: string, language: string): Promise<InferenceResponse> {
-    const prompt = PROMPT_TEMPLATES['code_review']!
-      .replace('{code}', code)
-      .replace('{language}', language)
+    const prompt = PROMPT_TEMPLATES['code_review']!.replace('{code}', code).replace(
+      '{language}',
+      language,
+    )
 
     return this.generate({
       prompt,
@@ -609,8 +658,7 @@ export class QwenLocalLLM {
 
   /** Debug code using the debugging template */
   async debugCode(code: string, error: string, language: string): Promise<InferenceResponse> {
-    const prompt = PROMPT_TEMPLATES['debugging']!
-      .replace('{code}', code)
+    const prompt = PROMPT_TEMPLATES['debugging']!.replace('{code}', code)
       .replace('{error}', error)
       .replace('{language}', language)
 
@@ -623,9 +671,10 @@ export class QwenLocalLLM {
 
   /** Analyze exploits using the exploit analysis template */
   async analyzeExploit(target: string, context: string): Promise<InferenceResponse> {
-    const prompt = PROMPT_TEMPLATES['exploit_analysis']!
-      .replace('{target}', target)
-      .replace('{context}', context)
+    const prompt = PROMPT_TEMPLATES['exploit_analysis']!.replace('{target}', target).replace(
+      '{context}',
+      context,
+    )
 
     return this.generate({
       prompt,
@@ -636,8 +685,7 @@ export class QwenLocalLLM {
 
   /** Search vulnerabilities using the vulnerability search template */
   async searchVulnerabilities(query: string): Promise<InferenceResponse> {
-    const prompt = PROMPT_TEMPLATES['vulnerability_search']!
-      .replace('{query}', query)
+    const prompt = PROMPT_TEMPLATES['vulnerability_search']!.replace('{query}', query)
 
     return this.generate({
       prompt,
@@ -648,9 +696,10 @@ export class QwenLocalLLM {
 
   /** Debug buffer overflow using the overflow debug template */
   async debugOverflow(crashData: string, protections: string): Promise<InferenceResponse> {
-    const prompt = PROMPT_TEMPLATES['overflow_debug']!
-      .replace('{crash_data}', crashData)
-      .replace('{protections}', protections)
+    const prompt = PROMPT_TEMPLATES['overflow_debug']!.replace('{crash_data}', crashData).replace(
+      '{protections}',
+      protections,
+    )
 
     return this.generate({
       prompt,
@@ -931,7 +980,12 @@ export class QwenLocalLLM {
       ].join('\n')
     }
 
-    if (prompt.includes('overflow') || prompt.includes('buffer') || prompt.includes('crash') || prompt.includes('rop')) {
+    if (
+      prompt.includes('overflow') ||
+      prompt.includes('buffer') ||
+      prompt.includes('crash') ||
+      prompt.includes('rop')
+    ) {
       return [
         `[Qwen2.5-Coder Local LLM — Offline Mode]`,
         '',
@@ -947,7 +1001,12 @@ export class QwenLocalLLM {
       ].join('\n')
     }
 
-    if (prompt.includes('code') || prompt.includes('function') || prompt.includes('class') || prompt.includes('implement')) {
+    if (
+      prompt.includes('code') ||
+      prompt.includes('function') ||
+      prompt.includes('class') ||
+      prompt.includes('implement')
+    ) {
       return [
         `[Qwen2.5-Coder Local LLM — Offline Mode]`,
         '',

@@ -99,10 +99,7 @@ function formatToolInput(input: unknown): string {
  * Returns a summary of recent assistant messages to provide context
  * for "why" this command is being run.
  */
-function extractConversationContext(
-  messages: Message[],
-  maxChars = 1000,
-): string {
+function extractConversationContext(messages: Message[], maxChars = 1000): string {
   // Get recent assistant messages (they contain Claude's reasoning)
   const assistantMessages = messages
     .filter((m): m is AssistantMessage => m.type === 'assistant')
@@ -121,9 +118,7 @@ function extractConversationContext(
     if (textBlocks && totalChars < maxChars) {
       const remaining = maxChars - totalChars
       const truncated =
-        textBlocks.length > remaining
-          ? textBlocks.slice(0, remaining) + '...'
-          : textBlocks
+        textBlocks.length > remaining ? textBlocks.slice(0, remaining) + '...' : textBlocks
       contextParts.unshift(truncated)
       totalChars += truncated.length
     }
@@ -160,9 +155,7 @@ export async function generatePermissionExplanation({
 
   try {
     const formattedInput = formatToolInput(toolInput)
-    const conversationContext = messages?.length
-      ? extractConversationContext(messages)
-      : ''
+    const conversationContext = messages?.length ? extractConversationContext(messages) : ''
 
     const userPrompt = `Tool: ${toolName}
 ${toolDescription ? `Description: ${toolDescription}\n` : ''}

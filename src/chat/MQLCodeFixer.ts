@@ -195,11 +195,7 @@ double tp = NormalizeDouble(Ask + MathMax(TakeProfit * Point, stopLevel + 2*Poin
     name: 'ERR_OFF_QUOTES',
     category: 'trade-execution',
     description: 'No quotes available or broker is off-quoting',
-    commonCauses: [
-      'Extreme market volatility',
-      'Low liquidity period',
-      'Broker server issues',
-    ],
+    commonCauses: ['Extreme market volatility', 'Low liquidity period', 'Broker server issues'],
     fix: 'Implement retry logic with Sleep() between attempts. Check IsConnected() before trading.',
     mqlVersion: 'mql4',
   },
@@ -240,10 +236,7 @@ while(ticket < 0 && retries > 0) {
     name: 'ERR_ORDER_LOCKED',
     category: 'trade-execution',
     description: 'Order is locked and cannot be modified',
-    commonCauses: [
-      'Order is being processed by another operation',
-      'Close-by order in progress',
-    ],
+    commonCauses: ['Order is being processed by another operation', 'Close-by order in progress'],
     fix: 'Wait for the operation to complete. Check order status before modification.',
     mqlVersion: 'mql4',
   },
@@ -284,10 +277,7 @@ int ticket = OrderSend(Symbol(), OP_BUY, lots, Ask, slippage, sl, tp);`,
     name: 'ERR_TRADE_TOO_MANY_ORDERS',
     category: 'trade-execution',
     description: 'Too many open and pending orders (broker limit reached)',
-    commonCauses: [
-      'Grid EA creating too many pending orders',
-      'Broker limit on total orders',
-    ],
+    commonCauses: ['Grid EA creating too many pending orders', 'Broker limit on total orders'],
     fix: 'Check OrdersTotal() before opening new orders. Implement max orders limit in EA.',
     mqlVersion: 'mql4',
   },
@@ -316,11 +306,7 @@ if(!trade.Buy(lots)) {
     name: 'TRADE_RETCODE_REJECT',
     category: 'trade-execution',
     description: 'Trade request rejected by server',
-    commonCauses: [
-      'Invalid trade parameters',
-      'Insufficient margin',
-      'Trading disabled',
-    ],
+    commonCauses: ['Invalid trade parameters', 'Insufficient margin', 'Trading disabled'],
     fix: 'Validate all parameters before sending. Check trade.CheckResult() before trade execution.',
     mqlVersion: 'mql5',
   },
@@ -338,10 +324,7 @@ if(!trade.Buy(lots)) {
     name: 'TRADE_RETCODE_INVALID_STOPS',
     category: 'trade-execution',
     description: 'Invalid stops (MQL5 equivalent of error 130)',
-    commonCauses: [
-      'Stop level too close to current price',
-      'Freeze level violation',
-    ],
+    commonCauses: ['Stop level too close to current price', 'Freeze level violation'],
     fix: 'Check SYMBOL_TRADE_STOPS_LEVEL and SYMBOL_TRADE_FREEZE_LEVEL before setting SL/TP.',
     codeExample: `long stopLevel = SymbolInfoInteger(Symbol(), SYMBOL_TRADE_STOPS_LEVEL);
 double point = SymbolInfoDouble(Symbol(), SYMBOL_POINT);
@@ -606,55 +589,240 @@ const COMPILATION_ERRORS: CompilationError[] = [
 
 const MIGRATION_MAPPINGS: MigrationMapping[] = [
   // Account functions
-  { mql4Function: 'AccountBalance()', mql5Equivalent: 'AccountInfoDouble(ACCOUNT_BALANCE)', notes: 'Direct replacement', category: 'Account' },
-  { mql4Function: 'AccountEquity()', mql5Equivalent: 'AccountInfoDouble(ACCOUNT_EQUITY)', notes: 'Direct replacement', category: 'Account' },
-  { mql4Function: 'AccountFreeMargin()', mql5Equivalent: 'AccountInfoDouble(ACCOUNT_MARGIN_FREE)', notes: 'Direct replacement', category: 'Account' },
-  { mql4Function: 'AccountMargin()', mql5Equivalent: 'AccountInfoDouble(ACCOUNT_MARGIN)', notes: 'Direct replacement', category: 'Account' },
-  { mql4Function: 'AccountProfit()', mql5Equivalent: 'AccountInfoDouble(ACCOUNT_PROFIT)', notes: 'Direct replacement', category: 'Account' },
-  { mql4Function: 'AccountNumber()', mql5Equivalent: 'AccountInfoInteger(ACCOUNT_LOGIN)', notes: 'Returns long in MQL5', category: 'Account' },
-  { mql4Function: 'AccountLeverage()', mql5Equivalent: 'AccountInfoInteger(ACCOUNT_LEVERAGE)', notes: 'Returns long in MQL5', category: 'Account' },
+  {
+    mql4Function: 'AccountBalance()',
+    mql5Equivalent: 'AccountInfoDouble(ACCOUNT_BALANCE)',
+    notes: 'Direct replacement',
+    category: 'Account',
+  },
+  {
+    mql4Function: 'AccountEquity()',
+    mql5Equivalent: 'AccountInfoDouble(ACCOUNT_EQUITY)',
+    notes: 'Direct replacement',
+    category: 'Account',
+  },
+  {
+    mql4Function: 'AccountFreeMargin()',
+    mql5Equivalent: 'AccountInfoDouble(ACCOUNT_MARGIN_FREE)',
+    notes: 'Direct replacement',
+    category: 'Account',
+  },
+  {
+    mql4Function: 'AccountMargin()',
+    mql5Equivalent: 'AccountInfoDouble(ACCOUNT_MARGIN)',
+    notes: 'Direct replacement',
+    category: 'Account',
+  },
+  {
+    mql4Function: 'AccountProfit()',
+    mql5Equivalent: 'AccountInfoDouble(ACCOUNT_PROFIT)',
+    notes: 'Direct replacement',
+    category: 'Account',
+  },
+  {
+    mql4Function: 'AccountNumber()',
+    mql5Equivalent: 'AccountInfoInteger(ACCOUNT_LOGIN)',
+    notes: 'Returns long in MQL5',
+    category: 'Account',
+  },
+  {
+    mql4Function: 'AccountLeverage()',
+    mql5Equivalent: 'AccountInfoInteger(ACCOUNT_LEVERAGE)',
+    notes: 'Returns long in MQL5',
+    category: 'Account',
+  },
 
   // Symbol/Market info
-  { mql4Function: 'MarketInfo(s, MODE_BID)', mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_BID)', notes: 'Direct replacement', category: 'Symbol' },
-  { mql4Function: 'MarketInfo(s, MODE_ASK)', mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_ASK)', notes: 'Direct replacement', category: 'Symbol' },
-  { mql4Function: 'MarketInfo(s, MODE_SPREAD)', mql5Equivalent: '(int)SymbolInfoInteger(s, SYMBOL_SPREAD)', notes: 'Cast to int', category: 'Symbol' },
-  { mql4Function: 'MarketInfo(s, MODE_STOPLEVEL)', mql5Equivalent: '(int)SymbolInfoInteger(s, SYMBOL_TRADE_STOPS_LEVEL)', notes: 'Cast to int', category: 'Symbol' },
-  { mql4Function: 'MarketInfo(s, MODE_MINLOT)', mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_VOLUME_MIN)', notes: 'Direct replacement', category: 'Symbol' },
-  { mql4Function: 'MarketInfo(s, MODE_MAXLOT)', mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_VOLUME_MAX)', notes: 'Direct replacement', category: 'Symbol' },
-  { mql4Function: 'MarketInfo(s, MODE_LOTSTEP)', mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_VOLUME_STEP)', notes: 'Direct replacement', category: 'Symbol' },
+  {
+    mql4Function: 'MarketInfo(s, MODE_BID)',
+    mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_BID)',
+    notes: 'Direct replacement',
+    category: 'Symbol',
+  },
+  {
+    mql4Function: 'MarketInfo(s, MODE_ASK)',
+    mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_ASK)',
+    notes: 'Direct replacement',
+    category: 'Symbol',
+  },
+  {
+    mql4Function: 'MarketInfo(s, MODE_SPREAD)',
+    mql5Equivalent: '(int)SymbolInfoInteger(s, SYMBOL_SPREAD)',
+    notes: 'Cast to int',
+    category: 'Symbol',
+  },
+  {
+    mql4Function: 'MarketInfo(s, MODE_STOPLEVEL)',
+    mql5Equivalent: '(int)SymbolInfoInteger(s, SYMBOL_TRADE_STOPS_LEVEL)',
+    notes: 'Cast to int',
+    category: 'Symbol',
+  },
+  {
+    mql4Function: 'MarketInfo(s, MODE_MINLOT)',
+    mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_VOLUME_MIN)',
+    notes: 'Direct replacement',
+    category: 'Symbol',
+  },
+  {
+    mql4Function: 'MarketInfo(s, MODE_MAXLOT)',
+    mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_VOLUME_MAX)',
+    notes: 'Direct replacement',
+    category: 'Symbol',
+  },
+  {
+    mql4Function: 'MarketInfo(s, MODE_LOTSTEP)',
+    mql5Equivalent: 'SymbolInfoDouble(s, SYMBOL_VOLUME_STEP)',
+    notes: 'Direct replacement',
+    category: 'Symbol',
+  },
 
   // Order functions
-  { mql4Function: 'OrderSend()', mql5Equivalent: 'CTrade::Buy()/Sell()/BuyLimit()/SellStop()', notes: 'Use CTrade class. Different parameter structure.', category: 'Trading' },
-  { mql4Function: 'OrderClose()', mql5Equivalent: 'CTrade::PositionClose()', notes: 'Use position ticket instead of order ticket', category: 'Trading' },
-  { mql4Function: 'OrderModify()', mql5Equivalent: 'CTrade::PositionModify()/OrderModify()', notes: 'Separate position and pending order modification', category: 'Trading' },
-  { mql4Function: 'OrderDelete()', mql5Equivalent: 'CTrade::OrderDelete()', notes: 'Only for pending orders', category: 'Trading' },
-  { mql4Function: 'OrdersTotal()', mql5Equivalent: 'PositionsTotal() / OrdersTotal()', notes: 'MQL5 separates positions from pending orders', category: 'Trading' },
-  { mql4Function: 'OrderSelect()', mql5Equivalent: 'PositionSelectByTicket() / OrderGetTicket()', notes: 'Different selection mechanism', category: 'Trading' },
+  {
+    mql4Function: 'OrderSend()',
+    mql5Equivalent: 'CTrade::Buy()/Sell()/BuyLimit()/SellStop()',
+    notes: 'Use CTrade class. Different parameter structure.',
+    category: 'Trading',
+  },
+  {
+    mql4Function: 'OrderClose()',
+    mql5Equivalent: 'CTrade::PositionClose()',
+    notes: 'Use position ticket instead of order ticket',
+    category: 'Trading',
+  },
+  {
+    mql4Function: 'OrderModify()',
+    mql5Equivalent: 'CTrade::PositionModify()/OrderModify()',
+    notes: 'Separate position and pending order modification',
+    category: 'Trading',
+  },
+  {
+    mql4Function: 'OrderDelete()',
+    mql5Equivalent: 'CTrade::OrderDelete()',
+    notes: 'Only for pending orders',
+    category: 'Trading',
+  },
+  {
+    mql4Function: 'OrdersTotal()',
+    mql5Equivalent: 'PositionsTotal() / OrdersTotal()',
+    notes: 'MQL5 separates positions from pending orders',
+    category: 'Trading',
+  },
+  {
+    mql4Function: 'OrderSelect()',
+    mql5Equivalent: 'PositionSelectByTicket() / OrderGetTicket()',
+    notes: 'Different selection mechanism',
+    category: 'Trading',
+  },
 
   // Price data
-  { mql4Function: 'iMA(...)', mql5Equivalent: 'int handle = iMA(...); CopyBuffer(handle, 0, ...)', notes: 'MQL5 uses handles + CopyBuffer pattern', category: 'Indicators' },
-  { mql4Function: 'iRSI(...)', mql5Equivalent: 'int handle = iRSI(...); CopyBuffer(handle, 0, ...)', notes: 'Same handle pattern', category: 'Indicators' },
-  { mql4Function: 'iMACD(...)', mql5Equivalent: 'int handle = iMACD(...); CopyBuffer(handle, 0, ...)', notes: 'Same handle pattern', category: 'Indicators' },
-  { mql4Function: 'iStochastic(...)', mql5Equivalent: 'int handle = iStochastic(...); CopyBuffer(handle, ...)', notes: 'Main=buffer 0, Signal=buffer 1', category: 'Indicators' },
-  { mql4Function: 'iBands(...)', mql5Equivalent: 'int handle = iBands(...); CopyBuffer(handle, ...)', notes: 'Base=0, Upper=1, Lower=2', category: 'Indicators' },
+  {
+    mql4Function: 'iMA(...)',
+    mql5Equivalent: 'int handle = iMA(...); CopyBuffer(handle, 0, ...)',
+    notes: 'MQL5 uses handles + CopyBuffer pattern',
+    category: 'Indicators',
+  },
+  {
+    mql4Function: 'iRSI(...)',
+    mql5Equivalent: 'int handle = iRSI(...); CopyBuffer(handle, 0, ...)',
+    notes: 'Same handle pattern',
+    category: 'Indicators',
+  },
+  {
+    mql4Function: 'iMACD(...)',
+    mql5Equivalent: 'int handle = iMACD(...); CopyBuffer(handle, 0, ...)',
+    notes: 'Same handle pattern',
+    category: 'Indicators',
+  },
+  {
+    mql4Function: 'iStochastic(...)',
+    mql5Equivalent: 'int handle = iStochastic(...); CopyBuffer(handle, ...)',
+    notes: 'Main=buffer 0, Signal=buffer 1',
+    category: 'Indicators',
+  },
+  {
+    mql4Function: 'iBands(...)',
+    mql5Equivalent: 'int handle = iBands(...); CopyBuffer(handle, ...)',
+    notes: 'Base=0, Upper=1, Lower=2',
+    category: 'Indicators',
+  },
 
   // Time series
-  { mql4Function: 'Open[i] / Close[i] / High[i] / Low[i]', mql5Equivalent: 'iOpen(s,tf,i) / iClose(s,tf,i) / iHigh(s,tf,i) / iLow(s,tf,i)', notes: 'Or use CopyRates into MqlRates array', category: 'TimeSeries' },
-  { mql4Function: 'Volume[i]', mql5Equivalent: 'iVolume(s, tf, i) or iTickVolume(s, tf, i)', notes: 'MQL5 has tick and real volume', category: 'TimeSeries' },
-  { mql4Function: 'Time[i]', mql5Equivalent: 'iTime(s, tf, i)', notes: 'Or CopyTime()', category: 'TimeSeries' },
-  { mql4Function: 'Bars', mql5Equivalent: 'Bars(Symbol(), Period())', notes: 'Bars is a function in MQL5, not a variable', category: 'TimeSeries' },
-  { mql4Function: 'IndicatorCounted()', mql5Equivalent: 'prev_calculated (OnCalculate param)', notes: 'Passed as parameter to OnCalculate()', category: 'TimeSeries' },
+  {
+    mql4Function: 'Open[i] / Close[i] / High[i] / Low[i]',
+    mql5Equivalent: 'iOpen(s,tf,i) / iClose(s,tf,i) / iHigh(s,tf,i) / iLow(s,tf,i)',
+    notes: 'Or use CopyRates into MqlRates array',
+    category: 'TimeSeries',
+  },
+  {
+    mql4Function: 'Volume[i]',
+    mql5Equivalent: 'iVolume(s, tf, i) or iTickVolume(s, tf, i)',
+    notes: 'MQL5 has tick and real volume',
+    category: 'TimeSeries',
+  },
+  {
+    mql4Function: 'Time[i]',
+    mql5Equivalent: 'iTime(s, tf, i)',
+    notes: 'Or CopyTime()',
+    category: 'TimeSeries',
+  },
+  {
+    mql4Function: 'Bars',
+    mql5Equivalent: 'Bars(Symbol(), Period())',
+    notes: 'Bars is a function in MQL5, not a variable',
+    category: 'TimeSeries',
+  },
+  {
+    mql4Function: 'IndicatorCounted()',
+    mql5Equivalent: 'prev_calculated (OnCalculate param)',
+    notes: 'Passed as parameter to OnCalculate()',
+    category: 'TimeSeries',
+  },
 
   // Event handlers
-  { mql4Function: 'init()', mql5Equivalent: 'OnInit()', notes: 'Return type is int', category: 'Events' },
-  { mql4Function: 'start()', mql5Equivalent: 'OnTick() / OnCalculate()', notes: 'OnTick for EA, OnCalculate for indicator', category: 'Events' },
-  { mql4Function: 'deinit()', mql5Equivalent: 'OnDeinit(const int reason)', notes: 'Receives reason parameter', category: 'Events' },
+  {
+    mql4Function: 'init()',
+    mql5Equivalent: 'OnInit()',
+    notes: 'Return type is int',
+    category: 'Events',
+  },
+  {
+    mql4Function: 'start()',
+    mql5Equivalent: 'OnTick() / OnCalculate()',
+    notes: 'OnTick for EA, OnCalculate for indicator',
+    category: 'Events',
+  },
+  {
+    mql4Function: 'deinit()',
+    mql5Equivalent: 'OnDeinit(const int reason)',
+    notes: 'Receives reason parameter',
+    category: 'Events',
+  },
 
   // Misc
-  { mql4Function: 'extern', mql5Equivalent: 'input', notes: 'extern still works but input is preferred', category: 'Syntax' },
-  { mql4Function: 'Ask / Bid', mql5Equivalent: 'SymbolInfoDouble(Symbol(), SYMBOL_ASK/SYMBOL_BID)', notes: 'Predefined Ask/Bid removed in MQL5', category: 'Price' },
-  { mql4Function: 'Point', mql5Equivalent: 'SymbolInfoDouble(Symbol(), SYMBOL_POINT)', notes: 'Or _Point predefined variable', category: 'Price' },
-  { mql4Function: 'Digits', mql5Equivalent: 'SymbolInfoInteger(Symbol(), SYMBOL_DIGITS)', notes: 'Or _Digits predefined variable', category: 'Price' },
+  {
+    mql4Function: 'extern',
+    mql5Equivalent: 'input',
+    notes: 'extern still works but input is preferred',
+    category: 'Syntax',
+  },
+  {
+    mql4Function: 'Ask / Bid',
+    mql5Equivalent: 'SymbolInfoDouble(Symbol(), SYMBOL_ASK/SYMBOL_BID)',
+    notes: 'Predefined Ask/Bid removed in MQL5',
+    category: 'Price',
+  },
+  {
+    mql4Function: 'Point',
+    mql5Equivalent: 'SymbolInfoDouble(Symbol(), SYMBOL_POINT)',
+    notes: 'Or _Point predefined variable',
+    category: 'Price',
+  },
+  {
+    mql4Function: 'Digits',
+    mql5Equivalent: 'SymbolInfoInteger(Symbol(), SYMBOL_DIGITS)',
+    notes: 'Or _Digits predefined variable',
+    category: 'Price',
+  },
 ]
 
 // ── Error Handler Templates ──────────────────────────────────────────────────
@@ -921,7 +1089,8 @@ const CODE_PATTERNS: CodePattern[] = [
   },
   {
     name: 'mql5-unchecked-trade',
-    pattern: /trade\.\s*(?:Buy|Sell|BuyLimit|SellLimit|BuyStop|SellStop)\s*\((?:[^()]*\([^()]*\))*[^()]*\)\s*;/g,
+    pattern:
+      /trade\.\s*(?:Buy|Sell|BuyLimit|SellLimit|BuyStop|SellStop)\s*\((?:[^()]*\([^()]*\))*[^()]*\)\s*;/g,
     severity: 'critical',
     description: 'CTrade operation result not checked',
     fix: 'Check: if(!trade.Buy(...)) Print(trade.ResultRetcode(), trade.ResultComment());',
@@ -1003,7 +1172,8 @@ export class MQLCodeFixer {
     const info = this.lookupError(code)
     if (!info) return { found: false }
 
-    this.stats.errorsByCategory[info.category] = (this.stats.errorsByCategory[info.category] ?? 0) + 1
+    this.stats.errorsByCategory[info.category] =
+      (this.stats.errorsByCategory[info.category] ?? 0) + 1
 
     return {
       found: true,
@@ -1061,7 +1231,10 @@ export class MQLCodeFixer {
   // ── Error Handler Generation ─────────────────────────────────────────────
 
   /** Generate an error handler template for MQL4 or MQL5. */
-  generateErrorHandler(type: 'ordersend' | 'orderclose' | 'ordermodify' | 'trade' | 'position', version?: MQLVersion): ErrorHandlerTemplate | undefined {
+  generateErrorHandler(
+    type: 'ordersend' | 'orderclose' | 'ordermodify' | 'trade' | 'position',
+    version?: MQLVersion,
+  ): ErrorHandlerTemplate | undefined {
     const v = version ?? this.config.version
     const templates = ERROR_HANDLER_TEMPLATES.filter(t => t.version === v)
 
@@ -1097,9 +1270,7 @@ export class MQLCodeFixer {
 
   /** Get all migration mappings for a category. */
   getMigrationsByCategory(category: string): MigrationMapping[] {
-    return MIGRATION_MAPPINGS.filter(m =>
-      m.category.toLowerCase() === category.toLowerCase(),
-    )
+    return MIGRATION_MAPPINGS.filter(m => m.category.toLowerCase() === category.toLowerCase())
   }
 
   /** Get all migration mappings. */
@@ -1108,7 +1279,9 @@ export class MQLCodeFixer {
   }
 
   /** Scan MQL4 code and suggest MQL5 replacements. */
-  suggestMigration(mql4Code: string): Array<{ original: string; replacement: string; notes: string }> {
+  suggestMigration(
+    mql4Code: string,
+  ): Array<{ original: string; replacement: string; notes: string }> {
     this.stats.totalMigrations++
     const suggestions: Array<{ original: string; replacement: string; notes: string }> = []
 

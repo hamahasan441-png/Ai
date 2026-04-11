@@ -138,11 +138,7 @@ describe('analyze – branch counting and complexity', () => {
 
 describe('analyze – test case extraction', () => {
   it('extracts test cases from it() calls', () => {
-    const testCode = [
-      "it('should work', () => {",
-      '  expect(1).toBe(1)',
-      '})',
-    ].join('\n')
+    const testCode = ["it('should work', () => {", '  expect(1).toBe(1)', '})'].join('\n')
     const result = new TestCoverageAnalyzer().analyze('function a() { return 1 }', testCode)
     expect(result.testCases.length).toBeGreaterThanOrEqual(1)
     expect(result.testCases[0].name).toBe('should work')
@@ -154,7 +150,10 @@ describe('analyze – test case extraction', () => {
       '  expect(validate("x")).toBeTruthy()',
       '})',
     ].join('\n')
-    const result = new TestCoverageAnalyzer().analyze('function validate(x: string) { return true }', testCode)
+    const result = new TestCoverageAnalyzer().analyze(
+      'function validate(x: string) { return true }',
+      testCode,
+    )
     const tc = result.testCases.find(t => t.name === 'validates input')
     expect(tc).toBeDefined()
   })
@@ -172,7 +171,8 @@ describe('analyze – test case extraction', () => {
   })
 
   it('classifies error-case test type', () => {
-    const testCode = "it('should throw error for invalid input', () => {\n  expect(() => fn()).toThrow()\n})"
+    const testCode =
+      "it('should throw error for invalid input', () => {\n  expect(() => fn()).toThrow()\n})"
     const result = new TestCoverageAnalyzer().analyze('function fn() {}', testCode)
     const tc = result.testCases.find(t => t.name.includes('error'))
     expect(tc).toBeDefined()
@@ -181,7 +181,10 @@ describe('analyze – test case extraction', () => {
 
   it('classifies edge-case test type', () => {
     const testCode = "it('handles empty array', () => {\n  expect(fn([])).toEqual([])\n})"
-    const result = new TestCoverageAnalyzer().analyze('function fn(a: any[]) { return a }', testCode)
+    const result = new TestCoverageAnalyzer().analyze(
+      'function fn(a: any[]) { return a }',
+      testCode,
+    )
     const tc = result.testCases.find(t => t.name.includes('empty'))
     expect(tc).toBeDefined()
     expect(tc!.type).toBe('edge-case')
@@ -204,7 +207,8 @@ describe('analyze – test case extraction', () => {
   })
 
   it('skips describe blocks (not counted as test cases)', () => {
-    const testCode = "describe('MyModule', () => {\n  it('works', () => {\n    expect(1).toBe(1)\n  })\n})"
+    const testCode =
+      "describe('MyModule', () => {\n  it('works', () => {\n    expect(1).toBe(1)\n  })\n})"
     const result = new TestCoverageAnalyzer().analyze('function a() {}', testCode)
     expect(result.testCases.some(t => t.name === 'MyModule')).toBe(false)
   })
@@ -268,7 +272,8 @@ describe('analyze – coverage gaps', () => {
   })
 
   it('reports untested-error-path when source has throw but no error tests', () => {
-    const source = 'export function validate(x: string) {\n  if (!x) throw new Error("invalid")\n  return true\n}'
+    const source =
+      'export function validate(x: string) {\n  if (!x) throw new Error("invalid")\n  return true\n}'
     const testCode = "it('validates ok', () => {\n  expect(validate('a')).toBe(true)\n})"
     const result = new TestCoverageAnalyzer().analyze(source, testCode)
     const gap = result.gaps.find(g => g.type === 'untested-error-path')
@@ -277,7 +282,8 @@ describe('analyze – coverage gaps', () => {
   })
 
   it('does not report untested-error-path when error-case test exists', () => {
-    const source = 'export function validate(x: string) {\n  if (!x) throw new Error("invalid")\n  return true\n}'
+    const source =
+      'export function validate(x: string) {\n  if (!x) throw new Error("invalid")\n  return true\n}'
     const testCode = [
       "it('should throw error for empty', () => { expect(() => validate('')).toThrow() })",
       "it('validates ok', () => { expect(validate('a')).toBe(true) })",
@@ -329,7 +335,8 @@ describe('analyze – function coverage', () => {
   })
 
   it('returns 0% when no functions are tested', () => {
-    const source = 'export function zzUnique() { return 1 }\nexport function yyDistinct() { return 2 }'
+    const source =
+      'export function zzUnique() { return 1 }\nexport function yyDistinct() { return 2 }'
     const testCode = "it('something else', () => { expect(1).toBe(1) })"
     const result = new TestCoverageAnalyzer().analyze(source, testCode)
     expect(result.functionCoverage).toBe(0)

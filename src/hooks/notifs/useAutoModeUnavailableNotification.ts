@@ -19,9 +19,7 @@ import { hasAutoModeOptIn } from '../../utils/settings/settings.js'
 export function useAutoModeUnavailableNotification(): void {
   const { addNotification } = useNotifications()
   const mode = useAppState(s => s.toolPermissionContext.mode)
-  const isAutoModeAvailable = useAppState(
-    s => s.toolPermissionContext.isAutoModeAvailable,
-  )
+  const isAutoModeAvailable = useAppState(s => s.toolPermissionContext.isAutoModeAvailable)
   const shownRef = useRef(false)
   const prevModeRef = useRef<PermissionMode>(mode)
 

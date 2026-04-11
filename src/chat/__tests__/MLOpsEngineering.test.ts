@@ -16,21 +16,33 @@ describe('MLOpsEngineering', () => {
 
   describe('KB entry tests', () => {
     it('should match ML pipeline and model registry keywords', async () => {
-      const r = await brain.chat('explain ml pipeline kubeflow mlflow airflow metaflow model registry mlflow model versioning ab testing shadow deployment')
+      const r = await brain.chat(
+        'explain ml pipeline kubeflow mlflow airflow metaflow model registry mlflow model versioning ab testing shadow deployment',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/ml\s+pipeline|kubeflow|mlflow|model\s+registry|versioning/)
+      expect(r.text.toLowerCase()).toMatch(
+        /ml\s+pipeline|kubeflow|mlflow|model\s+registry|versioning/,
+      )
     })
 
     it('should match feature store and data versioning keywords', async () => {
-      const r = await brain.chat('explain feature store feast tecton hopsworks online offline data versioning dvc delta lake lakefs data lineage')
+      const r = await brain.chat(
+        'explain feature store feast tecton hopsworks online offline data versioning dvc delta lake lakefs data lineage',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/feature\s+store|feast|tecton|dvc|delta\s+lake|data\s+versioning/)
+      expect(r.text.toLowerCase()).toMatch(
+        /feature\s+store|feast|tecton|dvc|delta\s+lake|data\s+versioning/,
+      )
     })
 
     it('should match experiment tracking and model monitoring keywords', async () => {
-      const r = await brain.chat('explain experiment tracking mlflow tracking weights biases neptune model monitoring data drift concept drift retraining trigger')
+      const r = await brain.chat(
+        'explain experiment tracking mlflow tracking weights biases neptune model monitoring data drift concept drift retraining trigger',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/mlflow|tracking|monitoring|drift|feature\s+store|pipeline/)
+      expect(r.text.toLowerCase()).toMatch(
+        /mlflow|tracking|monitoring|drift|feature\s+store|pipeline/,
+      )
     })
   })
 

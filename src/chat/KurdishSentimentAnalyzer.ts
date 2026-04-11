@@ -94,185 +94,185 @@ const SENTIMENT_LEXICON: readonly SentimentWord[] = [
   { word: 'خۆشحاڵ', sentiment: 'positive', weight: 0.85, category: 'joy' },
   { word: 'جوان', sentiment: 'positive', weight: 0.75, category: 'joy' },
   { word: 'باش', sentiment: 'positive', weight: 0.65, category: 'joy' },
-  { word: 'خۆش', sentiment: 'positive', weight: 0.70, category: 'joy' },
-  { word: 'سوپاس', sentiment: 'positive', weight: 0.80, category: 'gratitude' },
-  { word: 'سپاس', sentiment: 'positive', weight: 0.80, category: 'gratitude' },
-  { word: 'بەختەوەر', sentiment: 'positive', weight: 0.90, category: 'joy' },
+  { word: 'خۆش', sentiment: 'positive', weight: 0.7, category: 'joy' },
+  { word: 'سوپاس', sentiment: 'positive', weight: 0.8, category: 'gratitude' },
+  { word: 'سپاس', sentiment: 'positive', weight: 0.8, category: 'gratitude' },
+  { word: 'بەختەوەر', sentiment: 'positive', weight: 0.9, category: 'joy' },
   { word: 'ئازاد', sentiment: 'positive', weight: 0.75, category: 'hope' },
   { word: 'سەرکەوتن', sentiment: 'positive', weight: 0.85, category: 'pride' },
-  { word: 'هیوا', sentiment: 'positive', weight: 0.70, category: 'hope' },
-  { word: 'خۆشەویستی', sentiment: 'positive', weight: 0.90, category: 'love' },
-  { word: 'ئارام', sentiment: 'positive', weight: 0.60, category: 'joy' },
+  { word: 'هیوا', sentiment: 'positive', weight: 0.7, category: 'hope' },
+  { word: 'خۆشەویستی', sentiment: 'positive', weight: 0.9, category: 'love' },
+  { word: 'ئارام', sentiment: 'positive', weight: 0.6, category: 'joy' },
   { word: 'دڵخۆش', sentiment: 'positive', weight: 0.75, category: 'joy' },
-  { word: 'پیرۆز', sentiment: 'positive', weight: 0.80, category: 'joy' },
-  { word: 'گەشبین', sentiment: 'positive', weight: 0.70, category: 'hope' },
+  { word: 'پیرۆز', sentiment: 'positive', weight: 0.8, category: 'joy' },
+  { word: 'گەشبین', sentiment: 'positive', weight: 0.7, category: 'hope' },
   { word: 'بەرز', sentiment: 'positive', weight: 0.55, category: 'pride' },
   { word: 'نوێ', sentiment: 'positive', weight: 0.45, category: 'hope' },
   { word: 'توانا', sentiment: 'positive', weight: 0.65, category: 'pride' },
-  { word: 'هاوکار', sentiment: 'positive', weight: 0.60, category: 'gratitude' },
+  { word: 'هاوکار', sentiment: 'positive', weight: 0.6, category: 'gratitude' },
   { word: 'ئاسوودە', sentiment: 'positive', weight: 0.65, category: 'joy' },
-  { word: 'ڕەزامەندی', sentiment: 'positive', weight: 0.70, category: 'gratitude' },
+  { word: 'ڕەزامەندی', sentiment: 'positive', weight: 0.7, category: 'gratitude' },
   { word: 'دڵسۆز', sentiment: 'positive', weight: 0.75, category: 'love' },
-  { word: 'شانازی', sentiment: 'positive', weight: 0.70, category: 'pride' },
+  { word: 'شانازی', sentiment: 'positive', weight: 0.7, category: 'pride' },
   { word: 'خەڵات', sentiment: 'positive', weight: 0.65, category: 'joy' },
-  { word: 'ڕۆشنایی', sentiment: 'positive', weight: 0.60, category: 'hope' },
+  { word: 'ڕۆشنایی', sentiment: 'positive', weight: 0.6, category: 'hope' },
   { word: 'دەستکەوت', sentiment: 'positive', weight: 0.75, category: 'pride' },
-  { word: 'پێکەنین', sentiment: 'positive', weight: 0.70, category: 'joy' },
-  { word: 'گوڵ', sentiment: 'positive', weight: 0.60, category: 'love' },
+  { word: 'پێکەنین', sentiment: 'positive', weight: 0.7, category: 'joy' },
+  { word: 'گوڵ', sentiment: 'positive', weight: 0.6, category: 'love' },
   { word: 'ڕێز', sentiment: 'positive', weight: 0.65, category: 'gratitude' },
-  { word: 'سەلامەت', sentiment: 'positive', weight: 0.60, category: 'joy' },
+  { word: 'سەلامەت', sentiment: 'positive', weight: 0.6, category: 'joy' },
   { word: 'دەنگدار', sentiment: 'positive', weight: 0.55, category: 'pride' },
   { word: 'خۆشەویست', sentiment: 'positive', weight: 0.85, category: 'love' },
   { word: 'بەنرخ', sentiment: 'positive', weight: 0.65, category: 'pride' },
-  { word: 'جێگای', sentiment: 'positive', weight: 0.50, category: 'pride' },
+  { word: 'جێگای', sentiment: 'positive', weight: 0.5, category: 'pride' },
   { word: 'بڵند', sentiment: 'positive', weight: 0.55, category: 'pride' },
-  { word: 'زۆر باش', sentiment: 'positive', weight: 0.80, category: 'joy' },
+  { word: 'زۆر باش', sentiment: 'positive', weight: 0.8, category: 'joy' },
   { word: 'شکۆمەند', sentiment: 'positive', weight: 0.75, category: 'pride' },
-  { word: 'پشت', sentiment: 'positive', weight: 0.50, category: 'hope' },
+  { word: 'پشت', sentiment: 'positive', weight: 0.5, category: 'hope' },
   { word: 'نەرم', sentiment: 'positive', weight: 0.45, category: 'love' },
-  { word: 'هەڵگری', sentiment: 'positive', weight: 0.50, category: 'pride' },
-  { word: 'پاک', sentiment: 'positive', weight: 0.60, category: 'joy' },
-  { word: 'سادە', sentiment: 'positive', weight: 0.40, category: 'joy' },
+  { word: 'هەڵگری', sentiment: 'positive', weight: 0.5, category: 'pride' },
+  { word: 'پاک', sentiment: 'positive', weight: 0.6, category: 'joy' },
+  { word: 'سادە', sentiment: 'positive', weight: 0.4, category: 'joy' },
   { word: 'ڕاست', sentiment: 'positive', weight: 0.55, category: 'pride' },
   { word: 'دڵنیا', sentiment: 'positive', weight: 0.65, category: 'pride' },
-  { word: 'شیرین', sentiment: 'positive', weight: 0.70, category: 'love' },
+  { word: 'شیرین', sentiment: 'positive', weight: 0.7, category: 'love' },
   { word: 'تایبەت', sentiment: 'positive', weight: 0.55, category: 'pride' },
-  { word: 'هەناسە', sentiment: 'positive', weight: 0.50, category: 'joy' },
+  { word: 'هەناسە', sentiment: 'positive', weight: 0.5, category: 'joy' },
   { word: 'بەهرە', sentiment: 'positive', weight: 0.55, category: 'joy' },
   { word: 'پاداشت', sentiment: 'positive', weight: 0.65, category: 'gratitude' },
-  { word: 'هێز', sentiment: 'positive', weight: 0.60, category: 'pride' },
+  { word: 'هێز', sentiment: 'positive', weight: 0.6, category: 'pride' },
   { word: 'سەرکەوتوو', sentiment: 'positive', weight: 0.85, category: 'pride' },
   { word: 'خۆشی', sentiment: 'positive', weight: 0.75, category: 'joy' },
   { word: 'بەرەکەت', sentiment: 'positive', weight: 0.65, category: 'gratitude' },
-  { word: 'ئاشتی', sentiment: 'positive', weight: 0.70, category: 'hope' },
+  { word: 'ئاشتی', sentiment: 'positive', weight: 0.7, category: 'hope' },
   { word: 'دڵۆڤانی', sentiment: 'positive', weight: 0.75, category: 'love' },
-  { word: 'بژی', sentiment: 'positive', weight: 0.80, category: 'hope' },
+  { word: 'بژی', sentiment: 'positive', weight: 0.8, category: 'hope' },
   { word: 'خۆشبێت', sentiment: 'positive', weight: 0.75, category: 'gratitude' },
-  { word: 'گەورە', sentiment: 'positive', weight: 0.60, category: 'pride' },
+  { word: 'گەورە', sentiment: 'positive', weight: 0.6, category: 'pride' },
   { word: 'ڕازی', sentiment: 'positive', weight: 0.65, category: 'joy' },
-  { word: 'بەرەو', sentiment: 'positive', weight: 0.40, category: 'hope' },
-  { word: 'ئومێد', sentiment: 'positive', weight: 0.70, category: 'hope' },
+  { word: 'بەرەو', sentiment: 'positive', weight: 0.4, category: 'hope' },
+  { word: 'ئومێد', sentiment: 'positive', weight: 0.7, category: 'hope' },
   { word: 'ئەخلاق', sentiment: 'positive', weight: 0.65, category: 'pride' },
-  { word: 'دڵسۆزی', sentiment: 'positive', weight: 0.70, category: 'love' },
-  { word: 'خودا', sentiment: 'positive', weight: 0.50, category: 'hope' },
+  { word: 'دڵسۆزی', sentiment: 'positive', weight: 0.7, category: 'love' },
+  { word: 'خودا', sentiment: 'positive', weight: 0.5, category: 'hope' },
   { word: 'پارێزگاری', sentiment: 'positive', weight: 0.65, category: 'pride' },
-  { word: 'لەزەت', sentiment: 'positive', weight: 0.70, category: 'joy' },
+  { word: 'لەزەت', sentiment: 'positive', weight: 0.7, category: 'joy' },
   { word: 'میهرەبان', sentiment: 'positive', weight: 0.75, category: 'love' },
   { word: 'هاوڕێ', sentiment: 'positive', weight: 0.65, category: 'love' },
   { word: 'بەخت', sentiment: 'positive', weight: 0.75, category: 'joy' },
-  { word: 'نیشتمان', sentiment: 'positive', weight: 0.60, category: 'pride' },
-  { word: 'ئازادی', sentiment: 'positive', weight: 0.80, category: 'hope' },
+  { word: 'نیشتمان', sentiment: 'positive', weight: 0.6, category: 'pride' },
+  { word: 'ئازادی', sentiment: 'positive', weight: 0.8, category: 'hope' },
   { word: 'سۆز', sentiment: 'positive', weight: 0.65, category: 'love' },
   { word: 'دەستخۆش', sentiment: 'positive', weight: 0.75, category: 'gratitude' },
-  { word: 'شایەنی', sentiment: 'positive', weight: 0.60, category: 'pride' },
-  { word: 'دڵگرم', sentiment: 'positive', weight: 0.70, category: 'hope' },
+  { word: 'شایەنی', sentiment: 'positive', weight: 0.6, category: 'pride' },
+  { word: 'دڵگرم', sentiment: 'positive', weight: 0.7, category: 'hope' },
   { word: 'بەرەکەللا', sentiment: 'positive', weight: 0.75, category: 'gratitude' },
   { word: 'ئاوەدان', sentiment: 'positive', weight: 0.65, category: 'hope' },
-  { word: 'ڕووناکی', sentiment: 'positive', weight: 0.60, category: 'hope' },
+  { word: 'ڕووناکی', sentiment: 'positive', weight: 0.6, category: 'hope' },
   { word: 'نازدار', sentiment: 'positive', weight: 0.65, category: 'love' },
-  { word: 'خاوەن', sentiment: 'positive', weight: 0.50, category: 'pride' },
-  { word: 'ئاسودە', sentiment: 'positive', weight: 0.60, category: 'joy' },
-  { word: 'فەرح', sentiment: 'positive', weight: 0.70, category: 'joy' },
+  { word: 'خاوەن', sentiment: 'positive', weight: 0.5, category: 'pride' },
+  { word: 'ئاسودە', sentiment: 'positive', weight: 0.6, category: 'joy' },
+  { word: 'فەرح', sentiment: 'positive', weight: 0.7, category: 'joy' },
   { word: 'شاد', sentiment: 'positive', weight: 0.75, category: 'joy' },
   { word: 'خۆشبەخت', sentiment: 'positive', weight: 0.85, category: 'joy' },
   { word: 'بەرز', sentiment: 'positive', weight: 0.55, category: 'pride' },
-  { word: 'دڵەڕەحم', sentiment: 'positive', weight: 0.70, category: 'love' },
+  { word: 'دڵەڕەحم', sentiment: 'positive', weight: 0.7, category: 'love' },
   { word: 'بوێر', sentiment: 'positive', weight: 0.65, category: 'pride' },
-  { word: 'گیان', sentiment: 'positive', weight: 0.60, category: 'love' },
-  { word: 'ئاڵقۆس', sentiment: 'positive', weight: 0.50, category: 'love' },
+  { word: 'گیان', sentiment: 'positive', weight: 0.6, category: 'love' },
+  { word: 'ئاڵقۆس', sentiment: 'positive', weight: 0.5, category: 'love' },
   { word: 'لایەنگری', sentiment: 'positive', weight: 0.55, category: 'gratitude' },
   { word: 'مەزن', sentiment: 'positive', weight: 0.55, category: 'pride' },
-  { word: 'بەرین', sentiment: 'positive', weight: 0.60, category: 'pride' },
+  { word: 'بەرین', sentiment: 'positive', weight: 0.6, category: 'pride' },
   { word: 'پشتیوان', sentiment: 'positive', weight: 0.65, category: 'hope' },
 
   // ── Negative words (55+20 expanded) ──────────────────────────────────────
-  { word: 'خەم', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'خەم', sentiment: 'negative', weight: -0.7, category: 'sadness' },
   { word: 'ئازار', sentiment: 'negative', weight: -0.75, category: 'sadness' },
-  { word: 'ترس', sentiment: 'negative', weight: -0.70, category: 'fear' },
+  { word: 'ترس', sentiment: 'negative', weight: -0.7, category: 'fear' },
   { word: 'بێزار', sentiment: 'negative', weight: -0.65, category: 'frustration' },
-  { word: 'ناشرین', sentiment: 'negative', weight: -0.60, category: 'sadness' },
+  { word: 'ناشرین', sentiment: 'negative', weight: -0.6, category: 'sadness' },
   { word: 'خراپ', sentiment: 'negative', weight: -0.65, category: 'anger' },
-  { word: 'قەلەق', sentiment: 'negative', weight: -0.60, category: 'fear' },
+  { word: 'قەلەق', sentiment: 'negative', weight: -0.6, category: 'fear' },
   { word: 'نەخۆش', sentiment: 'negative', weight: -0.65, category: 'sadness' },
   { word: 'هەڵە', sentiment: 'negative', weight: -0.55, category: 'frustration' },
   { word: 'تووڕە', sentiment: 'negative', weight: -0.75, category: 'anger' },
-  { word: 'شەڕ', sentiment: 'negative', weight: -0.70, category: 'anger' },
-  { word: 'بێ ئومێد', sentiment: 'negative', weight: -0.80, category: 'sadness' },
+  { word: 'شەڕ', sentiment: 'negative', weight: -0.7, category: 'anger' },
+  { word: 'بێ ئومێد', sentiment: 'negative', weight: -0.8, category: 'sadness' },
   { word: 'ناڕەحەت', sentiment: 'negative', weight: -0.55, category: 'frustration' },
   { word: 'کێشە', sentiment: 'negative', weight: -0.55, category: 'frustration' },
-  { word: 'ئەندوو', sentiment: 'negative', weight: -0.70, category: 'sadness' },
-  { word: 'نارەزایی', sentiment: 'negative', weight: -0.60, category: 'anger' },
+  { word: 'ئەندوو', sentiment: 'negative', weight: -0.7, category: 'sadness' },
+  { word: 'نارەزایی', sentiment: 'negative', weight: -0.6, category: 'anger' },
   { word: 'زیان', sentiment: 'negative', weight: -0.65, category: 'sadness' },
   { word: 'دڵتەنگ', sentiment: 'negative', weight: -0.65, category: 'sadness' },
-  { word: 'بەد', sentiment: 'negative', weight: -0.70, category: 'anger' },
-  { word: 'ڕق', sentiment: 'negative', weight: -0.80, category: 'anger' },
+  { word: 'بەد', sentiment: 'negative', weight: -0.7, category: 'anger' },
+  { word: 'ڕق', sentiment: 'negative', weight: -0.8, category: 'anger' },
   { word: 'نەفرەت', sentiment: 'negative', weight: -0.85, category: 'anger' },
   { word: 'تاوان', sentiment: 'negative', weight: -0.75, category: 'anger' },
-  { word: 'فریو', sentiment: 'negative', weight: -0.70, category: 'anger' },
+  { word: 'فریو', sentiment: 'negative', weight: -0.7, category: 'anger' },
   { word: 'درۆ', sentiment: 'negative', weight: -0.65, category: 'anger' },
-  { word: 'داخ', sentiment: 'negative', weight: -0.60, category: 'sadness' },
-  { word: 'کوشتن', sentiment: 'negative', weight: -0.90, category: 'fear' },
+  { word: 'داخ', sentiment: 'negative', weight: -0.6, category: 'sadness' },
+  { word: 'کوشتن', sentiment: 'negative', weight: -0.9, category: 'fear' },
   { word: 'مردن', sentiment: 'negative', weight: -0.85, category: 'fear' },
-  { word: 'ئاگر', sentiment: 'negative', weight: -0.60, category: 'anger' },
-  { word: 'وێران', sentiment: 'negative', weight: -0.80, category: 'sadness' },
+  { word: 'ئاگر', sentiment: 'negative', weight: -0.6, category: 'anger' },
+  { word: 'وێران', sentiment: 'negative', weight: -0.8, category: 'sadness' },
   { word: 'گەندەڵ', sentiment: 'negative', weight: -0.75, category: 'anger' },
   { word: 'بێ سوود', sentiment: 'negative', weight: -0.55, category: 'frustration' },
-  { word: 'بەئاشکرا', sentiment: 'negative', weight: -0.50, category: 'anger' },
+  { word: 'بەئاشکرا', sentiment: 'negative', weight: -0.5, category: 'anger' },
   { word: 'پەشێو', sentiment: 'negative', weight: -0.55, category: 'fear' },
-  { word: 'بوار', sentiment: 'negative', weight: -0.50, category: 'sadness' },
+  { word: 'بوار', sentiment: 'negative', weight: -0.5, category: 'sadness' },
   { word: 'شکست', sentiment: 'negative', weight: -0.75, category: 'sadness' },
   { word: 'لاواز', sentiment: 'negative', weight: -0.55, category: 'sadness' },
   { word: 'عاجز', sentiment: 'negative', weight: -0.65, category: 'sadness' },
   { word: 'زوڵم', sentiment: 'negative', weight: -0.85, category: 'anger' },
-  { word: 'ستەم', sentiment: 'negative', weight: -0.80, category: 'anger' },
-  { word: 'بەندی', sentiment: 'negative', weight: -0.70, category: 'fear' },
-  { word: 'قوربانی', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'ستەم', sentiment: 'negative', weight: -0.8, category: 'anger' },
+  { word: 'بەندی', sentiment: 'negative', weight: -0.7, category: 'fear' },
+  { word: 'قوربانی', sentiment: 'negative', weight: -0.7, category: 'sadness' },
   { word: 'ڕسوا', sentiment: 'negative', weight: -0.65, category: 'sadness' },
   { word: 'ئاژاوە', sentiment: 'negative', weight: -0.65, category: 'fear' },
-  { word: 'تەنیا', sentiment: 'negative', weight: -0.60, category: 'sadness' },
-  { word: 'گریان', sentiment: 'negative', weight: -0.70, category: 'sadness' },
-  { word: 'برسی', sentiment: 'negative', weight: -0.50, category: 'sadness' },
-  { word: 'نەهامەتی', sentiment: 'negative', weight: -0.70, category: 'sadness' },
-  { word: 'داگیرکەر', sentiment: 'negative', weight: -0.80, category: 'anger' },
+  { word: 'تەنیا', sentiment: 'negative', weight: -0.6, category: 'sadness' },
+  { word: 'گریان', sentiment: 'negative', weight: -0.7, category: 'sadness' },
+  { word: 'برسی', sentiment: 'negative', weight: -0.5, category: 'sadness' },
+  { word: 'نەهامەتی', sentiment: 'negative', weight: -0.7, category: 'sadness' },
+  { word: 'داگیرکەر', sentiment: 'negative', weight: -0.8, category: 'anger' },
   { word: 'بێ ڕەحم', sentiment: 'negative', weight: -0.85, category: 'anger' },
   { word: 'تووشبوون', sentiment: 'negative', weight: -0.55, category: 'sadness' },
-  { word: 'بێزاری', sentiment: 'negative', weight: -0.60, category: 'frustration' },
+  { word: 'بێزاری', sentiment: 'negative', weight: -0.6, category: 'frustration' },
   { word: 'خەفەت', sentiment: 'negative', weight: -0.65, category: 'sadness' },
-  { word: 'پەژارە', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'پەژارە', sentiment: 'negative', weight: -0.7, category: 'sadness' },
   { word: 'بێچارە', sentiment: 'negative', weight: -0.75, category: 'sadness' },
-  { word: 'دڵشکاو', sentiment: 'negative', weight: -0.80, category: 'sadness' },
+  { word: 'دڵشکاو', sentiment: 'negative', weight: -0.8, category: 'sadness' },
   { word: 'ناخۆش', sentiment: 'negative', weight: -0.55, category: 'frustration' },
-  { word: 'تەقەت', sentiment: 'negative', weight: -0.50, category: 'frustration' },
+  { word: 'تەقەت', sentiment: 'negative', weight: -0.5, category: 'frustration' },
   { word: 'نەیار', sentiment: 'negative', weight: -0.65, category: 'anger' },
   { word: 'تاڵان', sentiment: 'negative', weight: -0.75, category: 'anger' },
   { word: 'داماوی', sentiment: 'negative', weight: -0.55, category: 'sadness' },
-  { word: 'تۆمار', sentiment: 'negative', weight: -0.40, category: 'frustration' },
+  { word: 'تۆمار', sentiment: 'negative', weight: -0.4, category: 'frustration' },
   { word: 'بێتاقەت', sentiment: 'negative', weight: -0.65, category: 'frustration' },
-  { word: 'خەڵوەز', sentiment: 'negative', weight: -0.60, category: 'sadness' },
+  { word: 'خەڵوەز', sentiment: 'negative', weight: -0.6, category: 'sadness' },
   { word: 'گومان', sentiment: 'negative', weight: -0.45, category: 'fear' },
-  { word: 'ئاوارە', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'ئاوارە', sentiment: 'negative', weight: -0.7, category: 'sadness' },
   { word: 'بێکەسی', sentiment: 'negative', weight: -0.75, category: 'sadness' },
-  { word: 'نائومێدی', sentiment: 'negative', weight: -0.80, category: 'sadness' },
+  { word: 'نائومێدی', sentiment: 'negative', weight: -0.8, category: 'sadness' },
   { word: 'خوارە', sentiment: 'negative', weight: -0.55, category: 'sadness' },
-  { word: 'سەرلێشێواو', sentiment: 'negative', weight: -0.60, category: 'frustration' },
-  { word: 'نەگبەت', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'سەرلێشێواو', sentiment: 'negative', weight: -0.6, category: 'frustration' },
+  { word: 'نەگبەت', sentiment: 'negative', weight: -0.7, category: 'sadness' },
   { word: 'خوارخوێن', sentiment: 'negative', weight: -0.85, category: 'anger' },
-  { word: 'پەراوێز', sentiment: 'negative', weight: -0.50, category: 'sadness' },
+  { word: 'پەراوێز', sentiment: 'negative', weight: -0.5, category: 'sadness' },
   { word: 'ڕەشبین', sentiment: 'negative', weight: -0.65, category: 'sadness' },
-  { word: 'توڕەیی', sentiment: 'negative', weight: -0.70, category: 'anger' },
+  { word: 'توڕەیی', sentiment: 'negative', weight: -0.7, category: 'anger' },
   { word: 'بێ ئابڕوو', sentiment: 'negative', weight: -0.75, category: 'anger' },
   { word: 'خیانەت', sentiment: 'negative', weight: -0.85, category: 'anger' },
-  { word: 'بێ وەفا', sentiment: 'negative', weight: -0.70, category: 'sadness' },
+  { word: 'بێ وەفا', sentiment: 'negative', weight: -0.7, category: 'sadness' },
   { word: 'دڵکوێر', sentiment: 'negative', weight: -0.55, category: 'fear' },
-  { word: 'ژەهراوی', sentiment: 'negative', weight: -0.70, category: 'fear' },
-  { word: 'بێزاربوون', sentiment: 'negative', weight: -0.60, category: 'frustration' },
-  { word: 'پاشگەز', sentiment: 'negative', weight: -0.50, category: 'frustration' },
-  { word: 'وێرانکاری', sentiment: 'negative', weight: -0.80, category: 'anger' },
-  { word: 'تاڵ', sentiment: 'negative', weight: -0.50, category: 'sadness' },
+  { word: 'ژەهراوی', sentiment: 'negative', weight: -0.7, category: 'fear' },
+  { word: 'بێزاربوون', sentiment: 'negative', weight: -0.6, category: 'frustration' },
+  { word: 'پاشگەز', sentiment: 'negative', weight: -0.5, category: 'frustration' },
+  { word: 'وێرانکاری', sentiment: 'negative', weight: -0.8, category: 'anger' },
+  { word: 'تاڵ', sentiment: 'negative', weight: -0.5, category: 'sadness' },
   { word: 'ناشاد', sentiment: 'negative', weight: -0.65, category: 'sadness' },
   { word: 'دڵشکانی', sentiment: 'negative', weight: -0.75, category: 'sadness' },
-  { word: 'بێچارەیی', sentiment: 'negative', weight: -0.70, category: 'sadness' },
-  { word: 'حەسوود', sentiment: 'negative', weight: -0.60, category: 'anger' },
+  { word: 'بێچارەیی', sentiment: 'negative', weight: -0.7, category: 'sadness' },
+  { word: 'حەسوود', sentiment: 'negative', weight: -0.6, category: 'anger' },
 
   // ── Neutral words (36+15 expanded) ───────────────────────────────────────
   { word: 'ڕۆژ', sentiment: 'neutral', weight: 0.0, category: 'time' },
@@ -333,50 +333,50 @@ const SENTIMENT_LEXICON: readonly SentimentWord[] = [
  */
 const EMOJI_SENTIMENT: ReadonlyMap<string, number> = new Map<string, number>([
   // Positive emojis
-  ['😊', 0.60],
-  ['😄', 0.70],
+  ['😊', 0.6],
+  ['😄', 0.7],
   ['😁', 0.65],
-  ['🥰', 0.80],
+  ['🥰', 0.8],
   ['❤️', 0.75],
-  ['💕', 0.70],
-  ['🌸', 0.50],
+  ['💕', 0.7],
+  ['🌸', 0.5],
   ['🌹', 0.55],
-  ['🙏', 0.60],
-  ['👍', 0.50],
-  ['🎉', 0.70],
+  ['🙏', 0.6],
+  ['👍', 0.5],
+  ['🎉', 0.7],
   ['💪', 0.55],
-  ['✨', 0.50],
+  ['✨', 0.5],
   ['🥳', 0.75],
   ['😍', 0.75],
   ['💚', 0.65],
-  ['🌺', 0.50],
+  ['🌺', 0.5],
   ['💐', 0.55],
-  ['👏', 0.60],
+  ['👏', 0.6],
   ['🤗', 0.65],
   // Negative emojis
   ['😢', -0.65],
   ['😭', -0.75],
-  ['💔', -0.70],
+  ['💔', -0.7],
   ['😞', -0.55],
-  ['😤', -0.60],
-  ['😡', -0.80],
-  ['🤬', -0.80],
+  ['😤', -0.6],
+  ['😡', -0.8],
+  ['🤬', -0.8],
   ['😒', -0.45],
-  ['😠', -0.70],
-  ['🥺', -0.40],
+  ['😠', -0.7],
+  ['🥺', -0.4],
   ['😰', -0.55],
   ['😱', -0.65],
-  ['👎', -0.50],
-  ['💀', -0.50],
-  ['🖤', -0.30],
+  ['👎', -0.5],
+  ['💀', -0.5],
+  ['🖤', -0.3],
   // Neutral emojis
   ['🤔', 0.0],
   ['😐', 0.0],
   ['🙄', 0.0],
   ['🤷', 0.0],
   // Mixed emojis (slight positive lean — laughter is ambiguous)
-  ['😂', 0.10],
-  ['🤣', 0.10],
+  ['😂', 0.1],
+  ['🤣', 0.1],
 ])
 
 /** Negation particles that invert the polarity of the following word. */
@@ -403,8 +403,16 @@ const INTENSIFIERS: ReadonlyMap<string, number> = new Map([
 
 /** Emotion categories used by the analyzer. */
 const EMOTION_CATEGORIES = [
-  'joy', 'sadness', 'anger', 'hope', 'fear',
-  'love', 'pride', 'nostalgia', 'frustration', 'gratitude',
+  'joy',
+  'sadness',
+  'anger',
+  'hope',
+  'fear',
+  'love',
+  'pride',
+  'nostalgia',
+  'frustration',
+  'gratitude',
 ] as const
 
 /**
@@ -712,13 +720,10 @@ export class KurdishSentimentAnalyzer {
     }
 
     // Score lexicon matches
-    const { positiveScore, negativeScore, emotionCounts, matchedWords } =
-      this.scoreLexicon(tokens)
+    const { positiveScore, negativeScore, emotionCounts, matchedWords } = this.scoreLexicon(tokens)
 
     // Score emojis
-    const emojiScore = this.config.enableEmojiAnalysis
-      ? this.scoreEmojis(text)
-      : 0
+    const emojiScore = this.config.enableEmojiAnalysis ? this.scoreEmojis(text) : 0
 
     // Aggregate raw scores
     const totalPositive = positiveScore + Math.max(0, emojiScore)
@@ -731,7 +736,11 @@ export class KurdishSentimentAnalyzer {
     const dominantEmotion = this.pickDominantEmotion(emotionCounts)
     const isSubjective = this.determineSubjectivity(matchedWords, tokens.length)
     const explanation = this.buildExplanation(
-      label, confidence, matchedWords, dominantEmotion, tokens.length,
+      label,
+      confidence,
+      matchedWords,
+      dominantEmotion,
+      tokens.length,
       containsKurdishScript(text),
     )
 
@@ -766,7 +775,7 @@ export class KurdishSentimentAnalyzer {
    * @returns Array of {@link SentimentResult} in the same order.
    */
   analyzeBatch(texts: string[]): SentimentResult[] {
-    return texts.map((t) => this.analyzeSentiment(t))
+    return texts.map(t => this.analyzeSentiment(t))
   }
 
   /**
@@ -775,12 +784,9 @@ export class KurdishSentimentAnalyzer {
    * @param count - Maximum number of samples to return.
    * @returns Matching corpus samples.
    */
-  getCorpusSamples(
-    sentiment?: SentimentLabel,
-    count?: number,
-  ): SentimentCorpusSample[] {
+  getCorpusSamples(sentiment?: SentimentLabel, count?: number): SentimentCorpusSample[] {
     const filtered = sentiment
-      ? CORPUS_SAMPLES.filter((s) => s.sentiment === sentiment)
+      ? CORPUS_SAMPLES.filter(s => s.sentiment === sentiment)
       : [...CORPUS_SAMPLES]
 
     return count !== undefined ? filtered.slice(0, count) : filtered
@@ -791,7 +797,7 @@ export class KurdishSentimentAnalyzer {
    * @returns Array of positive {@link SentimentWord} entries.
    */
   getPositiveWords(): SentimentWord[] {
-    return SENTIMENT_LEXICON.filter((w) => w.sentiment === 'positive')
+    return SENTIMENT_LEXICON.filter(w => w.sentiment === 'positive')
   }
 
   /**
@@ -799,7 +805,7 @@ export class KurdishSentimentAnalyzer {
    * @returns Array of negative {@link SentimentWord} entries.
    */
   getNegativeWords(): SentimentWord[] {
-    return SENTIMENT_LEXICON.filter((w) => w.sentiment === 'negative')
+    return SENTIMENT_LEXICON.filter(w => w.sentiment === 'negative')
   }
 
   /**
@@ -873,9 +879,8 @@ export class KurdishSentimentAnalyzer {
       }
 
       // Try multi-word lookup first (bigram with next token)
-      const bigramMatch = i + 1 < tokens.length
-        ? this.lexiconMap.get(`${token} ${tokens[i + 1]}`)
-        : undefined
+      const bigramMatch =
+        i + 1 < tokens.length ? this.lexiconMap.get(`${token} ${tokens[i + 1]}`) : undefined
 
       let match = bigramMatch ?? this.lexiconMap.get(token)
       if (bigramMatch) {
@@ -907,7 +912,9 @@ export class KurdishSentimentAnalyzer {
         // Determine effective sentiment after negation
         const effectiveSentiment: SentimentLabel =
           negateNext && match.sentiment !== 'neutral'
-            ? (match.sentiment === 'positive' ? 'negative' : 'positive')
+            ? match.sentiment === 'positive'
+              ? 'negative'
+              : 'positive'
             : match.sentiment
 
         matchedWords.push({
@@ -971,8 +978,7 @@ export class KurdishSentimentAnalyzer {
 
     // Mixed if both polarities are significantly present
     const hasBothPolarities =
-      matched.some((w) => w.sentiment === 'positive') &&
-      matched.some((w) => w.sentiment === 'negative')
+      matched.some(w => w.sentiment === 'positive') && matched.some(w => w.sentiment === 'negative')
     const polarityBalance = Math.min(posNorm, negNorm) / Math.max(posNorm, negNorm)
     const mixedScore = hasBothPolarities ? polarityBalance * 0.8 : 0
 
@@ -996,9 +1002,12 @@ export class KurdishSentimentAnalyzer {
   /**
    * Pick the label with the highest score.
    */
-  private classifyLabel(
-    scores: { positive: number; negative: number; neutral: number; mixed: number },
-  ): SentimentLabel {
+  private classifyLabel(scores: {
+    positive: number
+    negative: number
+    neutral: number
+    mixed: number
+  }): SentimentLabel {
     const entries: [SentimentLabel, number][] = [
       ['positive', scores.positive],
       ['negative', scores.negative],
@@ -1036,10 +1045,7 @@ export class KurdishSentimentAnalyzer {
     let best = ''
     let bestScore = -Infinity
     for (const [emotion, score] of emotionCounts) {
-      if (
-        score > bestScore &&
-        (EMOTION_CATEGORIES as readonly string[]).includes(emotion)
-      ) {
+      if (score > bestScore && (EMOTION_CATEGORIES as readonly string[]).includes(emotion)) {
         bestScore = score
         best = emotion
       }
@@ -1053,14 +1059,9 @@ export class KurdishSentimentAnalyzer {
    * Heuristic: text is subjective if sentiment words make up at least 15 %
    * of all tokens.
    */
-  private determineSubjectivity(
-    matchedWords: SentimentWord[],
-    totalTokens: number,
-  ): boolean {
+  private determineSubjectivity(matchedWords: SentimentWord[], totalTokens: number): boolean {
     if (totalTokens === 0) return false
-    const sentimentTokens = matchedWords.filter(
-      (w) => w.sentiment !== 'neutral',
-    ).length
+    const sentimentTokens = matchedWords.filter(w => w.sentiment !== 'neutral').length
     return sentimentTokens / totalTokens >= 0.15
   }
 
@@ -1083,19 +1084,13 @@ export class KurdishSentimentAnalyzer {
       parts.push('Warning: no Kurdish script detected in input.')
     }
 
-    parts.push(
-      `Analyzed ${tokenCount} token(s); ${matchedWords.length} matched the lexicon.`,
-    )
+    parts.push(`Analyzed ${tokenCount} token(s); ${matchedWords.length} matched the lexicon.`)
 
-    const posCount = matchedWords.filter((w) => w.sentiment === 'positive').length
-    const negCount = matchedWords.filter((w) => w.sentiment === 'negative').length
-    parts.push(
-      `Polarity breakdown: ${posCount} positive, ${negCount} negative.`,
-    )
+    const posCount = matchedWords.filter(w => w.sentiment === 'positive').length
+    const negCount = matchedWords.filter(w => w.sentiment === 'negative').length
+    parts.push(`Polarity breakdown: ${posCount} positive, ${negCount} negative.`)
 
-    parts.push(
-      `Label: ${label} (confidence ${(confidence * 100).toFixed(1)}%).`,
-    )
+    parts.push(`Label: ${label} (confidence ${(confidence * 100).toFixed(1)}%).`)
 
     if (dominantEmotion !== 'neutral') {
       parts.push(`Dominant emotion: ${dominantEmotion}.`)
@@ -1105,7 +1100,7 @@ export class KurdishSentimentAnalyzer {
       const topWords = matchedWords
         .sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight))
         .slice(0, 3)
-        .map((w) => w.word)
+        .map(w => w.word)
         .join(', ')
       parts.push(`Key words: ${topWords}.`)
     }

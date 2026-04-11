@@ -21,23 +21,42 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type PersonalityTrait = 'openness' | 'conscientiousness' | 'extraversion' | 'agreeableness' | 'neuroticism'
+export type PersonalityTrait =
+  | 'openness'
+  | 'conscientiousness'
+  | 'extraversion'
+  | 'agreeableness'
+  | 'neuroticism'
 
 export type CommunicationStyle = 'analytical' | 'driver' | 'expressive' | 'amiable'
 
-export type ToneType = 'formal' | 'casual' | 'enthusiastic' | 'empathetic' | 'professional' | 'humorous' | 'encouraging' | 'neutral'
+export type ToneType =
+  | 'formal'
+  | 'casual'
+  | 'enthusiastic'
+  | 'empathetic'
+  | 'professional'
+  | 'humorous'
+  | 'encouraging'
+  | 'neutral'
 
-export type CulturalContext = 'western' | 'eastern' | 'middle_eastern' | 'latin' | 'african' | 'universal'
+export type CulturalContext =
+  | 'western'
+  | 'eastern'
+  | 'middle_eastern'
+  | 'latin'
+  | 'african'
+  | 'universal'
 
 export interface PersonalityProfile {
   readonly id: string
   readonly name: string
-  readonly traits: Readonly<Record<PersonalityTrait, number>>  // 0–1 scale
+  readonly traits: Readonly<Record<PersonalityTrait, number>> // 0–1 scale
   readonly communicationStyle: CommunicationStyle
   readonly preferredTone: ToneType
   readonly culturalContext: CulturalContext
-  readonly verbosity: number  // 0=terse, 1=verbose
-  readonly formality: number  // 0=casual, 1=formal
+  readonly verbosity: number // 0=terse, 1=verbose
+  readonly formality: number // 0=casual, 1=formal
 }
 
 export interface PersonaTemplate {
@@ -115,13 +134,54 @@ export const DEFAULT_PERSONALITY_CONFIG: PersonalityEngineConfig = {
 
 function buildToneKeywords(): ReadonlyMap<ToneType, readonly string[]> {
   const m = new Map<ToneType, readonly string[]>()
-  m.set('formal', ['furthermore', 'therefore', 'consequently', 'hereby', 'pursuant', 'regarding', 'accordingly'])
+  m.set('formal', [
+    'furthermore',
+    'therefore',
+    'consequently',
+    'hereby',
+    'pursuant',
+    'regarding',
+    'accordingly',
+  ])
   m.set('casual', ['hey', 'cool', 'awesome', 'gonna', 'kinda', 'basically', 'pretty much', 'stuff'])
-  m.set('enthusiastic', ['amazing', 'fantastic', 'incredible', 'love', 'excited', 'wonderful', 'brilliant'])
-  m.set('empathetic', ['understand', 'feel', 'sorry', 'care', 'support', 'concern', 'listen', 'here for you'])
-  m.set('professional', ['recommend', 'suggest', 'analysis', 'strategy', 'implement', 'objective', 'deliverable'])
+  m.set('enthusiastic', [
+    'amazing',
+    'fantastic',
+    'incredible',
+    'love',
+    'excited',
+    'wonderful',
+    'brilliant',
+  ])
+  m.set('empathetic', [
+    'understand',
+    'feel',
+    'sorry',
+    'care',
+    'support',
+    'concern',
+    'listen',
+    'here for you',
+  ])
+  m.set('professional', [
+    'recommend',
+    'suggest',
+    'analysis',
+    'strategy',
+    'implement',
+    'objective',
+    'deliverable',
+  ])
   m.set('humorous', ['funny', 'joke', 'laugh', 'haha', 'ironic', 'amusing', 'entertaining'])
-  m.set('encouraging', ['great job', 'well done', 'keep going', 'proud', 'progress', 'capable', 'believe'])
+  m.set('encouraging', [
+    'great job',
+    'well done',
+    'keep going',
+    'proud',
+    'progress',
+    'capable',
+    'believe',
+  ])
   m.set('neutral', ['the', 'is', 'are', 'was', 'it', 'that', 'this'])
   return m
 }
@@ -147,7 +207,14 @@ export class PersonalityEngine {
   private readonly profiles = new Map<string, PersonalityProfile>()
   private readonly personas = new Map<string, PersonaTemplate>()
   private readonly userPrefs = new Map<string, UserPreference>()
-  private stats = { totalProfiles: 0, totalPersonas: 0, totalToneAnalyses: 0, totalAdaptations: 0, totalEmpathyResponses: 0, feedbackCount: 0 }
+  private stats = {
+    totalProfiles: 0,
+    totalPersonas: 0,
+    totalToneAnalyses: 0,
+    totalAdaptations: 0,
+    totalEmpathyResponses: 0,
+    feedbackCount: 0,
+  }
 
   constructor(config: Partial<PersonalityEngineConfig> = {}) {
     this.config = { ...DEFAULT_PERSONALITY_CONFIG, ...config }
@@ -155,16 +222,26 @@ export class PersonalityEngine {
 
   // ── Profile management ───────────────────────────────────────────────
 
-  createProfile(name: string, traits: Record<PersonalityTrait, number>, options: {
-    communicationStyle?: CommunicationStyle; preferredTone?: ToneType; culturalContext?: CulturalContext; verbosity?: number; formality?: number
-  } = {}): PersonalityProfile {
+  createProfile(
+    name: string,
+    traits: Record<PersonalityTrait, number>,
+    options: {
+      communicationStyle?: CommunicationStyle
+      preferredTone?: ToneType
+      culturalContext?: CulturalContext
+      verbosity?: number
+      formality?: number
+    } = {},
+  ): PersonalityProfile {
     const id = `prof_${++this.stats.totalProfiles}`
     const clamped: Record<PersonalityTrait, number> = {} as Record<PersonalityTrait, number>
     for (const [k, v] of Object.entries(traits)) {
       clamped[k as PersonalityTrait] = Math.max(0, Math.min(1, v))
     }
     const profile: PersonalityProfile = {
-      id, name, traits: clamped,
+      id,
+      name,
+      traits: clamped,
       communicationStyle: options.communicationStyle ?? this.inferStyle(clamped),
       preferredTone: options.preferredTone ?? this.config.defaultTone,
       culturalContext: options.culturalContext ?? 'universal',
@@ -189,9 +266,24 @@ export class PersonalityEngine {
 
   // ── Persona templates ────────────────────────────────────────────────
 
-  createPersona(name: string, description: string, profile: PersonalityProfile, greetings: string[], signoffs: string[], fillers: string[] = []): PersonaTemplate {
+  createPersona(
+    name: string,
+    description: string,
+    profile: PersonalityProfile,
+    greetings: string[],
+    signoffs: string[],
+    fillers: string[] = [],
+  ): PersonaTemplate {
     const id = `persona_${++this.stats.totalPersonas}`
-    const persona: PersonaTemplate = { id, name, description, profile, greetings, signoffs, fillerPhrases: fillers }
+    const persona: PersonaTemplate = {
+      id,
+      name,
+      description,
+      profile,
+      greetings,
+      signoffs,
+      fillerPhrases: fillers,
+    }
     this.personas.set(id, persona)
     return persona
   }
@@ -230,14 +322,21 @@ export class PersonalityEngine {
     // Emotionality: presence of emotion keywords and punctuation
     const exclamations = (text.match(/!/g) ?? []).length
     const questions = (text.match(/\?/g) ?? []).length
-    const emotionality = Math.min(1, (exclamations * 0.2 + questions * 0.1 + bestScore * 0.5))
+    const emotionality = Math.min(1, exclamations * 0.2 + questions * 0.1 + bestScore * 0.5)
 
     // Directness: short sentences, imperative mood
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0)
     const avgSentLen = words.length / Math.max(1, sentences.length)
     const directness = Math.min(1, Math.max(0, 1 - (avgSentLen - 5) / 20))
 
-    return { text, detectedTone: bestTone, confidence: Math.max(0.3, bestScore), formalityScore, emotionality, directness }
+    return {
+      text,
+      detectedTone: bestTone,
+      confidence: Math.max(0.3, bestScore),
+      formalityScore,
+      emotionality,
+      directness,
+    }
   }
 
   // ── Empathy response ─────────────────────────────────────────────────
@@ -259,19 +358,23 @@ export class PersonalityEngine {
     const empathyLevel = Math.min(1, maxMatches * 0.25 + 0.3)
 
     const toneMap: Record<string, ToneType> = {
-      happy: 'enthusiastic', sad: 'empathetic', angry: 'empathetic',
-      anxious: 'encouraging', confused: 'professional', grateful: 'enthusiastic',
+      happy: 'enthusiastic',
+      sad: 'empathetic',
+      angry: 'empathetic',
+      anxious: 'encouraging',
+      confused: 'professional',
+      grateful: 'enthusiastic',
       neutral: 'professional',
     }
 
     const openerMap: Record<string, string> = {
-      happy: 'That\'s wonderful to hear!',
-      sad: 'I\'m sorry you\'re feeling this way.',
+      happy: "That's wonderful to hear!",
+      sad: "I'm sorry you're feeling this way.",
       angry: 'I understand your frustration.',
-      anxious: 'It\'s okay to feel that way. Let\'s work through this.',
+      anxious: "It's okay to feel that way. Let's work through this.",
       confused: 'Let me help clarify things for you.',
       grateful: 'I appreciate your kind words!',
-      neutral: 'I\'m here to help.',
+      neutral: "I'm here to help.",
     }
 
     const approachMap: Record<string, string> = {
@@ -285,9 +388,10 @@ export class PersonalityEngine {
     }
 
     return {
-      detectedEmotion, empathyLevel,
+      detectedEmotion,
+      empathyLevel,
       suggestedTone: toneMap[detectedEmotion] ?? 'professional',
-      suggestedOpener: openerMap[detectedEmotion] ?? 'I\'m here to help.',
+      suggestedOpener: openerMap[detectedEmotion] ?? "I'm here to help.",
       suggestedApproach: approachMap[detectedEmotion] ?? 'Provide helpful information',
     }
   }
@@ -304,11 +408,17 @@ export class PersonalityEngine {
 
     // Adjust formality
     if (profile.formality > 0.7) {
-      adapted = adapted.replace(/\bdon't\b/g, 'do not').replace(/\bcan't\b/g, 'cannot').replace(/\bwon't\b/g, 'will not')
+      adapted = adapted
+        .replace(/\bdon't\b/g, 'do not')
+        .replace(/\bcan't\b/g, 'cannot')
+        .replace(/\bwon't\b/g, 'will not')
       adapted = adapted.replace(/\bgonna\b/g, 'going to').replace(/\bwanna\b/g, 'want to')
       changes.push('Increased formality (expanded contractions)')
     } else if (profile.formality < 0.3) {
-      adapted = adapted.replace(/\bdo not\b/g, "don't").replace(/\bcannot\b/g, "can't").replace(/\bwill not\b/g, "won't")
+      adapted = adapted
+        .replace(/\bdo not\b/g, "don't")
+        .replace(/\bcannot\b/g, "can't")
+        .replace(/\bwill not\b/g, "won't")
       changes.push('Decreased formality (used contractions)')
     }
 
@@ -332,7 +442,10 @@ export class PersonalityEngine {
 
   // ── User preference tracking ─────────────────────────────────────────
 
-  updateUserPreference(userId: string, updates: Partial<Omit<UserPreference, 'userId' | 'interactionCount' | 'lastInteraction'>>): UserPreference {
+  updateUserPreference(
+    userId: string,
+    updates: Partial<Omit<UserPreference, 'userId' | 'interactionCount' | 'lastInteraction'>>,
+  ): UserPreference {
     const existing = this.userPrefs.get(userId)
     const pref: UserPreference = {
       userId,
@@ -357,7 +470,9 @@ export class PersonalityEngine {
     return { ...this.stats }
   }
 
-  provideFeedback(): void { this.stats.feedbackCount++ }
+  provideFeedback(): void {
+    this.stats.feedbackCount++
+  }
 
   serialize(): string {
     return JSON.stringify({

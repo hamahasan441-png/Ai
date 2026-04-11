@@ -11,13 +11,19 @@ describe('DataVisualization', () => {
 
   describe('KB entry tests', () => {
     it('should match charts/dashboards keywords', async () => {
-      const r = await brain.chat('explain data visualization chart bar line scatter dashboard design layout tableau power bi grafana d3 js plotly matplotlib')
+      const r = await brain.chat(
+        'explain data visualization chart bar line scatter dashboard design layout tableau power bi grafana d3 js plotly matplotlib',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/chart|dashboard|tableau|d3|plotly|matplotlib|visualization/)
+      expect(r.text.toLowerCase()).toMatch(
+        /chart|dashboard|tableau|d3|plotly|matplotlib|visualization/,
+      )
     })
 
     it('should match interactive/geospatial keywords', async () => {
-      const r = await brain.chat('explain interactive visualization brushing linking zoom geospatial visualization map choropleth leaflet storytelling data')
+      const r = await brain.chat(
+        'explain interactive visualization brushing linking zoom geospatial visualization map choropleth leaflet storytelling data',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/interactive|geospatial|choropleth|leaflet|storytelling/)
     })

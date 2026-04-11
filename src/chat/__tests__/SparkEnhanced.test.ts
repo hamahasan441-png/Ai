@@ -68,9 +68,30 @@ describe('🔍 SparkSearchEngine', () => {
 
     it('should bulk index documents', () => {
       const count = engine.indexDocuments([
-        { id: 'doc1', title: 'JS', content: 'JavaScript basics', category: 'code', tags: ['js'], metadata: {} },
-        { id: 'doc2', title: 'Python', content: 'Python programming', category: 'code', tags: ['python'], metadata: {} },
-        { id: 'doc3', title: 'SQL', content: 'Database queries', category: 'data', tags: ['sql'], metadata: {} },
+        {
+          id: 'doc1',
+          title: 'JS',
+          content: 'JavaScript basics',
+          category: 'code',
+          tags: ['js'],
+          metadata: {},
+        },
+        {
+          id: 'doc2',
+          title: 'Python',
+          content: 'Python programming',
+          category: 'code',
+          tags: ['python'],
+          metadata: {},
+        },
+        {
+          id: 'doc3',
+          title: 'SQL',
+          content: 'Database queries',
+          category: 'data',
+          tags: ['sql'],
+          metadata: {},
+        },
       ])
 
       expect(count).toBe(3)
@@ -78,13 +99,27 @@ describe('🔍 SparkSearchEngine', () => {
     })
 
     it('should get document by ID', () => {
-      engine.indexDocument({ id: 'doc1', title: 'Test', content: 'Content', category: 'test', tags: [], metadata: {} })
+      engine.indexDocument({
+        id: 'doc1',
+        title: 'Test',
+        content: 'Content',
+        category: 'test',
+        tags: [],
+        metadata: {},
+      })
       expect(engine.getDocument('doc1')?.title).toBe('Test')
       expect(engine.getDocument('nonexistent')).toBeNull()
     })
 
     it('should remove a document', () => {
-      engine.indexDocument({ id: 'doc1', title: 'Test', content: 'Content', category: 'test', tags: [], metadata: {} })
+      engine.indexDocument({
+        id: 'doc1',
+        title: 'Test',
+        content: 'Content',
+        category: 'test',
+        tags: [],
+        metadata: {},
+      })
       expect(engine.removeDocument('doc1')).toBe(true)
       expect(engine.getDocumentCount()).toBe(0)
       expect(engine.removeDocument('nonexistent')).toBe(false)
@@ -103,9 +138,30 @@ describe('🔍 SparkSearchEngine', () => {
 
     it('should evict least-used when at capacity', () => {
       const small = new SparkSearchEngine({ maxDocuments: 2 })
-      small.indexDocument({ id: 'd1', title: 'A', content: 'first', category: 'test', tags: [], metadata: {} })
-      small.indexDocument({ id: 'd2', title: 'B', content: 'second', category: 'test', tags: [], metadata: {} })
-      small.indexDocument({ id: 'd3', title: 'C', content: 'third', category: 'test', tags: [], metadata: {} })
+      small.indexDocument({
+        id: 'd1',
+        title: 'A',
+        content: 'first',
+        category: 'test',
+        tags: [],
+        metadata: {},
+      })
+      small.indexDocument({
+        id: 'd2',
+        title: 'B',
+        content: 'second',
+        category: 'test',
+        tags: [],
+        metadata: {},
+      })
+      small.indexDocument({
+        id: 'd3',
+        title: 'C',
+        content: 'third',
+        category: 'test',
+        tags: [],
+        metadata: {},
+      })
       expect(small.getDocumentCount()).toBe(2)
     })
   })
@@ -113,10 +169,38 @@ describe('🔍 SparkSearchEngine', () => {
   describe('Keyword Search', () => {
     beforeEach(() => {
       engine.indexDocuments([
-        { id: 'd1', title: 'TypeScript Tutorial', content: 'Learn TypeScript programming with advanced types', category: 'code', tags: ['ts'], metadata: {} },
-        { id: 'd2', title: 'Python Guide', content: 'Python programming for data science and machine learning', category: 'code', tags: ['python'], metadata: {} },
-        { id: 'd3', title: 'SQL Basics', content: 'Learn SQL database queries and joins', category: 'data', tags: ['sql'], metadata: {} },
-        { id: 'd4', title: 'Security Hardening', content: 'Network security and vulnerability assessment techniques', category: 'security', tags: ['security'], metadata: {} },
+        {
+          id: 'd1',
+          title: 'TypeScript Tutorial',
+          content: 'Learn TypeScript programming with advanced types',
+          category: 'code',
+          tags: ['ts'],
+          metadata: {},
+        },
+        {
+          id: 'd2',
+          title: 'Python Guide',
+          content: 'Python programming for data science and machine learning',
+          category: 'code',
+          tags: ['python'],
+          metadata: {},
+        },
+        {
+          id: 'd3',
+          title: 'SQL Basics',
+          content: 'Learn SQL database queries and joins',
+          category: 'data',
+          tags: ['sql'],
+          metadata: {},
+        },
+        {
+          id: 'd4',
+          title: 'Security Hardening',
+          content: 'Network security and vulnerability assessment techniques',
+          category: 'security',
+          tags: ['security'],
+          metadata: {},
+        },
       ])
     })
 
@@ -135,8 +219,22 @@ describe('🔍 SparkSearchEngine', () => {
   describe('Fuzzy Search', () => {
     beforeEach(() => {
       engine.indexDocuments([
-        { id: 'd1', title: 'TypeScript', content: 'TypeScript is great for development', category: 'code', tags: [], metadata: {} },
-        { id: 'd2', title: 'JavaScript', content: 'JavaScript runtime environment', category: 'code', tags: [], metadata: {} },
+        {
+          id: 'd1',
+          title: 'TypeScript',
+          content: 'TypeScript is great for development',
+          category: 'code',
+          tags: [],
+          metadata: {},
+        },
+        {
+          id: 'd2',
+          title: 'JavaScript',
+          content: 'JavaScript runtime environment',
+          category: 'code',
+          tags: [],
+          metadata: {},
+        },
       ])
     })
 
@@ -149,9 +247,30 @@ describe('🔍 SparkSearchEngine', () => {
   describe('Semantic Search', () => {
     beforeEach(() => {
       engine.indexDocuments([
-        { id: 'd1', title: 'Machine Learning', content: 'Neural networks deep learning algorithms', category: 'ai', tags: [], metadata: {} },
-        { id: 'd2', title: 'Web Dev', content: 'HTML CSS JavaScript frontend development', category: 'web', tags: [], metadata: {} },
-        { id: 'd3', title: 'Deep Learning', content: 'Training neural networks with gradient descent', category: 'ai', tags: [], metadata: {} },
+        {
+          id: 'd1',
+          title: 'Machine Learning',
+          content: 'Neural networks deep learning algorithms',
+          category: 'ai',
+          tags: [],
+          metadata: {},
+        },
+        {
+          id: 'd2',
+          title: 'Web Dev',
+          content: 'HTML CSS JavaScript frontend development',
+          category: 'web',
+          tags: [],
+          metadata: {},
+        },
+        {
+          id: 'd3',
+          title: 'Deep Learning',
+          content: 'Training neural networks with gradient descent',
+          category: 'ai',
+          tags: [],
+          metadata: {},
+        },
       ])
     })
 
@@ -165,8 +284,22 @@ describe('🔍 SparkSearchEngine', () => {
   describe('Synonym Search', () => {
     beforeEach(() => {
       engine.indexDocuments([
-        { id: 'd1', title: 'Bug Report', content: 'Found a critical error in the system', category: 'bugs', tags: [], metadata: {} },
-        { id: 'd2', title: 'Feature Request', content: 'Add new user interface', category: 'features', tags: [], metadata: {} },
+        {
+          id: 'd1',
+          title: 'Bug Report',
+          content: 'Found a critical error in the system',
+          category: 'bugs',
+          tags: [],
+          metadata: {},
+        },
+        {
+          id: 'd2',
+          title: 'Feature Request',
+          content: 'Add new user interface',
+          category: 'features',
+          tags: [],
+          metadata: {},
+        },
       ])
     })
 
@@ -180,8 +313,22 @@ describe('🔍 SparkSearchEngine', () => {
   describe('Contextual Search', () => {
     it('should apply recency and frequency boosts', () => {
       engine.indexDocuments([
-        { id: 'd1', title: 'Old Doc', content: 'old information', category: 'test', tags: [], metadata: {} },
-        { id: 'd2', title: 'New Info', content: 'new information about topic', category: 'test', tags: [], metadata: {} },
+        {
+          id: 'd1',
+          title: 'Old Doc',
+          content: 'old information',
+          category: 'test',
+          tags: [],
+          metadata: {},
+        },
+        {
+          id: 'd2',
+          title: 'New Info',
+          content: 'new information about topic',
+          category: 'test',
+          tags: [],
+          metadata: {},
+        },
       ])
 
       const results = engine.search({ text: 'information', strategy: 'contextual' })
@@ -192,9 +339,30 @@ describe('🔍 SparkSearchEngine', () => {
   describe('Graph Search', () => {
     it('should follow graph connections', () => {
       engine.indexDocuments([
-        { id: 'd1', title: 'React', content: 'React component library', category: 'frontend', tags: ['ui', 'react'], metadata: {} },
-        { id: 'd2', title: 'Vue', content: 'Vue framework for web', category: 'frontend', tags: ['ui', 'vue'], metadata: {} },
-        { id: 'd3', title: 'Node', content: 'Node server runtime', category: 'backend', tags: ['server'], metadata: {} },
+        {
+          id: 'd1',
+          title: 'React',
+          content: 'React component library',
+          category: 'frontend',
+          tags: ['ui', 'react'],
+          metadata: {},
+        },
+        {
+          id: 'd2',
+          title: 'Vue',
+          content: 'Vue framework for web',
+          category: 'frontend',
+          tags: ['ui', 'vue'],
+          metadata: {},
+        },
+        {
+          id: 'd3',
+          title: 'Node',
+          content: 'Node server runtime',
+          category: 'backend',
+          tags: ['server'],
+          metadata: {},
+        },
       ])
 
       const results = engine.search({ text: 'React component', strategy: 'graph' })
@@ -205,9 +373,30 @@ describe('🔍 SparkSearchEngine', () => {
   describe('Combined Search', () => {
     beforeEach(() => {
       engine.indexDocuments([
-        { id: 'd1', title: 'TypeScript Advanced', content: 'Advanced TypeScript generics and mapped types', category: 'code', tags: ['ts'], metadata: {} },
-        { id: 'd2', title: 'JavaScript ES6', content: 'Modern JavaScript features arrow functions', category: 'code', tags: ['js'], metadata: {} },
-        { id: 'd3', title: 'Python Data', content: 'Python pandas numpy data analysis', category: 'data', tags: ['python'], metadata: {} },
+        {
+          id: 'd1',
+          title: 'TypeScript Advanced',
+          content: 'Advanced TypeScript generics and mapped types',
+          category: 'code',
+          tags: ['ts'],
+          metadata: {},
+        },
+        {
+          id: 'd2',
+          title: 'JavaScript ES6',
+          content: 'Modern JavaScript features arrow functions',
+          category: 'code',
+          tags: ['js'],
+          metadata: {},
+        },
+        {
+          id: 'd3',
+          title: 'Python Data',
+          content: 'Python pandas numpy data analysis',
+          category: 'data',
+          tags: ['python'],
+          metadata: {},
+        },
       ])
     })
 
@@ -244,7 +433,14 @@ describe('🔍 SparkSearchEngine', () => {
 
   describe('Stats & Config', () => {
     it('should track search statistics', () => {
-      engine.indexDocument({ id: 'd1', title: 'Test', content: 'test content', category: 'test', tags: [], metadata: {} })
+      engine.indexDocument({
+        id: 'd1',
+        title: 'Test',
+        content: 'test content',
+        category: 'test',
+        tags: [],
+        metadata: {},
+      })
       engine.search({ text: 'test' })
       engine.search({ text: 'content' })
 
@@ -260,7 +456,14 @@ describe('🔍 SparkSearchEngine', () => {
     })
 
     it('should clear all data', () => {
-      engine.indexDocument({ id: 'd1', title: 'Test', content: 'content', category: 'test', tags: [], metadata: {} })
+      engine.indexDocument({
+        id: 'd1',
+        title: 'Test',
+        content: 'content',
+        category: 'test',
+        tags: [],
+        metadata: {},
+      })
       engine.clear()
       expect(engine.getDocumentCount()).toBe(0)
     })
@@ -612,10 +815,18 @@ describe('🎯 AdaptiveToolSelector', () => {
 
     it('should update existing records', () => {
       selector.recordPerformance('tool1', 'code_generation', {
-        success: true, output: '', confidence: 0.9, source: 'tool1', durationMs: 100,
+        success: true,
+        output: '',
+        confidence: 0.9,
+        source: 'tool1',
+        durationMs: 100,
       })
       selector.recordPerformance('tool1', 'code_generation', {
-        success: false, output: '', confidence: 0.3, source: 'tool1', durationMs: 200,
+        success: false,
+        output: '',
+        confidence: 0.3,
+        source: 'tool1',
+        durationMs: 200,
       })
 
       const perf = selector.getToolPerformance('tool1')
@@ -628,12 +839,20 @@ describe('🎯 AdaptiveToolSelector', () => {
     it('should select tool with best performance', () => {
       // Tool1: high success rate
       selector.recordPerformance('tool1', 'code_generation', {
-        success: true, output: '', confidence: 0.9, source: 'tool1', durationMs: 50,
+        success: true,
+        output: '',
+        confidence: 0.9,
+        source: 'tool1',
+        durationMs: 50,
       })
 
       // Tool2: lower success rate
       selector.recordPerformance('tool2', 'code_generation', {
-        success: false, output: '', confidence: 0.3, source: 'tool2', durationMs: 500,
+        success: false,
+        output: '',
+        confidence: 0.3,
+        source: 'tool2',
+        durationMs: 500,
       })
 
       const selection = selector.selectBestTool(['tool1', 'tool2'], 'code_generation')
@@ -648,10 +867,18 @@ describe('🎯 AdaptiveToolSelector', () => {
       breaker.recordFailure('tool1')
 
       selector.recordPerformance('tool1', 'code_generation', {
-        success: true, output: '', confidence: 0.9, source: 'tool1', durationMs: 50,
+        success: true,
+        output: '',
+        confidence: 0.9,
+        source: 'tool1',
+        durationMs: 50,
       })
       selector.recordPerformance('tool2', 'code_generation', {
-        success: true, output: '', confidence: 0.7, source: 'tool2', durationMs: 100,
+        success: true,
+        output: '',
+        confidence: 0.7,
+        source: 'tool2',
+        durationMs: 100,
       })
 
       const selection = selector.selectBestTool(['tool1', 'tool2'], 'code_generation')
@@ -673,7 +900,11 @@ describe('🎯 AdaptiveToolSelector', () => {
   describe('Data Management', () => {
     it('should get all performance data', () => {
       selector.recordPerformance('tool1', 'code_generation', {
-        success: true, output: '', confidence: 0.9, source: 'tool1', durationMs: 50,
+        success: true,
+        output: '',
+        confidence: 0.9,
+        source: 'tool1',
+        durationMs: 50,
       })
 
       const all = selector.getAllPerformance()
@@ -682,7 +913,11 @@ describe('🎯 AdaptiveToolSelector', () => {
 
     it('should clear performance history', () => {
       selector.recordPerformance('tool1', 'code_generation', {
-        success: true, output: '', confidence: 0.9, source: 'tool1', durationMs: 50,
+        success: true,
+        output: '',
+        confidence: 0.9,
+        source: 'tool1',
+        durationMs: 50,
       })
       selector.clear()
       expect(selector.getAllPerformance().size).toBe(0)
@@ -708,14 +943,22 @@ describe('⚡ ParallelExecutor', () => {
           toolName: 'tool1',
           input: 'input1',
           handler: async () => ({
-            success: true, output: 'result1', confidence: 0.9, source: 'tool1', durationMs: 10,
+            success: true,
+            output: 'result1',
+            confidence: 0.9,
+            source: 'tool1',
+            durationMs: 10,
           }),
         },
         {
           toolName: 'tool2',
           input: 'input2',
           handler: async () => ({
-            success: true, output: 'result2', confidence: 0.8, source: 'tool2', durationMs: 10,
+            success: true,
+            output: 'result2',
+            confidence: 0.8,
+            source: 'tool2',
+            durationMs: 10,
           }),
         },
       ])
@@ -731,13 +974,19 @@ describe('⚡ ParallelExecutor', () => {
           toolName: 'good',
           input: 'input',
           handler: async () => ({
-            success: true, output: 'ok', confidence: 0.9, source: 'good', durationMs: 10,
+            success: true,
+            output: 'ok',
+            confidence: 0.9,
+            source: 'good',
+            durationMs: 10,
           }),
         },
         {
           toolName: 'bad',
           input: 'input',
-          handler: async () => { throw new Error('Tool crashed') },
+          handler: async () => {
+            throw new Error('Tool crashed')
+          },
         },
       ])
 
@@ -749,9 +998,39 @@ describe('⚡ ParallelExecutor', () => {
     it('should respect max concurrency', async () => {
       const executor3 = new ParallelExecutor(1) // Only 1 at a time
       const tasks = [
-        { toolName: 't1', input: 'i1', handler: async () => ({ success: true, output: 'r1', confidence: 1, source: 't1', durationMs: 1 }) },
-        { toolName: 't2', input: 'i2', handler: async () => ({ success: true, output: 'r2', confidence: 1, source: 't2', durationMs: 1 }) },
-        { toolName: 't3', input: 'i3', handler: async () => ({ success: true, output: 'r3', confidence: 1, source: 't3', durationMs: 1 }) },
+        {
+          toolName: 't1',
+          input: 'i1',
+          handler: async () => ({
+            success: true,
+            output: 'r1',
+            confidence: 1,
+            source: 't1',
+            durationMs: 1,
+          }),
+        },
+        {
+          toolName: 't2',
+          input: 'i2',
+          handler: async () => ({
+            success: true,
+            output: 'r2',
+            confidence: 1,
+            source: 't2',
+            durationMs: 1,
+          }),
+        },
+        {
+          toolName: 't3',
+          input: 'i3',
+          handler: async () => ({
+            success: true,
+            output: 'r3',
+            confidence: 1,
+            source: 't3',
+            durationMs: 1,
+          }),
+        },
       ]
 
       const results = await executor3.executeParallel(tasks)
@@ -771,7 +1050,11 @@ describe('⚡ ParallelExecutor', () => {
           toolName: 'sync_tool',
           input: 'input',
           handler: () => ({
-            success: true, output: 'sync result', confidence: 0.9, source: 'sync_tool', durationMs: 1,
+            success: true,
+            output: 'sync result',
+            confidence: 0.9,
+            source: 'sync_tool',
+            durationMs: 1,
           }),
         },
       ])
@@ -808,11 +1091,15 @@ describe('📋 DynamicPlanner', () => {
 
   describe('Plan Creation', () => {
     it('should create a dynamic plan', () => {
-      const plan = planner.createPlan('Build a web app', [
-        { description: 'Design architecture', tool: 'spark_reason' },
-        { description: 'Generate code', tool: 'spark_code_generate', dependencies: ['step_0'] },
-        { description: 'Review code', tool: 'spark_code_review', dependencies: ['step_1'] },
-      ], ['Must use TypeScript'])
+      const plan = planner.createPlan(
+        'Build a web app',
+        [
+          { description: 'Design architecture', tool: 'spark_reason' },
+          { description: 'Generate code', tool: 'spark_code_generate', dependencies: ['step_0'] },
+          { description: 'Review code', tool: 'spark_code_review', dependencies: ['step_1'] },
+        ],
+        ['Must use TypeScript'],
+      )
 
       expect(plan.id).toMatch(/^plan_/)
       expect(plan.goal).toBe('Build a web app')
@@ -833,9 +1120,7 @@ describe('📋 DynamicPlanner', () => {
     })
 
     it('should initialize steps as pending', () => {
-      const plan = planner.createPlan('Test', [
-        { description: 'Step', tool: 'tool' },
-      ])
+      const plan = planner.createPlan('Test', [{ description: 'Step', tool: 'tool' }])
 
       expect(plan.steps[0]!.status).toBe('pending')
       expect(plan.steps[0]!.retries).toBe(0)
@@ -867,7 +1152,11 @@ describe('📋 DynamicPlanner', () => {
 
       // Complete step_0
       planner.completeStep(plan, 'step_0', {
-        success: true, output: 'done', confidence: 0.9, source: 'tool1', durationMs: 100,
+        success: true,
+        output: 'done',
+        confidence: 0.9,
+        source: 'tool1',
+        durationMs: 100,
       })
 
       // Now step_1 should be ready
@@ -880,7 +1169,11 @@ describe('📋 DynamicPlanner', () => {
       const plan = planner.createPlan('Test', [{ description: 'A', tool: 'tool1' }])
 
       planner.completeStep(plan, 'step_0', {
-        success: true, output: 'ok', confidence: 0.9, source: 'tool1', durationMs: 50,
+        success: true,
+        output: 'ok',
+        confidence: 0.9,
+        source: 'tool1',
+        durationMs: 50,
       })
 
       expect(plan.steps[0]!.status).toBe('complete')
@@ -891,7 +1184,11 @@ describe('📋 DynamicPlanner', () => {
       const plan = planner.createPlan('Test', [{ description: 'A', tool: 'tool1' }])
 
       planner.completeStep(plan, 'step_0', {
-        success: false, output: 'error', confidence: 0, source: 'tool1', durationMs: 50,
+        success: false,
+        output: 'error',
+        confidence: 0,
+        source: 'tool1',
+        durationMs: 50,
       })
 
       expect(plan.steps[0]!.status).toBe('failed')
@@ -905,28 +1202,48 @@ describe('📋 DynamicPlanner', () => {
         { description: 'B', tool: 'tool2' },
       ])
 
-      planner.completeStep(plan, 'step_0', { success: true, output: 'ok', confidence: 1, source: 'tool1', durationMs: 10 })
-      planner.completeStep(plan, 'step_1', { success: true, output: 'ok', confidence: 1, source: 'tool2', durationMs: 10 })
+      planner.completeStep(plan, 'step_0', {
+        success: true,
+        output: 'ok',
+        confidence: 1,
+        source: 'tool1',
+        durationMs: 10,
+      })
+      planner.completeStep(plan, 'step_1', {
+        success: true,
+        output: 'ok',
+        confidence: 1,
+        source: 'tool2',
+        durationMs: 10,
+      })
 
       expect(planner.isPlanComplete(plan)).toBe(true)
     })
 
     it('should detect failed plan (max retries exceeded)', () => {
-      const plan = planner.createPlan('Test', [
-        { description: 'A', tool: 'tool1', maxRetries: 0 },
-      ])
+      const plan = planner.createPlan('Test', [{ description: 'A', tool: 'tool1', maxRetries: 0 }])
 
-      planner.completeStep(plan, 'step_0', { success: false, output: 'err', confidence: 0, source: 'tool1', durationMs: 10 })
+      planner.completeStep(plan, 'step_0', {
+        success: false,
+        output: 'err',
+        confidence: 0,
+        source: 'tool1',
+        durationMs: 10,
+      })
 
       expect(planner.isPlanFailed(plan)).toBe(true)
     })
 
     it('should not be failed if retries remain', () => {
-      const plan = planner.createPlan('Test', [
-        { description: 'A', tool: 'tool1', maxRetries: 2 },
-      ])
+      const plan = planner.createPlan('Test', [{ description: 'A', tool: 'tool1', maxRetries: 2 }])
 
-      planner.completeStep(plan, 'step_0', { success: false, output: 'err', confidence: 0, source: 'tool1', durationMs: 10 })
+      planner.completeStep(plan, 'step_0', {
+        success: false,
+        output: 'err',
+        confidence: 0,
+        source: 'tool1',
+        durationMs: 10,
+      })
 
       expect(planner.isPlanFailed(plan)).toBe(false) // retries: 0 < maxRetries: 2
     })
@@ -938,7 +1255,13 @@ describe('📋 DynamicPlanner', () => {
         { description: 'Generate code', tool: 'tool1', maxRetries: 2 },
       ])
 
-      planner.completeStep(plan, 'step_0', { success: false, output: 'err', confidence: 0, source: 'tool1', durationMs: 10 })
+      planner.completeStep(plan, 'step_0', {
+        success: false,
+        output: 'err',
+        confidence: 0,
+        source: 'tool1',
+        durationMs: 10,
+      })
 
       const replanned = planner.replan(plan, 'step_0', 'Try alternative generation', 'tool2')
       expect(replanned.tool).toBe('tool2')
@@ -948,9 +1271,7 @@ describe('📋 DynamicPlanner', () => {
     })
 
     it('should add new step when max retries exceeded', () => {
-      const plan = planner.createPlan('Test', [
-        { description: 'A', tool: 'tool1', maxRetries: 0 },
-      ])
+      const plan = planner.createPlan('Test', [{ description: 'A', tool: 'tool1', maxRetries: 0 }])
 
       plan.steps[0]!.retries = 1 // Already retried
 
@@ -963,9 +1284,9 @@ describe('📋 DynamicPlanner', () => {
   describe('Execution Order', () => {
     it('should compute topological execution order', () => {
       const plan = planner.createPlan('Test', [
-        { description: 'A', tool: 't1' },                                // step_0: no deps
-        { description: 'B', tool: 't2' },                                // step_1: no deps
-        { description: 'C', tool: 't3', dependencies: ['step_0'] },     // step_2: depends on step_0
+        { description: 'A', tool: 't1' }, // step_0: no deps
+        { description: 'B', tool: 't2' }, // step_1: no deps
+        { description: 'C', tool: 't3', dependencies: ['step_0'] }, // step_2: depends on step_0
         { description: 'D', tool: 't4', dependencies: ['step_0', 'step_1'] }, // step_3: depends on both
       ])
 
@@ -1025,8 +1346,22 @@ describe('🔄 Integration: Systems Working Together', () => {
 
     // Index documents
     search.indexDocuments([
-      { id: 'd1', title: 'TypeScript Patterns', content: 'Design patterns in TypeScript', category: 'code', tags: ['ts'], metadata: {} },
-      { id: 'd2', title: 'Security Guide', content: 'Web security best practices', category: 'security', tags: ['sec'], metadata: {} },
+      {
+        id: 'd1',
+        title: 'TypeScript Patterns',
+        content: 'Design patterns in TypeScript',
+        category: 'code',
+        tags: ['ts'],
+        metadata: {},
+      },
+      {
+        id: 'd2',
+        title: 'Security Guide',
+        content: 'Web security best practices',
+        category: 'security',
+        tags: ['sec'],
+        metadata: {},
+      },
     ])
 
     // Search and memorize results
@@ -1051,12 +1386,20 @@ describe('🔄 Integration: Systems Working Together', () => {
 
     // Record good performance for tool1
     selector.recordPerformance('tool1', 'code_generation', {
-      success: true, output: '', confidence: 0.9, source: 'tool1', durationMs: 50,
+      success: true,
+      output: '',
+      confidence: 0.9,
+      source: 'tool1',
+      durationMs: 50,
     })
 
     // tool2 fails
     selector.recordPerformance('tool2', 'code_generation', {
-      success: false, output: '', confidence: 0.1, source: 'tool2', durationMs: 500,
+      success: false,
+      output: '',
+      confidence: 0.1,
+      source: 'tool2',
+      durationMs: 500,
     })
 
     // Selector should prefer tool1
@@ -1073,7 +1416,11 @@ describe('🔄 Integration: Systems Working Together', () => {
       { description: 'Analyze structure', tool: 'analyzer' },
       { description: 'Check security', tool: 'security' },
       { description: 'Review quality', tool: 'reviewer' },
-      { description: 'Final report', tool: 'reporter', dependencies: ['step_0', 'step_1', 'step_2'] },
+      {
+        description: 'Final report',
+        tool: 'reporter',
+        dependencies: ['step_0', 'step_1', 'step_2'],
+      },
     ])
 
     // Get parallel-ready steps
@@ -1111,8 +1458,14 @@ describe('🔄 Integration: Systems Working Together', () => {
     const memory = new MemoryManager()
 
     // Store some learnings
-    memory.store('best_tool_for_code', 'spark_code_generate', { category: 'tool_selection', importance: 0.9 })
-    memory.store('best_tool_for_security', 'spark_security_analyze', { category: 'tool_selection', importance: 0.85 })
+    memory.store('best_tool_for_code', 'spark_code_generate', {
+      category: 'tool_selection',
+      importance: 0.9,
+    })
+    memory.store('best_tool_for_security', 'spark_security_analyze', {
+      category: 'tool_selection',
+      importance: 0.85,
+    })
 
     // Save snapshot
     const snapshot = memory.save()

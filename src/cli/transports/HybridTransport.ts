@@ -4,10 +4,7 @@ import { logForDebugging } from '../../utils/debug.js'
 import { logForDiagnosticsNoPII } from '../../utils/diagLogs.js'
 import { getSessionIngressAuthToken } from '../../utils/sessionIngressAuth.js'
 import { SerialBatchEventUploader } from './SerialBatchEventUploader.js'
-import {
-  WebSocketTransport,
-  type WebSocketTransportOptions,
-} from './WebSocketTransport.js'
+import { WebSocketTransport, type WebSocketTransportOptions } from './WebSocketTransport.js'
 
 const BATCH_FLUSH_INTERVAL_MS = 100
 // Per-attempt POST timeout. Bounds how long a single stuck POST can block
@@ -91,14 +88,10 @@ export class HybridTransport extends WebSocketTransport {
       // replBridge sets this; the 1P transportUtils path does not.
       maxConsecutiveFailures,
       onBatchDropped: (batchSize, failures) => {
-        logForDiagnosticsNoPII(
-          'error',
-          'cli_hybrid_batch_dropped_max_failures',
-          {
-            batchSize,
-            failures,
-          },
-        )
+        logForDiagnosticsNoPII('error', 'cli_hybrid_batch_dropped_max_failures', {
+          batchSize,
+          failures,
+        })
         onBatchDropped?.(batchSize, failures)
       },
       send: batch => this.postOnce(batch),
@@ -120,10 +113,7 @@ export class HybridTransport extends WebSocketTransport {
       // Promise resolves immediately — callers don't await stream_events.
       this.streamEventBuffer.push(message)
       if (!this.streamEventTimer) {
-        this.streamEventTimer = setTimeout(
-          () => this.flushStreamEvents(),
-          BATCH_FLUSH_INTERVAL_MS,
-        )
+        this.streamEventTimer = setTimeout(() => this.flushStreamEvents(), BATCH_FLUSH_INTERVAL_MS)
       }
       return
     }
@@ -236,14 +226,8 @@ export class HybridTransport extends WebSocketTransport {
     }
 
     // 4xx (except 429) are permanent — drop, don't retry.
-    if (
-      response.status >= 400 &&
-      response.status < 500 &&
-      response.status !== 429
-    ) {
-      logForDebugging(
-        `HybridTransport: POST returned ${response.status} (permanent), dropping`,
-      )
+    if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+      logForDebugging(`HybridTransport: POST returned ${response.status} (permanent), dropping`)
       logForDiagnosticsNoPII('warn', 'cli_hybrid_post_client_error', {
         status: response.status,
       })
@@ -251,9 +235,7 @@ export class HybridTransport extends WebSocketTransport {
     }
 
     // 429 / 5xx — retryable. Throw so uploader re-queues and backs off.
-    logForDebugging(
-      `HybridTransport: POST returned ${response.status} (retryable)`,
-    )
+    logForDebugging(`HybridTransport: POST returned ${response.status} (retryable)`)
     logForDiagnosticsNoPII('warn', 'cli_hybrid_post_retryable_error', {
       status: response.status,
     })
@@ -273,9 +255,7 @@ function convertWsUrlToPostUrl(wsUrl: URL): string {
   let pathname = wsUrl.pathname
   pathname = pathname.replace('/ws/', '/session/')
   if (!pathname.endsWith('/events')) {
-    pathname = pathname.endsWith('/')
-      ? pathname + 'events'
-      : pathname + '/events'
+    pathname = pathname.endsWith('/') ? pathname + 'events' : pathname + '/events'
   }
 
   return `${protocol}//${wsUrl.host}${pathname}${wsUrl.search}`

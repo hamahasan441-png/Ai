@@ -1,11 +1,7 @@
 import { feature } from 'bun:bundle'
 import { chmod, mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises'
 import { join } from 'path'
-import {
-  getOriginalCwd,
-  getSessionId,
-  onSessionSwitch,
-} from '../bootstrap/state.js'
+import { getOriginalCwd, getSessionId, onSessionSwitch } from '../bootstrap/state.js'
 import { registerCleanup } from './cleanupRegistry.js'
 import { logForDebugging } from './debug.js'
 import { getClaudeConfigHomeDir } from './envUtils.js'
@@ -116,21 +112,14 @@ export async function registerSession(): Promise<boolean> {
 async function updatePidFile(patch: Record<string, unknown>): Promise<void> {
   const pidFile = join(getSessionsDir(), `${process.pid}.json`)
   try {
-    const data = jsonParse(await readFile(pidFile, 'utf8')) as Record<
-      string,
-      unknown
-    >
+    const data = jsonParse(await readFile(pidFile, 'utf8')) as Record<string, unknown>
     await writeFile(pidFile, jsonStringify({ ...data, ...patch }))
   } catch (e) {
-    logForDebugging(
-      `[concurrentSessions] updatePidFile failed: ${errorMessage(e)}`,
-    )
+    logForDebugging(`[concurrentSessions] updatePidFile failed: ${errorMessage(e)}`)
   }
 }
 
-export async function updateSessionName(
-  name: string | undefined,
-): Promise<void> {
+export async function updateSessionName(name: string | undefined): Promise<void> {
   if (!name) return
   await updatePidFile({ name })
 }
@@ -141,9 +130,7 @@ export async function updateSessionName(
  * once (local wins). Cleared on bridge teardown so stale IDs don't
  * suppress a legitimately-remote session after reconnect.
  */
-export async function updateSessionBridgeId(
-  bridgeSessionId: string | null,
-): Promise<void> {
+export async function updateSessionBridgeId(bridgeSessionId: string | null): Promise<void> {
   await updatePidFile({ bridgeSessionId })
 }
 

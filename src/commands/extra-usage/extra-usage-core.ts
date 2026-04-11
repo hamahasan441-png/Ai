@@ -25,8 +25,7 @@ export async function runExtraUsage(): Promise<ExtraUsageResult> {
   invalidateOverageCreditGrantCache()
 
   const subscriptionType = getSubscriptionType()
-  const isTeamOrEnterprise =
-    subscriptionType === 'team' || subscriptionType === 'enterprise'
+  const isTeamOrEnterprise = subscriptionType === 'team' || subscriptionType === 'enterprise'
   const hasBillingAccess = hasClaudeAiBillingAccess()
 
   if (!hasBillingAccess && isTeamOrEnterprise) {
@@ -44,8 +43,7 @@ export async function runExtraUsage(): Promise<ExtraUsageResult> {
     if (extraUsage?.is_enabled && extraUsage.monthly_limit === null) {
       return {
         type: 'message',
-        value:
-          'Your organization already has unlimited extra usage. No request needed.',
+        value: 'Your organization already has unlimited extra usage. No request needed.',
       }
     }
 
@@ -63,15 +61,14 @@ export async function runExtraUsage(): Promise<ExtraUsageResult> {
     }
 
     try {
-      const pendingOrDismissedRequests = await getMyAdminRequests(
-        'limit_increase',
-        ['pending', 'dismissed'],
-      )
+      const pendingOrDismissedRequests = await getMyAdminRequests('limit_increase', [
+        'pending',
+        'dismissed',
+      ])
       if (pendingOrDismissedRequests && pendingOrDismissedRequests.length > 0) {
         return {
           type: 'message',
-          value:
-            'You have already submitted a request for extra usage to your admin.',
+          value: 'You have already submitted a request for extra usage to your admin.',
         }
       }
     } catch (error) {

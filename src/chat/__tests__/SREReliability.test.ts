@@ -5,35 +5,47 @@ import { createProgrammingKnowledgeGraph } from '../SemanticMemory'
 describe('Site Reliability Engineering (SRE) Knowledge', () => {
   let brain: LocalBrain
 
-  beforeAll(() => { brain = new LocalBrain({ enableIntelligence: true }) })
+  beforeAll(() => {
+    brain = new LocalBrain({ enableIntelligence: true })
+  })
 
   // ── KB entry tests ──────────────────────────────────────
   it('knows about SLIs SLOs and SLAs', async () => {
-    const r = await brain.chat('explain sli slo sla service level indicator objective agreement error budget')
+    const r = await brain.chat(
+      'explain sli slo sla service level indicator objective agreement error budget',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/sli|slo|sla|service\s+level|error\s+budget/)
   })
 
   it('knows about incident management', async () => {
-    const r = await brain.chat('explain incident management response postmortem blameless review on call rotation')
+    const r = await brain.chat(
+      'explain incident management response postmortem blameless review on call rotation',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/incident|postmortem|blameless|on.call|severity/)
   })
 
   it('knows about chaos engineering', async () => {
-    const r = await brain.chat('explain chaos engineering resilience testing fault injection chaos monkey gameday')
+    const r = await brain.chat(
+      'explain chaos engineering resilience testing fault injection chaos monkey gameday',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/chaos|resilience|fault|monkey|gameday|disaster/)
   })
 
   it('knows about toil reduction', async () => {
-    const r = await brain.chat('explain toil reduction automation operational work repetitive release engineering canary deployment')
+    const r = await brain.chat(
+      'explain toil reduction automation operational work repetitive release engineering canary deployment',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/toil|automat|release|deploy|canary|rolling|operational/)
   })
 
   it('knows about SRE observability', async () => {
-    const r = await brain.chat('explain observability three pillars metrics logs traces alerting fatigue golden signals')
+    const r = await brain.chat(
+      'explain observability three pillars metrics logs traces alerting fatigue golden signals',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/observ|metric|log|trace|alert|golden/)
   })

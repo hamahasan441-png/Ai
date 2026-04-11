@@ -41,12 +41,7 @@ export type DreamTaskState = TaskStateBase & {
 }
 
 export function isDreamTask(task: unknown): task is DreamTaskState {
-  return (
-    typeof task === 'object' &&
-    task !== null &&
-    'type' in task &&
-    task.type === 'dream'
-  )
+  return typeof task === 'object' && task !== null && 'type' in task && task.type === 'dream'
 }
 
 export function registerDreamTask(
@@ -84,29 +79,20 @@ export function addDreamTurn(
     const newTouched = touchedPaths.filter(p => !seen.has(p) && seen.add(p))
     // Skip the update entirely if the turn is empty AND nothing new was
     // touched. Avoids re-rendering on pure no-ops.
-    if (
-      turn.text === '' &&
-      turn.toolUseCount === 0 &&
-      newTouched.length === 0
-    ) {
+    if (turn.text === '' && turn.toolUseCount === 0 && newTouched.length === 0) {
       return task
     }
     return {
       ...task,
       phase: newTouched.length > 0 ? 'updating' : task.phase,
       filesTouched:
-        newTouched.length > 0
-          ? [...task.filesTouched, ...newTouched]
-          : task.filesTouched,
+        newTouched.length > 0 ? [...task.filesTouched, ...newTouched] : task.filesTouched,
       turns: task.turns.slice(-(MAX_TURNS - 1)).concat(turn),
     }
   })
 }
 
-export function completeDreamTask(
-  taskId: string,
-  setAppState: SetAppState,
-): void {
+export function completeDreamTask(taskId: string, setAppState: SetAppState): void {
   // notified: true immediately — dream has no model-facing notification path
   // (it's UI-only), and eviction requires terminal + notified. The inline
   // appendSystemMessage completion note IS the user surface.

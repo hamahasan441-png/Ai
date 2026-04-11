@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  IntentEngine,
-  type ConversationTurn,
-} from '../IntentEngine'
+import { IntentEngine, type ConversationTurn } from '../IntentEngine'
 
 // ── Constructor Tests ──
 
@@ -289,9 +286,7 @@ describe('IntentEngine.extractEntities', () => {
 
   it('deduplicates entities with same type, value, and position', () => {
     const entities = engine.extractEntities('python python')
-    const pythons = entities.filter(
-      e => e.type === 'programming_language' && e.value === 'python',
-    )
+    const pythons = entities.filter(e => e.type === 'programming_language' && e.value === 'python')
     // Each occurrence at a different position should appear, but no duplicates
     const positions = pythons.map(e => e.position)
     const uniquePositions = new Set(positions)
@@ -346,9 +341,7 @@ describe('IntentEngine.resolveCompound', () => {
   })
 
   it('includes entities for each segment', () => {
-    const resolved = engine.resolveCompound(
-      'write Python code and review the JavaScript module',
-    )
+    const resolved = engine.resolveCompound('write Python code and review the JavaScript module')
     expect(resolved.length).toBe(2)
     // Each resolved intent should have its own entities array
     for (const r of resolved) {
@@ -367,26 +360,20 @@ describe('IntentEngine.resolveReferences', () => {
   })
 
   it('resolves "it" to the last relevant noun from context', () => {
-    const context: ConversationTurn[] = [
-      { role: 'user', content: 'I have a `sortArray` function' },
-    ]
+    const context: ConversationTurn[] = [{ role: 'user', content: 'I have a `sortArray` function' }]
     const resolved = engine.resolveReferences('explain it', context)
     expect(resolved).toContain('sortArray')
     expect(resolved).not.toContain(' it')
   })
 
   it('resolves "that" to the last noun from user turns', () => {
-    const context: ConversationTurn[] = [
-      { role: 'user', content: 'Check the "UserService" class' },
-    ]
+    const context: ConversationTurn[] = [{ role: 'user', content: 'Check the "UserService" class' }]
     const resolved = engine.resolveReferences('refactor that', context)
     expect(resolved).toContain('UserService')
   })
 
   it('returns input unchanged when no pronouns are present', () => {
-    const context: ConversationTurn[] = [
-      { role: 'user', content: 'I wrote a function' },
-    ]
+    const context: ConversationTurn[] = [{ role: 'user', content: 'I wrote a function' }]
     const resolved = engine.resolveReferences('write a new function', context)
     expect(resolved).toBe('write a new function')
   })
@@ -406,9 +393,7 @@ describe('IntentEngine.resolveReferences', () => {
   })
 
   it('resolves programming language references from context', () => {
-    const context: ConversationTurn[] = [
-      { role: 'user', content: 'I am learning Python' },
-    ]
+    const context: ConversationTurn[] = [{ role: 'user', content: 'I am learning Python' }]
     const resolved = engine.resolveReferences('tell me more about it', context)
     expect(resolved).toContain('python')
   })

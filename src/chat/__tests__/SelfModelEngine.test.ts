@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  SelfModelEngine,
-  DEFAULT_SELF_MODEL_CONFIG,
-} from '../SelfModelEngine'
+import { SelfModelEngine, DEFAULT_SELF_MODEL_CONFIG } from '../SelfModelEngine'
 
 describe('SelfModelEngine', () => {
   let engine: SelfModelEngine
@@ -42,7 +39,9 @@ describe('SelfModelEngine', () => {
 
   describe('capability management', () => {
     it('registers a capability', () => {
-      const cap = engine.registerCapability('programming', 'TypeScript', 'advanced', ['Built multiple projects'])
+      const cap = engine.registerCapability('programming', 'TypeScript', 'advanced', [
+        'Built multiple projects',
+      ])
       expect(cap.domain).toBe('programming')
       expect(cap.skill).toBe('TypeScript')
       expect(cap.proficiency).toBe('advanced')
@@ -50,7 +49,9 @@ describe('SelfModelEngine', () => {
 
     it('updates an existing capability', () => {
       engine.registerCapability('programming', 'Python', 'beginner')
-      const updated = engine.registerCapability('programming', 'Python', 'intermediate', ['Completed course'])
+      const updated = engine.registerCapability('programming', 'Python', 'intermediate', [
+        'Completed course',
+      ])
       expect(updated.proficiency).toBe('intermediate')
     })
 
@@ -182,9 +183,15 @@ describe('SelfModelEngine', () => {
 
     it('supports all limitation categories', () => {
       const categories = [
-        'knowledge_cutoff', 'reasoning_depth', 'context_length',
-        'real_time_data', 'computation', 'multimodal',
-        'personalization', 'creativity', 'reliability'
+        'knowledge_cutoff',
+        'reasoning_depth',
+        'context_length',
+        'real_time_data',
+        'computation',
+        'multimodal',
+        'personalization',
+        'creativity',
+        'reliability',
       ] as const
       for (const cat of categories) {
         const results = engine.getLimitationsByCategory(cat)

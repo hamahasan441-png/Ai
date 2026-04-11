@@ -19,13 +19,20 @@
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-function round2(n: number): number { return Math.round(n * 100) / 100 }
-function clamp(v: number, lo: number, hi: number): number { return Math.max(lo, Math.min(hi, v)) }
+function round2(n: number): number {
+  return Math.round(n * 100) / 100
+}
+function clamp(v: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, v))
+}
 function generateId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
 function tokenize(text: string): string[] {
-  return text.toLowerCase().split(/[\s\-_./,;:()[\]{}]+/).filter(Boolean)
+  return text
+    .toLowerCase()
+    .split(/[\s\-_./,;:()[\]{}]+/)
+    .filter(Boolean)
 }
 function matchScore(tokens: string[], keywords: string[]): number {
   let score = 0
@@ -182,15 +189,34 @@ function buildAWSMisconfigurations(): CloudMisconfiguration[] {
   const items: CloudMisconfiguration[] = []
 
   const add = (
-    id: string, service: string, severity: Severity, title: string,
-    description: string, impact: string, remediation: string,
-    compliance: string[], cweId?: string,
+    id: string,
+    service: string,
+    severity: Severity,
+    title: string,
+    description: string,
+    impact: string,
+    remediation: string,
+    compliance: string[],
+    cweId?: string,
   ) => {
-    items.push({ id, provider: 'aws', service, severity, title, description, impact, remediation, compliance, cweId })
+    items.push({
+      id,
+      provider: 'aws',
+      service,
+      severity,
+      title,
+      description,
+      impact,
+      remediation,
+      compliance,
+      cweId,
+    })
   }
 
   add(
-    'AWS-S3-001', 'S3', 'critical',
+    'AWS-S3-001',
+    'S3',
+    'critical',
     'S3 Bucket Public Access Enabled',
     'S3 bucket has public access enabled via ACL or bucket policy, allowing unrestricted read/write access to objects.',
     'Sensitive data exposure, data exfiltration, unauthorized modification of bucket contents, potential regulatory violations.',
@@ -200,7 +226,9 @@ function buildAWSMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AWS-SG-001', 'EC2', 'high',
+    'AWS-SG-001',
+    'EC2',
+    'high',
     'Security Group Allows Unrestricted Inbound Access',
     'Security group has inbound rules allowing traffic from 0.0.0.0/0 or ::/0 on sensitive ports (SSH 22, RDP 3389, DB ports).',
     'Unauthorized access to instances, brute force attacks, lateral movement, data breaches via exposed services.',
@@ -210,7 +238,9 @@ function buildAWSMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AWS-EBS-001', 'EBS', 'high',
+    'AWS-EBS-001',
+    'EBS',
+    'high',
     'Unencrypted EBS Volumes',
     'EBS volumes are not encrypted at rest using AWS KMS, leaving data vulnerable if physical storage is compromised.',
     'Data exposure in case of physical media theft or unauthorized snapshot access. Non-compliance with data-at-rest encryption requirements.',
@@ -220,7 +250,9 @@ function buildAWSMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AWS-RDS-001', 'RDS', 'high',
+    'AWS-RDS-001',
+    'RDS',
+    'high',
     'Unencrypted RDS Instances',
     'RDS database instances are running without storage encryption enabled, exposing data at rest.',
     'Database contents exposed if underlying storage is accessed. Regulatory non-compliance for sensitive data handling.',
@@ -230,7 +262,9 @@ function buildAWSMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AWS-IAM-001', 'IAM', 'critical',
+    'AWS-IAM-001',
+    'IAM',
+    'critical',
     'IAM Policy With Wildcard Actions',
     'IAM policy grants Action: "*" (all actions) combined with Resource: "*" (all resources), providing unrestricted access.',
     'Full account compromise, privilege escalation, data exfiltration, resource manipulation, inability to enforce least privilege.',
@@ -240,7 +274,9 @@ function buildAWSMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AWS-CT-001', 'CloudTrail', 'critical',
+    'AWS-CT-001',
+    'CloudTrail',
+    'critical',
     'CloudTrail Logging Disabled',
     'AWS CloudTrail is not enabled for all regions, resulting in incomplete audit trail of API activity.',
     'Inability to detect security incidents, forensic investigation gaps, compliance audit failures, undetected unauthorized activity.',
@@ -250,7 +286,9 @@ function buildAWSMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AWS-IAM-002', 'IAM', 'critical',
+    'AWS-IAM-002',
+    'IAM',
+    'critical',
     'Root Account Without MFA',
     'The AWS root account does not have multi-factor authentication enabled, relying solely on password-based authentication.',
     'Complete account takeover via credential compromise, unrestricted access to all services and billing, irrecoverable damage potential.',
@@ -260,7 +298,9 @@ function buildAWSMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AWS-VPC-001', 'VPC', 'medium',
+    'AWS-VPC-001',
+    'VPC',
+    'medium',
     'VPC Flow Logs Not Enabled',
     'VPC Flow Logs are not enabled, preventing network traffic monitoring and analysis for the virtual private cloud.',
     'Unable to detect network anomalies, lateral movement, data exfiltration attempts, or unauthorized access patterns.',
@@ -270,7 +310,9 @@ function buildAWSMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AWS-VPC-002', 'VPC', 'medium',
+    'AWS-VPC-002',
+    'VPC',
+    'medium',
     'Default VPC In Use',
     'Resources are deployed in the default VPC which has overly permissive networking defaults including public subnets and internet gateways.',
     'Unintended public exposure of resources, inadequate network segmentation, difficulty enforcing network security policies.',
@@ -288,15 +330,34 @@ function buildAzureMisconfigurations(): CloudMisconfiguration[] {
   const items: CloudMisconfiguration[] = []
 
   const add = (
-    id: string, service: string, severity: Severity, title: string,
-    description: string, impact: string, remediation: string,
-    compliance: string[], cweId?: string,
+    id: string,
+    service: string,
+    severity: Severity,
+    title: string,
+    description: string,
+    impact: string,
+    remediation: string,
+    compliance: string[],
+    cweId?: string,
   ) => {
-    items.push({ id, provider: 'azure', service, severity, title, description, impact, remediation, compliance, cweId })
+    items.push({
+      id,
+      provider: 'azure',
+      service,
+      severity,
+      title,
+      description,
+      impact,
+      remediation,
+      compliance,
+      cweId,
+    })
   }
 
   add(
-    'AZ-NSG-001', 'Network', 'high',
+    'AZ-NSG-001',
+    'Network',
+    'high',
     'NSG Rule Allows Any Source',
     'Network Security Group contains a rule with source address prefix set to "*" or "0.0.0.0/0" allowing unrestricted inbound traffic.',
     'Unauthorized access to virtual machines and services, potential for brute force and exploitation of exposed services.',
@@ -306,7 +367,9 @@ function buildAzureMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AZ-STOR-001', 'Storage', 'critical',
+    'AZ-STOR-001',
+    'Storage',
+    'critical',
     'Storage Account Allows Anonymous Access',
     'Azure Storage account is configured to allow anonymous/public read access to containers and blobs.',
     'Sensitive data exposure, data exfiltration without authentication, regulatory violations for data handling.',
@@ -316,7 +379,9 @@ function buildAzureMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AZ-SQL-001', 'SQL Database', 'high',
+    'AZ-SQL-001',
+    'SQL Database',
+    'high',
     'Azure SQL Auditing Disabled',
     'Azure SQL Database does not have auditing enabled, resulting in no tracking of database events and activities.',
     'Inability to detect unauthorized access, compliance audit failures, missing forensic trail for security incidents.',
@@ -326,7 +391,9 @@ function buildAzureMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AZ-AKS-001', 'AKS', 'high',
+    'AZ-AKS-001',
+    'AKS',
+    'high',
     'AKS Cluster Without RBAC',
     'Azure Kubernetes Service cluster is deployed without Role-Based Access Control enabled, allowing any authenticated user full cluster access.',
     'Unauthorized access to cluster resources, privilege escalation, deployment of malicious workloads, data access across namespaces.',
@@ -336,7 +403,9 @@ function buildAzureMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AZ-KV-001', 'Key Vault', 'medium',
+    'AZ-KV-001',
+    'Key Vault',
+    'medium',
     'Key Vault Soft Delete Disabled',
     'Azure Key Vault does not have soft delete enabled, meaning deleted secrets/keys/certificates are permanently lost.',
     'Irrecoverable data loss from accidental or malicious deletion of cryptographic keys and secrets. Service disruptions.',
@@ -346,7 +415,9 @@ function buildAzureMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'AZ-MON-001', 'Monitor', 'medium',
+    'AZ-MON-001',
+    'Monitor',
+    'medium',
     'Activity Log Retention Below 365 Days',
     'Azure Activity Log retention is configured for less than 365 days, potentially losing historical audit data.',
     'Incomplete audit trail for security investigations, inability to meet regulatory retention requirements.',
@@ -364,15 +435,34 @@ function buildGCPMisconfigurations(): CloudMisconfiguration[] {
   const items: CloudMisconfiguration[] = []
 
   const add = (
-    id: string, service: string, severity: Severity, title: string,
-    description: string, impact: string, remediation: string,
-    compliance: string[], cweId?: string,
+    id: string,
+    service: string,
+    severity: Severity,
+    title: string,
+    description: string,
+    impact: string,
+    remediation: string,
+    compliance: string[],
+    cweId?: string,
   ) => {
-    items.push({ id, provider: 'gcp', service, severity, title, description, impact, remediation, compliance, cweId })
+    items.push({
+      id,
+      provider: 'gcp',
+      service,
+      severity,
+      title,
+      description,
+      impact,
+      remediation,
+      compliance,
+      cweId,
+    })
   }
 
   add(
-    'GCP-GCS-001', 'Cloud Storage', 'high',
+    'GCP-GCS-001',
+    'Cloud Storage',
+    'high',
     'Uniform Bucket-Level Access Not Enabled',
     'GCP Cloud Storage bucket does not enforce uniform bucket-level access, allowing legacy ACLs that can create inconsistent permissions.',
     'Permission bypass through object-level ACLs, difficulty auditing access, inconsistent security posture across objects.',
@@ -382,7 +472,9 @@ function buildGCPMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'GCP-CE-001', 'Compute Engine', 'high',
+    'GCP-CE-001',
+    'Compute Engine',
+    'high',
     'Compute Instance Using Default Service Account',
     'Compute Engine instance is running with the default service account which has Editor role on the project by default.',
     'Over-privileged instance allowing lateral movement, resource manipulation, and data access if the instance is compromised.',
@@ -392,7 +484,9 @@ function buildGCPMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'GCP-SQL-001', 'Cloud SQL', 'critical',
+    'GCP-SQL-001',
+    'Cloud SQL',
+    'critical',
     'Cloud SQL Instance With Public IP',
     'Cloud SQL database instance is configured with a public IP address, making it potentially accessible from the internet.',
     'Database exposure to internet-based attacks, SQL injection exploitation, brute force authentication attacks, data exfiltration.',
@@ -402,7 +496,9 @@ function buildGCPMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'GCP-FW-001', 'VPC Network', 'critical',
+    'GCP-FW-001',
+    'VPC Network',
+    'critical',
     'VPC Firewall Rule Allows All Traffic',
     'VPC firewall rule is configured with source range 0.0.0.0/0 and allows all protocols/ports, providing unrestricted ingress.',
     'Complete network exposure, unauthorized access to all services, lateral movement enabled across the VPC.',
@@ -412,7 +508,9 @@ function buildGCPMisconfigurations(): CloudMisconfiguration[] {
   )
 
   add(
-    'GCP-KMS-001', 'Cloud KMS', 'medium',
+    'GCP-KMS-001',
+    'Cloud KMS',
+    'medium',
     'Cloud KMS Key Rotation Period Exceeds 90 Days',
     'Cloud KMS encryption keys have rotation period configured beyond 90 days or automatic rotation is not enabled.',
     'Extended cryptographic key exposure window, increased risk of key compromise, non-compliance with key management policies.',
@@ -430,14 +528,23 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   const items: KubernetesSecurityIssue[] = []
 
   const add = (
-    id: string, severity: Severity, category: string, resource: string,
-    description: string, impact: string, remediation: string, cisControl?: string,
+    id: string,
+    severity: Severity,
+    category: string,
+    resource: string,
+    description: string,
+    impact: string,
+    remediation: string,
+    cisControl?: string,
   ) => {
     items.push({ id, severity, category, resource, description, impact, remediation, cisControl })
   }
 
   add(
-    'K8S-POD-001', 'critical', 'Pod Security', 'Pod',
+    'K8S-POD-001',
+    'critical',
+    'Pod Security',
+    'Pod',
     'Pod running with privileged: true in securityContext, granting full host access to the container.',
     'Container escape to host, access to all host devices and filesystems, complete node compromise, lateral movement across cluster.',
     'Remove privileged: true from pod spec. Use specific capabilities instead. Enforce with PodSecurity admission controller or OPA Gatekeeper.',
@@ -445,7 +552,10 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   )
 
   add(
-    'K8S-NET-001', 'high', 'Network Security', 'Pod',
+    'K8S-NET-001',
+    'high',
+    'Network Security',
+    'Pod',
     'Pod configured with hostNetwork: true, sharing the host network namespace.',
     'Pod can sniff host network traffic, access host-bound services on localhost, bypass network policies, impersonate host identity.',
     'Remove hostNetwork: true unless absolutely required (e.g., CNI plugins). Use Services and Ingress for external connectivity.',
@@ -453,7 +563,10 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   )
 
   add(
-    'K8S-SEC-001', 'high', 'Pod Security', 'Pod',
+    'K8S-SEC-001',
+    'high',
+    'Pod Security',
+    'Pod',
     'Pod missing securityContext configuration, running with default (often excessive) privileges.',
     'Container may run as root, have unnecessary capabilities, write to filesystem, leading to potential container breakout.',
     'Set securityContext with runAsNonRoot: true, readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, drop ALL capabilities.',
@@ -461,7 +574,10 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   )
 
   add(
-    'K8S-RBAC-001', 'critical', 'Access Control', 'ClusterRoleBinding',
+    'K8S-RBAC-001',
+    'critical',
+    'Access Control',
+    'ClusterRoleBinding',
     'ClusterRoleBinding grants cluster-admin role to a service account, user, or group beyond system components.',
     'Full cluster administrative access, ability to read all secrets, modify any resource, create backdoor access, delete workloads.',
     'Remove unnecessary cluster-admin bindings. Create scoped ClusterRoles with minimum required permissions. Use namespace-scoped RoleBindings.',
@@ -469,7 +585,10 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   )
 
   add(
-    'K8S-NET-002', 'high', 'Network Security', 'Namespace',
+    'K8S-NET-002',
+    'high',
+    'Network Security',
+    'Namespace',
     'Namespace has no NetworkPolicy resources defined, allowing unrestricted pod-to-pod communication.',
     'Lateral movement between pods, unauthorized access to backend services, data exfiltration across namespaces.',
     'Implement default-deny NetworkPolicy in each namespace. Add explicit allow rules for required communication paths. Use Calico or Cilium for advanced policies.',
@@ -477,7 +596,10 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   )
 
   add(
-    'K8S-HELM-001', 'critical', 'Cluster Security', 'Deployment',
+    'K8S-HELM-001',
+    'critical',
+    'Cluster Security',
+    'Deployment',
     'Tiller (Helm v2 server component) is deployed in the cluster with cluster-admin privileges.',
     'Any user with access to Tiller can perform any cluster operation, complete RBAC bypass, arbitrary resource manipulation.',
     'Upgrade to Helm v3 which removes Tiller entirely. If stuck on v2, configure Tiller with RBAC-restricted service account and TLS authentication.',
@@ -485,7 +607,10 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   )
 
   add(
-    'K8S-SEC-002', 'medium', 'Secret Management', 'Pod',
+    'K8S-SEC-002',
+    'medium',
+    'Secret Management',
+    'Pod',
     'Kubernetes Secrets are passed to containers via environment variables instead of mounted volumes.',
     'Secrets visible in process listings, container inspection, crash dumps, and logs. Higher risk of accidental exposure.',
     'Mount secrets as volumes instead of environment variables. Use external secret managers (Vault, AWS Secrets Manager). Enable encryption at rest for etcd.',
@@ -493,7 +618,10 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   )
 
   add(
-    'K8S-RES-001', 'medium', 'Resource Management', 'Pod',
+    'K8S-RES-001',
+    'medium',
+    'Resource Management',
+    'Pod',
     'Pod spec does not define resource requests and limits for CPU and memory.',
     'Resource starvation attacks (noisy neighbor), pod eviction unpredictability, inability to schedule efficiently, potential node OOM.',
     'Set both requests and limits for CPU and memory on all containers. Use LimitRange to enforce defaults. Implement ResourceQuota per namespace.',
@@ -501,7 +629,10 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   )
 
   add(
-    'K8S-PSP-001', 'high', 'Cluster Security', 'Cluster',
+    'K8S-PSP-001',
+    'high',
+    'Cluster Security',
+    'Cluster',
     'No PodSecurity admission (PodSecurityPolicy, PodSecurity Standards, or OPA/Kyverno policies) is enforced.',
     'Pods can run with any security context, privileged containers allowed, host namespaces accessible, no security baseline enforcement.',
     'Enable PodSecurity admission controller with "restricted" or "baseline" profile. Migrate from deprecated PSP to Pod Security Standards or OPA Gatekeeper.',
@@ -509,7 +640,10 @@ function buildKubernetesIssues(): KubernetesSecurityIssue[] {
   )
 
   add(
-    'K8S-MOUNT-001', 'critical', 'Container Security', 'Pod',
+    'K8S-MOUNT-001',
+    'critical',
+    'Container Security',
+    'Pod',
     'Pod mounts the Docker socket (/var/run/docker.sock) from the host, enabling container escape.',
     'Container can create new privileged containers on the host, access other containers, execute commands on the host, full node compromise.',
     'Remove Docker socket mounts. Use container-native build tools (Kaniko, Buildah). If required, use a dedicated build node with strict access controls.',
@@ -525,8 +659,12 @@ function buildContainerFindings(): ContainerSecurityFinding[] {
   const items: ContainerSecurityFinding[] = []
 
   items.push({
-    id: 'CTR-IMG-001', severity: 'high', imageVulnerabilities: 0,
-    runAsRoot: false, capabilities: [], readOnlyRootfs: true,
+    id: 'CTR-IMG-001',
+    severity: 'high',
+    imageVulnerabilities: 0,
+    runAsRoot: false,
+    capabilities: [],
+    readOnlyRootfs: true,
     recommendations: [
       'Use specific image tags instead of :latest. Pin by SHA256 digest for reproducibility.',
       'Regularly scan base images for known vulnerabilities.',
@@ -535,8 +673,12 @@ function buildContainerFindings(): ContainerSecurityFinding[] {
   })
 
   items.push({
-    id: 'CTR-ROOT-001', severity: 'critical', imageVulnerabilities: 0,
-    runAsRoot: true, capabilities: ['ALL'], readOnlyRootfs: false,
+    id: 'CTR-ROOT-001',
+    severity: 'critical',
+    imageVulnerabilities: 0,
+    runAsRoot: true,
+    capabilities: ['ALL'],
+    readOnlyRootfs: false,
     recommendations: [
       'Add USER directive to run as non-root: RUN adduser -D appuser && USER appuser.',
       'Drop all capabilities and add only required ones.',
@@ -545,8 +687,12 @@ function buildContainerFindings(): ContainerSecurityFinding[] {
   })
 
   items.push({
-    id: 'CTR-SEC-001', severity: 'critical', imageVulnerabilities: 0,
-    runAsRoot: false, capabilities: [], readOnlyRootfs: true,
+    id: 'CTR-SEC-001',
+    severity: 'critical',
+    imageVulnerabilities: 0,
+    runAsRoot: false,
+    capabilities: [],
+    readOnlyRootfs: true,
     recommendations: [
       'Never embed secrets, API keys, or credentials in Dockerfile.',
       'Use multi-stage builds and BuildKit --secret flag for build-time secrets.',
@@ -555,8 +701,12 @@ function buildContainerFindings(): ContainerSecurityFinding[] {
   })
 
   items.push({
-    id: 'CTR-CAP-001', severity: 'high', imageVulnerabilities: 0,
-    runAsRoot: false, capabilities: ['NET_ADMIN', 'SYS_ADMIN', 'SYS_PTRACE'], readOnlyRootfs: true,
+    id: 'CTR-CAP-001',
+    severity: 'high',
+    imageVulnerabilities: 0,
+    runAsRoot: false,
+    capabilities: ['NET_ADMIN', 'SYS_ADMIN', 'SYS_PTRACE'],
+    readOnlyRootfs: true,
     recommendations: [
       'Drop ALL capabilities and add back only those explicitly required.',
       'Avoid SYS_ADMIN, NET_ADMIN, SYS_PTRACE unless absolutely necessary.',
@@ -565,8 +715,12 @@ function buildContainerFindings(): ContainerSecurityFinding[] {
   })
 
   items.push({
-    id: 'CTR-HEALTH-001', severity: 'medium', imageVulnerabilities: 0,
-    runAsRoot: false, capabilities: [], readOnlyRootfs: true,
+    id: 'CTR-HEALTH-001',
+    severity: 'medium',
+    imageVulnerabilities: 0,
+    runAsRoot: false,
+    capabilities: [],
+    readOnlyRootfs: true,
     recommendations: [
       'Add HEALTHCHECK instruction to Dockerfile.',
       'Define liveness and readiness probes in Kubernetes manifests.',
@@ -583,7 +737,10 @@ function buildServerlessRisks(): ServerlessRisk[] {
   const items: ServerlessRisk[] = []
 
   items.push({
-    id: 'SLS-PERM-001', provider: 'aws', functionName: 'generic-lambda', runtime: 'nodejs18.x',
+    id: 'SLS-PERM-001',
+    provider: 'aws',
+    functionName: 'generic-lambda',
+    runtime: 'nodejs18.x',
     risks: [
       'Function execution role has AdministratorAccess or overly broad permissions.',
       'Compromised function gains excessive blast radius across account resources.',
@@ -601,7 +758,10 @@ function buildServerlessRisks(): ServerlessRisk[] {
   })
 
   items.push({
-    id: 'SLS-ENV-001', provider: 'aws', functionName: 'generic-lambda', runtime: 'python3.11',
+    id: 'SLS-ENV-001',
+    provider: 'aws',
+    functionName: 'generic-lambda',
+    runtime: 'python3.11',
     risks: [
       'Secrets and API keys stored in plaintext environment variables.',
       'Environment variables visible in Lambda console and API responses.',
@@ -616,7 +776,10 @@ function buildServerlessRisks(): ServerlessRisk[] {
   })
 
   items.push({
-    id: 'SLS-TIMEOUT-001', provider: 'aws', functionName: 'generic-lambda', runtime: 'nodejs18.x',
+    id: 'SLS-TIMEOUT-001',
+    provider: 'aws',
+    functionName: 'generic-lambda',
+    runtime: 'nodejs18.x',
     risks: [
       'Function timeout set to maximum (15 minutes) without justification.',
       'No concurrency limits set, allowing resource exhaustion attacks.',
@@ -631,7 +794,10 @@ function buildServerlessRisks(): ServerlessRisk[] {
   })
 
   items.push({
-    id: 'SLS-API-001', provider: 'aws', functionName: 'api-handler', runtime: 'nodejs18.x',
+    id: 'SLS-API-001',
+    provider: 'aws',
+    functionName: 'api-handler',
+    runtime: 'nodejs18.x',
     risks: [
       'Public API Gateway endpoint with no authentication mechanism.',
       'No request validation or input sanitization. Wildcard CORS origin.',
@@ -649,7 +815,10 @@ function buildServerlessRisks(): ServerlessRisk[] {
   })
 
   items.push({
-    id: 'SLS-DLQ-001', provider: 'aws', functionName: 'event-processor', runtime: 'python3.11',
+    id: 'SLS-DLQ-001',
+    provider: 'aws',
+    functionName: 'event-processor',
+    runtime: 'python3.11',
     risks: [
       'No Dead Letter Queue (DLQ) configured for async invocations.',
       'Failed events are silently dropped after retry exhaustion.',
@@ -682,47 +851,69 @@ interface IAMRiskPattern {
 function buildIAMRiskPatterns(): IAMRiskPattern[] {
   const items: IAMRiskPattern[] = []
 
-  const add = (id: string, pattern: string, severity: Severity, description: string, recommendation: string) => {
+  const add = (
+    id: string,
+    pattern: string,
+    severity: Severity,
+    description: string,
+    recommendation: string,
+  ) => {
     items.push({ id, pattern, severity, description, recommendation })
   }
 
   add(
-    'IAM-WILD-001', '*', 'critical',
+    'IAM-WILD-001',
+    '*',
+    'critical',
     'Wildcard action (Action: "*") grants access to all API operations across all services.',
     'Replace with specific action names. Use AWS IAM Access Analyzer to determine required permissions.',
   )
   add(
-    'IAM-WILD-002', ':*', 'high',
+    'IAM-WILD-002',
+    ':*',
+    'high',
     'Service-level wildcard (e.g., s3:*) grants all actions within a service.',
     'Scope actions to specific operations (e.g., s3:GetObject, s3:PutObject) based on actual requirements.',
   )
   add(
-    'IAM-CROSS-001', 'arn:aws:iam::', 'high',
+    'IAM-CROSS-001',
+    'arn:aws:iam::',
+    'high',
     'Cross-account access via trust policy allows external AWS accounts to assume roles.',
     'Verify all trusted accounts. Add ExternalId condition. Limit assumed role permissions with session policies.',
   )
   add(
-    'IAM-ASSUME-001', 'sts:AssumeRole', 'medium',
+    'IAM-ASSUME-001',
+    'sts:AssumeRole',
+    'medium',
     'AssumeRole chains can create transitive trust paths through multiple accounts.',
     'Map all assume-role chains. Limit chain depth. Use confused deputy prevention with ExternalId conditions.',
   )
   add(
-    'IAM-COND-001', 'Condition', 'medium',
+    'IAM-COND-001',
+    'Condition',
+    'medium',
     'IAM policy lacks condition keys to restrict when and how permissions are granted.',
     'Add conditions: aws:SourceIp, aws:MultiFactorAuthPresent, aws:PrincipalOrgID, aws:RequestedRegion.',
   )
   add(
-    'IAM-MFA-001', 'MultiFactorAuthPresent', 'high',
+    'IAM-MFA-001',
+    'MultiFactorAuthPresent',
+    'high',
     'IAM policy does not require MFA for sensitive operations.',
     'Add Condition: { Bool: { "aws:MultiFactorAuthPresent": "true" } } for privilege-escalation-capable actions.',
   )
   add(
-    'IAM-RESOURCE-001', 'Resource', 'high',
+    'IAM-RESOURCE-001',
+    'Resource',
+    'high',
     'IAM policy uses Resource: "*" allowing actions on all resources of the specified type.',
     'Scope Resource to specific ARNs. Use resource-based policies where applicable. Tag resources for ABAC.',
   )
   add(
-    'IAM-ADMIN-001', 'AdministratorAccess', 'critical',
+    'IAM-ADMIN-001',
+    'AdministratorAccess',
+    'critical',
     'AWS managed AdministratorAccess policy attached, granting full unrestricted access.',
     'Remove AdministratorAccess. Create custom policies with only required permissions. Use permission boundaries.',
   )
@@ -743,46 +934,61 @@ function buildComplianceFrameworks(): ComplianceFramework[] {
       {
         id: 'CIS-1.1',
         title: 'Avoid the use of the root account',
-        description: 'The root account has unrestricted access. Avoid using it for daily operations and enable MFA.',
+        description:
+          'The root account has unrestricted access. Avoid using it for daily operations and enable MFA.',
         cloudMapping: {
-          aws: ['IAM root user usage', 'Root MFA status'], azure: ['Global Administrator usage', 'Emergency access accounts'],
-          gcp: ['Organization admin usage', 'Super admin activity'], multi: ['Privileged account monitoring'],
+          aws: ['IAM root user usage', 'Root MFA status'],
+          azure: ['Global Administrator usage', 'Emergency access accounts'],
+          gcp: ['Organization admin usage', 'Super admin activity'],
+          multi: ['Privileged account monitoring'],
         },
       },
       {
         id: 'CIS-1.2',
         title: 'Ensure MFA is enabled for all IAM users',
-        description: 'Multi-factor authentication adds a layer of protection beyond passwords for console access.',
+        description:
+          'Multi-factor authentication adds a layer of protection beyond passwords for console access.',
         cloudMapping: {
-          aws: ['IAM user MFA status', 'Virtual MFA configuration'], azure: ['Azure AD MFA registration', 'Conditional Access MFA policies'],
-          gcp: ['2-Step Verification enforcement', 'Security key usage'], multi: ['MFA adoption rate'],
+          aws: ['IAM user MFA status', 'Virtual MFA configuration'],
+          azure: ['Azure AD MFA registration', 'Conditional Access MFA policies'],
+          gcp: ['2-Step Verification enforcement', 'Security key usage'],
+          multi: ['MFA adoption rate'],
         },
       },
       {
         id: 'CIS-1.3',
         title: 'Ensure credentials unused for 90 days are disabled',
-        description: 'Inactive credentials increase the risk of unauthorized access through stale accounts.',
+        description:
+          'Inactive credentials increase the risk of unauthorized access through stale accounts.',
         cloudMapping: {
-          aws: ['IAM credential report', 'Access key last used'], azure: ['Azure AD sign-in logs', 'Inactive user detection'],
-          gcp: ['Policy Analyzer', 'Service account key usage'], multi: ['Credential lifecycle management'],
+          aws: ['IAM credential report', 'Access key last used'],
+          azure: ['Azure AD sign-in logs', 'Inactive user detection'],
+          gcp: ['Policy Analyzer', 'Service account key usage'],
+          multi: ['Credential lifecycle management'],
         },
       },
       {
         id: 'CIS-2.1',
         title: 'Ensure encryption at rest is enabled',
-        description: 'All storage services should encrypt data at rest using platform or customer-managed keys.',
+        description:
+          'All storage services should encrypt data at rest using platform or customer-managed keys.',
         cloudMapping: {
-          aws: ['S3 default encryption', 'EBS encryption', 'RDS encryption'], azure: ['Storage Service Encryption', 'Disk encryption', 'SQL TDE'],
-          gcp: ['Default encryption', 'CMEK configuration', 'Cloud SQL encryption'], multi: ['Encryption at rest inventory'],
+          aws: ['S3 default encryption', 'EBS encryption', 'RDS encryption'],
+          azure: ['Storage Service Encryption', 'Disk encryption', 'SQL TDE'],
+          gcp: ['Default encryption', 'CMEK configuration', 'Cloud SQL encryption'],
+          multi: ['Encryption at rest inventory'],
         },
       },
       {
         id: 'CIS-3.1',
         title: 'Ensure audit logging is enabled',
-        description: 'Enable comprehensive logging of API calls, data access, and administrative actions.',
+        description:
+          'Enable comprehensive logging of API calls, data access, and administrative actions.',
         cloudMapping: {
-          aws: ['CloudTrail multi-region', 'S3 access logging', 'VPC Flow Logs'], azure: ['Activity Log', 'Diagnostic settings', 'NSG Flow Logs'],
-          gcp: ['Cloud Audit Logs', 'VPC Flow Logs', 'Data Access logs'], multi: ['Centralized logging architecture'],
+          aws: ['CloudTrail multi-region', 'S3 access logging', 'VPC Flow Logs'],
+          azure: ['Activity Log', 'Diagnostic settings', 'NSG Flow Logs'],
+          gcp: ['Cloud Audit Logs', 'VPC Flow Logs', 'Data Access logs'],
+          multi: ['Centralized logging architecture'],
         },
       },
     ],
@@ -796,46 +1002,61 @@ function buildComplianceFrameworks(): ComplianceFramework[] {
       {
         id: 'SOC2-CC6.1',
         title: 'Logical and Physical Access Controls',
-        description: 'Implement logical access security measures to protect against unauthorized access to information assets.',
+        description:
+          'Implement logical access security measures to protect against unauthorized access to information assets.',
         cloudMapping: {
-          aws: ['IAM policies', 'Security Groups', 'S3 bucket policies'], azure: ['Azure AD', 'NSGs', 'RBAC assignments'],
-          gcp: ['IAM policies', 'VPC firewall rules', 'Organization policies'], multi: ['Identity governance', 'Access reviews'],
+          aws: ['IAM policies', 'Security Groups', 'S3 bucket policies'],
+          azure: ['Azure AD', 'NSGs', 'RBAC assignments'],
+          gcp: ['IAM policies', 'VPC firewall rules', 'Organization policies'],
+          multi: ['Identity governance', 'Access reviews'],
         },
       },
       {
         id: 'SOC2-CC6.3',
         title: 'Role-Based Access and Least Privilege',
-        description: 'Implement role-based access and enforce least privilege across all cloud services.',
+        description:
+          'Implement role-based access and enforce least privilege across all cloud services.',
         cloudMapping: {
-          aws: ['IAM roles', 'Permission boundaries', 'SCPs'], azure: ['Azure RBAC', 'PIM', 'Conditional Access'],
-          gcp: ['IAM roles', 'Organization policies', 'Workload Identity'], multi: ['Privilege access management'],
+          aws: ['IAM roles', 'Permission boundaries', 'SCPs'],
+          azure: ['Azure RBAC', 'PIM', 'Conditional Access'],
+          gcp: ['IAM roles', 'Organization policies', 'Workload Identity'],
+          multi: ['Privilege access management'],
         },
       },
       {
         id: 'SOC2-CC6.6',
         title: 'System Boundary Protection',
-        description: 'Implement measures to restrict access at system boundaries including network perimeters.',
+        description:
+          'Implement measures to restrict access at system boundaries including network perimeters.',
         cloudMapping: {
-          aws: ['VPC design', 'WAF', 'CloudFront', 'Shield'], azure: ['Virtual Network', 'Azure Firewall', 'Front Door', 'DDoS Protection'],
-          gcp: ['VPC Network', 'Cloud Armor', 'Cloud CDN', 'Cloud Load Balancing'], multi: ['Perimeter security architecture'],
+          aws: ['VPC design', 'WAF', 'CloudFront', 'Shield'],
+          azure: ['Virtual Network', 'Azure Firewall', 'Front Door', 'DDoS Protection'],
+          gcp: ['VPC Network', 'Cloud Armor', 'Cloud CDN', 'Cloud Load Balancing'],
+          multi: ['Perimeter security architecture'],
         },
       },
       {
         id: 'SOC2-CC6.7',
         title: 'Data Encryption',
-        description: 'Encrypt data at rest and in transit to protect against unauthorized disclosure.',
+        description:
+          'Encrypt data at rest and in transit to protect against unauthorized disclosure.',
         cloudMapping: {
-          aws: ['KMS', 'ACM', 'S3 encryption', 'EBS encryption'], azure: ['Key Vault', 'Storage encryption', 'SQL TDE', 'App Service TLS'],
-          gcp: ['Cloud KMS', 'Default encryption', 'SSL policies', 'Certificate Manager'], multi: ['Encryption key management'],
+          aws: ['KMS', 'ACM', 'S3 encryption', 'EBS encryption'],
+          azure: ['Key Vault', 'Storage encryption', 'SQL TDE', 'App Service TLS'],
+          gcp: ['Cloud KMS', 'Default encryption', 'SSL policies', 'Certificate Manager'],
+          multi: ['Encryption key management'],
         },
       },
       {
         id: 'SOC2-CC7.2',
         title: 'System Monitoring',
-        description: 'Monitor system components and detect anomalies, security events, and vulnerabilities.',
+        description:
+          'Monitor system components and detect anomalies, security events, and vulnerabilities.',
         cloudMapping: {
-          aws: ['CloudWatch', 'GuardDuty', 'SecurityHub', 'Config'], azure: ['Monitor', 'Sentinel', 'Defender for Cloud', 'Policy'],
-          gcp: ['Cloud Monitoring', 'Security Command Center', 'Chronicle', 'Recommender'], multi: ['SIEM integration', 'Alert correlation'],
+          aws: ['CloudWatch', 'GuardDuty', 'SecurityHub', 'Config'],
+          azure: ['Monitor', 'Sentinel', 'Defender for Cloud', 'Policy'],
+          gcp: ['Cloud Monitoring', 'Security Command Center', 'Chronicle', 'Recommender'],
+          multi: ['SIEM integration', 'Alert correlation'],
         },
       },
     ],
@@ -849,46 +1070,61 @@ function buildComplianceFrameworks(): ComplianceFramework[] {
       {
         id: 'PCI-1.2',
         title: 'Network Security Controls',
-        description: 'Configure network security controls (firewalls, security groups) to restrict traffic to cardholder data environments.',
+        description:
+          'Configure network security controls (firewalls, security groups) to restrict traffic to cardholder data environments.',
         cloudMapping: {
-          aws: ['Security Groups', 'NACLs', 'VPC peering restrictions'], azure: ['NSGs', 'Azure Firewall', 'Private Link'],
-          gcp: ['VPC Firewall', 'Shared VPC', 'VPC Service Controls'], multi: ['CDE network segmentation'],
+          aws: ['Security Groups', 'NACLs', 'VPC peering restrictions'],
+          azure: ['NSGs', 'Azure Firewall', 'Private Link'],
+          gcp: ['VPC Firewall', 'Shared VPC', 'VPC Service Controls'],
+          multi: ['CDE network segmentation'],
         },
       },
       {
         id: 'PCI-3.4',
         title: 'Render PAN Unreadable',
-        description: 'Render Primary Account Numbers unreadable anywhere it is stored using strong cryptography.',
+        description:
+          'Render Primary Account Numbers unreadable anywhere it is stored using strong cryptography.',
         cloudMapping: {
-          aws: ['KMS encryption', 'DynamoDB encryption', 'RDS encryption'], azure: ['Always Encrypted', 'TDE', 'Key Vault'],
-          gcp: ['Cloud KMS', 'BigQuery encryption', 'Cloud SQL encryption'], multi: ['Tokenization services', 'Format-preserving encryption'],
+          aws: ['KMS encryption', 'DynamoDB encryption', 'RDS encryption'],
+          azure: ['Always Encrypted', 'TDE', 'Key Vault'],
+          gcp: ['Cloud KMS', 'BigQuery encryption', 'Cloud SQL encryption'],
+          multi: ['Tokenization services', 'Format-preserving encryption'],
         },
       },
       {
         id: 'PCI-7.1',
         title: 'Restrict Access to System Components',
-        description: 'Limit access to system components and cardholder data to only those individuals whose job requires access.',
+        description:
+          'Limit access to system components and cardholder data to only those individuals whose job requires access.',
         cloudMapping: {
-          aws: ['IAM policies', 'Resource-based policies', 'VPC endpoints'], azure: ['Azure RBAC', 'PIM', 'Managed identities'],
-          gcp: ['IAM bindings', 'VPC Service Controls', 'Access Context Manager'], multi: ['Access control matrices'],
+          aws: ['IAM policies', 'Resource-based policies', 'VPC endpoints'],
+          azure: ['Azure RBAC', 'PIM', 'Managed identities'],
+          gcp: ['IAM bindings', 'VPC Service Controls', 'Access Context Manager'],
+          multi: ['Access control matrices'],
         },
       },
       {
         id: 'PCI-8.3',
         title: 'Strong Authentication',
-        description: 'Secure all individual access to system components with strong authentication factors.',
+        description:
+          'Secure all individual access to system components with strong authentication factors.',
         cloudMapping: {
-          aws: ['IAM MFA', 'AWS SSO', 'Federation'], azure: ['Azure MFA', 'Conditional Access', 'Passwordless'],
-          gcp: ['2-Step Verification', 'BeyondCorp', 'Identity-Aware Proxy'], multi: ['Multi-factor authentication strategy'],
+          aws: ['IAM MFA', 'AWS SSO', 'Federation'],
+          azure: ['Azure MFA', 'Conditional Access', 'Passwordless'],
+          gcp: ['2-Step Verification', 'BeyondCorp', 'Identity-Aware Proxy'],
+          multi: ['Multi-factor authentication strategy'],
         },
       },
       {
         id: 'PCI-10.1',
         title: 'Audit Trail for System Components',
-        description: 'Implement audit trails to link all access to system components to each individual user.',
+        description:
+          'Implement audit trails to link all access to system components to each individual user.',
         cloudMapping: {
-          aws: ['CloudTrail', 'CloudWatch Logs', 'S3 access logging'], azure: ['Activity Log', 'Diagnostic Logs', 'Azure Monitor'],
-          gcp: ['Cloud Audit Logs', 'Access Transparency', 'Cloud Logging'], multi: ['Centralized audit logging'],
+          aws: ['CloudTrail', 'CloudWatch Logs', 'S3 access logging'],
+          azure: ['Activity Log', 'Diagnostic Logs', 'Azure Monitor'],
+          gcp: ['Cloud Audit Logs', 'Access Transparency', 'Cloud Logging'],
+          multi: ['Centralized audit logging'],
         },
       },
     ],
@@ -902,46 +1138,61 @@ function buildComplianceFrameworks(): ComplianceFramework[] {
       {
         id: 'HIPAA-164.312(a)(1)',
         title: 'Access Control',
-        description: 'Implement technical policies and procedures for electronic information systems that maintain ePHI to allow access only to authorized persons.',
+        description:
+          'Implement technical policies and procedures for electronic information systems that maintain ePHI to allow access only to authorized persons.',
         cloudMapping: {
-          aws: ['IAM policies', 'S3 bucket policies', 'KMS key policies'], azure: ['Azure RBAC', 'Managed identities', 'Key Vault access policies'],
-          gcp: ['IAM policies', 'VPC Service Controls', 'Organization policies'], multi: ['PHI access governance'],
+          aws: ['IAM policies', 'S3 bucket policies', 'KMS key policies'],
+          azure: ['Azure RBAC', 'Managed identities', 'Key Vault access policies'],
+          gcp: ['IAM policies', 'VPC Service Controls', 'Organization policies'],
+          multi: ['PHI access governance'],
         },
       },
       {
         id: 'HIPAA-164.312(a)(2)(iv)',
         title: 'Encryption and Decryption',
-        description: 'Implement a mechanism to encrypt and decrypt electronic protected health information.',
+        description:
+          'Implement a mechanism to encrypt and decrypt electronic protected health information.',
         cloudMapping: {
-          aws: ['KMS CMK', 'S3 SSE', 'EBS encryption', 'RDS encryption'], azure: ['Key Vault CMK', 'Storage SSE', 'Disk encryption', 'SQL TDE'],
-          gcp: ['Cloud KMS CMEK', 'Default encryption', 'Cloud SQL encryption'], multi: ['ePHI encryption inventory'],
+          aws: ['KMS CMK', 'S3 SSE', 'EBS encryption', 'RDS encryption'],
+          azure: ['Key Vault CMK', 'Storage SSE', 'Disk encryption', 'SQL TDE'],
+          gcp: ['Cloud KMS CMEK', 'Default encryption', 'Cloud SQL encryption'],
+          multi: ['ePHI encryption inventory'],
         },
       },
       {
         id: 'HIPAA-164.312(b)',
         title: 'Audit Controls',
-        description: 'Implement hardware, software, and procedural mechanisms that record and examine activity in systems containing ePHI.',
+        description:
+          'Implement hardware, software, and procedural mechanisms that record and examine activity in systems containing ePHI.',
         cloudMapping: {
-          aws: ['CloudTrail', 'CloudWatch', 'Config', 'GuardDuty'], azure: ['Activity Log', 'Monitor', 'Sentinel', 'Defender'],
-          gcp: ['Cloud Audit Logs', 'Cloud Monitoring', 'Security Command Center'], multi: ['ePHI access auditing'],
+          aws: ['CloudTrail', 'CloudWatch', 'Config', 'GuardDuty'],
+          azure: ['Activity Log', 'Monitor', 'Sentinel', 'Defender'],
+          gcp: ['Cloud Audit Logs', 'Cloud Monitoring', 'Security Command Center'],
+          multi: ['ePHI access auditing'],
         },
       },
       {
         id: 'HIPAA-164.312(d)',
         title: 'Person or Entity Authentication',
-        description: 'Implement procedures to verify that a person or entity seeking access to ePHI is the one claimed.',
+        description:
+          'Implement procedures to verify that a person or entity seeking access to ePHI is the one claimed.',
         cloudMapping: {
-          aws: ['IAM MFA', 'AWS SSO', 'Cognito'], azure: ['Azure MFA', 'Conditional Access', 'Azure AD B2C'],
-          gcp: ['2-Step Verification', 'Identity Platform', 'BeyondCorp'], multi: ['Identity verification procedures'],
+          aws: ['IAM MFA', 'AWS SSO', 'Cognito'],
+          azure: ['Azure MFA', 'Conditional Access', 'Azure AD B2C'],
+          gcp: ['2-Step Verification', 'Identity Platform', 'BeyondCorp'],
+          multi: ['Identity verification procedures'],
         },
       },
       {
         id: 'HIPAA-164.312(e)(1)',
         title: 'Transmission Security',
-        description: 'Implement technical security measures to guard against unauthorized access to ePHI transmitted over an electronic network.',
+        description:
+          'Implement technical security measures to guard against unauthorized access to ePHI transmitted over an electronic network.',
         cloudMapping: {
-          aws: ['ACM TLS', 'VPN', 'PrivateLink', 'CloudFront HTTPS'], azure: ['App Gateway TLS', 'VPN Gateway', 'Private Link', 'Front Door HTTPS'],
-          gcp: ['SSL policies', 'Cloud VPN', 'Private Google Access', 'HTTPS LB'], multi: ['TLS enforcement', 'VPN architecture'],
+          aws: ['ACM TLS', 'VPN', 'PrivateLink', 'CloudFront HTTPS'],
+          azure: ['App Gateway TLS', 'VPN Gateway', 'Private Link', 'Front Door HTTPS'],
+          gcp: ['SSL policies', 'Cloud VPN', 'Private Google Access', 'HTTPS LB'],
+          multi: ['TLS enforcement', 'VPN architecture'],
         },
       },
     ],
@@ -955,46 +1206,61 @@ function buildComplianceFrameworks(): ComplianceFramework[] {
       {
         id: 'NIST-AC-2',
         title: 'Account Management',
-        description: 'Define, create, enable, modify, disable, and remove accounts in accordance with organizational policy.',
+        description:
+          'Define, create, enable, modify, disable, and remove accounts in accordance with organizational policy.',
         cloudMapping: {
-          aws: ['IAM users/roles', 'AWS SSO', 'Organizations'], azure: ['Azure AD users', 'PIM', 'Access Reviews'],
-          gcp: ['Cloud Identity', 'IAM', 'Groups'], multi: ['Account lifecycle management'],
+          aws: ['IAM users/roles', 'AWS SSO', 'Organizations'],
+          azure: ['Azure AD users', 'PIM', 'Access Reviews'],
+          gcp: ['Cloud Identity', 'IAM', 'Groups'],
+          multi: ['Account lifecycle management'],
         },
       },
       {
         id: 'NIST-AC-3',
         title: 'Access Enforcement',
-        description: 'Enforce approved authorizations for logical access to information and system resources.',
+        description:
+          'Enforce approved authorizations for logical access to information and system resources.',
         cloudMapping: {
-          aws: ['IAM policies', 'Resource policies', 'SCPs', 'Permission boundaries'], azure: ['RBAC', 'Azure Policy', 'Conditional Access'],
-          gcp: ['IAM bindings', 'Organization policies', 'VPC Service Controls'], multi: ['Policy enforcement points'],
+          aws: ['IAM policies', 'Resource policies', 'SCPs', 'Permission boundaries'],
+          azure: ['RBAC', 'Azure Policy', 'Conditional Access'],
+          gcp: ['IAM bindings', 'Organization policies', 'VPC Service Controls'],
+          multi: ['Policy enforcement points'],
         },
       },
       {
         id: 'NIST-AC-4',
         title: 'Information Flow Enforcement',
-        description: 'Enforce approved authorizations for controlling the flow of information within the system and between systems.',
+        description:
+          'Enforce approved authorizations for controlling the flow of information within the system and between systems.',
         cloudMapping: {
-          aws: ['Security Groups', 'NACLs', 'VPC endpoints', 'Transit Gateway'], azure: ['NSGs', 'Azure Firewall', 'Private Link', 'Virtual WAN'],
-          gcp: ['VPC Firewall', 'Shared VPC', 'VPC peering', 'Cloud Interconnect'], multi: ['Network flow controls'],
+          aws: ['Security Groups', 'NACLs', 'VPC endpoints', 'Transit Gateway'],
+          azure: ['NSGs', 'Azure Firewall', 'Private Link', 'Virtual WAN'],
+          gcp: ['VPC Firewall', 'Shared VPC', 'VPC peering', 'Cloud Interconnect'],
+          multi: ['Network flow controls'],
         },
       },
       {
         id: 'NIST-AC-6',
         title: 'Least Privilege',
-        description: 'Employ the principle of least privilege, allowing only authorized accesses necessary to accomplish assigned tasks.',
+        description:
+          'Employ the principle of least privilege, allowing only authorized accesses necessary to accomplish assigned tasks.',
         cloudMapping: {
-          aws: ['IAM Access Analyzer', 'Permission boundaries', 'SCPs'], azure: ['PIM', 'Just-In-Time access', 'Managed identities'],
-          gcp: ['IAM Recommender', 'Workload Identity', 'Organization policies'], multi: ['Privilege minimization review'],
+          aws: ['IAM Access Analyzer', 'Permission boundaries', 'SCPs'],
+          azure: ['PIM', 'Just-In-Time access', 'Managed identities'],
+          gcp: ['IAM Recommender', 'Workload Identity', 'Organization policies'],
+          multi: ['Privilege minimization review'],
         },
       },
       {
         id: 'NIST-AU-2',
         title: 'Event Logging',
-        description: 'Identify the types of events that the system is capable of logging in support of the audit function.',
+        description:
+          'Identify the types of events that the system is capable of logging in support of the audit function.',
         cloudMapping: {
-          aws: ['CloudTrail events', 'CloudWatch Logs', 'VPC Flow Logs'], azure: ['Activity Log categories', 'Diagnostic settings', 'NSG Flow Logs'],
-          gcp: ['Audit log types', 'Data Access logs', 'VPC Flow Logs'], multi: ['Audit event catalog'],
+          aws: ['CloudTrail events', 'CloudWatch Logs', 'VPC Flow Logs'],
+          azure: ['Activity Log categories', 'Diagnostic settings', 'NSG Flow Logs'],
+          gcp: ['Audit log types', 'Data Access logs', 'VPC Flow Logs'],
+          multi: ['Audit event catalog'],
         },
       },
     ],
@@ -1008,46 +1274,61 @@ function buildComplianceFrameworks(): ComplianceFramework[] {
       {
         id: 'ISO-A.5.15',
         title: 'Access Control',
-        description: 'Rules to control physical and logical access to information and other associated assets shall be established.',
+        description:
+          'Rules to control physical and logical access to information and other associated assets shall be established.',
         cloudMapping: {
-          aws: ['IAM', 'Organizations', 'Resource-based policies'], azure: ['Azure AD', 'RBAC', 'Conditional Access'],
-          gcp: ['Cloud IAM', 'Organization policies', 'BeyondCorp'], multi: ['Access control policy framework'],
+          aws: ['IAM', 'Organizations', 'Resource-based policies'],
+          azure: ['Azure AD', 'RBAC', 'Conditional Access'],
+          gcp: ['Cloud IAM', 'Organization policies', 'BeyondCorp'],
+          multi: ['Access control policy framework'],
         },
       },
       {
         id: 'ISO-A.5.23',
         title: 'Information Security for Use of Cloud Services',
-        description: 'Processes for acquisition, use, management and exit from cloud services shall be established.',
+        description:
+          'Processes for acquisition, use, management and exit from cloud services shall be established.',
         cloudMapping: {
-          aws: ['Well-Architected Framework', 'Trusted Advisor', 'Config'], azure: ['Cloud Adoption Framework', 'Advisor', 'Policy'],
-          gcp: ['Architecture Framework', 'Recommender', 'Organization Policy'], multi: ['Cloud governance framework'],
+          aws: ['Well-Architected Framework', 'Trusted Advisor', 'Config'],
+          azure: ['Cloud Adoption Framework', 'Advisor', 'Policy'],
+          gcp: ['Architecture Framework', 'Recommender', 'Organization Policy'],
+          multi: ['Cloud governance framework'],
         },
       },
       {
         id: 'ISO-A.8.9',
         title: 'Configuration Management',
-        description: 'Configurations of hardware, software, services and networks shall be established, documented, implemented and monitored.',
+        description:
+          'Configurations of hardware, software, services and networks shall be established, documented, implemented and monitored.',
         cloudMapping: {
-          aws: ['AWS Config', 'Systems Manager', 'CloudFormation drift detection'], azure: ['Azure Policy', 'Automation', 'ARM template validation'],
-          gcp: ['Security Health Analytics', 'Asset Inventory', 'Policy Intelligence'], multi: ['Configuration baseline enforcement'],
+          aws: ['AWS Config', 'Systems Manager', 'CloudFormation drift detection'],
+          azure: ['Azure Policy', 'Automation', 'ARM template validation'],
+          gcp: ['Security Health Analytics', 'Asset Inventory', 'Policy Intelligence'],
+          multi: ['Configuration baseline enforcement'],
         },
       },
       {
         id: 'ISO-A.8.15',
         title: 'Logging',
-        description: 'Logs that record activities, exceptions, faults and other relevant events shall be produced, stored, protected and analyzed.',
+        description:
+          'Logs that record activities, exceptions, faults and other relevant events shall be produced, stored, protected and analyzed.',
         cloudMapping: {
-          aws: ['CloudTrail', 'CloudWatch Logs', 'S3 access logs'], azure: ['Activity Log', 'Diagnostic settings', 'Log Analytics'],
-          gcp: ['Cloud Logging', 'Cloud Audit Logs', 'Log Router'], multi: ['Centralized log management'],
+          aws: ['CloudTrail', 'CloudWatch Logs', 'S3 access logs'],
+          azure: ['Activity Log', 'Diagnostic settings', 'Log Analytics'],
+          gcp: ['Cloud Logging', 'Cloud Audit Logs', 'Log Router'],
+          multi: ['Centralized log management'],
         },
       },
       {
         id: 'ISO-A.8.24',
         title: 'Use of Cryptography',
-        description: 'Rules for the effective use of cryptography, including cryptographic key management, shall be defined and implemented.',
+        description:
+          'Rules for the effective use of cryptography, including cryptographic key management, shall be defined and implemented.',
         cloudMapping: {
-          aws: ['KMS', 'CloudHSM', 'ACM', 'S3 encryption'], azure: ['Key Vault', 'Managed HSM', 'Storage encryption'],
-          gcp: ['Cloud KMS', 'Cloud HSM', 'Certificate Authority Service'], multi: ['Cryptographic controls inventory'],
+          aws: ['KMS', 'CloudHSM', 'ACM', 'S3 encryption'],
+          azure: ['Key Vault', 'Managed HSM', 'Storage encryption'],
+          gcp: ['Cloud KMS', 'Cloud HSM', 'Certificate Authority Service'],
+          multi: ['Cryptographic controls inventory'],
         },
       },
     ],
@@ -1122,7 +1403,9 @@ export class CloudSecurityAnalyzer {
       misconfigs = this.getMisconfigsForProvider(provider)
     }
 
-    misconfigs = misconfigs.filter(m => severityAtOrAbove(m.severity, this.config.severityThreshold))
+    misconfigs = misconfigs.filter(m =>
+      severityAtOrAbove(m.severity, this.config.severityThreshold),
+    )
     misconfigs.sort((a, b) => SEVERITY_ORDER[b.severity] - SEVERITY_ORDER[a.severity])
 
     const results = misconfigs.slice(0, this.config.maxResults)
@@ -1149,34 +1432,52 @@ export class CloudSecurityAnalyzer {
           const re = /"([a-z0-9]+):\*"/gi
           let m: RegExpExecArray | null
           while ((m = re.exec(policyJson)) !== null) wildcardActions.push(`${m[1]}:*`)
-          if (wildcardActions.length > 0) { riskScore += 2; recommendations.push(pattern.recommendation) }
+          if (wildcardActions.length > 0) {
+            riskScore += 2
+            recommendations.push(pattern.recommendation)
+          }
         }
       }
     }
 
-    const crossAccountAccess = policyJson.includes('arn:aws:iam::') && !policyJson.includes('"Effect": "Deny"')
-    if (crossAccountAccess) { riskScore += 2; recommendations.push('Review cross-account trust. Add ExternalId conditions.') }
+    const crossAccountAccess =
+      policyJson.includes('arn:aws:iam::') && !policyJson.includes('"Effect": "Deny"')
+    if (crossAccountAccess) {
+      riskScore += 2
+      recommendations.push('Review cross-account trust. Add ExternalId conditions.')
+    }
 
     const noMFA = !lower.includes('multifactorauthpresent') && !lower.includes('mfa')
-    if (noMFA) { riskScore += 1; recommendations.push('Add MFA condition for sensitive operations.') }
+    if (noMFA) {
+      riskScore += 1
+      recommendations.push('Add MFA condition for sensitive operations.')
+    }
 
     if (!lower.includes('"condition"')) {
-      riskScore += 1; recommendations.push('Add IAM policy conditions (IP, MFA, time) to restrict permission usage.')
+      riskScore += 1
+      recommendations.push(
+        'Add IAM policy conditions (IP, MFA, time) to restrict permission usage.',
+      )
     }
     if (policyJson.includes('"Resource": "*"') || policyJson.includes('"Resource":"*"')) {
-      riskScore += 2; recommendations.push('Replace Resource: "*" with specific ARNs.')
+      riskScore += 2
+      recommendations.push('Replace Resource: "*" with specific ARNs.')
     }
     if (policyJson.includes('AdministratorAccess') || policyJson.includes('"Action": "*"')) {
-      riskScore += 3; recommendations.push('Remove AdministratorAccess. Create least-privilege policies.')
+      riskScore += 3
+      recommendations.push('Remove AdministratorAccess. Create least-privilege policies.')
     }
     if (lower.includes('"notaction"')) {
-      riskScore += 1; recommendations.push('Review NotAction — it grants all actions EXCEPT listed ones.')
+      riskScore += 1
+      recommendations.push('Review NotAction — it grants all actions EXCEPT listed ones.')
     }
 
     const overprivileged = riskScore >= 4 || wildcardActions.length > 0
 
     if (recommendations.length === 0) {
-      recommendations.push('Policy appears to follow least-privilege principles. Continue regular reviews with IAM Access Analyzer.')
+      recommendations.push(
+        'Policy appears to follow least-privilege principles. Continue regular reviews with IAM Access Analyzer.',
+      )
     }
 
     return {
@@ -1204,21 +1505,32 @@ export class CloudSecurityAnalyzer {
       if (issue) found.push(issue)
     }
 
-    if (lower.includes('privileged: true') || lower.includes('privileged:true')) findAndPush('K8S-POD-001')
-    if (lower.includes('hostnetwork: true') || lower.includes('hostnetwork:true')) findAndPush('K8S-NET-001')
+    if (lower.includes('privileged: true') || lower.includes('privileged:true'))
+      findAndPush('K8S-POD-001')
+    if (lower.includes('hostnetwork: true') || lower.includes('hostnetwork:true'))
+      findAndPush('K8S-NET-001')
     if (!lower.includes('securitycontext')) findAndPush('K8S-SEC-001')
     if (lower.includes('cluster-admin')) findAndPush('K8S-RBAC-001')
 
-    if ((lower.includes('kind: deployment') || lower.includes('kind: namespace')) &&
-        !lower.includes('kind: networkpolicy') && !lower.includes('networkpolicy')) {
+    if (
+      (lower.includes('kind: deployment') || lower.includes('kind: namespace')) &&
+      !lower.includes('kind: networkpolicy') &&
+      !lower.includes('networkpolicy')
+    ) {
       findAndPush('K8S-NET-002')
     }
 
     if (lower.includes('tiller') || lower.includes('helm2')) findAndPush('K8S-HELM-001')
     if (lower.includes('secretkeyref') && lower.includes('env:')) findAndPush('K8S-SEC-002')
-    if (!lower.includes('resources:') || (!lower.includes('limits:') && !lower.includes('requests:'))) findAndPush('K8S-RES-001')
-    if (!lower.includes('podsecuritypolicy') && !lower.includes('pod-security.kubernetes.io')) findAndPush('K8S-PSP-001')
-    if (lower.includes('/var/run/docker.sock') || lower.includes('docker.sock')) findAndPush('K8S-MOUNT-001')
+    if (
+      !lower.includes('resources:') ||
+      (!lower.includes('limits:') && !lower.includes('requests:'))
+    )
+      findAndPush('K8S-RES-001')
+    if (!lower.includes('podsecuritypolicy') && !lower.includes('pod-security.kubernetes.io'))
+      findAndPush('K8S-PSP-001')
+    if (lower.includes('/var/run/docker.sock') || lower.includes('docker.sock'))
+      findAndPush('K8S-MOUNT-001')
 
     // Fallback: keyword matching for remaining issues
     if (found.length === 0) {
@@ -1260,21 +1572,33 @@ export class CloudSecurityAnalyzer {
 
     if (lower.includes('from ') && (lower.includes(':latest') || !lower.includes(':'))) {
       vulnCount++
-      recommendations.push('Use specific image tags instead of :latest. Pin by SHA256 digest for reproducibility.')
+      recommendations.push(
+        'Use specific image tags instead of :latest. Pin by SHA256 digest for reproducibility.',
+      )
       overallSeverity = this.raiseSeverity(overallSeverity, 'high')
     }
 
     const runAsRoot = !lower.includes('user ') || lower.includes('user root')
     if (runAsRoot) {
       vulnCount++
-      recommendations.push('Add USER directive to run as non-root: RUN adduser -D appuser && USER appuser.')
+      recommendations.push(
+        'Add USER directive to run as non-root: RUN adduser -D appuser && USER appuser.',
+      )
       overallSeverity = this.raiseSeverity(overallSeverity, 'critical')
     }
 
-    if (lower.includes('env ') && (lower.includes('password') || lower.includes('secret') ||
-        lower.includes('api_key') || lower.includes('token') || lower.includes('credential'))) {
+    if (
+      lower.includes('env ') &&
+      (lower.includes('password') ||
+        lower.includes('secret') ||
+        lower.includes('api_key') ||
+        lower.includes('token') ||
+        lower.includes('credential'))
+    ) {
       vulnCount++
-      recommendations.push('Never embed secrets in Dockerfile. Use BuildKit --secret flag or runtime injection.')
+      recommendations.push(
+        'Never embed secrets in Dockerfile. Use BuildKit --secret flag or runtime injection.',
+      )
       overallSeverity = this.raiseSeverity(overallSeverity, 'critical')
     }
 
@@ -1306,8 +1630,13 @@ export class CloudSecurityAnalyzer {
     if (lower.includes('apt-get install') && !lower.includes('--no-install-recommends')) {
       recommendations.push('Use --no-install-recommends with apt-get to minimize attack surface.')
     }
-    if ((lower.match(/from\s/g) || []).length < 2 && (lower.includes('build') || lower.includes('compile'))) {
-      recommendations.push('Consider multi-stage builds to separate build from runtime dependencies.')
+    if (
+      (lower.match(/from\s/g) || []).length < 2 &&
+      (lower.includes('build') || lower.includes('compile'))
+    ) {
+      recommendations.push(
+        'Consider multi-stage builds to separate build from runtime dependencies.',
+      )
     }
 
     const readOnlyRootfs = !lower.includes('chmod') && !lower.includes('mkdir')
@@ -1332,9 +1661,16 @@ export class CloudSecurityAnalyzer {
   analyzeServerless(config: string, provider: CloudProvider): ServerlessRisk {
     this.totalServerlessAnalyses++
     if (!this.config.enableServerlessAnalysis) {
-      return { id: generateId('SLS'), provider, functionName: 'unknown', runtime: 'unknown',
-        risks: ['Serverless analysis is disabled.'], eventSourceRisks: [],
-        recommendations: ['Enable serverless analysis in configuration.'], riskScore: 0 }
+      return {
+        id: generateId('SLS'),
+        provider,
+        functionName: 'unknown',
+        runtime: 'unknown',
+        risks: ['Serverless analysis is disabled.'],
+        eventSourceRisks: [],
+        recommendations: ['Enable serverless analysis in configuration.'],
+        riskScore: 0,
+      }
     }
 
     const lower = config.toLowerCase()
@@ -1343,46 +1679,74 @@ export class CloudSecurityAnalyzer {
     const recommendations: string[] = []
     let riskScore = 0
 
-    const nameMatch = config.match(/(?:function[_\-\s]*name|FunctionName)["\s:=]+["']?([a-zA-Z0-9_-]+)/i)
+    const nameMatch = config.match(
+      /(?:function[_\-\s]*name|FunctionName)["\s:=]+["']?([a-zA-Z0-9_-]+)/i,
+    )
     const functionName = nameMatch ? nameMatch[1] : 'unknown'
     const runtimeMatch = config.match(/(?:runtime|Runtime)["\s:=]+["']?([a-zA-Z0-9._-]+)/i)
     const runtime = runtimeMatch ? runtimeMatch[1] : 'unknown'
 
-    if (lower.includes('administratoraccess') || lower.includes('"action": "*"') ||
-        lower.includes("'action': '*'") || lower.includes('action: "*"')) {
+    if (
+      lower.includes('administratoraccess') ||
+      lower.includes('"action": "*"') ||
+      lower.includes("'action': '*'") ||
+      lower.includes('action: "*"')
+    ) {
       risks.push('Function has overly permissive execution role with wildcard or admin access.')
       riskScore += 3
-      recommendations.push('Apply least-privilege permissions. Use per-function IAM roles with specific resources.')
+      recommendations.push(
+        'Apply least-privilege permissions. Use per-function IAM roles with specific resources.',
+      )
     }
 
-    if ((lower.includes('environment') || lower.includes('variables')) &&
-        (lower.includes('password') || lower.includes('secret') ||
-         lower.includes('api_key') || lower.includes('token') || lower.includes('credential'))) {
+    if (
+      (lower.includes('environment') || lower.includes('variables')) &&
+      (lower.includes('password') ||
+        lower.includes('secret') ||
+        lower.includes('api_key') ||
+        lower.includes('token') ||
+        lower.includes('credential'))
+    ) {
       risks.push('Secrets appear to be stored in plaintext environment variables.')
       riskScore += 2.5
       recommendations.push('Use a secrets manager instead of environment variables.')
     }
 
-    if (lower.includes('timeout') && (lower.includes('900') || lower.includes('600') || lower.includes('max'))) {
+    if (
+      lower.includes('timeout') &&
+      (lower.includes('900') || lower.includes('600') || lower.includes('max'))
+    ) {
       risks.push('Function timeout is set to maximum or very high value.')
       riskScore += 1.5
-      recommendations.push('Set timeout to minimum required. Use Step Functions for long-running workflows.')
+      recommendations.push(
+        'Set timeout to minimum required. Use Step Functions for long-running workflows.',
+      )
     }
 
-    if ((lower.includes('api') || lower.includes('http') || lower.includes('gateway')) &&
-        !lower.includes('authoriz') && !lower.includes('cognito') && !lower.includes('iam') &&
-        !lower.includes('auth')) {
+    if (
+      (lower.includes('api') || lower.includes('http') || lower.includes('gateway')) &&
+      !lower.includes('authoriz') &&
+      !lower.includes('cognito') &&
+      !lower.includes('iam') &&
+      !lower.includes('auth')
+    ) {
       risks.push('API endpoint has no authentication mechanism configured.')
       eventSourceRisks.push('Public API without authentication allows unrestricted invocation.')
       riskScore += 2.5
       recommendations.push('Implement authentication using IAM, Cognito, or a custom authorizer.')
     }
 
-    if (!lower.includes('deadletter') && !lower.includes('dlq') && !lower.includes('dead_letter') &&
-        !lower.includes('destination')) {
+    if (
+      !lower.includes('deadletter') &&
+      !lower.includes('dlq') &&
+      !lower.includes('dead_letter') &&
+      !lower.includes('destination')
+    ) {
       risks.push('No Dead Letter Queue configured for failed async invocations.')
       riskScore += 1.5
-      recommendations.push('Configure DLQ for async functions. Set up Lambda Destinations for failure routing.')
+      recommendations.push(
+        'Configure DLQ for async functions. Set up Lambda Destinations for failure routing.',
+      )
     }
 
     if (!lower.includes('concurrency') && !lower.includes('reserved')) {
@@ -1401,10 +1765,19 @@ export class CloudSecurityAnalyzer {
     }
 
     if (risks.length === 0) risks.push('No major serverless risks detected.')
-    if (recommendations.length === 0) recommendations.push('Serverless configuration follows best practices.')
+    if (recommendations.length === 0)
+      recommendations.push('Serverless configuration follows best practices.')
 
-    return { id: generateId('SLS'), provider, functionName, runtime,
-      risks, eventSourceRisks, recommendations, riskScore: clamp(round2(riskScore), 0, 10) }
+    return {
+      id: generateId('SLS'),
+      provider,
+      functionName,
+      runtime,
+      risks,
+      eventSourceRisks,
+      recommendations,
+      riskScore: clamp(round2(riskScore), 0, 10),
+    }
   }
 
   // ── Compliance Checking ───────────────────────────────────────
@@ -1416,8 +1789,9 @@ export class CloudSecurityAnalyzer {
     if (!this.config.enableComplianceChecks) return []
 
     const fw = this.complianceFrameworks.find(
-      f => f.name.toLowerCase() === framework.toLowerCase() ||
-           f.name.toLowerCase().replace(/-/g, '') === framework.toLowerCase().replace(/-/g, ''),
+      f =>
+        f.name.toLowerCase() === framework.toLowerCase() ||
+        f.name.toLowerCase().replace(/-/g, '') === framework.toLowerCase().replace(/-/g, ''),
     )
 
     if (!fw) return []
@@ -1456,8 +1830,11 @@ export class CloudSecurityAnalyzer {
       containerIssues.push(this.scanContainer(config))
     }
     // Run serverless scan if serverless config detected
-    if (lowerConfig.includes('lambda') || lowerConfig.includes('function') ||
-        lowerConfig.includes('serverless')) {
+    if (
+      lowerConfig.includes('lambda') ||
+      lowerConfig.includes('function') ||
+      lowerConfig.includes('serverless')
+    ) {
       serverlessRisks.push(this.analyzeServerless(config, provider))
     }
 
@@ -1477,25 +1854,33 @@ export class CloudSecurityAnalyzer {
     const highMisconfigs = misconfigurations.filter(m => m.severity === 'high')
 
     if (criticalMisconfigs.length > 0) {
-      recommendations.push(`Address ${criticalMisconfigs.length} critical misconfiguration(s) immediately.`)
+      recommendations.push(
+        `Address ${criticalMisconfigs.length} critical misconfiguration(s) immediately.`,
+      )
       for (const m of criticalMisconfigs.slice(0, 3)) {
         recommendations.push(`[CRITICAL] ${m.title}: ${m.remediation}`)
       }
     }
 
     if (highMisconfigs.length > 0) {
-      recommendations.push(`Remediate ${highMisconfigs.length} high severity misconfiguration(s) within 7 days.`)
+      recommendations.push(
+        `Remediate ${highMisconfigs.length} high severity misconfiguration(s) within 7 days.`,
+      )
     }
 
     if (iamIssues.overprivileged) {
-      recommendations.push('IAM policies are overly permissive. Implement least-privilege access controls.')
+      recommendations.push(
+        'IAM policies are overly permissive. Implement least-privilege access controls.',
+      )
       for (const rec of iamIssues.recommendations.slice(0, 3)) {
         recommendations.push(`[IAM] ${rec}`)
       }
     }
 
     if (kubernetesIssues.length > 0) {
-      recommendations.push(`Found ${kubernetesIssues.length} Kubernetes security issue(s). Review pod security and RBAC configuration.`)
+      recommendations.push(
+        `Found ${kubernetesIssues.length} Kubernetes security issue(s). Review pod security and RBAC configuration.`,
+      )
     }
 
     if (containerIssues.length > 0 && containerIssues[0].runAsRoot) {
@@ -1503,7 +1888,9 @@ export class CloudSecurityAnalyzer {
     }
 
     if (serverlessRisks.length > 0 && serverlessRisks[0].riskScore > 5) {
-      recommendations.push('High-risk serverless configuration detected. Review permissions and authentication.')
+      recommendations.push(
+        'High-risk serverless configuration detected. Review permissions and authentication.',
+      )
     }
 
     if (recommendations.length === 0) {
@@ -1562,9 +1949,10 @@ export class CloudSecurityAnalyzer {
 
   /** Get current statistics for this analyzer instance. */
   getStats(): Readonly<CloudSecurityStats> {
-    const avgScore = this.feedbackScores.length > 0
-      ? this.feedbackScores.reduce((s, v) => s + v, 0) / this.feedbackScores.length
-      : 0
+    const avgScore =
+      this.feedbackScores.length > 0
+        ? this.feedbackScores.reduce((s, v) => s + v, 0) / this.feedbackScores.length
+        : 0
 
     return {
       totalScans: this.totalScans,
@@ -1658,10 +2046,14 @@ export class CloudSecurityAnalyzer {
    */
   private getMisconfigsForProvider(provider: CloudProvider): CloudMisconfiguration[] {
     switch (provider) {
-      case 'aws': return [...this.awsMisconfigs]
-      case 'azure': return [...this.azureMisconfigs]
-      case 'gcp': return [...this.gcpMisconfigs]
-      case 'multi': return [...this.awsMisconfigs, ...this.azureMisconfigs, ...this.gcpMisconfigs]
+      case 'aws':
+        return [...this.awsMisconfigs]
+      case 'azure':
+        return [...this.azureMisconfigs]
+      case 'gcp':
+        return [...this.gcpMisconfigs]
+      case 'multi':
+        return [...this.awsMisconfigs, ...this.azureMisconfigs, ...this.gcpMisconfigs]
     }
   }
 
@@ -1669,15 +2061,14 @@ export class CloudSecurityAnalyzer {
    * Match misconfigurations against tokenized config input.
    * Returns items with positive match scores based on keyword overlap.
    */
-  private matchMisconfigurations(misconfigs: CloudMisconfiguration[], tokens: string[]): CloudMisconfiguration[] {
+  private matchMisconfigurations(
+    misconfigs: CloudMisconfiguration[],
+    tokens: string[],
+  ): CloudMisconfiguration[] {
     const matches: Array<{ item: CloudMisconfiguration; score: number }> = []
 
     for (const m of misconfigs) {
-      const keywords = [
-        ...tokenize(m.service),
-        ...tokenize(m.title),
-        ...tokenize(m.description),
-      ]
+      const keywords = [...tokenize(m.service), ...tokenize(m.title), ...tokenize(m.description)]
       const score = matchScore(tokens, keywords)
       if (score > 2) {
         matches.push({ item: m, score })

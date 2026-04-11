@@ -1,9 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { getIsRemoteMode } from '../../bootstrap/state.js'
-import {
-  type Notification,
-  useNotifications,
-} from '../../context/notifications.js'
+import { type Notification, useNotifications } from '../../context/notifications.js'
 import { logError } from '../../utils/log.js'
 
 type Result = Notification | Notification[] | null
@@ -16,9 +13,7 @@ type Result = Notification | Notification[] | null
  * a Notification to fire one, or an array to fire several. Sync or async.
  * Rejections are routed to logError.
  */
-export function useStartupNotification(
-  compute: () => Result | Promise<Result>,
-): void {
+export function useStartupNotification(compute: () => Result | Promise<Result>): void {
   const { addNotification } = useNotifications()
   const hasRunRef = useRef(false)
   const computeRef = useRef(compute)

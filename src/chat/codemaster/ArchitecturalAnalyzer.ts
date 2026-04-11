@@ -193,14 +193,18 @@ export class ArchitecturalAnalyzer {
         }
 
         // Count methods (including getters/setters)
-        const methodMatch = line.match(/^\s+(?:(?:public|private|protected|static|async|get|set)\s+)*(\w+)\s*\(/)
+        const methodMatch = line.match(
+          /^\s+(?:(?:public|private|protected|static|async|get|set)\s+)*(\w+)\s*\(/,
+        )
         if (methodMatch && j !== i) {
           methodCount++
           methodNames.push(methodMatch[1])
         }
 
         // Count properties
-        const propMatch = line.match(/^\s+(?:(?:public|private|protected|static|readonly)\s+)*(\w+)\s*[?!]?\s*[:=]/)
+        const propMatch = line.match(
+          /^\s+(?:(?:public|private|protected|static|readonly)\s+)*(\w+)\s*[?!]?\s*[:=]/,
+        )
         if (propMatch && !/\(/.test(line) && j !== i) {
           propertyCount++
           propertyNames.push(propMatch[1])
@@ -261,7 +265,8 @@ export class ArchitecturalAnalyzer {
           line: cls.line,
           title: `God class: '${cls.name}' (${cls.lineCount} lines)`,
           description: `Class '${cls.name}' has ${cls.lineCount} lines, ${cls.methodCount} methods, and ${cls.propertyCount} properties. It likely has too many responsibilities.`,
-          suggestion: 'Split into smaller, focused classes. Extract method groups into separate classes with clear responsibilities.',
+          suggestion:
+            'Split into smaller, focused classes. Extract method groups into separate classes with clear responsibilities.',
           solidPrinciple: 'SRP',
         })
       }
@@ -281,14 +286,16 @@ export class ArchitecturalAnalyzer {
   }
 
   private detectGodFunctions(lines: string[], issues: ArchitecturalIssue[]): void {
-    const funcPattern = /(?:(?:export\s+)?(?:async\s+)?function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?(?:\([^)]*\)|[^=])\s*=>|(\w+)\s*\([^)]*\)\s*(?::\s*[^{]*)?{)/
+    const funcPattern =
+      /(?:(?:export\s+)?(?:async\s+)?function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?(?:\([^)]*\)|[^=])\s*=>|(\w+)\s*\([^)]*\)\s*(?::\s*[^{]*)?{)/
 
     for (let i = 0; i < lines.length; i++) {
       const match = funcPattern.exec(lines[i])
       if (!match) continue
 
       const name = match[1] || match[2] || match[3]
-      if (!name || name === 'constructor' || name === 'if' || name === 'for' || name === 'while') continue
+      if (!name || name === 'constructor' || name === 'if' || name === 'for' || name === 'while')
+        continue
 
       // Count function length
       let braceDepth = 0
@@ -314,7 +321,8 @@ export class ArchitecturalAnalyzer {
           endLine: funcEnd + 1,
           title: `Long function '${name}' (${funcLength} lines)`,
           description: `Function '${name}' is ${funcLength} lines long. Long functions are hard to test, debug, and maintain.`,
-          suggestion: 'Extract logical sections into helper functions. Each function should do one thing.',
+          suggestion:
+            'Extract logical sections into helper functions. Each function should do one thing.',
           solidPrinciple: 'SRP',
         })
       }
@@ -328,17 +336,29 @@ export class ArchitecturalAnalyzer {
   ): void {
     // Detect classes that mix concerns (e.g., data access + business logic + formatting)
     const concernKeywords = {
-      'data-access': ['database', 'query', 'sql', 'insert', 'update', 'delete', 'fetch', 'repository'],
+      'data-access': [
+        'database',
+        'query',
+        'sql',
+        'insert',
+        'update',
+        'delete',
+        'fetch',
+        'repository',
+      ],
       'business-logic': ['calculate', 'validate', 'process', 'compute', 'transform'],
-      'presentation': ['render', 'display', 'format', 'template', 'html', 'css', 'style'],
-      'io': ['read', 'write', 'file', 'stream', 'socket', 'http'],
-      'logging': ['log', 'debug', 'warn', 'error', 'trace', 'info'],
+      presentation: ['render', 'display', 'format', 'template', 'html', 'css', 'style'],
+      io: ['read', 'write', 'file', 'stream', 'socket', 'http'],
+      logging: ['log', 'debug', 'warn', 'error', 'trace', 'info'],
     }
 
     for (const cls of classMetrics) {
       if (cls.methodCount < 3) continue
 
-      const classBody = lines.slice(cls.line - 1, cls.line - 1 + cls.lineCount).join('\n').toLowerCase()
+      const classBody = lines
+        .slice(cls.line - 1, cls.line - 1 + cls.lineCount)
+        .join('\n')
+        .toLowerCase()
       const detectedConcerns: string[] = []
 
       for (const [concern, keywords] of Object.entries(concernKeywords)) {
@@ -445,8 +465,15 @@ export class ArchitecturalAnalyzer {
       const line = lines[i]
 
       // Count external object accesses on a single line
-      const externalAccesses = (line.match(/\b\w+\.\w+/g) || [])
-        .filter(a => !a.startsWith('this.') && !a.startsWith('console.') && !a.startsWith('Math.') && !a.startsWith('Object.') && !a.startsWith('Array.') && !a.startsWith('JSON.'))
+      const externalAccesses = (line.match(/\b\w+\.\w+/g) || []).filter(
+        a =>
+          !a.startsWith('this.') &&
+          !a.startsWith('console.') &&
+          !a.startsWith('Math.') &&
+          !a.startsWith('Object.') &&
+          !a.startsWith('Array.') &&
+          !a.startsWith('JSON.'),
+      )
 
       if (externalAccesses.length >= 4) {
         // Check if they're all from the same object
@@ -478,13 +505,18 @@ export class ArchitecturalAnalyzer {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]
 
-      const funcMatch = line.match(/(?:function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?)\s*\(/)
+      const funcMatch = line.match(
+        /(?:function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?)\s*\(/,
+      )
       if (!funcMatch) continue
 
       const params = line.match(/\(([^)]*)\)/)
       if (!params || !params[1]) continue
 
-      const paramList = params[1].split(',').map(p => p.trim()).filter(Boolean)
+      const paramList = params[1]
+        .split(',')
+        .map(p => p.trim())
+        .filter(Boolean)
       if (paramList.length >= 5) {
         issues.push({
           type: 'data-clump',
@@ -492,7 +524,8 @@ export class ArchitecturalAnalyzer {
           line: i + 1,
           title: `Function with ${paramList.length} parameters`,
           description: `Function has ${paramList.length} parameters. This suggests related data should be grouped into an object/interface.`,
-          suggestion: 'Create a parameter object/interface: `function process(options: ProcessOptions)` instead of individual params.',
+          suggestion:
+            'Create a parameter object/interface: `function process(options: ProcessOptions)` instead of individual params.',
         })
       }
     }
@@ -561,7 +594,8 @@ export class ArchitecturalAnalyzer {
           line: switchLine,
           title: `Large switch statement (${switchCaseCount} cases)`,
           description: `Switch with ${switchCaseCount} cases may indicate missing polymorphism or strategy pattern.`,
-          suggestion: 'Consider replacing with a Map<type, handler>, strategy pattern, or subclass hierarchy.',
+          suggestion:
+            'Consider replacing with a Map<type, handler>, strategy pattern, or subclass hierarchy.',
         })
         switchCaseCount = 0
       }
@@ -637,12 +671,17 @@ export class ArchitecturalAnalyzer {
         line,
         confidence: 0.8,
         wellImplemented: true,
-        issues: /removeEventListener|unsubscribe|\.off\s*\(/.test(code) ? [] : ['Missing cleanup/unsubscribe mechanism'],
+        issues: /removeEventListener|unsubscribe|\.off\s*\(/.test(code)
+          ? []
+          : ['Missing cleanup/unsubscribe mechanism'],
       })
     }
 
     // Strategy pattern
-    if (/strategy|Strategy/.test(code) || (/Map<string,\s*\(/.test(code) && /\.get\s*\(/.test(code))) {
+    if (
+      /strategy|Strategy/.test(code) ||
+      (/Map<string,\s*\(/.test(code) && /\.get\s*\(/.test(code))
+    ) {
       const line = lines.findIndex(l => /strategy|Strategy|Map<string,\s*\(/.test(l)) + 1
       if (line > 0) {
         patterns.push({
@@ -692,18 +731,29 @@ export class ArchitecturalAnalyzer {
 
     for (const issue of issues) {
       switch (issue.severity) {
-        case 'critical': score -= 18; break
-        case 'high': score -= 12; break
-        case 'medium': score -= 6; break
-        case 'low': score -= 3; break
-        case 'info': score -= 1; break
+        case 'critical':
+          score -= 18
+          break
+        case 'high':
+          score -= 12
+          break
+        case 'medium':
+          score -= 6
+          break
+        case 'low':
+          score -= 3
+          break
+        case 'info':
+          score -= 1
+          break
       }
     }
 
     // Bonus for good cohesion
-    const avgCohesion = classMetrics.length > 0
-      ? classMetrics.reduce((sum, c) => sum + c.cohesion, 0) / classMetrics.length
-      : 1
+    const avgCohesion =
+      classMetrics.length > 0
+        ? classMetrics.reduce((sum, c) => sum + c.cohesion, 0) / classMetrics.length
+        : 1
     if (avgCohesion > 0.7) score += 5
 
     return Math.max(0, Math.min(100, Math.round(score)))
@@ -727,7 +777,9 @@ export class ArchitecturalAnalyzer {
 
     if (issues.length > 0) {
       const solidViolations = issues.filter(i => i.solidPrinciple).length
-      parts.push(`${issues.length} architectural issue(s)${solidViolations > 0 ? ` (${solidViolations} SOLID violations)` : ''}.`)
+      parts.push(
+        `${issues.length} architectural issue(s)${solidViolations > 0 ? ` (${solidViolations} SOLID violations)` : ''}.`,
+      )
     } else {
       parts.push('No architectural issues detected.')
     }

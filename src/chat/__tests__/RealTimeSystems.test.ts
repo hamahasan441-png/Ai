@@ -11,13 +11,19 @@ describe('RealTimeSystems', () => {
 
   describe('KB entry tests', () => {
     it('should match stream processing/websocket keywords', async () => {
-      const r = await brain.chat('explain stream processing apache flink kafka streams spark streaming websocket server sent events sse real time')
+      const r = await brain.chat(
+        'explain stream processing apache flink kafka streams spark streaming websocket server sent events sse real time',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/flink|kafka\s+streams|websocket|sse|stream\s+processing|real.time/)
+      expect(r.text.toLowerCase()).toMatch(
+        /flink|kafka\s+streams|websocket|sse|stream\s+processing|real.time/,
+      )
     })
 
     it('should match low latency/clock sync keywords', async () => {
-      const r = await brain.chat('explain low latency networking kernel bypass dpdk clock synchronization ntp ptp vector clock lamport backpressure flow control')
+      const r = await brain.chat(
+        'explain low latency networking kernel bypass dpdk clock synchronization ntp ptp vector clock lamport backpressure flow control',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/latency|dpdk|clock|ntp|lamport|backpressure/)
     })

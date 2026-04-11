@@ -58,8 +58,7 @@ export function formatAgentLine(agent: AgentDefinition): string {
  */
 export function shouldInjectAgentListInMessages(): boolean {
   if (isEnvTruthy(process.env.CLAUDE_CODE_AGENT_LIST_IN_MESSAGES)) return true
-  if (isEnvDefinedFalsy(process.env.CLAUDE_CODE_AGENT_LIST_IN_MESSAGES))
-    return false
+  if (isEnvDefinedFalsy(process.env.CLAUDE_CODE_AGENT_LIST_IN_MESSAGES)) return false
   return getFeatureValue_CACHED_MAY_BE_STALE('tengu_agent_list_attach', false)
 }
 
@@ -220,15 +219,11 @@ ${
   // Ant-native builds alias find/grep to embedded bfs/ugrep and remove the
   // dedicated Glob/Grep tools, so point at find via Bash instead.
   const embedded = hasEmbeddedSearchTools()
-  const fileSearchHint = embedded
-    ? '`find` via the Bash tool'
-    : `the ${GLOB_TOOL_NAME} tool`
+  const fileSearchHint = embedded ? '`find` via the Bash tool' : `the ${GLOB_TOOL_NAME} tool`
   // The "class Foo" example is about content search. Non-embedded stays Glob
   // (original intent: find-the-file-containing). Embedded gets grep because
   // find -name doesn't look at file contents.
-  const contentSearchHint = embedded
-    ? '`grep` via the Bash tool'
-    : `the ${GLOB_TOOL_NAME} tool`
+  const contentSearchHint = embedded ? '`grep` via the Bash tool' : `the ${GLOB_TOOL_NAME} tool`
   const whenNotToUseSection = forkEnabled
     ? ''
     : `

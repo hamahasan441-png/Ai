@@ -162,8 +162,16 @@ const KNOWN_PATTERNS: ErrorPattern[] = [
     severity: 'high',
     language: 'javascript',
     fixes: [
-      { description: 'Add null/undefined check before accessing the property', confidence: 0.8, code: 'if (obj != null) { obj.property }' },
-      { description: 'Use optional chaining: obj?.property', confidence: 0.9, code: 'obj?.property' },
+      {
+        description: 'Add null/undefined check before accessing the property',
+        confidence: 0.8,
+        code: 'if (obj != null) { obj.property }',
+      },
+      {
+        description: 'Use optional chaining: obj?.property',
+        confidence: 0.9,
+        code: 'obj?.property',
+      },
       { description: 'Ensure the object is properly initialized', confidence: 0.7 },
     ],
     description: 'Null/undefined access',
@@ -263,7 +271,10 @@ const KNOWN_PATTERNS: ErrorPattern[] = [
     severity: 'critical',
     language: 'python',
     fixes: [
-      { description: 'Fix indentation — use consistent spaces (4 spaces recommended)', confidence: 0.9 },
+      {
+        description: 'Fix indentation — use consistent spaces (4 spaces recommended)',
+        confidence: 0.9,
+      },
       { description: 'Check for mixed tabs and spaces', confidence: 0.8 },
     ],
     description: 'Python indentation error',
@@ -321,8 +332,14 @@ const KNOWN_PATTERNS: ErrorPattern[] = [
     severity: 'critical',
     language: 'any',
     fixes: [
-      { description: 'Increase memory allocation (--max-old-space-size for Node.js)', confidence: 0.6 },
-      { description: 'Check for memory leaks (unbounded arrays, event listeners)', confidence: 0.7 },
+      {
+        description: 'Increase memory allocation (--max-old-space-size for Node.js)',
+        confidence: 0.6,
+      },
+      {
+        description: 'Check for memory leaks (unbounded arrays, event listeners)',
+        confidence: 0.7,
+      },
     ],
     description: 'Out of memory',
   },
@@ -345,7 +362,10 @@ const KNOWN_PATTERNS: ErrorPattern[] = [
     language: 'any',
     fixes: [
       { description: 'Check the expected vs actual values in the assertion', confidence: 0.7 },
-      { description: 'Update the test expectation if the behavior changed intentionally', confidence: 0.5 },
+      {
+        description: 'Update the test expectation if the behavior changed intentionally',
+        confidence: 0.5,
+      },
     ],
     description: 'Assertion failure',
   },
@@ -357,9 +377,16 @@ const KNOWN_PATTERNS: ErrorPattern[] = [
 
 /** Library/framework paths to exclude from user code. */
 const LIBRARY_PATHS = [
-  'node_modules', 'site-packages', '.cargo/registry',
-  'internal/', 'native/', '<anonymous>', '<native>',
-  'runtime/', 'webpack/', 'regenerator-runtime',
+  'node_modules',
+  'site-packages',
+  '.cargo/registry',
+  'internal/',
+  'native/',
+  '<anonymous>',
+  '<native>',
+  'runtime/',
+  'webpack/',
+  'regenerator-runtime',
 ]
 
 function isUserCode(filePath: string): boolean {
@@ -454,7 +481,6 @@ function parseRustStackTrace(text: string): StackFrame[] {
  * like GitHub Copilot agent does when it encounters build/test errors.
  */
 export class ErrorDiagnoser {
-
   /**
    * Diagnose an error from its text representation.
    */
@@ -505,9 +531,9 @@ export class ErrorDiagnoser {
     const errors = errorTexts.map(text => this.diagnose(text))
 
     // Collect involved files
-    const involvedFiles = [...new Set(
-      errors.flatMap(e => e.stackFrames.filter(f => f.isUserCode).map(f => f.filePath)),
-    )]
+    const involvedFiles = [
+      ...new Set(errors.flatMap(e => e.stackFrames.filter(f => f.isUserCode).map(f => f.filePath))),
+    ]
 
     // Determine overall severity
     const severityOrder: Severity[] = ['info', 'low', 'medium', 'high', 'critical']
@@ -531,9 +557,10 @@ export class ErrorDiagnoser {
     }
 
     // Summary
-    const summary = errors.length === 1
-      ? errors[0].summary
-      : `${errors.length} errors diagnosed. ${involvedFiles.length} files involved. Overall severity: ${overallSeverity}.`
+    const summary =
+      errors.length === 1
+        ? errors[0].summary
+        : `${errors.length} errors diagnosed. ${involvedFiles.length} files involved. Overall severity: ${overallSeverity}.`
 
     return {
       errors,
@@ -585,17 +612,31 @@ export class ErrorDiagnoser {
     const typeLC = errorType.toLowerCase()
     const textLC = errorText.toLowerCase()
 
-    if (typeLC.includes('type') || typeLC.includes('ts2') || /TS\d{4}/.test(errorType)) return 'type-error'
+    if (typeLC.includes('type') || typeLC.includes('ts2') || /TS\d{4}/.test(errorType))
+      return 'type-error'
     if (typeLC.includes('syntax') || typeLC.includes('parse')) return 'syntax-error'
     if (typeLC.includes('reference')) return 'reference-error'
-    if (typeLC.includes('import') || textLC.includes('cannot find module') || textLC.includes('no module named')) return 'import-error'
+    if (
+      typeLC.includes('import') ||
+      textLC.includes('cannot find module') ||
+      textLC.includes('no module named')
+    )
+      return 'import-error'
     if (typeLC.includes('permission') || textLC.includes('eacces')) return 'permission-error'
-    if (textLC.includes('econnrefused') || textLC.includes('network') || textLC.includes('fetch')) return 'network-error'
+    if (textLC.includes('econnrefused') || textLC.includes('network') || textLC.includes('fetch'))
+      return 'network-error'
     if (textLC.includes('timeout') || textLC.includes('etimedout')) return 'timeout-error'
     if (textLC.includes('out of memory') || textLC.includes('heap')) return 'memory-error'
     if (typeLC.includes('assertion')) return 'assertion-error'
-    if (textLC.includes('config') || textLC.includes('.env') || textLC.includes('environment')) return 'config-error'
-    if (textLC.includes('npm') || textLC.includes('pip') || textLC.includes('cargo') || textLC.includes('dependency')) return 'dependency-error'
+    if (textLC.includes('config') || textLC.includes('.env') || textLC.includes('environment'))
+      return 'config-error'
+    if (
+      textLC.includes('npm') ||
+      textLC.includes('pip') ||
+      textLC.includes('cargo') ||
+      textLC.includes('dependency')
+    )
+      return 'dependency-error'
 
     return 'runtime-error'
   }
@@ -627,7 +668,10 @@ export class ErrorDiagnoser {
 
   // ── Private helpers ──
 
-  private matchPatterns(text: string, language: AnalysisLanguage): { fixes: SuggestedFix[]; patterns: string[] } {
+  private matchPatterns(
+    text: string,
+    language: AnalysisLanguage,
+  ): { fixes: SuggestedFix[]; patterns: string[] } {
     const fixes: SuggestedFix[] = []
     const patterns: string[] = []
 

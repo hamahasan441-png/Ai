@@ -11,7 +11,9 @@ describe('MQL Chart Objects & GUI Knowledge', () => {
 
   describe('KB entries', () => {
     it('knows MQL4 chart objects programming', async () => {
-      const r = await brain.chat('How to draw lines and rectangles on a chart using MQL4 ObjectCreate?')
+      const r = await brain.chat(
+        'How to draw lines and rectangles on a chart using MQL4 ObjectCreate?',
+      )
       expect(r.text.toLowerCase()).toMatch(/objectcreate|obj_hline|obj_trend|objprop_color/)
     })
 
@@ -22,7 +24,9 @@ describe('MQL Chart Objects & GUI Knowledge', () => {
 
     it('covers MQL5 canvas and CDialog panels', async () => {
       const r = await brain.chat('How to use MQL5 CCanvas drawing and CDialog custom panel?')
-      expect(r.text.toLowerCase()).toMatch(/canvas|ccanvas|cgraphic|cappdialog|cdialog|bitmap|pixel/)
+      expect(r.text.toLowerCase()).toMatch(
+        /canvas|ccanvas|cgraphic|cappdialog|cdialog|bitmap|pixel/,
+      )
     })
   })
 

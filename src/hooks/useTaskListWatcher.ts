@@ -31,11 +31,7 @@ type Props = {
  * This enables "tasks mode" where Claude watches for externally-created
  * tasks and processes them one at a time.
  */
-export function useTaskListWatcher({
-  taskListId,
-  isLoading,
-  onSubmitTask,
-}: Props): void {
+export function useTaskListWatcher({ taskListId, isLoading, onSubmitTask }: Props): void {
   const currentTaskRef = useRef<string | null>(null)
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -109,9 +105,7 @@ export function useTaskListWatcher({
     // Format the task as a prompt
     const prompt = formatTaskAsPrompt(availableTask)
 
-    logForDebugging(
-      `[TaskListWatcher] Submitting task #${availableTask.id} as prompt`,
-    )
+    logForDebugging(`[TaskListWatcher] Submitting task #${availableTask.id} as prompt`)
 
     const submitted = onSubmitTaskRef.current(prompt)
     if (!submitted) {
@@ -195,9 +189,7 @@ export function useTaskListWatcher({
  * - Not blocked by any unresolved tasks
  */
 function findAvailableTask(tasks: Task[]): Task | undefined {
-  const unresolvedTaskIds = new Set(
-    tasks.filter(t => t.status !== 'completed').map(t => t.id),
-  )
+  const unresolvedTaskIds = new Set(tasks.filter(t => t.status !== 'completed').map(t => t.id))
 
   return tasks.find(task => {
     if (task.status !== 'pending') return false

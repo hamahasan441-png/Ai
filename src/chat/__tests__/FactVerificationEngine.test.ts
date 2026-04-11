@@ -155,7 +155,10 @@ describe('FactVerificationEngine knowledge base', () => {
   })
 
   it('addFact detects history domain', () => {
-    const fact = engine.addFact('The ancient empire fell after the revolution in the 19th century.', 'history-book')
+    const fact = engine.addFact(
+      'The ancient empire fell after the revolution in the 19th century.',
+      'history-book',
+    )
     expect(fact.domain).toBe('history')
   })
 
@@ -374,7 +377,9 @@ describe('FactVerificationEngine extractClaims', () => {
   })
 
   it('assigns a domain to extracted claims', () => {
-    const claims = engine.extractClaims('The computer algorithm is efficient and the software works well.')
+    const claims = engine.extractClaims(
+      'The computer algorithm is efficient and the software works well.',
+    )
     if (claims.length > 0) {
       expect(claims[0].domain).toBe('technology')
     }
@@ -415,7 +420,9 @@ describe('FactVerificationEngine extractClaims', () => {
   })
 
   it('detects claims with "always" or "never" quantifiers', () => {
-    const claims = engine.extractClaims('The system always returns a valid response. The program never crashes.')
+    const claims = engine.extractClaims(
+      'The system always returns a valid response. The program never crashes.',
+    )
     expect(claims.length).toBeGreaterThanOrEqual(1)
   })
 
@@ -700,8 +707,14 @@ describe('FactVerificationEngine contradiction detection', () => {
   it('caps stored contradictions at 100', () => {
     const big = new FactVerificationEngine({ maxFacts: 300 })
     for (let i = 0; i < 60; i++) {
-      big.addFact(`The item number ${i} system is operational and running well today.`, `src-a-${i}`)
-      big.addFact(`The item number ${i} system is not operational and not running well today.`, `src-b-${i}`)
+      big.addFact(
+        `The item number ${i} system is operational and running well today.`,
+        `src-a-${i}`,
+      )
+      big.addFact(
+        `The item number ${i} system is not operational and not running well today.`,
+        `src-b-${i}`,
+      )
     }
     big.detectContradictions()
     big.detectContradictions()
@@ -731,7 +744,12 @@ describe('FactVerificationEngine getStats', () => {
   it('verdictDistribution has all verdict types', () => {
     const dist = engine.getStats().verdictDistribution
     const expectedVerdicts: Verdict[] = [
-      'verified', 'likely_true', 'uncertain', 'likely_false', 'false', 'unverifiable',
+      'verified',
+      'likely_true',
+      'uncertain',
+      'likely_false',
+      'false',
+      'unverifiable',
     ]
     for (const v of expectedVerdicts) {
       expect(dist).toHaveProperty(v)
@@ -829,8 +847,13 @@ describe('FactVerificationEngine serialization', () => {
     const engine = new FactVerificationEngine()
     engine.addFact('Test fact for stats.', 'src')
     engine.verifyClaim({
-      id: 'c1', text: 'Test fact for stats.', domain: 'general',
-      entities: [], isQuantitative: false, confidence: 0.7, extractedFrom: 'test',
+      id: 'c1',
+      text: 'Test fact for stats.',
+      domain: 'general',
+      entities: [],
+      isQuantitative: false,
+      confidence: 0.7,
+      extractedFrom: 'test',
     })
     const json = engine.serialize()
 

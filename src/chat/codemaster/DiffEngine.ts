@@ -194,20 +194,26 @@ export class DiffEngine {
         if (line.type === 'context' && line.originalLine) {
           const idx = line.originalLine - 1
           if (idx >= 0 && idx < lines.length && lines[idx] !== line.content) {
-            issues.push(`Context mismatch at line ${line.originalLine}: expected "${line.content}" but found "${lines[idx]}"`)
+            issues.push(
+              `Context mismatch at line ${line.originalLine}: expected "${line.content}" but found "${lines[idx]}"`,
+            )
           }
         }
         if (line.type === 'remove' && line.originalLine) {
           const idx = line.originalLine - 1
           if (idx >= 0 && idx < lines.length && lines[idx] !== line.content) {
-            issues.push(`Remove target mismatch at line ${line.originalLine}: expected "${line.content}" but found "${lines[idx]}"`)
+            issues.push(
+              `Remove target mismatch at line ${line.originalLine}: expected "${line.content}" but found "${lines[idx]}"`,
+            )
           }
         }
       }
 
       // Check line range
       if (hunk.originalStart > lines.length + 1) {
-        issues.push(`Hunk starts at line ${hunk.originalStart} but file only has ${lines.length} lines`)
+        issues.push(
+          `Hunk starts at line ${hunk.originalStart} but file only has ${lines.length} lines`,
+        )
       }
     }
 
@@ -217,7 +223,10 @@ export class DiffEngine {
   /**
    * Create a batch of diffs from multiple file changes.
    */
-  createBatch(description: string, changes: Array<{ path: string; original: string; modified: string }>): DiffBatch {
+  createBatch(
+    description: string,
+    changes: Array<{ path: string; original: string; modified: string }>,
+  ): DiffBatch {
     const diffs: FileDiff[] = []
     let totalAdditions = 0
     let totalDeletions = 0
@@ -272,7 +281,12 @@ export class DiffEngine {
   /**
    * Get diff statistics.
    */
-  getStats(diff: FileDiff): { additions: number; deletions: number; hunks: number; netChange: number } {
+  getStats(diff: FileDiff): {
+    additions: number
+    deletions: number
+    hunks: number
+    netChange: number
+  } {
     return {
       additions: diff.additions,
       deletions: diff.deletions,
@@ -288,7 +302,10 @@ export class DiffEngine {
   /**
    * Compute edit script using LCS.
    */
-  private computeEditScript(origLines: string[], modLines: string[]): Array<{ type: 'keep' | 'add' | 'remove'; origIdx?: number; modIdx?: number }> {
+  private computeEditScript(
+    origLines: string[],
+    modLines: string[],
+  ): Array<{ type: 'keep' | 'add' | 'remove'; origIdx?: number; modIdx?: number }> {
     const n = origLines.length
     const m = modLines.length
 
@@ -338,7 +355,7 @@ export class DiffEngine {
     if (edits.length === 0) return []
 
     // Mark which edits are changes (not keeps)
-    const changeIndices = edits.map((e, i) => e.type !== 'keep' ? i : -1).filter(i => i !== -1)
+    const changeIndices = edits.map((e, i) => (e.type !== 'keep' ? i : -1)).filter(i => i !== -1)
     if (changeIndices.length === 0) return []
 
     // Group changes that are within contextLines of each other
@@ -427,13 +444,12 @@ export class DiffEngine {
    * Format hunks as unified diff.
    */
   private formatUnified(hunks: DiffHunk[], originalPath: string, modifiedPath: string): string {
-    const lines: string[] = [
-      `--- a/${originalPath}`,
-      `+++ b/${modifiedPath}`,
-    ]
+    const lines: string[] = [`--- a/${originalPath}`, `+++ b/${modifiedPath}`]
 
     for (const hunk of hunks) {
-      lines.push(`@@ -${hunk.originalStart},${hunk.originalLength} +${hunk.modifiedStart},${hunk.modifiedLength} @@`)
+      lines.push(
+        `@@ -${hunk.originalStart},${hunk.originalLength} +${hunk.modifiedStart},${hunk.modifiedLength} @@`,
+      )
       for (const line of hunk.lines) {
         if (line.type === 'context') lines.push(` ${line.content}`)
         else if (line.type === 'remove') lines.push(`-${line.content}`)
@@ -447,7 +463,10 @@ export class DiffEngine {
   /**
    * Try to apply a single hunk.
    */
-  private applyHunk(lines: string[], hunk: DiffHunk): { success: boolean; lines: string[]; conflict?: string } {
+  private applyHunk(
+    lines: string[],
+    hunk: DiffHunk,
+  ): { success: boolean; lines: string[]; conflict?: string } {
     const result = [...lines]
     const startIdx = hunk.originalStart - 1
 

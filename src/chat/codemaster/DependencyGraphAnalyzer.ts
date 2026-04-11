@@ -216,9 +216,14 @@ export class DependencyGraphAnalyzer {
       const line = lines[i].trim()
 
       // ES6: import { X, Y } from 'module'
-      const es6Match = line.match(/^import\s+(?:type\s+)?(?:\{([^}]*)\}|(\w+)(?:\s*,\s*\{([^}]*)\})?)\s+from\s+['"]([^'"]+)['"]/)
+      const es6Match = line.match(
+        /^import\s+(?:type\s+)?(?:\{([^}]*)\}|(\w+)(?:\s*,\s*\{([^}]*)\})?)\s+from\s+['"]([^'"]+)['"]/,
+      )
       if (es6Match) {
-        const namedImports = (es6Match[1] || es6Match[3] || '').split(',').map(s => s.trim()).filter(Boolean)
+        const namedImports = (es6Match[1] || es6Match[3] || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
         const defaultImport = es6Match[2]
         const source = es6Match[4]
 
@@ -246,9 +251,14 @@ export class DependencyGraphAnalyzer {
       }
 
       // CommonJS: const X = require('module')
-      const requireMatch = line.match(/(?:const|let|var)\s+(?:\{([^}]*)\}|(\w+))\s*=\s*require\s*\(\s*['"]([^'"]+)['"]\s*\)/)
+      const requireMatch = line.match(
+        /(?:const|let|var)\s+(?:\{([^}]*)\}|(\w+))\s*=\s*require\s*\(\s*['"]([^'"]+)['"]\s*\)/,
+      )
       if (requireMatch) {
-        const namedImports = (requireMatch[1] || '').split(',').map(s => s.trim()).filter(Boolean)
+        const namedImports = (requireMatch[1] || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
         const defaultName = requireMatch[2]
         const source = requireMatch[3]
 
@@ -265,7 +275,10 @@ export class DependencyGraphAnalyzer {
       // Python: from module import X, Y
       const pyFromMatch = line.match(/^from\s+([\w.]+)\s+import\s+(.+)/)
       if (pyFromMatch) {
-        const names = pyFromMatch[2].split(',').map(s => s.trim().split(/\s+as\s+/)[0]).filter(Boolean)
+        const names = pyFromMatch[2]
+          .split(',')
+          .map(s => s.trim().split(/\s+as\s+/)[0])
+          .filter(Boolean)
         imports.push({
           source: pyFromMatch[1],
           names,
@@ -313,7 +326,17 @@ export class DependencyGraphAnalyzer {
       // export { X, Y }
       const namedExportMatch = line.match(/^export\s+(?:type\s+)?\{([^}]+)\}/)
       if (namedExportMatch) {
-        const names = namedExportMatch[1].split(',').map(s => s.trim().split(/\s+as\s+/).pop()?.trim() || s.trim()).filter(Boolean)
+        const names = namedExportMatch[1]
+          .split(',')
+          .map(
+            s =>
+              s
+                .trim()
+                .split(/\s+as\s+/)
+                .pop()
+                ?.trim() || s.trim(),
+          )
+          .filter(Boolean)
         for (const name of names) {
           exports.push({
             name,
@@ -326,7 +349,9 @@ export class DependencyGraphAnalyzer {
       }
 
       // export const/let/var/function/class/interface/type/enum
-      const directExportMatch = line.match(/^export\s+(?:type\s+|interface\s+|enum\s+|const\s+|let\s+|var\s+|function\s+|class\s+|abstract\s+class\s+)(\w+)/)
+      const directExportMatch = line.match(
+        /^export\s+(?:type\s+|interface\s+|enum\s+|const\s+|let\s+|var\s+|function\s+|class\s+|abstract\s+class\s+)(\w+)/,
+      )
       if (directExportMatch) {
         exports.push({
           name: directExportMatch[1],
@@ -392,7 +417,8 @@ export class DependencyGraphAnalyzer {
             // Avoid duplicate cycles
             const cycleKey = [...cycle].sort().join('→')
             if (!cycles.some(c => [...c.cycle].sort().join('→') === cycleKey)) {
-              const severity: Severity = cycle.length > 4 ? 'high' : cycle.length > 3 ? 'medium' : 'low'
+              const severity: Severity =
+                cycle.length > 4 ? 'high' : cycle.length > 3 ? 'medium' : 'low'
               cycles.push({
                 cycle,
                 severity,
@@ -429,7 +455,8 @@ export class DependencyGraphAnalyzer {
         line: 1,
         title: `Circular dependency (${cycle.cycle.length - 1} modules)`,
         description: cycle.description,
-        suggestion: 'Break the cycle by extracting shared interfaces into a separate module, or use dependency injection.',
+        suggestion:
+          'Break the cycle by extracting shared interfaces into a separate module, or use dependency injection.',
       })
     }
 
@@ -455,7 +482,8 @@ export class DependencyGraphAnalyzer {
           line: 1,
           title: `Highly unstable module (instability: ${node.instability.toFixed(2)})`,
           description: `Module '${node.id}' has high instability (${node.instability.toFixed(2)}). It depends on many modules but few depend on it.`,
-          suggestion: 'Consider making this module depend on abstractions (interfaces) rather than concrete implementations.',
+          suggestion:
+            'Consider making this module depend on abstractions (interfaces) rather than concrete implementations.',
         })
       }
     }
@@ -501,7 +529,8 @@ export class DependencyGraphAnalyzer {
             line: imp.line,
             title: `Deep relative import (${depth} levels)`,
             description: `Import '${imp.source}' reaches ${depth} levels deep. Deep imports create tight coupling.`,
-            suggestion: 'Consider using barrel exports (index.ts) or path aliases to flatten the import.',
+            suggestion:
+              'Consider using barrel exports (index.ts) or path aliases to flatten the import.',
           })
         }
       }
@@ -551,9 +580,7 @@ export class DependencyGraphAnalyzer {
     issues: DependencyIssue[],
     couplingScore: number,
   ): string {
-    const parts: string[] = [
-      `${this.nodes.size} module(s) analyzed.`,
-    ]
+    const parts: string[] = [`${this.nodes.size} module(s) analyzed.`]
 
     if (cycles.length > 0) {
       parts.push(`${cycles.length} circular dependency cycle(s) found.`)

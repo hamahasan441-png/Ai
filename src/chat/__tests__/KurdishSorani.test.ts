@@ -396,7 +396,9 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows Kurdish language history', async () => {
       const r = await brain.chat('What is the history of the Kurdish Sorani language?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/history|kurdish|sorani|indo.?european|iranian|literature/)
+      expect(r.text.toLowerCase()).toMatch(
+        /history|kurdish|sorani|indo.?european|iranian|literature/,
+      )
     })
   })
 
@@ -530,7 +532,9 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('gives advice on learning Sorani', async () => {
       const r = await brain.chat('How can I learn Sorani Kurdish?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/learn|sorani|kurdish|alphabet|grammar|vocabulary|practice/)
+      expect(r.text.toLowerCase()).toMatch(
+        /learn|sorani|kurdish|alphabet|grammar|vocabulary|practice/,
+      )
     })
 
     it('responds to general Kurdish language questions', async () => {
@@ -546,8 +550,10 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('finds Kurdish entries via knowledge search', () => {
       const results = brain.searchKnowledge('sorani kurdish')
       expect(results.length).toBeGreaterThan(0)
-      const hasKurdish = results.some(r =>
-        r.entry.content.toLowerCase().includes('kurdish') || r.entry.content.toLowerCase().includes('sorani')
+      const hasKurdish = results.some(
+        r =>
+          r.entry.content.toLowerCase().includes('kurdish') ||
+          r.entry.content.toLowerCase().includes('sorani'),
       )
       expect(hasKurdish).toBe(true)
     })
@@ -1250,7 +1256,9 @@ describe('Kurdish Sorani Language Knowledge', () => {
     })
 
     it('knows Sorani introduction phrases', async () => {
-      const r = await brain.chat('How do you introduce yourself in Sorani Kurdish daily conversation?')
+      const r = await brain.chat(
+        'How do you introduce yourself in Sorani Kurdish daily conversation?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/name|introduction|sorani|kurdish|conversation/)
     })
@@ -1298,7 +1306,9 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows Sorani social media terms', async () => {
       const r = await brain.chat('What are Sorani Kurdish social media terms?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/social media|facebook|instagram|like|share|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /social media|facebook|instagram|like|share|sorani|kurdish/,
+      )
     })
 
     it('knows Sorani online communication vocabulary', async () => {
@@ -1354,7 +1364,9 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows Sorani political vocabulary', async () => {
       const r = await brain.chat('What are Sorani Kurdish political vocabulary words?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/politic|government|parliament|minister|president|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /politic|government|parliament|minister|president|sorani|kurdish/,
+      )
     })
 
     it('knows Sorani governance and democracy terms', async () => {
@@ -1430,13 +1442,17 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows prominent Kurdish literary figures', async () => {
       const r = await brain.chat('Who are the famous Sorani Kurdish contemporary writers?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/sherko bekas|pashew|bakhtiar|writer|poet|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /sherko bekas|pashew|bakhtiar|writer|poet|sorani|kurdish/,
+      )
     })
 
     it('knows Sorani literary movements', async () => {
       const r = await brain.chat('What are the Sorani Kurdish literary movements?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/literature|movement|modern|romantis|realis|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /literature|movement|modern|romantis|realis|sorani|kurdish/,
+      )
     })
 
     it('knows Sorani folk tales and oral tradition', async () => {
@@ -1474,13 +1490,17 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows Sorani media and journalism vocabulary', async () => {
       const r = await brain.chat('What are Sorani Kurdish media vocabulary words?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/media|newspaper|radio|television|journalism|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /media|newspaper|radio|television|journalism|sorani|kurdish/,
+      )
     })
 
     it('knows Sorani news and press terminology', async () => {
       const r = await brain.chat('How do you discuss news and journalism in Sorani Kurdish?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/news|journalist|magazine|reporter|digital|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /news|journalist|magazine|reporter|digital|sorani|kurdish/,
+      )
     })
   })
 
@@ -1490,11 +1510,15 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows Sorani relative clause constructions', async () => {
       const r = await brain.chat('How do relative clauses work in Sorani Kurdish grammar?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/relative|clause|subordinate|who|which|that|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /relative|clause|subordinate|who|which|that|sorani|kurdish/,
+      )
     })
 
     it('knows Sorani relative clause marker ka', async () => {
-      const r = await brain.chat('What is the Sorani Kurdish relative pronoun for subordinate clauses?')
+      const r = await brain.chat(
+        'What is the Sorani Kurdish relative pronoun for subordinate clauses?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/relative|clause|marker|sorani|kurdish/)
     })
@@ -1502,11 +1526,15 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows Sorani reported speech constructions', async () => {
       const r = await brain.chat('How does reported speech work in Sorani Kurdish?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/reported speech|indirect|direct|said|quotation|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /reported speech|indirect|direct|said|quotation|sorani|kurdish/,
+      )
     })
 
     it('knows Sorani direct vs indirect speech', async () => {
-      const r = await brain.chat('What is the difference between direct and indirect speech in Sorani Kurdish?')
+      const r = await brain.chat(
+        'What is the difference between direct and indirect speech in Sorani Kurdish?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/direct|indirect|speech|said|sorani|kurdish/)
     })
@@ -1576,7 +1604,9 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows about Sorani Kurdish traditional clothing', async () => {
       const r = await brain.chat('What is Sorani Kurdish traditional clothing?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/traditional|clothing|dress|trouser|turban|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /traditional|clothing|dress|trouser|turban|sorani|kurdish/,
+      )
     })
 
     it('knows about Kurdish mens traditional garments', async () => {
@@ -1624,7 +1654,9 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows Sorani sports vocabulary', async () => {
       const r = await brain.chat('What are Sorani Kurdish sports vocabulary words?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/sport|football|basketball|volleyball|swim|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /sport|football|basketball|volleyball|swim|sorani|kurdish/,
+      )
     })
 
     it('knows Sorani athletic and game terms', async () => {
@@ -1640,7 +1672,9 @@ describe('Kurdish Sorani Language Knowledge', () => {
     it('knows Sorani religion vocabulary', async () => {
       const r = await brain.chat('What are Sorani Kurdish religion vocabulary words?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/religion|mosque|prayer|fasting|pilgrimage|sorani|kurdish/)
+      expect(r.text.toLowerCase()).toMatch(
+        /religion|mosque|prayer|fasting|pilgrimage|sorani|kurdish/,
+      )
     })
 
     it('knows Sorani multi-faith vocabulary', async () => {

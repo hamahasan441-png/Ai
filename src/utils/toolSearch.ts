@@ -13,11 +13,7 @@ import {
   logEvent,
 } from '../services/analytics/index.js'
 import type { Tool } from '../Tool.js'
-import {
-  type ToolPermissionContext,
-  type Tools,
-  toolMatchesName,
-} from '../Tool.js'
+import { type ToolPermissionContext, type Tools, toolMatchesName } from '../Tool.js'
 import type { AgentDefinition } from '../tools/AgentTool/loadAgentsDir.js'
 import {
   formatDeferredToolLine,
@@ -25,19 +21,13 @@ import {
   TOOL_SEARCH_TOOL_NAME,
 } from '../tools/ToolSearchTool/prompt.js'
 import type { Message } from '../types/message.js'
-import {
-  countToolDefinitionTokens,
-  TOOL_TOKEN_COUNT_OVERHEAD,
-} from './analyzeContext.js'
+import { countToolDefinitionTokens, TOOL_TOKEN_COUNT_OVERHEAD } from './analyzeContext.js'
 import { count } from './array.js'
 import { getMergedBetas } from './betas.js'
 import { getContextWindowForModel } from './context.js'
 import { logForDebugging } from './debug.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from './envUtils.js'
-import {
-  getAPIProvider,
-  isFirstPartyAnthropicBaseUrl,
-} from './model/providers.js'
+import { getAPIProvider, isFirstPartyAnthropicBaseUrl } from './model/providers.js'
 import { jsonStringify } from './slowOperations.js'
 import { zodToJsonSchema } from './zodToJsonSchema.js'
 
@@ -327,9 +317,7 @@ export function isToolSearchEnabledOptimistic(): boolean {
  * @param tools Array of tools with a 'name' property
  * @returns true if ToolSearchTool is in the tools list, false otherwise
  */
-export function isToolSearchToolAvailable(
-  tools: readonly { name: string }[],
-): boolean {
+export function isToolSearchToolAvailable(tools: readonly { name: string }[]): boolean {
   return tools.some(tool => toolMatchesName(tool, TOOL_SEARCH_TOOL_NAME))
 }
 
@@ -401,13 +389,11 @@ export async function isToolSearchEnabled(
     logEvent('tengu_tool_search_mode_decision', {
       enabled,
       mode: mode as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-      reason:
-        reason as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      reason: reason as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       // Log the actual model being checked, not the session's main model.
       // This is important for debugging subagent tool search decisions where
       // the subagent model (e.g., haiku) differs from the session model (e.g., opus).
-      checkedModel:
-        model as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      checkedModel: model as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       mcpToolCount,
       userType: (process.env.USER_TYPE ??
         'external') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -451,16 +437,14 @@ export async function isToolSearchEnabled(
 
       if (enabled) {
         logForDebugging(
-          `Auto tool search enabled: ${debugDescription}` +
-            (source ? ` [source: ${source}]` : ''),
+          `Auto tool search enabled: ${debugDescription}` + (source ? ` [source: ${source}]` : ''),
         )
         logModeDecision(true, mode, 'auto_above_threshold', metrics)
         return true
       }
 
       logForDebugging(
-        `Auto tool search disabled: ${debugDescription}` +
-          (source ? ` [source: ${source}]` : ''),
+        `Auto tool search disabled: ${debugDescription}` + (source ? ` [source: ${source}]` : ''),
       )
       logModeDecision(false, mode, 'auto_below_threshold', metrics)
       return false
@@ -582,9 +566,7 @@ export function extractDiscoveredToolNames(messages: Message[]): Set<string> {
   if (discoveredTools.size > 0) {
     logForDebugging(
       `Dynamic tool loading: found ${discoveredTools.size} discovered tools in message history` +
-        (carriedFromBoundary > 0
-          ? ` (${carriedFromBoundary} carried from compact boundary)`
-          : ''),
+        (carriedFromBoundary > 0 ? ` (${carriedFromBoundary} carried from compact boundary)` : ''),
     )
   }
 
@@ -739,12 +721,11 @@ async function checkAutoThreshold(
   }
 
   // Fallback: character-based heuristic when token API is unavailable
-  const deferredToolDescriptionChars =
-    await calculateDeferredToolDescriptionChars(
-      tools,
-      getToolPermissionContext,
-      agents,
-    )
+  const deferredToolDescriptionChars = await calculateDeferredToolDescriptionChars(
+    tools,
+    getToolPermissionContext,
+    agents,
+  )
   const charThreshold = getAutoToolSearchCharThreshold(model)
   return {
     enabled: deferredToolDescriptionChars >= charThreshold,

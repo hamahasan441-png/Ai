@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  WorkingMemoryEngine,
-  DEFAULT_WORKING_MEMORY_CONFIG,
-} from '../WorkingMemoryEngine'
+import { WorkingMemoryEngine, DEFAULT_WORKING_MEMORY_CONFIG } from '../WorkingMemoryEngine'
 
 describe('WorkingMemoryEngine', () => {
   let engine: WorkingMemoryEngine
@@ -49,7 +46,9 @@ describe('WorkingMemoryEngine', () => {
     })
 
     it('stores with metadata', () => {
-      const slot = engine.store('context', 'User asked about Python', { metadata: { source: 'chat' } })
+      const slot = engine.store('context', 'User asked about Python', {
+        metadata: { source: 'chat' },
+      })
       expect(slot.metadata.source).toBe('chat')
     })
 
@@ -115,7 +114,15 @@ describe('WorkingMemoryEngine', () => {
     })
 
     it('supports all slot types', () => {
-      const types = ['fact', 'goal', 'constraint', 'intermediate', 'context', 'instruction', 'hypothesis'] as const
+      const types = [
+        'fact',
+        'goal',
+        'constraint',
+        'intermediate',
+        'context',
+        'instruction',
+        'hypothesis',
+      ] as const
       for (const type of types) {
         const slot = engine.store(type, `${type} content`)
         expect(slot.type).toBe(type)
@@ -277,8 +284,11 @@ describe('WorkingMemoryEngine', () => {
     it('categorizes slots by attention level', () => {
       engine.store('fact', 'High priority', { priority: 0.95 })
       const snapshot = engine.getAttentionSnapshot()
-      const total = snapshot.focused.length + snapshot.active.length +
-        snapshot.peripheral.length + snapshot.decaying.length
+      const total =
+        snapshot.focused.length +
+        snapshot.active.length +
+        snapshot.peripheral.length +
+        snapshot.decaying.length
       expect(total).toBe(snapshot.totalSlots)
     })
   })

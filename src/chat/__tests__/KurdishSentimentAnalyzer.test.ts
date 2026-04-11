@@ -4,13 +4,8 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  KurdishSentimentAnalyzer,
-} from '../KurdishSentimentAnalyzer.js'
-import type {
-  SentimentLabel,
-  SentimentResult,
-} from '../KurdishSentimentAnalyzer.js'
+import { KurdishSentimentAnalyzer } from '../KurdishSentimentAnalyzer.js'
+import type { SentimentLabel, SentimentResult } from '../KurdishSentimentAnalyzer.js'
 import { LocalBrain } from '../LocalBrain.js'
 import { SemanticMemory, createProgrammingKnowledgeGraph } from '../SemanticMemory.js'
 
@@ -234,13 +229,9 @@ describe('KurdishSentimentAnalyzer', () => {
 
   describe('analyzeBatch', () => {
     it('analyzes multiple texts', () => {
-      const results = analyzer.analyzeBatch([
-        'زۆر خۆشحاڵم',
-        'زۆر دڵتەنگم',
-        'ڕۆژ باشە',
-      ])
+      const results = analyzer.analyzeBatch(['زۆر خۆشحاڵم', 'زۆر دڵتەنگم', 'ڕۆژ باشە'])
       expect(results).toHaveLength(3)
-      results.forEach((r) => {
+      results.forEach(r => {
         expect(VALID_LABELS).toContain(r.label)
       })
     })
@@ -267,12 +258,12 @@ describe('KurdishSentimentAnalyzer', () => {
 
     it('filters by sentiment label', () => {
       const positive = analyzer.getCorpusSamples('positive')
-      positive.forEach((s) => {
+      positive.forEach(s => {
         expect(s.sentiment).toBe('positive')
       })
 
       const negative = analyzer.getCorpusSamples('negative')
-      negative.forEach((s) => {
+      negative.forEach(s => {
         expect(s.sentiment).toBe('negative')
       })
     })
@@ -284,7 +275,7 @@ describe('KurdishSentimentAnalyzer', () => {
 
     it('each sample has text, sentiment, source', () => {
       const samples = analyzer.getCorpusSamples()
-      samples.forEach((s) => {
+      samples.forEach(s => {
         expect(typeof s.text).toBe('string')
         expect(s.text.length).toBeGreaterThan(0)
         expect(VALID_LABELS).toContain(s.sentiment)
@@ -294,7 +285,7 @@ describe('KurdishSentimentAnalyzer', () => {
 
     it('source is gold or silver', () => {
       const samples = analyzer.getCorpusSamples()
-      const sources = new Set(samples.map((s) => s.source))
+      const sources = new Set(samples.map(s => s.source))
       expect(sources.has('gold')).toBe(true)
       expect(sources.has('silver')).toBe(true)
     })
@@ -306,7 +297,7 @@ describe('KurdishSentimentAnalyzer', () => {
     it('returns array of SentimentWord for positive', () => {
       const words = analyzer.getPositiveWords()
       expect(Array.isArray(words)).toBe(true)
-      words.forEach((w) => {
+      words.forEach(w => {
         expect(w.word).toBeDefined()
         expect(w.sentiment).toBe('positive')
         expect(typeof w.weight).toBe('number')
@@ -316,14 +307,14 @@ describe('KurdishSentimentAnalyzer', () => {
 
     it('all positive words have weight > 0', () => {
       const words = analyzer.getPositiveWords()
-      words.forEach((w) => {
+      words.forEach(w => {
         expect(w.weight).toBeGreaterThan(0)
       })
     })
 
     it('all negative words have weight < 0', () => {
       const words = analyzer.getNegativeWords()
-      words.forEach((w) => {
+      words.forEach(w => {
         expect(w.weight).toBeLessThan(0)
       })
     })
@@ -377,16 +368,12 @@ describe('KurdishSentimentAnalyzer', () => {
     })
 
     it('"ناشرینترین کەس ئەو کەسەیە" → negative', () => {
-      const r = analyzer.analyzeSentiment(
-        'ناشرینترین کەس ئەو کەسەیە کە هەڵەکانت تۆمار دەکات',
-      )
+      const r = analyzer.analyzeSentiment('ناشرینترین کەس ئەو کەسەیە کە هەڵەکانت تۆمار دەکات')
       expect(r.label).toBe('negative')
     })
 
     it('"قسەکانتان بکەن ڕەخنە" → neutral', () => {
-      const r = analyzer.analyzeSentiment(
-        'قسەکانتان بکەن ڕەخنە و پێشنیارەکانتان بۆم گرنگن',
-      )
+      const r = analyzer.analyzeSentiment('قسەکانتان بکەن ڕەخنە و پێشنیارەکانتان بۆم گرنگن')
       expect(r.label).toBe('neutral')
     })
 
@@ -439,9 +426,7 @@ describe('KurdishSentimentAnalyzer', () => {
     })
 
     it('"سادەیی هەرچەندە ئازاری زۆرە" → mixed', () => {
-      const r = analyzer.analyzeSentiment(
-        'سادەیی هەرچەندە ئازاری زۆرە بەڵام لەزەتێکیشی هەیە',
-      )
+      const r = analyzer.analyzeSentiment('سادەیی هەرچەندە ئازاری زۆرە بەڵام لەزەتێکیشی هەیە')
       expect(['mixed', 'negative', 'positive']).toContain(r.label)
     })
   })

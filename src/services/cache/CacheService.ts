@@ -114,9 +114,7 @@ export class CacheService {
 
   constructor(config?: Partial<CacheConfig>) {
     this.memoryCache = new MemoryCache(config?.memory)
-    this.diskCache = config?.enableDisk !== false
-      ? new DiskCache(config?.disk)
-      : null
+    this.diskCache = config?.enableDisk !== false ? new DiskCache(config?.disk) : null
   }
 
   /** Get a value, checking L1 → L2. */
@@ -162,7 +160,7 @@ export class CacheService {
   /** Check if a key exists in any tier. */
   async has(key: string): Promise<boolean> {
     if (this.memoryCache.has(key)) return true
-    if (this.diskCache && await this.diskCache.has(key)) return true
+    if (this.diskCache && (await this.diskCache.has(key))) return true
     return false
   }
 

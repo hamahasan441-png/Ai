@@ -247,9 +247,7 @@ describe('SecurityScanner', () => {
     })
 
     it('should calculate risk score', () => {
-      const files = new Map<string, string>([
-        ['src/app.ts', `const x = eval(input);`],
-      ])
+      const files = new Map<string, string>([['src/app.ts', `const x = eval(input);`]])
       const result = scanner.scan(files)
       expect(result.riskScore).toBeGreaterThan(0)
     })
@@ -271,9 +269,7 @@ describe('SecurityScanner', () => {
     })
 
     it('should track stats by severity', () => {
-      const files = new Map<string, string>([
-        ['src/app.ts', `const x = eval(input);`],
-      ])
+      const files = new Map<string, string>([['src/app.ts', `const x = eval(input);`]])
       const result = scanner.scan(files)
       expect(result.bySeverity).toBeDefined()
       expect(typeof result.bySeverity.critical).toBe('number')
@@ -297,17 +293,13 @@ describe('SecurityScanner', () => {
     })
 
     it('should generate summary', () => {
-      const files = new Map<string, string>([
-        ['src/app.ts', `console.log("safe code");`],
-      ])
+      const files = new Map<string, string>([['src/app.ts', `console.log("safe code");`]])
       const result = scanner.scan(files)
       expect(result.summary).toContain('Scanned 1 files')
     })
 
     it('should report minimal risk for clean code', () => {
-      const files = new Map<string, string>([
-        ['src/app.ts', `const x = 1 + 2;`],
-      ])
+      const files = new Map<string, string>([['src/app.ts', `const x = 1 + 2;`]])
       const result = scanner.scan(files)
       expect(result.riskLevel).toBe('minimal')
     })

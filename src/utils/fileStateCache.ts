@@ -106,9 +106,7 @@ export function createFileStateCacheWithSizeLimit(
 }
 
 // Helper function to convert cache to object (used by compact.ts)
-export function cacheToObject(
-  cache: FileStateCache,
-): Record<string, FileState> {
+export function cacheToObject(cache: FileStateCache): Record<string, FileState> {
   return Object.fromEntries(cache.entries())
 }
 

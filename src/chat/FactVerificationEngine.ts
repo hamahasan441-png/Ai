@@ -41,7 +41,13 @@ export interface VerificationEvidence {
 }
 
 /** Verdict on a claim's truthfulness. */
-export type Verdict = 'verified' | 'likely_true' | 'uncertain' | 'likely_false' | 'false' | 'unverifiable'
+export type Verdict =
+  | 'verified'
+  | 'likely_true'
+  | 'uncertain'
+  | 'likely_false'
+  | 'false'
+  | 'unverifiable'
 
 /** Result of verifying a claim. */
 export interface VerificationResult {
@@ -131,7 +137,19 @@ const CLAIM_PATTERNS: RegExp[] = [
 ]
 
 /** Quantitative signal words. */
-const QUANTITATIVE_SIGNALS = ['percent', '%', 'million', 'billion', 'thousand', 'number', 'rate', 'ratio', 'count', 'average', 'median']
+const QUANTITATIVE_SIGNALS = [
+  'percent',
+  '%',
+  'million',
+  'billion',
+  'thousand',
+  'number',
+  'rate',
+  'ratio',
+  'count',
+  'average',
+  'median',
+]
 
 /** Domain keywords for classification. */
 const DOMAIN_KEYWORDS: Record<string, string[]> = {
@@ -182,7 +200,10 @@ function detectDomain(text: string): string {
 }
 
 function tokenize(text: string): string[] {
-  return text.toLowerCase().split(/\s+/).filter(t => t.length > 2)
+  return text
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(t => t.length > 2)
 }
 
 function computeTextSimilarity(text1: string, text2: string): number {
@@ -241,8 +262,7 @@ export class FactVerificationEngine {
 
     // Enforce max size
     if (this.facts.size > this.config.maxFacts) {
-      const oldest = [...this.facts.entries()]
-        .sort(([, a], [, b]) => a.addedAt - b.addedAt)[0]
+      const oldest = [...this.facts.entries()].sort(([, a], [, b]) => a.addedAt - b.addedAt)[0]
       if (oldest) this.facts.delete(oldest[0])
     }
 
@@ -283,8 +303,9 @@ export class FactVerificationEngine {
 
     // Enforce max sources
     if (this.sources.size > this.config.maxSources) {
-      const oldest = [...this.sources.entries()]
-        .sort(([, a], [, b]) => a.lastUpdated - b.lastUpdated)[0]
+      const oldest = [...this.sources.entries()].sort(
+        ([, a], [, b]) => a.lastUpdated - b.lastUpdated,
+      )[0]
       if (oldest) this.sources.delete(oldest[0])
     }
 
@@ -303,9 +324,9 @@ export class FactVerificationEngine {
       verifiedClaims: profile.verifiedClaims + (wasCorrect ? 1 : 0),
       falseClaims: profile.falseClaims + (wasCorrect ? 0 : 1),
       reliability: clamp(
-        (profile.verifiedClaims + (wasCorrect ? 1 : 0)) /
-        Math.max(profile.totalClaims + 1, 1),
-        0, 1,
+        (profile.verifiedClaims + (wasCorrect ? 1 : 0)) / Math.max(profile.totalClaims + 1, 1),
+        0,
+        1,
       ),
       lastUpdated: Date.now(),
     }
@@ -415,10 +436,16 @@ export class FactVerificationEngine {
 
     // Compute verdict
     const { verdict, confidence } = this.computeVerdict(supportingEvidence, contradictingEvidence)
-    const explanation = this.generateExplanation(claim, verdict, supportingEvidence, contradictingEvidence)
-    const correction = verdict === 'false' || verdict === 'likely_false'
-      ? this.suggestCorrection(claim, contradictingEvidence)
-      : null
+    const explanation = this.generateExplanation(
+      claim,
+      verdict,
+      supportingEvidence,
+      contradictingEvidence,
+    )
+    const correction =
+      verdict === 'false' || verdict === 'likely_false'
+        ? this.suggestCorrection(claim, contradictingEvidence)
+        : null
 
     this.stats.totalConfidence += confidence
     this.stats.verdictCounts[verdict]++
@@ -428,7 +455,9 @@ export class FactVerificationEngine {
       verdict,
       confidence,
       supportingEvidence: supportingEvidence.sort((a, b) => b.strength - a.strength).slice(0, 5),
-      contradictingEvidence: contradictingEvidence.sort((a, b) => b.strength - a.strength).slice(0, 5),
+      contradictingEvidence: contradictingEvidence
+        .sort((a, b) => b.strength - a.strength)
+        .slice(0, 5),
       explanation,
       suggestedCorrection: correction,
     }
@@ -445,8 +474,14 @@ export class FactVerificationEngine {
     const factTokens = new Set(tokenize(factText))
 
     // Check for negation signals
-    const claimHasNegation = /\b(not|no|never|none|neither|nor|isn't|aren't|wasn't|weren't|doesn't|don't)\b/.test(claimText.toLowerCase())
-    const factHasNegation = /\b(not|no|never|none|neither|nor|isn't|aren't|wasn't|weren't|doesn't|don't)\b/.test(factText.toLowerCase())
+    const claimHasNegation =
+      /\b(not|no|never|none|neither|nor|isn't|aren't|wasn't|weren't|doesn't|don't)\b/.test(
+        claimText.toLowerCase(),
+      )
+    const factHasNegation =
+      /\b(not|no|never|none|neither|nor|isn't|aren't|wasn't|weren't|doesn't|don't)\b/.test(
+        factText.toLowerCase(),
+      )
 
     // If one has negation and the other doesn't, they likely contradict
     if (claimHasNegation !== factHasNegation) return false
@@ -512,10 +547,14 @@ export class FactVerificationEngine {
         parts.push(`Verdict: LIKELY TRUE — mostly supported with ${supporting.length} source(s)`)
         break
       case 'uncertain':
-        parts.push(`Verdict: UNCERTAIN — mixed evidence (${supporting.length} supporting, ${contradicting.length} contradicting)`)
+        parts.push(
+          `Verdict: UNCERTAIN — mixed evidence (${supporting.length} supporting, ${contradicting.length} contradicting)`,
+        )
         break
       case 'likely_false':
-        parts.push(`Verdict: LIKELY FALSE — mostly contradicted by ${contradicting.length} source(s)`)
+        parts.push(
+          `Verdict: LIKELY FALSE — mostly contradicted by ${contradicting.length} source(s)`,
+        )
         break
       case 'false':
         parts.push(`Verdict: FALSE — contradicted by ${contradicting.length} source(s)`)
@@ -537,7 +576,9 @@ export class FactVerificationEngine {
 
   private suggestCorrection(claim: Claim, contradicting: VerificationEvidence[]): string | null {
     if (contradicting.length === 0) return null
-    const best = contradicting.sort((a, b) => b.strength * b.relevance - a.strength * a.relevance)[0]
+    const best = contradicting.sort(
+      (a, b) => b.strength * b.relevance - a.strength * a.relevance,
+    )[0]
     return `Consider: "${best.text.slice(0, 200)}" (from source: ${best.sourceId})`
   }
 
@@ -554,7 +595,8 @@ export class FactVerificationEngine {
         if (similarity < 0.3) continue
 
         // Check if one negates the other
-        const oneNegated = this.hasNegation(factList[i].statement) !== this.hasNegation(factList[j].statement)
+        const oneNegated =
+          this.hasNegation(factList[i].statement) !== this.hasNegation(factList[j].statement)
         if (!oneNegated) continue
 
         const severity = similarity * Math.max(factList[i].reliability, factList[j].reliability)
@@ -581,7 +623,9 @@ export class FactVerificationEngine {
   }
 
   private hasNegation(text: string): boolean {
-    return /\b(not|no|never|none|neither|nor|isn't|aren't|wasn't|weren't|doesn't|don't|cannot|can't|won't)\b/i.test(text)
+    return /\b(not|no|never|none|neither|nor|isn't|aren't|wasn't|weren't|doesn't|don't|cannot|can't|won't)\b/i.test(
+      text,
+    )
   }
 
   /** Get all detected contradictions. */
@@ -597,9 +641,10 @@ export class FactVerificationEngine {
       totalClaimsVerified: this.stats.totalClaimsVerified,
       totalFactsStored: this.facts.size,
       totalSourcesTracked: this.sources.size,
-      avgVerificationConfidence: this.stats.totalClaimsVerified > 0
-        ? this.stats.totalConfidence / this.stats.totalClaimsVerified
-        : 0,
+      avgVerificationConfidence:
+        this.stats.totalClaimsVerified > 0
+          ? this.stats.totalConfidence / this.stats.totalClaimsVerified
+          : 0,
       contradictionsDetected: this.stats.contradictionsDetected,
       verdictDistribution: { ...this.stats.verdictCounts },
     }
@@ -618,7 +663,10 @@ export class FactVerificationEngine {
   }
 
   /** Restore engine state from serialized data. */
-  static deserialize(json: string, config?: Partial<FactVerificationEngineConfig>): FactVerificationEngine {
+  static deserialize(
+    json: string,
+    config?: Partial<FactVerificationEngineConfig>,
+  ): FactVerificationEngine {
     const engine = new FactVerificationEngine(config)
     try {
       const data = JSON.parse(json)

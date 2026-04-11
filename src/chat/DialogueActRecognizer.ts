@@ -26,22 +26,22 @@ export type DialogueAct =
   | 'greeting'
   | 'opinion'
   | 'comparison'
-  | 'hypothetical';
+  | 'hypothetical'
 
 export interface DialogueActResult {
-  act: DialogueAct;
-  confidence: number;
-  subType?: string;
-  indicators: string[];
+  act: DialogueAct
+  confidence: number
+  subType?: string
+  indicators: string[]
 }
 
 // ── Pattern Definitions ──────────────────────────────────────────────────────
 
 interface ActPattern {
-  act: DialogueAct;
-  patterns: RegExp[];
-  keywords: string[];
-  subTypes?: Record<string, RegExp>;
+  act: DialogueAct
+  patterns: RegExp[]
+  keywords: string[]
+  subTypes?: Record<string, RegExp>
 }
 
 const ACT_PATTERNS: ActPattern[] = [
@@ -55,10 +55,10 @@ const ACT_PATTERNS: ActPattern[] = [
     ],
     keywords: ['what', 'where', 'when', 'why', 'who', 'how', 'which'],
     subTypes: {
-      'factual': /^(what is|what are|who is|who are|when was|where is)\b/i,
-      'procedural': /^(how (do|can|to|should)|what steps|what is the process)\b/i,
-      'causal': /^(why|what causes|what leads to)\b/i,
-      'definitional': /^(what (is|are) (a |an |the )?|define|meaning of)\b/i,
+      factual: /^(what is|what are|who is|who are|when was|where is)\b/i,
+      procedural: /^(how (do|can|to|should)|what steps|what is the process)\b/i,
+      causal: /^(why|what causes|what leads to)\b/i,
+      definitional: /^(what (is|are) (a |an |the )?|define|meaning of)\b/i,
     },
   },
   {
@@ -163,114 +163,111 @@ const ACT_PATTERNS: ActPattern[] = [
     ],
     keywords: ['what if', 'suppose', 'imagine', 'hypothetically'],
   },
-];
+]
 
 // ── DialogueActRecognizer Class ──────────────────────────────────────────────
 
 export class DialogueActRecognizer {
-  private recognizeCount = 0;
-  private actCounts: Record<string, number> = {};
+  private recognizeCount = 0
+  private actCounts: Record<string, number> = {}
 
   constructor() {
-    this.actCounts = {};
+    this.actCounts = {}
   }
 
   /**
    * Recognize the dialogue act of an utterance
    */
-  recognize(
-    text: string,
-    context?: { previousAct?: string }
-  ): DialogueActResult {
-    this.recognizeCount++;
+  recognize(text: string, context?: { previousAct?: string }): DialogueActResult {
+    this.recognizeCount++
 
     if (!text || text.trim().length === 0) {
-      return { act: 'assertion', confidence: 0.1, indicators: [] };
+      return { act: 'assertion', confidence: 0.1, indicators: [] }
     }
 
-    const trimmed = text.trim();
+    const trimmed = text.trim()
 
     // Score each act
     const scores: Array<{
-      act: DialogueAct;
-      score: number;
-      indicators: string[];
-      subType?: string;
-    }> = [];
+      act: DialogueAct
+      score: number
+      indicators: string[]
+      subType?: string
+    }> = []
 
     for (const pattern of ACT_PATTERNS) {
-      let score = 0;
-      const indicators: string[] = [];
+      let score = 0
+      const indicators: string[] = []
 
       // Check regex patterns
       for (const regex of pattern.patterns) {
         if (regex.test(trimmed)) {
-          score += 0.4;
-          indicators.push(`pattern:${regex.source.slice(0, 30)}`);
+          score += 0.4
+          indicators.push(`pattern:${regex.source.slice(0, 30)}`)
         }
       }
 
       // Check keywords
-      const lower = trimmed.toLowerCase();
+      const lower = trimmed.toLowerCase()
       for (const keyword of pattern.keywords) {
         if (lower.includes(keyword)) {
-          score += 0.15;
-          indicators.push(`keyword:${keyword}`);
+          score += 0.15
+          indicators.push(`keyword:${keyword}`)
         }
       }
 
       // Punctuation signals
       if (pattern.act === 'question' && trimmed.endsWith('?')) {
-        score += 0.3;
-        indicators.push('punctuation:?');
+        score += 0.3
+        indicators.push('punctuation:?')
       }
       if (pattern.act === 'command' && trimmed.endsWith('!')) {
-        score += 0.1;
-        indicators.push('punctuation:!');
+        score += 0.1
+        indicators.push('punctuation:!')
       }
 
       // Context bonus
       if (context?.previousAct) {
-        if (pattern.act === 'confirmation' && context.previousAct === 'question') score += 0.1;
-        if (pattern.act === 'clarification' && context.previousAct === 'assertion') score += 0.1;
-        if (pattern.act === 'correction' && context.previousAct === 'assertion') score += 0.1;
+        if (pattern.act === 'confirmation' && context.previousAct === 'question') score += 0.1
+        if (pattern.act === 'clarification' && context.previousAct === 'assertion') score += 0.1
+        if (pattern.act === 'correction' && context.previousAct === 'assertion') score += 0.1
       }
 
       // Detect sub-type if applicable
-      let subType: string | undefined;
+      let subType: string | undefined
       if (pattern.subTypes) {
         for (const [st, regex] of Object.entries(pattern.subTypes)) {
           if (regex.test(trimmed)) {
-            subType = st;
-            break;
+            subType = st
+            break
           }
         }
       }
 
       if (score > 0) {
-        scores.push({ act: pattern.act, score: Math.min(1, score), indicators, subType });
+        scores.push({ act: pattern.act, score: Math.min(1, score), indicators, subType })
       }
     }
 
     // Sort by score
-    scores.sort((a, b) => b.score - a.score);
+    scores.sort((a, b) => b.score - a.score)
 
     // Default if nothing matches
     if (scores.length === 0) {
-      return { act: 'assertion', confidence: 0.2, indicators: ['default'] };
+      return { act: 'assertion', confidence: 0.2, indicators: ['default'] }
     }
 
-    const best = scores[0]!;
+    const best = scores[0]!
 
     // Track
-    this.actCounts[best.act] = (this.actCounts[best.act] || 0) + 1;
+    this.actCounts[best.act] = (this.actCounts[best.act] || 0) + 1
 
     return {
       act: best.act,
       confidence: best.score,
       subType: best.subType,
       indicators: best.indicators,
-    };
+    }
   }
 
   /**
@@ -280,7 +277,7 @@ export class DialogueActRecognizer {
     return {
       recognizeCount: this.recognizeCount,
       actCounts: { ...this.actCounts },
-    };
+    }
   }
 
   /**
@@ -290,17 +287,17 @@ export class DialogueActRecognizer {
     return JSON.stringify({
       recognizeCount: this.recognizeCount,
       actCounts: this.actCounts,
-    });
+    })
   }
 
   /**
    * Deserialize state
    */
   static deserialize(data: string): DialogueActRecognizer {
-    const parsed = JSON.parse(data);
-    const recognizer = new DialogueActRecognizer();
-    recognizer.recognizeCount = parsed.recognizeCount || 0;
-    recognizer.actCounts = parsed.actCounts || {};
-    return recognizer;
+    const parsed = JSON.parse(data)
+    const recognizer = new DialogueActRecognizer()
+    recognizer.recognizeCount = parsed.recognizeCount || 0
+    recognizer.actCounts = parsed.actCounts || {}
+    return recognizer
   }
 }

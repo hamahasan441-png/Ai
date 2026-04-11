@@ -357,8 +357,22 @@ describe('NetworkForensics topology', () => {
     const topology: NetworkTopology = {
       nodes: [
         { id: 'n1', name: 'safe', type: 'workstation', ip: '192.168.1.10', services: [], risk: 10 },
-        { id: 'n2', name: 'risky', type: 'server', ip: '10.0.0.5', services: ['HTTP', 'SSH'], risk: 75 },
-        { id: 'n3', name: 'dangerous', type: 'server', ip: '203.0.113.5', services: ['MySQL'], risk: 90 },
+        {
+          id: 'n2',
+          name: 'risky',
+          type: 'server',
+          ip: '10.0.0.5',
+          services: ['HTTP', 'SSH'],
+          risk: 75,
+        },
+        {
+          id: 'n3',
+          name: 'dangerous',
+          type: 'server',
+          ip: '203.0.113.5',
+          services: ['MySQL'],
+          risk: 90,
+        },
       ],
       connections: [],
       segments: [],
@@ -381,9 +395,14 @@ describe('NetworkForensics correlateThreats', () => {
   it('returns empty array when anomalies do not form a known threat pattern', () => {
     const anomalies: NetworkAnomaly[] = [
       {
-        id: 'a1', type: 'unusual_port', severity: 'low',
-        description: 'Unusual port', timestamp: Date.now(),
-        confidence: 0.8, indicators: [], relatedPackets: [],
+        id: 'a1',
+        type: 'unusual_port',
+        severity: 'low',
+        description: 'Unusual port',
+        timestamp: Date.now(),
+        confidence: 0.8,
+        indicators: [],
+        relatedPackets: [],
       },
     ]
     const threats = nf.correlateThreats(anomalies)
@@ -393,14 +412,24 @@ describe('NetworkForensics correlateThreats', () => {
   it('detects coordinated recon when port_scan + brute_force are present', () => {
     const anomalies: NetworkAnomaly[] = [
       {
-        id: 'a1', type: 'port_scan', severity: 'medium',
-        description: 'Port scan', timestamp: Date.now(),
-        confidence: 0.9, indicators: [], relatedPackets: [],
+        id: 'a1',
+        type: 'port_scan',
+        severity: 'medium',
+        description: 'Port scan',
+        timestamp: Date.now(),
+        confidence: 0.9,
+        indicators: [],
+        relatedPackets: [],
       },
       {
-        id: 'a2', type: 'brute_force', severity: 'high',
-        description: 'Brute force', timestamp: Date.now(),
-        confidence: 0.85, indicators: [], relatedPackets: [],
+        id: 'a2',
+        type: 'brute_force',
+        severity: 'high',
+        description: 'Brute force',
+        timestamp: Date.now(),
+        confidence: 0.85,
+        indicators: [],
+        relatedPackets: [],
       },
     ]
     const threats = nf.correlateThreats(anomalies)

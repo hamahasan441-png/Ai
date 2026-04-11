@@ -400,7 +400,9 @@ describe('TargetScanner', () => {
       const vulns = scanner.scanVulnerabilities(target, recon)
       const exploits = scanner.analyzeExploits(vulns)
       if (exploits.length >= 2) {
-        expect(exploits[0].estimatedSuccessRate).toBeGreaterThanOrEqual(exploits[1].estimatedSuccessRate)
+        expect(exploits[0].estimatedSuccessRate).toBeGreaterThanOrEqual(
+          exploits[1].estimatedSuccessRate,
+        )
       }
     })
 
@@ -443,7 +445,11 @@ describe('TargetScanner', () => {
       const exploits = scanner.analyzeExploits(vulns)
       const chains = scanner.buildAttackChains(exploits, vulns)
       // Chains are built when matching exploit types exist
-      if (exploits.some(e => e.type.includes('sqli') || e.type.includes('xss') || e.type.includes('idor'))) {
+      if (
+        exploits.some(
+          e => e.type.includes('sqli') || e.type.includes('xss') || e.type.includes('idor'),
+        )
+      ) {
         expect(chains.length).toBeGreaterThan(0)
       } else {
         expect(chains.length).toBeGreaterThanOrEqual(0)
@@ -452,7 +458,25 @@ describe('TargetScanner', () => {
 
     it('returns empty when attack selection disabled', () => {
       const scanner = new TargetScanner({ enableAttackSelection: false })
-      const chains = scanner.buildAttackChains([{ id: '1', vulnerabilityId: '1', name: 't', type: 'sqli', complexity: 'low', reliability: 0.8, prerequisites: [], impact: '', steps: [], payload: '', mitigation: '', estimatedSuccessRate: 0.8 }], [])
+      const chains = scanner.buildAttackChains(
+        [
+          {
+            id: '1',
+            vulnerabilityId: '1',
+            name: 't',
+            type: 'sqli',
+            complexity: 'low',
+            reliability: 0.8,
+            prerequisites: [],
+            impact: '',
+            steps: [],
+            payload: '',
+            mitigation: '',
+            estimatedSuccessRate: 0.8,
+          },
+        ],
+        [],
+      )
       expect(chains).toHaveLength(0)
     })
 
@@ -659,8 +683,9 @@ describe('TargetScanner', () => {
   describe('getScanProgress', () => {
     it('returns progress for each phase', () => {
       const scanner = new TargetScanner()
-      const phases: Array<'recon' | 'scanning' | 'analysis' | 'exploitation' | 'reporting' | 'complete'> =
-        ['recon', 'scanning', 'analysis', 'exploitation', 'reporting', 'complete']
+      const phases: Array<
+        'recon' | 'scanning' | 'analysis' | 'exploitation' | 'reporting' | 'complete'
+      > = ['recon', 'scanning', 'analysis', 'exploitation', 'reporting', 'complete']
       const start = Date.now()
       for (const phase of phases) {
         const progress = scanner.getScanProgress(phase, start)

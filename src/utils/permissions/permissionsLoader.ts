@@ -29,10 +29,7 @@ import {
  * When enabled, only permission rules from managed settings are respected.
  */
 export function shouldAllowManagedPermissionRulesOnly(): boolean {
-  return (
-    getSettingsForSource('policySettings')?.allowManagedPermissionRulesOnly ===
-    true
-  )
+  return getSettingsForSource('policySettings')?.allowManagedPermissionRulesOnly === true
 }
 
 /**
@@ -43,11 +40,7 @@ export function shouldShowAlwaysAllowOptions(): boolean {
   return !shouldAllowManagedPermissionRulesOnly()
 }
 
-const SUPPORTED_RULE_BEHAVIORS = [
-  'allow',
-  'deny',
-  'ask',
-] as const satisfies PermissionBehavior[]
+const SUPPORTED_RULE_BEHAVIORS = ['allow', 'deny', 'ask'] as const satisfies PermissionBehavior[]
 
 /**
  * Lenient version of getSettingsForSource that doesn't fail on ANY validation errors.
@@ -137,9 +130,7 @@ export function loadAllPermissionRulesFromDisk(): PermissionRule[] {
  * @param source The source to load from
  * @returns Array of permission rules from that source
  */
-export function getPermissionRulesForSource(
-  source: SettingSource,
-): PermissionRule[] {
+export function getPermissionRulesForSource(source: SettingSource): PermissionRule[] {
   const settingsData = getSettingsForSource(source)
   return settingsJsonToRules(settingsData, source)
 }
@@ -196,9 +187,7 @@ export function deletePermissionRuleFromSettings(
       ...settingsData,
       permissions: {
         ...settingsData.permissions,
-        [rule.ruleBehavior]: behaviorArray.filter(
-          raw => normalizeEntry(raw) !== ruleString,
-        ),
+        [rule.ruleBehavior]: behaviorArray.filter(raw => normalizeEntry(raw) !== ruleString),
       },
     }
 
@@ -263,9 +252,7 @@ export function addPermissionRulesToSettings(
     // Filter out duplicates - normalize existing entries via roundtrip
     // parse→serialize so legacy names match their canonical form.
     const existingRulesSet = new Set(
-      existingRules.map(raw =>
-        permissionRuleValueToString(permissionRuleValueFromString(raw)),
-      ),
+      existingRules.map(raw => permissionRuleValueToString(permissionRuleValueFromString(raw))),
     )
     const newRules = ruleStrings.filter(rule => !existingRulesSet.has(rule))
 

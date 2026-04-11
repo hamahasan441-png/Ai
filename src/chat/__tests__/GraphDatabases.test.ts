@@ -11,15 +11,23 @@ describe('GraphDatabases', () => {
 
   describe('KB entry tests', () => {
     it('should respond to neo4j RDF and graph algorithm queries', async () => {
-      const response = await brain.chat('explain graph database neo4j property graph cypher rdf sparql knowledge graph ontology graph algorithm pagerank shortest path')
+      const response = await brain.chat(
+        'explain graph database neo4j property graph cypher rdf sparql knowledge graph ontology graph algorithm pagerank shortest path',
+      )
       expect(response.text.length).toBeGreaterThan(50)
-      expect(response.text.toLowerCase()).toMatch(/neo4j|cypher|rdf|sparql|pagerank|graph\s+(database|algorithm)/)
+      expect(response.text.toLowerCase()).toMatch(
+        /neo4j|cypher|rdf|sparql|pagerank|graph\s+(database|algorithm)/,
+      )
     })
 
     it('should respond to knowledge graph construction and GNN queries', async () => {
-      const response = await brain.chat('explain knowledge graph construction entity extraction graph neural network gnn node classification graph visualization force directed')
+      const response = await brain.chat(
+        'explain knowledge graph construction entity extraction graph neural network gnn node classification graph visualization force directed',
+      )
       expect(response.text.length).toBeGreaterThan(50)
-      expect(response.text.toLowerCase()).toMatch(/knowledge\s+graph|entity|graph\s+neural|gnn|visualization|force/)
+      expect(response.text.toLowerCase()).toMatch(
+        /knowledge\s+graph|entity|graph\s+neural|gnn|visualization|force/,
+      )
     })
   })
 

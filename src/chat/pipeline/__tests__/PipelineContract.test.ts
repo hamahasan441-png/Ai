@@ -15,7 +15,9 @@ import {
 
 describe('PipelinePhase enum', () => {
   it('should have 10 phases numbered 1-10', () => {
-    const numericValues = Object.values(PipelinePhase).filter((v): v is number => typeof v === 'number')
+    const numericValues = Object.values(PipelinePhase).filter(
+      (v): v is number => typeof v === 'number',
+    )
     expect(numericValues).toHaveLength(10)
     expect(numericValues).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   })
@@ -27,7 +29,9 @@ describe('PipelinePhase enum', () => {
 
 describe('PHASE_LABELS', () => {
   it('should have a label for every phase', () => {
-    const phases = Object.values(PipelinePhase).filter((v): v is PipelinePhase => typeof v === 'number')
+    const phases = Object.values(PipelinePhase).filter(
+      (v): v is PipelinePhase => typeof v === 'number',
+    )
     for (const phase of phases) {
       expect(PHASE_LABELS[phase]).toBeDefined()
       expect(typeof PHASE_LABELS[phase]).toBe('string')

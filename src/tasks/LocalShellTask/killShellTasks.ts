@@ -57,11 +57,7 @@ export function killShellTasksForAgent(
 ): void {
   const tasks = getAppState().tasks ?? {}
   for (const [taskId, task] of Object.entries(tasks)) {
-    if (
-      isLocalShellTask(task) &&
-      task.agentId === agentId &&
-      task.status === 'running'
-    ) {
+    if (isLocalShellTask(task) && task.agentId === agentId && task.status === 'running') {
       logForDebugging(
         `killShellTasksForAgent: killing orphaned shell task ${taskId} (agent ${agentId} exiting)`,
       )

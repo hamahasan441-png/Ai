@@ -78,9 +78,7 @@ export const TeamDeleteTool: Tool<InputSchema, Output> = buildTool({
       const teamFile = readTeamFile(teamName)
       if (teamFile) {
         // Filter out the team lead - only count non-lead members
-        const nonLeadMembers = teamFile.members.filter(
-          m => m.name !== TEAM_LEAD_NAME,
-        )
+        const nonLeadMembers = teamFile.members.filter(m => m.name !== TEAM_LEAD_NAME)
 
         // Separate truly active members from idle/dead ones
         // Members with isActive === false are idle (finished their turn or crashed)
@@ -109,8 +107,7 @@ export const TeamDeleteTool: Tool<InputSchema, Output> = buildTool({
       clearLeaderTeamName()
 
       logEvent('tengu_team_deleted', {
-        team_name:
-          teamName as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        team_name: teamName as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       })
     }
 

@@ -31,9 +31,7 @@ describe('RetryExecutor', () => {
   })
 
   it('should retry on transient error then succeed', async () => {
-    const fn = vi.fn()
-      .mockRejectedValueOnce(new Error('transient'))
-      .mockResolvedValue('recovered')
+    const fn = vi.fn().mockRejectedValueOnce(new Error('transient')).mockResolvedValue('recovered')
 
     const promise = executor.execute(fn, {
       maxAttempts: 3,
@@ -59,7 +57,8 @@ describe('RetryExecutor', () => {
   })
 
   it('should apply exponential backoff timing', async () => {
-    const fn = vi.fn()
+    const fn = vi
+      .fn()
       .mockRejectedValueOnce(new Error('fail'))
       .mockRejectedValueOnce(new Error('fail'))
       .mockResolvedValue('ok')
@@ -84,7 +83,8 @@ describe('RetryExecutor', () => {
   })
 
   it('should apply linear backoff timing', async () => {
-    const fn = vi.fn()
+    const fn = vi
+      .fn()
       .mockRejectedValueOnce(new Error('fail'))
       .mockRejectedValueOnce(new Error('fail'))
       .mockResolvedValue('ok')
@@ -106,7 +106,8 @@ describe('RetryExecutor', () => {
   })
 
   it('should apply constant backoff timing', async () => {
-    const fn = vi.fn()
+    const fn = vi
+      .fn()
       .mockRejectedValueOnce(new Error('fail'))
       .mockRejectedValueOnce(new Error('fail'))
       .mockResolvedValue('ok')
@@ -129,9 +130,7 @@ describe('RetryExecutor', () => {
   it('should add jitter randomness to delay', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0) // jitter factor becomes 0.5
 
-    const fn = vi.fn()
-      .mockRejectedValueOnce(new Error('fail'))
-      .mockResolvedValue('ok')
+    const fn = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('ok')
 
     const promise = executor.execute(fn, {
       maxAttempts: 3,
@@ -149,7 +148,8 @@ describe('RetryExecutor', () => {
 
   it('should respect custom retryOn predicate', async () => {
     vi.useRealTimers()
-    const fn = vi.fn()
+    const fn = vi
+      .fn()
       .mockRejectedValueOnce(new Error('retryable'))
       .mockRejectedValueOnce(new Error('permanent'))
 
@@ -158,14 +158,15 @@ describe('RetryExecutor', () => {
         maxAttempts: 5,
         baseDelay: 1,
         jitter: false,
-        retryOn: (err) => (err as Error).message === 'retryable',
+        retryOn: err => (err as Error).message === 'retryable',
       }),
     ).rejects.toThrow('permanent')
     expect(fn).toHaveBeenCalledTimes(2) // stopped at non-retryable
   })
 
   it('should cap delay at maxDelay', async () => {
-    const fn = vi.fn()
+    const fn = vi
+      .fn()
       .mockRejectedValueOnce(new Error('fail'))
       .mockRejectedValueOnce(new Error('fail'))
       .mockRejectedValueOnce(new Error('fail'))
@@ -198,9 +199,7 @@ describe('RetryExecutor', () => {
   })
 
   it('should track stats across executions', async () => {
-    const fn = vi.fn()
-      .mockRejectedValueOnce(new Error('fail'))
-      .mockResolvedValue('ok')
+    const fn = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('ok')
 
     const promise = executor.execute(fn, {
       maxAttempts: 3,
@@ -251,7 +250,11 @@ describe('CircuitBreaker', () => {
     breaker = new CircuitBreaker({ failureThreshold: 2 })
 
     for (let i = 0; i < 2; i++) {
-      await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
+      await breaker
+        .execute(async () => {
+          throw new Error('fail')
+        })
+        .catch(() => {})
     }
 
     expect(breaker.getState()).toBe('open')
@@ -259,17 +262,25 @@ describe('CircuitBreaker', () => {
 
   it('should reject calls when open', async () => {
     breaker = new CircuitBreaker({ failureThreshold: 1, timeout: 60_000 })
-    await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
+    await breaker
+      .execute(async () => {
+        throw new Error('fail')
+      })
+      .catch(() => {})
 
     await expect(breaker.execute(async () => 'ok')).rejects.toThrow('Circuit breaker is open')
   })
 
   it('should transition to half-open after timeout', async () => {
     breaker = new CircuitBreaker({ failureThreshold: 1, timeout: 50 })
-    await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
+    await breaker
+      .execute(async () => {
+        throw new Error('fail')
+      })
+      .catch(() => {})
     expect(breaker.getState()).toBe('open')
 
-    await new Promise((r) => setTimeout(r, 60))
+    await new Promise(r => setTimeout(r, 60))
     expect(breaker.getState()).toBe('half-open')
   })
 
@@ -281,8 +292,12 @@ describe('CircuitBreaker', () => {
       halfOpenMax: 2,
     })
 
-    await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
-    await new Promise((r) => setTimeout(r, 60))
+    await breaker
+      .execute(async () => {
+        throw new Error('fail')
+      })
+      .catch(() => {})
+    await new Promise(r => setTimeout(r, 60))
 
     await breaker.execute(async () => 'ok')
     expect(breaker.getState()).toBe('closed')
@@ -295,17 +310,29 @@ describe('CircuitBreaker', () => {
       halfOpenMax: 2,
     })
 
-    await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
-    await new Promise((r) => setTimeout(r, 60))
+    await breaker
+      .execute(async () => {
+        throw new Error('fail')
+      })
+      .catch(() => {})
+    await new Promise(r => setTimeout(r, 60))
 
     // Now half-open; fail again
-    await breaker.execute(async () => { throw new Error('again') }).catch(() => {})
+    await breaker
+      .execute(async () => {
+        throw new Error('again')
+      })
+      .catch(() => {})
     expect(breaker.getState()).toBe('open')
   })
 
   it('should reset to closed state', async () => {
     breaker = new CircuitBreaker({ failureThreshold: 1, timeout: 60_000 })
-    await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
+    await breaker
+      .execute(async () => {
+        throw new Error('fail')
+      })
+      .catch(() => {})
     expect(breaker.getState()).toBe('open')
 
     breaker.reset()
@@ -316,7 +343,11 @@ describe('CircuitBreaker', () => {
     breaker = new CircuitBreaker({ failureThreshold: 5 })
 
     await breaker.execute(async () => 'ok')
-    await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
+    await breaker
+      .execute(async () => {
+        throw new Error('fail')
+      })
+      .catch(() => {})
 
     const stats = breaker.getStats()
     expect(stats.successes).toBe(1)
@@ -332,7 +363,11 @@ describe('CircuitBreaker', () => {
       onStateChange: (from, to) => changes.push({ from, to }),
     })
 
-    await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
+    await breaker
+      .execute(async () => {
+        throw new Error('fail')
+      })
+      .catch(() => {})
     expect(changes).toContainEqual({ from: 'closed', to: 'open' })
   })
 
@@ -343,12 +378,16 @@ describe('CircuitBreaker', () => {
       halfOpenMax: 1,
     })
 
-    await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
-    await new Promise((r) => setTimeout(r, 60))
+    await breaker
+      .execute(async () => {
+        throw new Error('fail')
+      })
+      .catch(() => {})
+    await new Promise(r => setTimeout(r, 60))
 
     // First half-open call: allowed but slow
     const slowPromise = breaker.execute(async () => {
-      await new Promise((r) => setTimeout(r, 100))
+      await new Promise(r => setTimeout(r, 100))
       return 'ok'
     })
 
@@ -369,7 +408,11 @@ describe('CircuitBreaker', () => {
 
   it('should track circuitBreaks in stats when rejecting calls', async () => {
     breaker = new CircuitBreaker({ failureThreshold: 1, timeout: 60_000 })
-    await breaker.execute(async () => { throw new Error('fail') }).catch(() => {})
+    await breaker
+      .execute(async () => {
+        throw new Error('fail')
+      })
+      .catch(() => {})
 
     await breaker.execute(async () => 'ok').catch(() => {})
     await breaker.execute(async () => 'ok').catch(() => {})
@@ -394,15 +437,12 @@ describe('Bulkhead', () => {
     const task = async () => {
       running++
       maxRunning = Math.max(maxRunning, running)
-      await new Promise((r) => setTimeout(r, 50))
+      await new Promise(r => setTimeout(r, 50))
       running--
       return 'done'
     }
 
-    const results = await Promise.all([
-      bulkhead.execute(task),
-      bulkhead.execute(task),
-    ])
+    const results = await Promise.all([bulkhead.execute(task), bulkhead.execute(task)])
     expect(results).toEqual(['done', 'done'])
     expect(maxRunning).toBeLessThanOrEqual(2)
   })
@@ -412,7 +452,7 @@ describe('Bulkhead', () => {
     const order: number[] = []
 
     const makeTask = (id: number) => async () => {
-      await new Promise((r) => setTimeout(r, 30))
+      await new Promise(r => setTimeout(r, 30))
       order.push(id)
       return id
     }
@@ -430,17 +470,11 @@ describe('Bulkhead', () => {
   it('should reject when queue is full', async () => {
     const bulkhead = new Bulkhead({ maxConcurrent: 1, maxQueue: 1 })
 
-    const blocker = bulkhead.execute(
-      () => new Promise((r) => setTimeout(() => r('ok'), 200)),
-    )
+    const blocker = bulkhead.execute(() => new Promise(r => setTimeout(() => r('ok'), 200)))
     // fills the queue
-    const queued = bulkhead.execute(
-      () => new Promise((r) => setTimeout(() => r('ok2'), 50)),
-    )
+    const queued = bulkhead.execute(() => new Promise(r => setTimeout(() => r('ok2'), 50)))
     // overflows
-    await expect(
-      bulkhead.execute(async () => 'overflow'),
-    ).rejects.toThrow('Bulkhead queue full')
+    await expect(bulkhead.execute(async () => 'overflow')).rejects.toThrow('Bulkhead queue full')
 
     await Promise.all([blocker, queued])
   })
@@ -463,9 +497,7 @@ describe('Bulkhead', () => {
     })
 
     // Block the single slot for a while
-    const blocker = bulkhead.execute(
-      () => new Promise((r) => setTimeout(() => r('ok'), 200)),
-    )
+    const blocker = bulkhead.execute(() => new Promise(r => setTimeout(() => r('ok'), 200)))
 
     // This one will wait in the queue and time out
     const queuedPromise = bulkhead.execute(async () => 'queued')
@@ -490,7 +522,10 @@ describe('Bulkhead', () => {
 
     let resolveBlocker!: () => void
     const blocker = bulkhead.execute(
-      () => new Promise<string>((r) => { resolveBlocker = () => r('ok') }),
+      () =>
+        new Promise<string>(r => {
+          resolveBlocker = () => r('ok')
+        }),
     )
 
     expect(bulkhead.getActiveCount()).toBe(1)
@@ -508,7 +543,11 @@ describe('Bulkhead', () => {
   it('should track failures in stats', async () => {
     const bulkhead = new Bulkhead({ maxConcurrent: 2 })
 
-    await bulkhead.execute(async () => { throw new Error('oops') }).catch(() => {})
+    await bulkhead
+      .execute(async () => {
+        throw new Error('oops')
+      })
+      .catch(() => {})
 
     const stats = bulkhead.getStats()
     expect(stats.failures).toBe(1)
@@ -545,7 +584,7 @@ describe('RecoveryPipeline', () => {
     })
 
     await expect(
-      pipeline.execute(() => new Promise((r) => setTimeout(() => r('late'), 200))),
+      pipeline.execute(() => new Promise(r => setTimeout(() => r('late'), 200))),
     ).rejects.toThrow('Recovery timeout after 50ms')
     expect(onTimeout).toHaveBeenCalled()
   })
@@ -556,9 +595,7 @@ describe('RecoveryPipeline', () => {
       circuitBreaker: { failureThreshold: 5 },
     })
 
-    const fn = vi.fn()
-      .mockRejectedValueOnce(new Error('temporary'))
-      .mockResolvedValue('ok')
+    const fn = vi.fn().mockRejectedValueOnce(new Error('temporary')).mockResolvedValue('ok')
 
     const result = await pipeline.execute(fn)
     expect(result).toBe('ok')
@@ -570,7 +607,9 @@ describe('RecoveryPipeline', () => {
       fallback: { fallbackFn: () => 'fallback-value' },
     })
 
-    const result = await pipeline.execute(async () => { throw new Error('fail') })
+    const result = await pipeline.execute(async () => {
+      throw new Error('fail')
+    })
     expect(result).toBe('fallback-value')
   })
 
@@ -594,9 +633,7 @@ describe('RecoveryPipeline', () => {
       circuitBreaker: { failureThreshold: 10 },
     })
 
-    const fn = vi.fn()
-      .mockRejectedValueOnce(new Error('fail'))
-      .mockResolvedValue('ok')
+    const fn = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('ok')
 
     await pipeline.execute(fn)
     const stats = pipeline.getStats()
@@ -652,9 +689,9 @@ describe('RecoveryManager', () => {
   })
 
   it('should throw when executing unknown pipeline', async () => {
-    await expect(
-      manager.execute('missing', async () => 'x'),
-    ).rejects.toThrow('Recovery pipeline "missing" not found')
+    await expect(manager.execute('missing', async () => 'x')).rejects.toThrow(
+      'Recovery pipeline "missing" not found',
+    )
   })
 
   it('should get pipeline by name', () => {
@@ -680,7 +717,7 @@ describe('RecoveryManager', () => {
   it('should fire events on success', async () => {
     manager.createPipeline('svc', {})
     const events: unknown[] = []
-    manager.onEvent((e) => events.push(e))
+    manager.onEvent(e => events.push(e))
 
     await manager.execute('svc', async () => 'ok')
     expect(events.length).toBe(1)
@@ -690,9 +727,13 @@ describe('RecoveryManager', () => {
   it('should fire events on failure', async () => {
     manager.createPipeline('svc', {})
     const events: unknown[] = []
-    manager.onEvent((e) => events.push(e))
+    manager.onEvent(e => events.push(e))
 
-    await manager.execute('svc', async () => { throw new Error('boom') }).catch(() => {})
+    await manager
+      .execute('svc', async () => {
+        throw new Error('boom')
+      })
+      .catch(() => {})
     expect(events.length).toBe(1)
     expect((events[0] as { type: string }).type).toBe('failure')
   })
@@ -700,11 +741,13 @@ describe('RecoveryManager', () => {
   it('should include error category in failure events', async () => {
     manager.createPipeline('svc', {})
     const events: Array<{ metadata?: Record<string, unknown> }> = []
-    manager.onEvent((e) => events.push(e))
+    manager.onEvent(e => events.push(e))
 
-    await manager.execute('svc', async () => {
-      throw new Error('connection timeout')
-    }).catch(() => {})
+    await manager
+      .execute('svc', async () => {
+        throw new Error('connection timeout')
+      })
+      .catch(() => {})
 
     expect(events[0].metadata?.category).toBe('transient')
   })
@@ -735,7 +778,9 @@ describe('RecoveryManager', () => {
 
   it('should swallow handler errors without breaking execution', async () => {
     manager.createPipeline('svc', {})
-    manager.onEvent(() => { throw new Error('handler boom') })
+    manager.onEvent(() => {
+      throw new Error('handler boom')
+    })
 
     // Should not throw
     const result = await manager.execute('svc', async () => 'safe')

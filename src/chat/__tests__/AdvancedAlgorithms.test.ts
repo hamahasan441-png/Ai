@@ -16,21 +16,29 @@ describe('AdvancedAlgorithms', () => {
 
   describe('KB entry tests', () => {
     it('should match dynamic programming and graph algorithm keywords', async () => {
-      const r = await brain.chat('explain dynamic programming tabular memoization state transition knapsack lcs edit distance graph algorithm dijkstra bellman ford')
+      const r = await brain.chat(
+        'explain dynamic programming tabular memoization state transition knapsack lcs edit distance graph algorithm dijkstra bellman ford',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/dynamic\s+programming|knapsack|dijkstra|bellman.ford/)
     })
 
     it('should match string algorithms and probabilistic structures keywords', async () => {
-      const r = await brain.chat('explain string algorithm kmp rabin karp suffix array trie probabilistic data structure bloom filter hyperloglog count min sketch')
+      const r = await brain.chat(
+        'explain string algorithm kmp rabin karp suffix array trie probabilistic data structure bloom filter hyperloglog count min sketch',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/kmp|rabin.karp|bloom\s+filter|hyperloglog/)
     })
 
     it('should match advanced trees and divide conquer keywords', async () => {
-      const r = await brain.chat('explain advanced tree b tree red black segment tree fenwick binary indexed divide conquer greedy algorithm merge sort quicksort huffman')
+      const r = await brain.chat(
+        'explain advanced tree b tree red black segment tree fenwick binary indexed divide conquer greedy algorithm merge sort quicksort huffman',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/b.tree|red.black|segment\s+tree|fenwick|merge\s+sort|huffman/)
+      expect(r.text.toLowerCase()).toMatch(
+        /b.tree|red.black|segment\s+tree|fenwick|merge\s+sort|huffman/,
+      )
     })
   })
 

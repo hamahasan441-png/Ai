@@ -5,22 +5,32 @@ import { createProgrammingKnowledgeGraph } from '../SemanticMemory'
 describe('Natural Language Generation (NLG) Knowledge', () => {
   let brain: LocalBrain
 
-  beforeAll(() => { brain = new LocalBrain({ enableIntelligence: true }) })
+  beforeAll(() => {
+    brain = new LocalBrain({ enableIntelligence: true })
+  })
 
   it('knows about NLG pipeline', async () => {
-    const r = await brain.chat('explain natural language generation template text production nlg pipeline content structuring')
+    const r = await brain.chat(
+      'explain natural language generation template text production nlg pipeline content structuring',
+    )
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/natural\s+language\s+generation|nlg|template|pipeline|text/)
+    expect(r.text.toLowerCase()).toMatch(
+      /natural\s+language\s+generation|nlg|template|pipeline|text/,
+    )
   })
 
   it('knows about text transformation', async () => {
-    const r = await brain.chat('explain text summarization extractive abstractive paraphrasing grammar checking correction')
+    const r = await brain.chat(
+      'explain text summarization extractive abstractive paraphrasing grammar checking correction',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/summariz|extractive|abstractive|paraphras|grammar/)
   })
 
   it('knows about applied NLG', async () => {
-    const r = await brain.chat('explain dialogue system response generation data to text report generation content seo')
+    const r = await brain.chat(
+      'explain dialogue system response generation data to text report generation content seo',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/dialogue|response|data.to.text|report|content|generation/)
   })

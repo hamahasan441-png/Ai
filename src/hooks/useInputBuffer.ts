@@ -34,11 +34,7 @@ export function useInputBuffer({
   const pendingPush = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const pushToBuffer = useCallback(
-    (
-      text: string,
-      cursorOffset: number,
-      pastedContents: Record<number, PastedContent> = {},
-    ) => {
+    (text: string, cursorOffset: number, pastedContents: Record<number, PastedContent> = {}) => {
       const now = Date.now()
 
       // Clear any pending push
@@ -63,8 +59,7 @@ export function useInputBuffer({
 
       setBuffer(prevBuffer => {
         // If we're not at the end of the buffer, truncate everything after current position
-        const newBuffer =
-          currentIndex >= 0 ? prevBuffer.slice(0, currentIndex + 1) : prevBuffer
+        const newBuffer = currentIndex >= 0 ? prevBuffer.slice(0, currentIndex + 1) : prevBuffer
 
         // Don't add if it's the same as the last entry
         const lastEntry = newBuffer[newBuffer.length - 1]
@@ -73,10 +68,7 @@ export function useInputBuffer({
         }
 
         // Add new entry
-        const updatedBuffer = [
-          ...newBuffer,
-          { text, cursorOffset, pastedContents, timestamp: now },
-        ]
+        const updatedBuffer = [...newBuffer, { text, cursorOffset, pastedContents, timestamp: now }]
 
         // Limit buffer size
         if (updatedBuffer.length > maxBufferSize) {

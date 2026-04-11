@@ -13,9 +13,13 @@ describe('API Design & GraphQL Knowledge', () => {
 
   describe('REST API Design', () => {
     it('explains REST API design best practices', async () => {
-      const r = await brain.chat('What are the REST API design best practices for resource naming and versioning?')
+      const r = await brain.chat(
+        'What are the REST API design best practices for resource naming and versioning?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/rest|api|resource|method|get|post|put|status|code|version/)
+      expect(r.text.toLowerCase()).toMatch(
+        /rest|api|resource|method|get|post|put|status|code|version/,
+      )
     })
 
     it('describes REST API pagination and filtering', async () => {
@@ -28,13 +32,19 @@ describe('API Design & GraphQL Knowledge', () => {
 
   describe('GraphQL Development', () => {
     it('explains GraphQL schema and resolvers', async () => {
-      const r = await brain.chat('How do GraphQL schema query mutation subscription and resolvers work?')
+      const r = await brain.chat(
+        'How do GraphQL schema query mutation subscription and resolvers work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/graphql|schema|query|mutation|subscription|resolver|type/)
+      expect(r.text.toLowerCase()).toMatch(
+        /graphql|schema|query|mutation|subscription|resolver|type/,
+      )
     })
 
     it('describes GraphQL DataLoader and N+1 problem', async () => {
-      const r = await brain.chat('How does the GraphQL resolver DataLoader solve the N+1 query problem?')
+      const r = await brain.chat(
+        'How does the GraphQL resolver DataLoader solve the N+1 query problem?',
+      )
       expect(r.text.toLowerCase()).toMatch(/graphql|dataloader|n\+1|batch|cache|resolver/)
     })
 
@@ -48,13 +58,19 @@ describe('API Design & GraphQL Knowledge', () => {
 
   describe('gRPC', () => {
     it('explains gRPC protocol buffers for microservices', async () => {
-      const r = await brain.chat('How does gRPC protocol buffers work for microservice communication?')
+      const r = await brain.chat(
+        'How does gRPC protocol buffers work for microservice communication?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/grpc|protocol\s*buffer|protobuf|service|streaming|http.2/)
+      expect(r.text.toLowerCase()).toMatch(
+        /grpc|protocol\s*buffer|protobuf|service|streaming|http.2/,
+      )
     })
 
     it('describes gRPC streaming patterns', async () => {
-      const r = await brain.chat('What are the gRPC streaming bidirectional communication patterns?')
+      const r = await brain.chat(
+        'What are the gRPC streaming bidirectional communication patterns?',
+      )
       expect(r.text.toLowerCase()).toMatch(/grpc|stream|bidirectional|unary|client|server/)
     })
   })
@@ -63,14 +79,20 @@ describe('API Design & GraphQL Knowledge', () => {
 
   describe('OpenAPI/Swagger', () => {
     it('explains OpenAPI specification and design-first approach', async () => {
-      const r = await brain.chat('How does the OpenAPI Swagger API documentation and specification work?')
+      const r = await brain.chat(
+        'How does the OpenAPI Swagger API documentation and specification work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/openapi|swagger|specification|document|path|schema|api/)
     })
 
     it('covers OpenAPI code generation and contract testing', async () => {
-      const r = await brain.chat('How does OpenAPI code generation and contract testing work for APIs?')
-      expect(r.text.toLowerCase()).toMatch(/openapi|code\s*generat|contract|test|spec|client|server/)
+      const r = await brain.chat(
+        'How does OpenAPI code generation and contract testing work for APIs?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /openapi|code\s*generat|contract|test|spec|client|server/,
+      )
     })
   })
 
@@ -93,9 +115,13 @@ describe('API Design & GraphQL Knowledge', () => {
 
   describe('Webhooks', () => {
     it('explains webhook event-driven APIs', async () => {
-      const r = await brain.chat('How do webhook event driven API notifications and retry delivery work?')
+      const r = await brain.chat(
+        'How do webhook event driven API notifications and retry delivery work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/webhook|event|callback|retry|delivery|hmac|notification/)
+      expect(r.text.toLowerCase()).toMatch(
+        /webhook|event|callback|retry|delivery|hmac|notification/,
+      )
     })
   })
 
@@ -103,9 +129,13 @@ describe('API Design & GraphQL Knowledge', () => {
 
   describe('API Versioning', () => {
     it('explains API versioning and evolution strategy', async () => {
-      const r = await brain.chat('What are the API versioning strategy and backward compatibility approaches?')
+      const r = await brain.chat(
+        'What are the API versioning strategy and backward compatibility approaches?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/api|version|backward|compat|deprecat|evolut|gateway|uri/)
+      expect(r.text.toLowerCase()).toMatch(
+        /api|version|backward|compat|deprecat|evolut|gateway|uri/,
+      )
     })
   })
 

@@ -11,19 +11,25 @@ describe('ComputerVision', () => {
 
   describe('KB entry tests', () => {
     it('should match object detection/yolo/segmentation keywords', async () => {
-      const r = await brain.chat('explain object detection yolo ssd faster rcnn image segmentation semantic instance panoptic')
+      const r = await brain.chat(
+        'explain object detection yolo ssd faster rcnn image segmentation semantic instance panoptic',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/yolo|object\s+detection|segmentation|rcnn/)
     })
 
     it('should match optical flow/3d vision keywords', async () => {
-      const r = await brain.chat('explain optical flow motion estimation video tracking image enhancement restoration super resolution denoising')
+      const r = await brain.chat(
+        'explain optical flow motion estimation video tracking image enhancement restoration super resolution denoising',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/optical\s+flow|tracking|restoration|super\s+resolution/)
     })
 
     it('should match opencv/face/ocr keywords', async () => {
-      const r = await brain.chat('explain opencv image processing face detection recognition deepface arcface ocr optical character recognition tesseract')
+      const r = await brain.chat(
+        'explain opencv image processing face detection recognition deepface arcface ocr optical character recognition tesseract',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/opencv|face|recognition|ocr|tesseract/)
     })

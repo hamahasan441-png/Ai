@@ -8,11 +8,7 @@ import { getClaudeConfigHomeDir, isEnvTruthy } from './utils/envUtils.js'
 import { getErrnoCode } from './utils/errors.js'
 import { readLinesReverse } from './utils/fsOperations.js'
 import { lock } from './utils/lockfile.js'
-import {
-  hashPastedText,
-  retrievePastedText,
-  storePastedText,
-} from './utils/pasteStore.js'
+import { hashPastedText, retrievePastedText, storePastedText } from './utils/pasteStore.js'
 import { sleep } from './utils/sleep.js'
 import { jsonParse, jsonStringify } from './utils/slowOperations.js'
 
@@ -92,9 +88,7 @@ export function expandPastedTextRefs(
     const content = pastedContents[ref.id]
     if (content?.type !== 'text') continue
     expanded =
-      expanded.slice(0, ref.index) +
-      content.content +
-      expanded.slice(ref.index + ref.match.length)
+      expanded.slice(0, ref.index) + content.content + expanded.slice(ref.index + ref.match.length)
   }
   return expanded
 }
@@ -121,10 +115,7 @@ async function* makeLogEntryReader(): AsyncGenerator<LogEntry> {
         // removeLastFromHistory slow path: entry was flushed before removal,
         // so filter here so both getHistory (Up-arrow) and makeHistoryReader
         // (ctrl+r search) skip it consistently.
-        if (
-          entry.sessionId === currentSession &&
-          skippedTimestamps.has(entry.timestamp)
-        ) {
+        if (entry.sessionId === currentSession && skippedTimestamps.has(entry.timestamp)) {
           continue
         }
         yield entry
@@ -352,13 +343,8 @@ async function flushPromptHistory(retries: number): Promise<void> {
   }
 }
 
-async function addToPromptHistory(
-  command: HistoryEntry | string,
-): Promise<void> {
-  const entry =
-    typeof command === 'string'
-      ? { display: command, pastedContents: {} }
-      : command
+async function addToPromptHistory(command: HistoryEntry | string): Promise<void> {
+  const entry = typeof command === 'string' ? { display: command, pastedContents: {} } : command
 
   const storedPastedContents: Record<number, StoredPastedContent> = {}
   if (entry.pastedContents) {

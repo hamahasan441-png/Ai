@@ -75,7 +75,9 @@ describe('analyze – god class detection', () => {
     const methods = Array.from({ length: 16 }, (_, i) => `  action${i}() { return ${i} }`)
     const code = ['class Overloaded {', ...methods, '}'].join('\n')
     const result = new ArchitecturalAnalyzer().analyze(code)
-    const issue = result.issues.find(i => i.type === 'god-class' && i.title.includes('too many methods'))
+    const issue = result.issues.find(
+      i => i.type === 'god-class' && i.title.includes('too many methods'),
+    )
     expect(issue).toBeDefined()
   })
 })
@@ -191,7 +193,8 @@ describe('analyze – feature envy detection', () => {
 
 describe('analyze – data clump detection', () => {
   it('detects function with 5+ parameters', () => {
-    const code = 'function send(to: string, from: string, subject: string, body: string, cc: string) {\n  return true\n}'
+    const code =
+      'function send(to: string, from: string, subject: string, body: string, cc: string) {\n  return true\n}'
     const result = new ArchitecturalAnalyzer().analyze(code)
     const issue = result.issues.find(i => i.type === 'data-clump')
     expect(issue).toBeDefined()
@@ -231,7 +234,9 @@ describe('analyze – missing abstraction detection', () => {
       '}',
     ].join('\n')
     const result = new ArchitecturalAnalyzer().analyze(code)
-    const issue = result.issues.find(i => i.type === 'missing-abstraction' && i.title.includes('switch'))
+    const issue = result.issues.find(
+      i => i.type === 'missing-abstraction' && i.title.includes('switch'),
+    )
     expect(issue).toBeDefined()
     expect(issue!.severity).toBe('low')
   })
@@ -247,7 +252,9 @@ describe('analyze – missing abstraction detection', () => {
       '}',
     ].join('\n')
     const result = new ArchitecturalAnalyzer().analyze(code)
-    const issue = result.issues.find(i => i.type === 'missing-abstraction' && i.title.includes('if-else'))
+    const issue = result.issues.find(
+      i => i.type === 'missing-abstraction' && i.title.includes('if-else'),
+    )
     expect(issue).toBeDefined()
   })
 })
@@ -356,12 +363,7 @@ describe('analyze – design pattern detection', () => {
   })
 
   it('detects Decorator pattern', () => {
-    const code = [
-      '@Component',
-      'class Widget {',
-      '  render() { return "<div/>" }',
-      '}',
-    ].join('\n')
+    const code = ['@Component', 'class Widget {', '  render() { return "<div/>" }', '}'].join('\n')
     const result = new ArchitecturalAnalyzer().analyze(code)
     const pattern = result.patterns.find(p => p.name === 'Decorator')
     expect(pattern).toBeDefined()

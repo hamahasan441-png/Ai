@@ -101,8 +101,7 @@ function handleInteractivePermission(
     ...(feature('BASH_CLASSIFIER')
       ? {
           classifierCheckInProgress:
-            !!result.pendingClassifierCheck &&
-            !awaitAutomatedChecksBeforeDialog,
+            !!result.pendingClassifierCheck && !awaitAutomatedChecksBeforeDialog,
         }
       : {}),
     onUserInteraction() {
@@ -253,46 +252,43 @@ function handleInteractivePermission(
     )
 
     const signal = ctx.toolUseContext.abortController.signal
-    const unsubscribe = bridgeCallbacks.onResponse(
-      bridgeRequestId,
-      response => {
-        if (!claim()) return // Local user/hook/classifier already responded
-        signal.removeEventListener('abort', unsubscribe)
-        clearClassifierChecking(ctx.toolUseID)
-        clearClassifierIndicator()
-        ctx.removeFromQueue()
-        channelUnsubscribe?.()
+    const unsubscribe = bridgeCallbacks.onResponse(bridgeRequestId, response => {
+      if (!claim()) return // Local user/hook/classifier already responded
+      signal.removeEventListener('abort', unsubscribe)
+      clearClassifierChecking(ctx.toolUseID)
+      clearClassifierIndicator()
+      ctx.removeFromQueue()
+      channelUnsubscribe?.()
 
-        if (response.behavior === 'allow') {
-          if (response.updatedPermissions?.length) {
-            void ctx.persistPermissions(response.updatedPermissions)
-          }
-          ctx.logDecision(
-            {
-              decision: 'accept',
-              source: {
-                type: 'user',
-                permanent: !!response.updatedPermissions?.length,
-              },
-            },
-            { permissionPromptStartTimeMs },
-          )
-          resolveOnce(ctx.buildAllow(response.updatedInput ?? displayInput))
-        } else {
-          ctx.logDecision(
-            {
-              decision: 'reject',
-              source: {
-                type: 'user_reject',
-                hasFeedback: !!response.message,
-              },
-            },
-            { permissionPromptStartTimeMs },
-          )
-          resolveOnce(ctx.cancelAndAbort(response.message))
+      if (response.behavior === 'allow') {
+        if (response.updatedPermissions?.length) {
+          void ctx.persistPermissions(response.updatedPermissions)
         }
-      },
-    )
+        ctx.logDecision(
+          {
+            decision: 'accept',
+            source: {
+              type: 'user',
+              permanent: !!response.updatedPermissions?.length,
+            },
+          },
+          { permissionPromptStartTimeMs },
+        )
+        resolveOnce(ctx.buildAllow(response.updatedInput ?? displayInput))
+      } else {
+        ctx.logDecision(
+          {
+            decision: 'reject',
+            source: {
+              type: 'user_reject',
+              hasFeedback: !!response.message,
+            },
+          },
+          { permissionPromptStartTimeMs },
+        )
+        resolveOnce(ctx.cancelAndAbort(response.message))
+      }
+    })
 
     signal.addEventListener('abort', unsubscribe, { once: true })
   }
@@ -360,42 +356,37 @@ function handleInteractivePermission(
       // dead closure stayed registered on the session-scoped abort signal
       // until the session ended. Not a functional bug (Map.delete is
       // idempotent), but it held the closure alive.
-      const mapUnsub = channelCallbacks.onResponse(
-        channelRequestId,
-        response => {
-          if (!claim()) return // Another racer won
-          channelUnsubscribe?.() // both: map delete + listener remove
-          clearClassifierChecking(ctx.toolUseID)
-          clearClassifierIndicator()
-          ctx.removeFromQueue()
-          // Bridge is the other remote — tell it we're done.
-          if (bridgeCallbacks && bridgeRequestId) {
-            bridgeCallbacks.cancelRequest(bridgeRequestId)
-          }
+      const mapUnsub = channelCallbacks.onResponse(channelRequestId, response => {
+        if (!claim()) return // Another racer won
+        channelUnsubscribe?.() // both: map delete + listener remove
+        clearClassifierChecking(ctx.toolUseID)
+        clearClassifierIndicator()
+        ctx.removeFromQueue()
+        // Bridge is the other remote — tell it we're done.
+        if (bridgeCallbacks && bridgeRequestId) {
+          bridgeCallbacks.cancelRequest(bridgeRequestId)
+        }
 
-          if (response.behavior === 'allow') {
-            ctx.logDecision(
-              {
-                decision: 'accept',
-                source: { type: 'user', permanent: false },
-              },
-              { permissionPromptStartTimeMs },
-            )
-            resolveOnce(ctx.buildAllow(displayInput))
-          } else {
-            ctx.logDecision(
-              {
-                decision: 'reject',
-                source: { type: 'user_reject', hasFeedback: false },
-              },
-              { permissionPromptStartTimeMs },
-            )
-            resolveOnce(
-              ctx.cancelAndAbort(`Denied via channel ${response.fromServer}`),
-            )
-          }
-        },
-      )
+        if (response.behavior === 'allow') {
+          ctx.logDecision(
+            {
+              decision: 'accept',
+              source: { type: 'user', permanent: false },
+            },
+            { permissionPromptStartTimeMs },
+          )
+          resolveOnce(ctx.buildAllow(displayInput))
+        } else {
+          ctx.logDecision(
+            {
+              decision: 'reject',
+              source: { type: 'user_reject', hasFeedback: false },
+            },
+            { permissionPromptStartTimeMs },
+          )
+          resolveOnce(ctx.cancelAndAbort(`Denied via channel ${response.fromServer}`))
+        }
+      })
       channelUnsubscribe = () => {
         mapUnsub()
         channelSignal.removeEventListener('abort', channelUnsubscribe!)
@@ -461,9 +452,8 @@ function handleInteractivePermission(
 
           const matchedRule =
             decisionReason.type === 'classifier'
-              ? (decisionReason.reason.match(
-                  /^Allowed by prompt rule: "(.+)"$/,
-                )?.[1] ?? decisionReason.reason)
+              ? (decisionReason.reason.match(/^Allowed by prompt rule: "(.+)"$/)?.[1] ??
+                decisionReason.reason)
               : undefined
 
           // Show auto-approved transition with dimmed options
@@ -475,10 +465,7 @@ function handleInteractivePermission(
             })
           }
 
-          if (
-            feature('TRANSCRIPT_CLASSIFIER') &&
-            decisionReason.type === 'classifier'
-          ) {
+          if (feature('TRANSCRIPT_CLASSIFIER') && decisionReason.type === 'classifier') {
             if (decisionReason.classifier === 'auto-mode') {
               setYoloClassifierApproval(ctx.toolUseID, decisionReason.reason)
             } else if (matchedRule) {

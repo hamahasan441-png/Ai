@@ -10,12 +10,16 @@ describe('EA Development Patterns Knowledge', () => {
   })
 
   it('explains EA template structure and patterns', async () => {
-    const r = await brain.chat('What is the best expert advisor template structure and EA development framework?')
+    const r = await brain.chat(
+      'What is the best expert advisor template structure and EA development framework?',
+    )
     expect(r.text.toLowerCase()).toMatch(/oninit|ontick|ondeinit|template|magic\s*number|input/)
   })
 
   it('covers EA state machine and multi-timeframe patterns', async () => {
-    const r = await brain.chat('How to implement a state machine EA and multi timeframe expert advisor design?')
+    const r = await brain.chat(
+      'How to implement a state machine EA and multi timeframe expert advisor design?',
+    )
     expect(r.text.toLowerCase()).toMatch(/state|multi.timeframe|pattern|event|pipeline|grid/)
   })
 

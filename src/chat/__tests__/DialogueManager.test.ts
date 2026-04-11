@@ -188,9 +188,7 @@ describe('DialogueManager', () => {
     })
 
     it('resetState clears slot values but keeps slot definitions', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'Which city?' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'Which city?' }])
       dm.setSlot('city', 'Paris')
       dm.resetState()
       expect(dm.getFilledSlots()).toHaveLength(0)
@@ -393,9 +391,7 @@ describe('DialogueManager', () => {
     })
 
     it('fillSlots handles boolean slots', () => {
-      dm.defineSlots([
-        { name: 'vip', type: 'boolean', required: true, prompt: 'VIP?' },
-      ])
+      dm.defineSlots([{ name: 'vip', type: 'boolean', required: true, prompt: 'VIP?' }])
       const result = dm.fillSlots('yes')
       expect(result.filled).toContain('vip')
     })
@@ -455,9 +451,7 @@ describe('DialogueManager', () => {
     })
 
     it('goal auto-completes when all required slots are filled', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'City?' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'City?' }])
       const goal = dm.addGoal('Book', 'Desc', ['city'])
       dm.setSlot('city', 'Paris')
       expect(dm.isGoalComplete(goal.id)).toBe(true)
@@ -532,18 +526,15 @@ describe('DialogueManager', () => {
     })
 
     it('throws if start node is not in nodes', () => {
-      expect(() => dm.defineFlow('f', nodes, [], 'missing', ['done']))
-        .toThrow(/Start node/)
+      expect(() => dm.defineFlow('f', nodes, [], 'missing', ['done'])).toThrow(/Start node/)
     })
 
     it('throws if end node is not in nodes', () => {
-      expect(() => dm.defineFlow('f', nodes, [], 'start', ['missing']))
-        .toThrow(/End node/)
+      expect(() => dm.defineFlow('f', nodes, [], 'start', ['missing'])).toThrow(/End node/)
     })
 
     it('throws for empty nodes list', () => {
-      expect(() => dm.defineFlow('f', [], [], 'start', []))
-        .toThrow()
+      expect(() => dm.defineFlow('f', [], [], 'start', [])).toThrow()
     })
 
     it('advanceFlow moves to the next node', () => {
@@ -617,18 +608,28 @@ describe('DialogueManager', () => {
     })
 
     it('getActiveFlow returns null when all flows are complete', () => {
-      const flow = dm.defineFlow('f', ['a', 'b'], [
-        { from: 'a', to: 'b', condition: 'go', priority: 1 },
-      ], 'a', ['b'])
+      const flow = dm.defineFlow(
+        'f',
+        ['a', 'b'],
+        [{ from: 'a', to: 'b', condition: 'go', priority: 1 }],
+        'a',
+        ['b'],
+      )
       dm.advanceFlow(flow.id, 'go')
       expect(dm.getActiveFlow()).toBeNull()
     })
 
     it('advanceFlow picks highest-priority transition on tie', () => {
-      const flow = dm.defineFlow('f', ['a', 'b', 'c'], [
-        { from: 'a', to: 'b', condition: 'go', priority: 1 },
-        { from: 'a', to: 'c', condition: 'go', priority: 2 },
-      ], 'a', ['b', 'c'])
+      const flow = dm.defineFlow(
+        'f',
+        ['a', 'b', 'c'],
+        [
+          { from: 'a', to: 'b', condition: 'go', priority: 1 },
+          { from: 'a', to: 'c', condition: 'go', priority: 2 },
+        ],
+        'a',
+        ['b', 'c'],
+      )
       const next = dm.advanceFlow(flow.id, 'go')
       expect(next).toBe('c')
     })
@@ -653,9 +654,7 @@ describe('DialogueManager', () => {
     })
 
     it('getDialogueContext includes slot values', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'City?' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'City?' }])
       dm.setSlot('city', 'Paris')
       const ctx = dm.getDialogueContext()
       expect((ctx['slots'] as Record<string, unknown>)['city']).toBe('Paris')
@@ -689,9 +688,7 @@ describe('DialogueManager', () => {
     })
 
     it('summarizeDialogue mentions slot status when slots exist', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'City?' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'City?' }])
       dm.setSlot('city', 'Paris')
       dm.addTurn('user', 'Some text')
       const summary = dm.summarizeDialogue()
@@ -722,9 +719,7 @@ describe('DialogueManager', () => {
     })
 
     it('applyPolicy matches act == condition', () => {
-      dm.setPolicy('p', [
-        { condition: 'act == greet', action: 'greet_back', response: 'Hello!' },
-      ])
+      dm.setPolicy('p', [{ condition: 'act == greet', action: 'greet_back', response: 'Hello!' }])
       dm.addTurn('user', 'Hello')
       const result = dm.applyPolicy()
       expect(result).not.toBeNull()
@@ -743,9 +738,7 @@ describe('DialogueManager', () => {
     })
 
     it('applyPolicy matches slot filled condition', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'City?' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'City?' }])
       dm.setSlot('city', 'Paris')
       dm.setPolicy('p', [
         { condition: 'slot.city == filled', action: 'proceed', response: 'Great!' },
@@ -757,9 +750,7 @@ describe('DialogueManager', () => {
     })
 
     it('applyPolicy matches slot missing condition', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'City?' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'City?' }])
       dm.setPolicy('p', [
         { condition: 'slot.city == missing', action: 'ask', response: 'Which city?' },
       ])
@@ -770,9 +761,7 @@ describe('DialogueManager', () => {
     })
 
     it('applyPolicy matches turns > N condition', () => {
-      dm.setPolicy('p', [
-        { condition: 'turns > 2', action: 'check', response: 'Many turns!' },
-      ])
+      dm.setPolicy('p', [{ condition: 'turns > 2', action: 'check', response: 'Many turns!' }])
       dm.addTurn('user', 'a')
       dm.addTurn('system', 'b')
       dm.addTurn('user', 'c')
@@ -782,13 +771,9 @@ describe('DialogueManager', () => {
     })
 
     it('applyPolicy matches all_slots_filled condition', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'City?' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'City?' }])
       dm.setSlot('city', 'Paris')
-      dm.setPolicy('p', [
-        { condition: 'all_slots_filled', action: 'done', response: 'All set!' },
-      ])
+      dm.setPolicy('p', [{ condition: 'all_slots_filled', action: 'done', response: 'All set!' }])
       dm.addTurn('user', 'ok')
       const result = dm.applyPolicy()
       expect(result).not.toBeNull()
@@ -796,12 +781,8 @@ describe('DialogueManager', () => {
     })
 
     it('applyPolicy matches has_missing_slots condition', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'City?' },
-      ])
-      dm.setPolicy('p', [
-        { condition: 'has_missing_slots', action: 'ask', response: 'Need info' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'City?' }])
+      dm.setPolicy('p', [{ condition: 'has_missing_slots', action: 'ask', response: 'Need info' }])
       dm.addTurn('user', 'ok')
       const result = dm.applyPolicy()
       expect(result).not.toBeNull()
@@ -809,12 +790,8 @@ describe('DialogueManager', () => {
     })
 
     it('applyPolicy falls back to asking missing slot when no rule matches', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'Which city?' },
-      ])
-      dm.setPolicy('p', [
-        { condition: 'act == bye', action: 'end', response: 'Goodbye' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'Which city?' }])
+      dm.setPolicy('p', [{ condition: 'act == bye', action: 'end', response: 'Goodbye' }])
       dm.addTurn('user', 'Hello')
       const result = dm.applyPolicy()
       expect(result).not.toBeNull()
@@ -823,21 +800,21 @@ describe('DialogueManager', () => {
     })
 
     it('higher-priority policies are evaluated first', () => {
-      dm.setPolicy('low', [
-        { condition: 'always', action: 'low_action', response: 'Low' },
-      ], 0.1)
-      dm.setPolicy('high', [
-        { condition: 'always', action: 'high_action', response: 'High' },
-      ], 0.9)
+      dm.setPolicy('low', [{ condition: 'always', action: 'low_action', response: 'Low' }], 0.1)
+      dm.setPolicy('high', [{ condition: 'always', action: 'high_action', response: 'High' }], 0.9)
       dm.addTurn('user', 'hi')
       const result = dm.applyPolicy()
       expect(result!.action).toBe('high_action')
     })
 
     it('applyPolicy matches flow == node condition', () => {
-      dm.defineFlow('f', ['start', 'end'], [
-        { from: 'start', to: 'end', condition: 'go', priority: 1 },
-      ], 'start', ['end'])
+      dm.defineFlow(
+        'f',
+        ['start', 'end'],
+        [{ from: 'start', to: 'end', condition: 'go', priority: 1 }],
+        'start',
+        ['end'],
+      )
       dm.setPolicy('p', [
         { condition: 'flow == start', action: 'flow_start', response: 'At start' },
       ])
@@ -907,9 +884,7 @@ describe('DialogueManager', () => {
     })
 
     it('suggestRepair returns disambiguate when missing slots exist', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'Which city?' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'Which city?' }])
       dm.addTurn('user', 'Hello')
       const repair = dm.suggestRepair()
       expect(repair.type).toBe('disambiguate')
@@ -1005,7 +980,10 @@ describe('DialogueManager', () => {
       m1.addTurn('user', 'Hi')
 
       const m2 = new DialogueManager()
-      m2.addTurn('user', 'Hello, I would like to book a very nice flight from New York to Paris for my family vacation next summer')
+      m2.addTurn(
+        'user',
+        'Hello, I would like to book a very nice flight from New York to Paris for my family vacation next summer',
+      )
 
       expect(m2.getEngagementScore()).toBeGreaterThanOrEqual(m1.getEngagementScore())
     })
@@ -1058,9 +1036,7 @@ describe('DialogueManager', () => {
     })
 
     it('preserves slots through serialization', () => {
-      dm.defineSlots([
-        { name: 'city', type: 'string', required: true, prompt: 'City?' },
-      ])
+      dm.defineSlots([{ name: 'city', type: 'string', required: true, prompt: 'City?' }])
       dm.setSlot('city', 'Tokyo')
       const restored = DialogueManager.deserialize(dm.serialize())
       expect(restored.getFilledSlots()).toHaveLength(1)
@@ -1075,17 +1051,15 @@ describe('DialogueManager', () => {
     })
 
     it('preserves flows through serialization', () => {
-      dm.defineFlow('f', ['a', 'b'], [
-        { from: 'a', to: 'b', condition: 'go', priority: 1 },
-      ], 'a', ['b'])
+      dm.defineFlow('f', ['a', 'b'], [{ from: 'a', to: 'b', condition: 'go', priority: 1 }], 'a', [
+        'b',
+      ])
       const restored = DialogueManager.deserialize(dm.serialize())
       expect(restored.getStats().flowCount).toBe(1)
     })
 
     it('preserves policies through serialization', () => {
-      dm.setPolicy('p', [
-        { condition: 'always', action: 'a', response: 'r' },
-      ])
+      dm.setPolicy('p', [{ condition: 'always', action: 'a', response: 'r' }])
       dm.addTurn('user', 'hi')
       const restored = DialogueManager.deserialize(dm.serialize())
       const result = restored.applyPolicy()
@@ -1142,7 +1116,7 @@ describe('DialogueManager', () => {
     })
 
     it('computes average turn length', () => {
-      dm.addTurn('user', 'Hello')     // 5 chars
+      dm.addTurn('user', 'Hello') // 5 chars
       dm.addTurn('system', 'Hi there') // 8 chars
       const stats = dm.getStats()
       expect(stats.avgTurnLength).toBe(Math.round((5 + 8) / 2))

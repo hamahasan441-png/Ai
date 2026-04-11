@@ -4,7 +4,13 @@ import { HypothesisEngine, DEFAULT_HYPOTHESIS_ENGINE_CONFIG } from '../Hypothesi
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
 function makeEvidence(
-  overrides: Partial<{ id: string; description: string; strength: number; source: string; supports: boolean }> = {},
+  overrides: Partial<{
+    id: string
+    description: string
+    strength: number
+    source: string
+    supports: boolean
+  }> = {},
 ) {
   return {
     id: overrides.id ?? 'ev1',
@@ -23,11 +29,14 @@ function addManyEvidences(
   strength = 0.8,
 ) {
   for (let i = 0; i < count; i++) {
-    engine.addEvidence(hId, makeEvidence({
-      id: `ev_${supports ? 's' : 'c'}_${i}`,
-      strength,
-      supports,
-    }))
+    engine.addEvidence(
+      hId,
+      makeEvidence({
+        id: `ev_${supports ? 's' : 'c'}_${i}`,
+        strength,
+        supports,
+      }),
+    )
   }
 }
 
@@ -104,7 +113,9 @@ describe('HypothesisEngine', () => {
 
     it('should generate at most 4 hypotheses', () => {
       const engine = new HypothesisEngine()
-      const results = engine.generateHypotheses('server latency memory cpu crash bug deploy network database performance issues')
+      const results = engine.generateHypotheses(
+        'server latency memory cpu crash bug deploy network database performance issues',
+      )
       expect(results.length).toBeLessThanOrEqual(4)
     })
 
@@ -152,7 +163,15 @@ describe('HypothesisEngine', () => {
       const engine = new HypothesisEngine()
       const results = engine.generateHypotheses('the chemical reaction rate', 'science')
       // Science templates contain phrases like "phenomenon", "cascading effect", etc.
-      expect(results.some(h => h.statement.includes('phenomenon') || h.statement.includes('interaction') || h.statement.includes('mechanism') || h.statement.includes('Environmental'))).toBe(true)
+      expect(
+        results.some(
+          h =>
+            h.statement.includes('phenomenon') ||
+            h.statement.includes('interaction') ||
+            h.statement.includes('mechanism') ||
+            h.statement.includes('Environmental'),
+        ),
+      ).toBe(true)
       for (const h of results) {
         expect(h.domain).toBe('science')
       }
@@ -161,12 +180,15 @@ describe('HypothesisEngine', () => {
     it('should use technology templates when domain is technology', () => {
       const engine = new HypothesisEngine()
       const results = engine.generateHypotheses('server latency spike', 'technology')
-      expect(results.some(h =>
-        h.statement.includes('issue might stem') ||
-        h.statement.includes('Performance degradation') ||
-        h.statement.includes('configuration') ||
-        h.statement.includes('Resource contention'),
-      )).toBe(true)
+      expect(
+        results.some(
+          h =>
+            h.statement.includes('issue might stem') ||
+            h.statement.includes('Performance degradation') ||
+            h.statement.includes('configuration') ||
+            h.statement.includes('Resource contention'),
+        ),
+      ).toBe(true)
       for (const h of results) {
         expect(h.domain).toBe('technology')
       }
@@ -175,12 +197,15 @@ describe('HypothesisEngine', () => {
     it('should use logic templates when domain is logic', () => {
       const engine = new HypothesisEngine()
       const results = engine.generateHypotheses('the premise implies conclusion', 'logic')
-      expect(results.some(h =>
-        h.statement.includes('If A then B') ||
-        h.statement.includes('absence of expected') ||
-        h.statement.includes('elimination') ||
-        h.statement.includes('pattern is consistent'),
-      )).toBe(true)
+      expect(
+        results.some(
+          h =>
+            h.statement.includes('If A then B') ||
+            h.statement.includes('absence of expected') ||
+            h.statement.includes('elimination') ||
+            h.statement.includes('pattern is consistent'),
+        ),
+      ).toBe(true)
       for (const h of results) {
         expect(h.domain).toBe('logic')
       }
@@ -189,12 +214,15 @@ describe('HypothesisEngine', () => {
     it('should use general templates for unrecognized domains', () => {
       const engine = new HypothesisEngine()
       const results = engine.generateHypotheses('something happened', 'unknown_domain')
-      expect(results.some(h =>
-        h.statement.includes('One explanation') ||
-        h.statement.includes('alternative hypothesis') ||
-        h.statement.includes('account for') ||
-        h.statement.includes('plausible'),
-      )).toBe(true)
+      expect(
+        results.some(
+          h =>
+            h.statement.includes('One explanation') ||
+            h.statement.includes('alternative hypothesis') ||
+            h.statement.includes('account for') ||
+            h.statement.includes('plausible'),
+        ),
+      ).toBe(true)
     })
 
     it('should use general templates when domain is explicitly general', () => {
@@ -209,7 +237,9 @@ describe('HypothesisEngine', () => {
 
     it('should infer science domain from science keywords', () => {
       const engine = new HypothesisEngine()
-      const results = engine.generateHypotheses('the experiment with molecule energy was interesting')
+      const results = engine.generateHypotheses(
+        'the experiment with molecule energy was interesting',
+      )
       for (const h of results) {
         expect(h.domain).toBe('science')
       }
@@ -565,9 +595,7 @@ describe('HypothesisEngine', () => {
       engine.testHypothesis(h2.id)
 
       const contradictions = engine.findContradictions()
-      expect(contradictions.some(c =>
-        c.reason.includes('Opposing conclusions'),
-      )).toBe(true)
+      expect(contradictions.some(c => c.reason.includes('Opposing conclusions'))).toBe(true)
     })
 
     it('should detect shared evidence used in opposite directions', () => {
@@ -584,50 +612,67 @@ describe('HypothesisEngine', () => {
       engine.addEvidence(h2.id, { ...sharedEvidence, supports: false })
 
       const contradictions = engine.findContradictions()
-      expect(contradictions.some(c =>
-        c.reason.includes('shared_ev'),
-      )).toBe(true)
+      expect(contradictions.some(c => c.reason.includes('shared_ev'))).toBe(true)
     })
 
     it('should detect keyword negation contradictions', () => {
       const engine = new HypothesisEngine()
       // Manually create hypotheses with negation
       const h1 = engine.generateHypotheses('the system load caused errors', 'general')[0]!
-      const h2Id = engine.generateHypotheses('the system load did not cause errors', 'general')[0]?.id
+      const h2Id = engine.generateHypotheses('the system load did not cause errors', 'general')[0]
+        ?.id
 
       // We need statements that share key terms but differ in negation
       // Since we can't control statements directly, let's use the external list variant
       const hypotheses = [
         {
-          id: 'h1', statement: 'the system load caused errors in processing',
-          confidence: 0.5, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'proposed' as const, domain: 'general', createdAt: Date.now(),
+          id: 'h1',
+          statement: 'the system load caused errors in processing',
+          confidence: 0.5,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'proposed' as const,
+          domain: 'general',
+          createdAt: Date.now(),
         },
         {
-          id: 'h2', statement: 'the system load did not cause errors in processing',
-          confidence: 0.5, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'proposed' as const, domain: 'general', createdAt: Date.now(),
+          id: 'h2',
+          statement: 'the system load did not cause errors in processing',
+          confidence: 0.5,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'proposed' as const,
+          domain: 'general',
+          createdAt: Date.now(),
         },
       ]
 
       const contradictions = engine.findContradictions(hypotheses)
-      expect(contradictions.some(c =>
-        c.reason.includes('negation'),
-      )).toBe(true)
+      expect(contradictions.some(c => c.reason.includes('negation'))).toBe(true)
     })
 
     it('should accept an external list of hypotheses', () => {
       const engine = new HypothesisEngine()
       const external = [
         {
-          id: 'ext1', statement: 'A is true',
-          confidence: 0.8, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'supported' as const, domain: 'science', createdAt: Date.now(),
+          id: 'ext1',
+          statement: 'A is true',
+          confidence: 0.8,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'supported' as const,
+          domain: 'science',
+          createdAt: Date.now(),
         },
         {
-          id: 'ext2', statement: 'A is not true',
-          confidence: 0.2, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'refuted' as const, domain: 'science', createdAt: Date.now(),
+          id: 'ext2',
+          statement: 'A is not true',
+          confidence: 0.2,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'refuted' as const,
+          domain: 'science',
+          createdAt: Date.now(),
         },
       ]
       const contradictions = engine.findContradictions(external)
@@ -638,14 +683,24 @@ describe('HypothesisEngine', () => {
       const engine = new HypothesisEngine()
       const external = [
         {
-          id: 'ext1', statement: 'hypothesis one',
-          confidence: 0.8, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'supported' as const, domain: 'science', createdAt: Date.now(),
+          id: 'ext1',
+          statement: 'hypothesis one',
+          confidence: 0.8,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'supported' as const,
+          domain: 'science',
+          createdAt: Date.now(),
         },
         {
-          id: 'ext2', statement: 'hypothesis two',
-          confidence: 0.7, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'supported' as const, domain: 'science', createdAt: Date.now(),
+          id: 'ext2',
+          statement: 'hypothesis two',
+          confidence: 0.7,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'supported' as const,
+          domain: 'science',
+          createdAt: Date.now(),
         },
       ]
       const contradictions = engine.findContradictions(external)
@@ -656,19 +711,34 @@ describe('HypothesisEngine', () => {
       const engine = new HypothesisEngine()
       const hypotheses = [
         {
-          id: 'a', statement: 'alpha is true',
-          confidence: 0.8, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'supported' as const, domain: 'science', createdAt: Date.now(),
+          id: 'a',
+          statement: 'alpha is true',
+          confidence: 0.8,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'supported' as const,
+          domain: 'science',
+          createdAt: Date.now(),
         },
         {
-          id: 'b', statement: 'beta is true',
-          confidence: 0.3, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'refuted' as const, domain: 'science', createdAt: Date.now(),
+          id: 'b',
+          statement: 'beta is true',
+          confidence: 0.3,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'refuted' as const,
+          domain: 'science',
+          createdAt: Date.now(),
         },
         {
-          id: 'c', statement: 'gamma is true',
-          confidence: 0.3, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'refuted' as const, domain: 'science', createdAt: Date.now(),
+          id: 'c',
+          statement: 'gamma is true',
+          confidence: 0.3,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'refuted' as const,
+          domain: 'science',
+          createdAt: Date.now(),
         },
       ]
       const contradictions = engine.findContradictions(hypotheses)
@@ -709,14 +779,24 @@ describe('HypothesisEngine', () => {
       const engine = new HypothesisEngine()
       const external = [
         {
-          id: 'low', statement: 'low confidence',
-          confidence: 0.1, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'proposed' as const, domain: 'general', createdAt: Date.now(),
+          id: 'low',
+          statement: 'low confidence',
+          confidence: 0.1,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'proposed' as const,
+          domain: 'general',
+          createdAt: Date.now(),
         },
         {
-          id: 'high', statement: 'high confidence',
-          confidence: 0.9, evidence: [] as any[], counterEvidence: [] as any[],
-          status: 'proposed' as const, domain: 'general', createdAt: Date.now(),
+          id: 'high',
+          statement: 'high confidence',
+          confidence: 0.9,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'proposed' as const,
+          domain: 'general',
+          createdAt: Date.now(),
         },
       ]
       const ranked = engine.rankHypotheses(external)
@@ -737,7 +817,10 @@ describe('HypothesisEngine', () => {
       const hyps = engine.generateHypotheses('something to observe', 'general')
       // Give h1 many weak supporting evidence, give h2 one strong supporting evidence
       for (let i = 0; i < 5; i++) {
-        engine.addEvidence(hyps[0]!.id, makeEvidence({ id: `w${i}`, strength: 0.1, supports: true }))
+        engine.addEvidence(
+          hyps[0]!.id,
+          makeEvidence({ id: `w${i}`, strength: 0.1, supports: true }),
+        )
       }
       engine.addEvidence(hyps[1]!.id, makeEvidence({ id: 'strong', strength: 0.9, supports: true }))
       const ranked = engine.rankHypotheses()
@@ -924,11 +1007,18 @@ describe('HypothesisEngine', () => {
 
     it('should handle ranking a single hypothesis', () => {
       const engine = new HypothesisEngine()
-      const external = [{
-        id: 'solo', statement: 'only one',
-        confidence: 0.7, evidence: [] as any[], counterEvidence: [] as any[],
-        status: 'proposed' as const, domain: 'general', createdAt: Date.now(),
-      }]
+      const external = [
+        {
+          id: 'solo',
+          statement: 'only one',
+          confidence: 0.7,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'proposed' as const,
+          domain: 'general',
+          createdAt: Date.now(),
+        },
+      ]
       const ranked = engine.rankHypotheses(external)
       expect(ranked).toHaveLength(1)
       expect(ranked[0]!.id).toBe('solo')
@@ -936,11 +1026,18 @@ describe('HypothesisEngine', () => {
 
     it('should find no contradictions with a single hypothesis', () => {
       const engine = new HypothesisEngine()
-      const external = [{
-        id: 'solo', statement: 'only one',
-        confidence: 0.7, evidence: [] as any[], counterEvidence: [] as any[],
-        status: 'proposed' as const, domain: 'general', createdAt: Date.now(),
-      }]
+      const external = [
+        {
+          id: 'solo',
+          statement: 'only one',
+          confidence: 0.7,
+          evidence: [] as any[],
+          counterEvidence: [] as any[],
+          status: 'proposed' as const,
+          domain: 'general',
+          createdAt: Date.now(),
+        },
+      ]
       expect(engine.findContradictions(external)).toEqual([])
     })
 
@@ -958,18 +1055,28 @@ describe('HypothesisEngine', () => {
       const sharedEvId = 'shared_reverse'
       const hypotheses = [
         {
-          id: 'h1', statement: 'hypothesis one',
+          id: 'h1',
+          statement: 'hypothesis one',
           confidence: 0.5,
           evidence: [] as any[],
-          counterEvidence: [{ id: sharedEvId, description: 'ev', strength: 0.5, source: 'test', supports: false }],
-          status: 'proposed' as const, domain: 'general', createdAt: Date.now(),
+          counterEvidence: [
+            { id: sharedEvId, description: 'ev', strength: 0.5, source: 'test', supports: false },
+          ],
+          status: 'proposed' as const,
+          domain: 'general',
+          createdAt: Date.now(),
         },
         {
-          id: 'h2', statement: 'hypothesis two',
+          id: 'h2',
+          statement: 'hypothesis two',
           confidence: 0.5,
-          evidence: [{ id: sharedEvId, description: 'ev', strength: 0.5, source: 'test', supports: true }],
+          evidence: [
+            { id: sharedEvId, description: 'ev', strength: 0.5, source: 'test', supports: true },
+          ],
           counterEvidence: [] as any[],
-          status: 'proposed' as const, domain: 'general', createdAt: Date.now(),
+          status: 'proposed' as const,
+          domain: 'general',
+          createdAt: Date.now(),
         },
       ]
       const contradictions = engine.findContradictions(hypotheses)

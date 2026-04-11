@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  CodeIntentPredictor,
-  type ContextSignal,
-} from '../CodeIntentPredictor.js'
+import { CodeIntentPredictor, type ContextSignal } from '../CodeIntentPredictor.js'
 
 describe('CodeIntentPredictor', () => {
   let predictor: CodeIntentPredictor
@@ -158,7 +155,12 @@ describe('CodeIntentPredictor', () => {
 
     it('should increase confidence with more history', () => {
       const short = predictor.predictSequence(['create_class'])
-      const long = predictor.predictSequence(['setup_project', 'configure', 'create_class', 'create_function'])
+      const long = predictor.predictSequence([
+        'setup_project',
+        'configure',
+        'create_class',
+        'create_function',
+      ])
       expect(long.confidence).toBeGreaterThanOrEqual(short.confidence)
     })
   })
@@ -196,7 +198,12 @@ describe('CodeIntentPredictor', () => {
 
   describe('context management', () => {
     it('should add context signals', () => {
-      predictor.addContext({ type: 'code', content: 'function test() {}', timestamp: Date.now(), weight: 1 })
+      predictor.addContext({
+        type: 'code',
+        content: 'function test() {}',
+        timestamp: Date.now(),
+        weight: 1,
+      })
       expect(predictor.getContextHistory().length).toBe(1)
     })
 
@@ -209,14 +216,24 @@ describe('CodeIntentPredictor', () => {
     it('should trim to maxHistorySize', () => {
       const small = new CodeIntentPredictor({ maxHistorySize: 3 })
       for (let i = 0; i < 10; i++) {
-        small.addContext({ type: 'action', content: `action${i}`, timestamp: Date.now(), weight: 1 })
+        small.addContext({
+          type: 'action',
+          content: `action${i}`,
+          timestamp: Date.now(),
+          weight: 1,
+        })
       }
       expect(small.getContextHistory().length).toBeLessThanOrEqual(3)
     })
 
     it('should get top patterns', () => {
       for (let i = 0; i < 5; i++) {
-        predictor.addContext({ type: 'action', content: 'create', timestamp: Date.now(), weight: 1 })
+        predictor.addContext({
+          type: 'action',
+          content: 'create',
+          timestamp: Date.now(),
+          weight: 1,
+        })
       }
       predictor.addContext({ type: 'code', content: 'other', timestamp: Date.now(), weight: 1 })
       const patterns = predictor.getTopPatterns(3)

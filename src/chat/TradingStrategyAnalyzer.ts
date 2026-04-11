@@ -259,30 +259,47 @@ export class TradingStrategyAnalyzer {
     const quality = this.analyzeCodeQuality(code, detected)
     const perf = this.config.enablePerformanceChecks
       ? this.analyzePerformance(code, detected)
-      : { excessiveIndicatorCalls: false, hasOptimizableLoops: false, hasRedundantCalculations: false, usesBuiltinFunctions: true, performanceScore: 100, issues: [] }
+      : {
+          excessiveIndicatorCalls: false,
+          hasOptimizableLoops: false,
+          hasRedundantCalculations: false,
+          usesBuiltinFunctions: true,
+          performanceScore: 100,
+          issues: [],
+        }
     const backtest = this.config.enableBacktestChecks
       ? this.assessBacktestQuality(code, detected)
-      : { hasSpreadConsideration: true, hasSlippageHandling: true, hasCommissionModeling: true, hasMultiTimeframe: false, hasOutOfSampleTest: false, backtestScore: 100, issues: [] }
+      : {
+          hasSpreadConsideration: true,
+          hasSlippageHandling: true,
+          hasCommissionModeling: true,
+          hasMultiTimeframe: false,
+          hasOutOfSampleTest: false,
+          backtestScore: 100,
+          issues: [],
+        }
 
-    const allIssues = [
-      ...risk.issues,
-      ...quality.issues,
-      ...perf.issues,
-      ...backtest.issues,
-    ]
+    const allIssues = [...risk.issues, ...quality.issues, ...perf.issues, ...backtest.issues]
 
     const overallScore = Math.round(
       risk.riskScore * 0.35 +
-      quality.qualityScore * 0.25 +
-      perf.performanceScore * 0.20 +
-      backtest.backtestScore * 0.20,
+        quality.qualityScore * 0.25 +
+        perf.performanceScore * 0.2 +
+        backtest.backtestScore * 0.2,
     )
 
     const suggestions = this.generateSuggestions(allIssues, patterns.patterns, detected)
     const summary = this.generateSummary(detected, patterns.patterns, overallScore, allIssues)
 
     // Update stats
-    this.updateStats(detected, patterns.patterns, overallScore, risk.riskScore, quality.qualityScore, allIssues)
+    this.updateStats(
+      detected,
+      patterns.patterns,
+      overallScore,
+      risk.riskScore,
+      quality.qualityScore,
+      allIssues,
+    )
 
     return {
       language: detected,
@@ -363,7 +380,10 @@ export class TradingStrategyAnalyzer {
   // ── Pattern Detection ───────────────────────────────────────────────────
 
   /** Detect strategy patterns present in the code. */
-  detectPatterns(code: string): { patterns: StrategyPattern[]; confidence: Record<StrategyPattern, number> } {
+  detectPatterns(code: string): {
+    patterns: StrategyPattern[]
+    confidence: Record<StrategyPattern, number>
+  } {
     const confidence: Partial<Record<StrategyPattern, number>> = {}
 
     for (const rule of PATTERN_RULES) {
@@ -380,7 +400,9 @@ export class TradingStrategyAnalyzer {
 
     const patterns = Object.keys(confidence)
       .filter(k => (confidence[k as StrategyPattern] ?? 0) >= 0.3)
-      .sort((a, b) => (confidence[b as StrategyPattern] ?? 0) - (confidence[a as StrategyPattern] ?? 0)) as StrategyPattern[]
+      .sort(
+        (a, b) => (confidence[b as StrategyPattern] ?? 0) - (confidence[a as StrategyPattern] ?? 0),
+      ) as StrategyPattern[]
 
     // Fill in zero for undetected patterns
     const fullConfidence = {} as Record<StrategyPattern, number>
@@ -399,8 +421,9 @@ export class TradingStrategyAnalyzer {
     const codeLower = code.toLowerCase()
 
     // Stop-loss detection
-    const hasStopLoss = /\b(?:stoploss|stop.?loss|sl\b|SL\b|stopLoss|InpStopLoss|stop_loss)/i.test(code)
-      || /\bstrategy\.exit\b.*\bstop\b/i.test(code)
+    const hasStopLoss =
+      /\b(?:stoploss|stop.?loss|sl\b|SL\b|stopLoss|InpStopLoss|stop_loss)/i.test(code) ||
+      /\bstrategy\.exit\b.*\bstop\b/i.test(code)
     if (!hasStopLoss) {
       issues.push({
         severity: 'critical',
@@ -411,8 +434,9 @@ export class TradingStrategyAnalyzer {
     }
 
     // Take-profit detection
-    const hasTakeProfit = /\b(?:takeprofit|take.?profit|tp\b|TP\b|TakeProfit|InpTakeProfit|take_profit)/i.test(code)
-      || /\bstrategy\.exit\b.*\bprofit\b/i.test(code)
+    const hasTakeProfit =
+      /\b(?:takeprofit|take.?profit|tp\b|TP\b|TakeProfit|InpTakeProfit|take_profit)/i.test(code) ||
+      /\bstrategy\.exit\b.*\bprofit\b/i.test(code)
     if (!hasTakeProfit) {
       issues.push({
         severity: 'high',
@@ -423,7 +447,10 @@ export class TradingStrategyAnalyzer {
     }
 
     // Position sizing
-    const hasPositionSizing = /\b(?:lotsize|lot.?size|position.?size|risk.?percent|risk.?pct|AccountBalance|AccountEquity|strategy\.percent_of_equity)/i.test(code)
+    const hasPositionSizing =
+      /\b(?:lotsize|lot.?size|position.?size|risk.?percent|risk.?pct|AccountBalance|AccountEquity|strategy\.percent_of_equity)/i.test(
+        code,
+      )
     if (!hasPositionSizing) {
       issues.push({
         severity: 'high',
@@ -434,7 +461,8 @@ export class TradingStrategyAnalyzer {
     }
 
     // Max drawdown check
-    const hasMaxDrawdownCheck = /\b(?:max.?drawdown|drawdown|maxdd|equity.?low|AccountEquity)/i.test(code)
+    const hasMaxDrawdownCheck =
+      /\b(?:max.?drawdown|drawdown|maxdd|equity.?low|AccountEquity)/i.test(code)
     if (!hasMaxDrawdownCheck) {
       issues.push({
         severity: 'medium',
@@ -496,7 +524,11 @@ export class TradingStrategyAnalyzer {
     }
 
     // MQL-specific: multiple orders without max check
-    if ((language === 'mql4' || language === 'mql5') && !codeLower.includes('orderstotal') && !codeLower.includes('positionstotal')) {
+    if (
+      (language === 'mql4' || language === 'mql5') &&
+      !codeLower.includes('orderstotal') &&
+      !codeLower.includes('positionstotal')
+    ) {
       if (/\b(?:OrderSend|trade\.Buy|trade\.Sell)\b/.test(code)) {
         issues.push({
           severity: 'medium',
@@ -544,11 +576,12 @@ export class TradingStrategyAnalyzer {
         severity: 'high',
         category: 'quality',
         message: 'No error handling detected — trades may fail silently',
-        suggestion: language === 'mql4'
-          ? 'Check GetLastError() after OrderSend/OrderClose calls'
-          : language === 'mql5'
-            ? 'Check trade.ResultRetcode() after trade operations'
-            : 'Add error handling for edge cases',
+        suggestion:
+          language === 'mql4'
+            ? 'Check GetLastError() after OrderSend/OrderClose calls'
+            : language === 'mql5'
+              ? 'Check trade.ResultRetcode() after trade operations'
+              : 'Add error handling for edge cases',
       })
     }
 
@@ -565,7 +598,9 @@ export class TradingStrategyAnalyzer {
 
     // Comments detection
     const lines = code.split('\n')
-    const commentLines = lines.filter(l => l.trim().startsWith('//') || l.trim().startsWith('/*') || l.trim().startsWith('*')).length
+    const commentLines = lines.filter(
+      l => l.trim().startsWith('//') || l.trim().startsWith('/*') || l.trim().startsWith('*'),
+    ).length
     const hasComments = commentLines >= Math.max(2, lines.length * 0.05)
     if (!hasComments) {
       issues.push({
@@ -577,7 +612,10 @@ export class TradingStrategyAnalyzer {
     }
 
     // Input validation
-    const hasInputValidation = /\b(?:if\s*\(.*(?:lot|period|stop|take).*[<>=]|MathMax|MathMin|math\.max|math\.min|clamp)/i.test(code)
+    const hasInputValidation =
+      /\b(?:if\s*\(.*(?:lot|period|stop|take).*[<>=]|MathMax|MathMin|math\.max|math\.min|clamp)/i.test(
+        code,
+      )
     if (!hasInputValidation) {
       issues.push({
         severity: 'medium',
@@ -588,8 +626,10 @@ export class TradingStrategyAnalyzer {
     }
 
     // Resource cleanup (MQL)
-    const hasResourceCleanup = language === 'pinescript' ? true :
-      /\b(?:deinit|OnDeinit|ObjectDelete|IndicatorRelease|ArrayFree|Comment)\b/.test(code)
+    const hasResourceCleanup =
+      language === 'pinescript'
+        ? true
+        : /\b(?:deinit|OnDeinit|ObjectDelete|IndicatorRelease|ArrayFree|Comment)\b/.test(code)
     if (!hasResourceCleanup && (language === 'mql4' || language === 'mql5')) {
       issues.push({
         severity: 'low',
@@ -656,7 +696,11 @@ export class TradingStrategyAnalyzer {
       case 'mql4':
         return /\bGetLastError\s*\(\)/.test(code) || /\bticket\s*[<>=]/.test(code)
       case 'mql5':
-        return /\bResultRetcode\b/.test(code) || /\bRETCODE\b/.test(code) || /\bGetLastError\s*\(\)/.test(code)
+        return (
+          /\bResultRetcode\b/.test(code) ||
+          /\bRETCODE\b/.test(code) ||
+          /\bGetLastError\s*\(\)/.test(code)
+        )
       case 'pinescript':
         return /\bna\b/.test(code) || /\bnz\s*\(/.test(code) || /\bbarstate\b/.test(code)
       default:
@@ -671,7 +715,9 @@ export class TradingStrategyAnalyzer {
     const issues: StrategyIssue[] = []
 
     // Excessive indicator calls
-    const indicatorCalls = (code.match(/\b(?:iMA|iRSI|iMACD|iStochastic|iBollinger|iATR|iCCI|iADX|ta\.\w+)\s*\(/g) || []).length
+    const indicatorCalls = (
+      code.match(/\b(?:iMA|iRSI|iMACD|iStochastic|iBollinger|iATR|iCCI|iADX|ta\.\w+)\s*\(/g) || []
+    ).length
     const excessiveIndicatorCalls = indicatorCalls > 10
     if (excessiveIndicatorCalls) {
       issues.push({
@@ -683,16 +729,18 @@ export class TradingStrategyAnalyzer {
     }
 
     // Optimizable loops
-    const hasOptimizableLoops = /\bfor\s*\(.*Bars\b/.test(code) || /\bfor\s*\(.*rates_total\b/.test(code)
+    const hasOptimizableLoops =
+      /\bfor\s*\(.*Bars\b/.test(code) || /\bfor\s*\(.*rates_total\b/.test(code)
     const usesCountedBars = /\b(?:IndicatorCounted|prev_calculated)\b/.test(code)
     if (hasOptimizableLoops && !usesCountedBars) {
       issues.push({
         severity: 'high',
         category: 'performance',
         message: 'Loop iterates over all bars without using counted bars optimization',
-        suggestion: language === 'mql4'
-          ? 'Use IndicatorCounted() to skip already-calculated bars'
-          : 'Use prev_calculated to skip already-calculated bars',
+        suggestion:
+          language === 'mql4'
+            ? 'Use IndicatorCounted() to skip already-calculated bars'
+            : 'Use prev_calculated to skip already-calculated bars',
       })
     }
 
@@ -757,8 +805,10 @@ export class TradingStrategyAnalyzer {
       return /\b(?:iMA|iRSI|iMACD|iStochastic|iATR|iBollinger|iCCI)\s*\(/.test(code)
     }
     if (language === 'mql5') {
-      return /\b(?:iMA|iRSI|iMACD|iStochastic|iATR|iBands|iCCI)\s*\(/.test(code)
-        || /\bCIndicator\b/.test(code)
+      return (
+        /\b(?:iMA|iRSI|iMACD|iStochastic|iATR|iBands|iCCI)\s*\(/.test(code) ||
+        /\bCIndicator\b/.test(code)
+      )
     }
     return true // PineScript always uses built-in ta.*
   }
@@ -770,7 +820,10 @@ export class TradingStrategyAnalyzer {
     const issues: StrategyIssue[] = []
 
     // Spread consideration
-    const hasSpreadConsideration = /\b(?:spread|Spread|Ask\s*-\s*Bid|MarketInfo.*MODE_SPREAD|SymbolInfoDouble.*SPREAD|slippage)/i.test(code)
+    const hasSpreadConsideration =
+      /\b(?:spread|Spread|Ask\s*-\s*Bid|MarketInfo.*MODE_SPREAD|SymbolInfoDouble.*SPREAD|slippage)/i.test(
+        code,
+      )
     if (!hasSpreadConsideration) {
       issues.push({
         severity: 'medium',
@@ -781,7 +834,9 @@ export class TradingStrategyAnalyzer {
     }
 
     // Slippage handling
-    const hasSlippageHandling = /\b(?:slippage|Slippage|SLIPPAGE|deviation|maxDeviation)/i.test(code)
+    const hasSlippageHandling = /\b(?:slippage|Slippage|SLIPPAGE|deviation|maxDeviation)/i.test(
+      code,
+    )
     if (!hasSlippageHandling && language !== 'pinescript') {
       issues.push({
         severity: 'low',
@@ -792,25 +847,32 @@ export class TradingStrategyAnalyzer {
     }
 
     // Commission modeling
-    const hasCommissionModeling = /\b(?:commission|Commission|COMMISSION|fee|cost.*trade)/i.test(code)
-      || /\bstrategy\s*\(.*commission/i.test(code)
+    const hasCommissionModeling =
+      /\b(?:commission|Commission|COMMISSION|fee|cost.*trade)/i.test(code) ||
+      /\bstrategy\s*\(.*commission/i.test(code)
     if (!hasCommissionModeling) {
       issues.push({
         severity: 'low',
         category: 'logic',
         message: 'No commission modeling — profits may be overstated',
-        suggestion: language === 'pinescript'
-          ? 'Add commission parameter to strategy() declaration'
-          : 'Account for trading costs in profit calculations',
+        suggestion:
+          language === 'pinescript'
+            ? 'Add commission parameter to strategy() declaration'
+            : 'Account for trading costs in profit calculations',
       })
     }
 
     // Multi-timeframe usage
-    const hasMultiTimeframe = /\b(?:iMA\s*\(\s*NULL\s*,\s*PERIOD_(?!CURRENT)|request\.multi|security\s*\(|timeframe\.)/i.test(code)
-      || /\binput\.timeframe\b/.test(code)
+    const hasMultiTimeframe =
+      /\b(?:iMA\s*\(\s*NULL\s*,\s*PERIOD_(?!CURRENT)|request\.multi|security\s*\(|timeframe\.)/i.test(
+        code,
+      ) || /\binput\.timeframe\b/.test(code)
 
     // Out-of-sample / walk-forward
-    const hasOutOfSampleTest = /\b(?:walk.?forward|out.?of.?sample|oos|validation.?period|isTesting|IsOptimization)/i.test(code)
+    const hasOutOfSampleTest =
+      /\b(?:walk.?forward|out.?of.?sample|oos|validation.?period|isTesting|IsOptimization)/i.test(
+        code,
+      )
 
     // Calculate backtest score
     let backtestScore = 40 // Base: just having code
@@ -834,7 +896,11 @@ export class TradingStrategyAnalyzer {
   // ── Suggestion Generation ──────────────────────────────────────────────
 
   /** Generate prioritized suggestions based on issues. */
-  generateSuggestions(issues: StrategyIssue[], patterns: StrategyPattern[], language: TradingLanguage): string[] {
+  generateSuggestions(
+    issues: StrategyIssue[],
+    patterns: StrategyPattern[],
+    language: TradingLanguage,
+  ): string[] {
     const suggestions: string[] = []
 
     // Critical issues first
@@ -851,21 +917,29 @@ export class TradingStrategyAnalyzer {
 
     // Pattern-specific suggestions
     if (patterns.includes('martingale')) {
-      suggestions.push('⚠️ Martingale strategies have a mathematical certainty of account blow-up given enough trades. Consider fixed-risk alternatives.')
+      suggestions.push(
+        '⚠️ Martingale strategies have a mathematical certainty of account blow-up given enough trades. Consider fixed-risk alternatives.',
+      )
     }
 
     if (patterns.includes('grid')) {
-      suggestions.push('💡 Grid strategies can accumulate large drawdowns. Consider implementing max grid levels and equity-based stop.')
+      suggestions.push(
+        '💡 Grid strategies can accumulate large drawdowns. Consider implementing max grid levels and equity-based stop.',
+      )
     }
 
     // Language-specific suggestions
     if (language === 'mql4') {
-      suggestions.push('💡 MQL4: Consider migrating to MQL5 for better object-oriented design and hedging support.')
+      suggestions.push(
+        '💡 MQL4: Consider migrating to MQL5 for better object-oriented design and hedging support.',
+      )
     }
 
     if (language === 'pinescript') {
       if (patterns.length > 0) {
-        suggestions.push('💡 PineScript: Use strategy.exit() with both stop and limit for complete trade management.')
+        suggestions.push(
+          '💡 PineScript: Use strategy.exit() with both stop and limit for complete trade management.',
+        )
       }
     }
 
@@ -881,16 +955,27 @@ export class TradingStrategyAnalyzer {
   // ── Summary Generation ─────────────────────────────────────────────────
 
   /** Generate a human-readable summary. */
-  generateSummary(language: TradingLanguage, patterns: StrategyPattern[], score: number, issues: StrategyIssue[]): string {
-    const langName = language === 'mql4' ? 'MQL4' : language === 'mql5' ? 'MQL5' : language === 'pinescript' ? 'PineScript' : 'Unknown'
-    const patternStr = patterns.length > 0
-      ? patterns.join(', ')
-      : 'no clear pattern'
+  generateSummary(
+    language: TradingLanguage,
+    patterns: StrategyPattern[],
+    score: number,
+    issues: StrategyIssue[],
+  ): string {
+    const langName =
+      language === 'mql4'
+        ? 'MQL4'
+        : language === 'mql5'
+          ? 'MQL5'
+          : language === 'pinescript'
+            ? 'PineScript'
+            : 'Unknown'
+    const patternStr = patterns.length > 0 ? patterns.join(', ') : 'no clear pattern'
 
     const critCount = issues.filter(i => i.severity === 'critical').length
     const highCount = issues.filter(i => i.severity === 'high').length
 
-    const grade = score >= 80 ? 'A' : score >= 60 ? 'B' : score >= 40 ? 'C' : score >= 20 ? 'D' : 'F'
+    const grade =
+      score >= 80 ? 'A' : score >= 60 ? 'B' : score >= 40 ? 'C' : score >= 20 ? 'D' : 'F'
 
     let summary = `${langName} strategy analysis: Grade ${grade} (${score}/100). `
     summary += `Detected patterns: ${patternStr}. `
@@ -951,7 +1036,8 @@ export class TradingStrategyAnalyzer {
     }
 
     for (const issue of issues) {
-      this.stats.issuesByCategory[issue.category] = (this.stats.issuesByCategory[issue.category] ?? 0) + 1
+      this.stats.issuesByCategory[issue.category] =
+        (this.stats.issuesByCategory[issue.category] ?? 0) + 1
     }
 
     this.stats.languageBreakdown[language] = (this.stats.languageBreakdown[language] ?? 0) + 1

@@ -62,16 +62,12 @@ export function getPersistenceThreshold(
   if (!Number.isFinite(declaredMaxResultSizeChars)) {
     return declaredMaxResultSizeChars
   }
-  const overrides = getFeatureValue_CACHED_MAY_BE_STALE<Record<
-    string,
-    number
-  > | null>(PERSIST_THRESHOLD_OVERRIDE_FLAG, {})
+  const overrides = getFeatureValue_CACHED_MAY_BE_STALE<Record<string, number> | null>(
+    PERSIST_THRESHOLD_OVERRIDE_FLAG,
+    {},
+  )
   const override = overrides?.[toolName]
-  if (
-    typeof override === 'number' &&
-    Number.isFinite(override) &&
-    override > 0
-  ) {
+  if (typeof override === 'number' && Number.isFinite(override) && override > 0) {
     return override
   }
   return Math.min(declaredMaxResultSizeChars, DEFAULT_MAX_RESULT_SIZE_CHARS)
@@ -160,9 +156,7 @@ export async function persistToolResult(
   // original messages. Use 'wx' instead of a stat-then-write race.
   try {
     await writeFile(filepath, contentStr, { encoding: 'utf-8', flag: 'wx' })
-    logForDebugging(
-      `Persisted tool result to ${filepath} (${formatFileSize(contentStr.length)})`,
-    )
+    logForDebugging(`Persisted tool result to ${filepath} (${formatFileSize(contentStr.length)})`)
   } catch (error) {
     if (getErrnoCode(error) !== 'EEXIST') {
       logError(toError(error))
@@ -186,9 +180,7 @@ export async function persistToolResult(
 /**
  * Build a message for large tool results with preview
  */
-export function buildLargeToolResultMessage(
-  result: PersistedToolResult,
-): string {
+export function buildLargeToolResultMessage(result: PersistedToolResult): string {
   let message = `${PERSISTED_OUTPUT_TAG}\n`
   message += `Output too large (${formatFileSize(result.originalSize)}). Full output saved to: ${result.filepath}\n\n`
   message += `Preview (first ${formatFileSize(PREVIEW_SIZE_BYTES)}):\n`
@@ -206,18 +198,12 @@ export async function processToolResultBlock<T>(
   tool: {
     name: string
     maxResultSizeChars: number
-    mapToolResultToToolResultBlockParam: (
-      result: T,
-      toolUseID: string,
-    ) => ToolResultBlockParam
+    mapToolResultToToolResultBlockParam: (result: T, toolUseID: string) => ToolResultBlockParam
   },
   toolUseResult: T,
   toolUseID: string,
 ): Promise<ToolResultBlockParam> {
-  const toolResultBlock = tool.mapToolResultToToolResultBlockParam(
-    toolUseResult,
-    toolUseID,
-  )
+  const toolResultBlock = tool.mapToolResultToToolResultBlockParam(toolUseResult, toolUseID)
   return maybePersistLargeToolResult(
     toolResultBlock,
     tool.name,
@@ -247,9 +233,7 @@ export async function processPreMappedToolResultBlock(
  * only blocks are text blocks with empty/whitespace text. Non-text blocks
  * (images, tool_reference) are treated as non-empty.
  */
-export function isToolResultContentEmpty(
-  content: ToolResultBlockParam['content'],
-): boolean {
+export function isToolResultContentEmpty(content: ToolResultBlockParam['content']): boolean {
   if (!content) return true
   if (typeof content === 'string') return content.trim() === ''
   if (!Array.isArray(content)) return false
@@ -419,15 +403,8 @@ export function cloneContentReplacementState(
  * so a flag served as null/string/NaN leaks through.
  */
 export function getPerMessageBudgetLimit(): number {
-  const override = getFeatureValue_CACHED_MAY_BE_STALE<number | null>(
-    'tengu_hawthorn_window',
-    null,
-  )
-  if (
-    typeof override === 'number' &&
-    Number.isFinite(override) &&
-    override > 0
-  ) {
+  const override = getFeatureValue_CACHED_MAY_BE_STALE<number | null>('tengu_hawthorn_window', null)
+  if (typeof override === 'number' && Number.isFinite(override) && override > 0) {
     return override
   }
   return MAX_TOOL_RESULTS_PER_MESSAGE_CHARS
@@ -448,16 +425,10 @@ export function provisionContentReplacementState(
   initialMessages?: Message[],
   initialContentReplacements?: ContentReplacementRecord[],
 ): ContentReplacementState | undefined {
-  const enabled = getFeatureValue_CACHED_MAY_BE_STALE(
-    'tengu_hawthorn_steeple',
-    false,
-  )
+  const enabled = getFeatureValue_CACHED_MAY_BE_STALE('tengu_hawthorn_steeple', false)
   if (!enabled) return undefined
   if (initialMessages) {
-    return reconstructContentReplacementState(
-      initialMessages,
-      initialContentReplacements ?? [],
-    )
+    return reconstructContentReplacementState(initialMessages, initialContentReplacements ?? [])
   }
   return createContentReplacementState()
 }
@@ -478,10 +449,7 @@ export type ContentReplacementRecord = {
   replacement: string
 }
 
-export type ToolResultReplacementRecord = Extract<
-  ContentReplacementRecord,
-  { kind: 'tool-result' }
->
+export type ToolResultReplacementRecord = Extract<ContentReplacementRecord, { kind: 'tool-result' }>
 
 type ToolResultCandidate = {
   toolUseId: string
@@ -495,37 +463,26 @@ type CandidatePartition = {
   fresh: ToolResultCandidate[]
 }
 
-function isContentAlreadyCompacted(
-  content: ToolResultBlockParam['content'],
-): boolean {
+function isContentAlreadyCompacted(content: ToolResultBlockParam['content']): boolean {
   // All budget-produced content starts with the tag (buildLargeToolResultMessage).
   // `.startsWith()` avoids false-positives when the tag appears anywhere else
   // in the content (e.g., reading this source file).
   return typeof content === 'string' && content.startsWith(PERSISTED_OUTPUT_TAG)
 }
 
-function hasImageBlock(
-  content: NonNullable<ToolResultBlockParam['content']>,
-): boolean {
+function hasImageBlock(content: NonNullable<ToolResultBlockParam['content']>): boolean {
   return (
     Array.isArray(content) &&
-    content.some(
-      b => typeof b === 'object' && 'type' in b && b.type === 'image',
-    )
+    content.some(b => typeof b === 'object' && 'type' in b && b.type === 'image')
   )
 }
 
-function contentSize(
-  content: NonNullable<ToolResultBlockParam['content']>,
-): number {
+function contentSize(content: NonNullable<ToolResultBlockParam['content']>): number {
   if (typeof content === 'string') return content.length
   // Sum text-block lengths directly. Slightly under-counts vs serialized
   // (no JSON framing), but the budget is a rough token heuristic anyway.
   // Avoids allocating a content-sized string every enforcement pass.
-  return content.reduce(
-    (sum, b) => sum + (b.type === 'text' ? b.text.length : 0),
-    0,
-  )
+  return content.reduce((sum, b) => sum + (b.type === 'text' ? b.text.length : 0), 0)
 }
 
 /**
@@ -597,9 +554,7 @@ function collectCandidatesFromMessage(message: Message): ToolResultCandidate[] {
  *
  * Only groups with at least one eligible candidate are returned.
  */
-function collectCandidatesByMessage(
-  messages: Message[],
-): ToolResultCandidate[][] {
+function collectCandidatesByMessage(messages: Message[]): ToolResultCandidate[][] {
   const groups: ToolResultCandidate[][] = []
   let current: ToolResultCandidate[] = []
 
@@ -716,9 +671,7 @@ function replaceToolResultContents(
         content: content.map(block => {
           if (block.type !== 'tool_result') return block
           const replacement = replacementMap.get(block.tool_use_id)
-          return replacement === undefined
-            ? block
-            : { ...block, content: replacement }
+          return replacement === undefined ? block : { ...block, content: replacement }
         }),
       },
     }
@@ -775,11 +728,9 @@ export async function enforceToolResultBudget(
   newlyReplaced: ToolResultReplacementRecord[]
 }> {
   const candidatesByMessage = collectCandidatesByMessage(messages)
-  const nameByToolUseId =
-    skipToolNames.size > 0 ? buildToolNameMap(messages) : undefined
+  const nameByToolUseId = skipToolNames.size > 0 ? buildToolNameMap(messages) : undefined
   const shouldSkip = (id: string): boolean =>
-    nameByToolUseId !== undefined &&
-    skipToolNames.has(nameByToolUseId.get(id) ?? '')
+    nameByToolUseId !== undefined && skipToolNames.has(nameByToolUseId.get(id) ?? '')
   // Resolve once per call. A mid-session flag change only affects FRESH
   // messages (prior decisions are frozen via seenIds/replacements), so
   // prompt cache for already-seen content is preserved regardless.
@@ -794,10 +745,7 @@ export async function enforceToolResultBudget(
   let messagesOverBudget = 0
 
   for (const candidates of candidatesByMessage) {
-    const { mustReapply, frozen, fresh } = partitionByPriorDecision(
-      candidates,
-      state,
-    )
+    const { mustReapply, frozen, fresh } = partitionByPriorDecision(candidates, state)
 
     // Re-apply: pure Map lookups. No file I/O, byte-identical, cannot fail.
     mustReapply.forEach(c => replacementMap.set(c.toolUseId, c.replacement))
@@ -826,9 +774,7 @@ export async function enforceToolResultBudget(
     const freshSize = eligible.reduce((sum, c) => sum + c.size, 0)
 
     const selected =
-      frozenSize + freshSize > limit
-        ? selectFreshToReplace(eligible, frozenSize, limit)
-        : []
+      frozenSize + freshSize > limit ? selectFreshToReplace(eligible, frozenSize, limit) : []
 
     // Mark non-persisting candidates as seen NOW (synchronously). IDs
     // selected for persist are marked seen AFTER the await, alongside
@@ -875,12 +821,8 @@ export async function enforceToolResultBudget(
     logEvent('tengu_tool_result_persisted_message_budget', {
       originalSizeBytes: replacement.originalSize,
       persistedSizeBytes: replacement.content.length,
-      estimatedOriginalTokens: Math.ceil(
-        replacement.originalSize / BYTES_PER_TOKEN,
-      ),
-      estimatedPersistedTokens: Math.ceil(
-        replacement.content.length / BYTES_PER_TOKEN,
-      ),
+      estimatedOriginalTokens: Math.ceil(replacement.originalSize / BYTES_PER_TOKEN),
+      estimatedPersistedTokens: Math.ceil(replacement.content.length / BYTES_PER_TOKEN),
     })
   }
 

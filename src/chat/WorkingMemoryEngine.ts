@@ -22,7 +22,14 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type MemorySlotType = 'fact' | 'goal' | 'constraint' | 'intermediate' | 'context' | 'instruction' | 'hypothesis'
+export type MemorySlotType =
+  | 'fact'
+  | 'goal'
+  | 'constraint'
+  | 'intermediate'
+  | 'context'
+  | 'instruction'
+  | 'hypothesis'
 
 export type AttentionLevel = 'focused' | 'active' | 'peripheral' | 'decaying'
 
@@ -35,8 +42,8 @@ export interface MemorySlot {
   lastAccessedAt: number
   accessCount: number
   attention: AttentionLevel
-  priority: number          // 0-1
-  decay: number             // current decay factor 0-1 (1 = fresh, 0 = faded)
+  priority: number // 0-1
+  decay: number // current decay factor 0-1 (1 = fresh, 0 = faded)
   readonly bindings: string[] // IDs of related slots
   readonly chunkId: string | null
 }
@@ -77,14 +84,14 @@ export interface InterferenceResult {
 }
 
 export interface WorkingMemoryEngineConfig {
-  readonly maxSlots: number             // Default: 9 (7+2)
-  readonly decayRatePerSecond: number   // Default: 0.001
-  readonly focusBoost: number           // Default: 0.3
-  readonly accessBoost: number          // Default: 0.1
-  readonly chunkCapacitySaving: number  // Default: 0.6 (chunk saves 60% of slot capacity)
+  readonly maxSlots: number // Default: 9 (7+2)
+  readonly decayRatePerSecond: number // Default: 0.001
+  readonly focusBoost: number // Default: 0.3
+  readonly accessBoost: number // Default: 0.1
+  readonly chunkCapacitySaving: number // Default: 0.6 (chunk saves 60% of slot capacity)
   readonly interferenceThreshold: number // Default: 0.5
-  readonly maxScratchpadEntries: number  // Default: 50
-  readonly maxChunks: number            // Default: 20
+  readonly maxScratchpadEntries: number // Default: 50
+  readonly maxChunks: number // Default: 20
 }
 
 export interface WorkingMemoryEngineStats {
@@ -128,7 +135,12 @@ function clamp(v: number, lo: number, hi: number): number {
 }
 
 function tokenize(text: string): Set<string> {
-  return new Set(text.toLowerCase().split(/\s+/).filter(t => t.length > 2))
+  return new Set(
+    text
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(t => t.length > 2),
+  )
 }
 
 function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
@@ -162,11 +174,15 @@ export class WorkingMemoryEngine {
   // ── Slot management ────────────────────────────────────────────────────
 
   /** Store an item in working memory. Evicts lowest-priority if full. */
-  store(type: MemorySlotType, content: string, options: {
-    priority?: number
-    metadata?: Record<string, string>
-    bindings?: string[]
-  } = {}): MemorySlot {
+  store(
+    type: MemorySlotType,
+    content: string,
+    options: {
+      priority?: number
+      metadata?: Record<string, string>
+      bindings?: string[]
+    } = {},
+  ): MemorySlot {
     // Apply decay first
     this.applyDecay()
 
@@ -356,10 +372,18 @@ export class WorkingMemoryEngine {
 
     for (const slot of this.slots.values()) {
       switch (slot.attention) {
-        case 'focused': focused.push(slot); break
-        case 'active': active.push(slot); break
-        case 'peripheral': peripheral.push(slot); break
-        case 'decaying': decaying.push(slot); break
+        case 'focused':
+          focused.push(slot)
+          break
+        case 'active':
+          active.push(slot)
+          break
+        case 'peripheral':
+          peripheral.push(slot)
+          break
+        case 'decaying':
+          decaying.push(slot)
+          break
       }
     }
 
@@ -391,9 +415,14 @@ export class WorkingMemoryEngine {
         if (sim < this.config.interferenceThreshold) continue
 
         // Determine type
-        const hasNeg1 = /\b(not|no|never|none|isn't|aren't|doesn't|don't|won't|can't)\b/i.test(s1.content)
-        const hasNeg2 = /\b(not|no|never|none|isn't|aren't|doesn't|don't|won't|can't)\b/i.test(s2.content)
-        const type = hasNeg1 !== hasNeg2 ? 'contradiction' : sim > 0.8 ? 'redundancy' : 'competition'
+        const hasNeg1 = /\b(not|no|never|none|isn't|aren't|doesn't|don't|won't|can't)\b/i.test(
+          s1.content,
+        )
+        const hasNeg2 = /\b(not|no|never|none|isn't|aren't|doesn't|don't|won't|can't)\b/i.test(
+          s2.content,
+        )
+        const type =
+          hasNeg1 !== hasNeg2 ? 'contradiction' : sim > 0.8 ? 'redundancy' : 'competition'
 
         results.push({
           slot1Id: s1.id,
@@ -465,7 +494,7 @@ export class WorkingMemoryEngine {
     }
 
     for (const slot of this.slots.values()) {
-      count += chunkedIds.has(slot.id) ? (1 - this.config.chunkCapacitySaving) : 1
+      count += chunkedIds.has(slot.id) ? 1 - this.config.chunkCapacitySaving : 1
     }
     return count
   }
@@ -478,9 +507,8 @@ export class WorkingMemoryEngine {
       totalItemsEvicted: this.stats.totalEvicted,
       totalChunksCreated: this.stats.totalChunks,
       totalScratchpadEntries: this.stats.totalScratchpad,
-      avgSlotLifetime: this.stats.lifetimeCount > 0
-        ? this.stats.totalLifetime / this.stats.lifetimeCount
-        : 0,
+      avgSlotLifetime:
+        this.stats.lifetimeCount > 0 ? this.stats.totalLifetime / this.stats.lifetimeCount : 0,
       interferenceCount: this.stats.interferenceCount,
       currentOccupancy: this.getEffectiveOccupancy(),
     }
@@ -497,7 +525,10 @@ export class WorkingMemoryEngine {
     })
   }
 
-  static deserialize(json: string, config?: Partial<WorkingMemoryEngineConfig>): WorkingMemoryEngine {
+  static deserialize(
+    json: string,
+    config?: Partial<WorkingMemoryEngineConfig>,
+  ): WorkingMemoryEngine {
     const engine = new WorkingMemoryEngine(config)
     try {
       const data = JSON.parse(json)
@@ -511,7 +542,9 @@ export class WorkingMemoryEngine {
         engine.scratchpad.push(...data.scratchpad)
       }
       if (data.stats) Object.assign(engine.stats, data.stats)
-    } catch { /* fresh engine on failure */ }
+    } catch {
+      /* fresh engine on failure */
+    }
     return engine
   }
 }

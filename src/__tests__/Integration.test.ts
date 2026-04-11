@@ -19,8 +19,19 @@ vi.mock('@anthropic-ai/sdk', () => ({
 }))
 
 import { CacheService } from '../services/cache/CacheService.js'
-import { validateToolInput, detectSqlInjection, detectPathTraversal, validateSchema } from '../utils/inputValidation.js'
-import { Logger, LogLevel, bufferTransport, generateCorrelationId, type LogEntry } from '../utils/logger.js'
+import {
+  validateToolInput,
+  detectSqlInjection,
+  detectPathTraversal,
+  validateSchema,
+} from '../utils/inputValidation.js'
+import {
+  Logger,
+  LogLevel,
+  bufferTransport,
+  generateCorrelationId,
+  type LogEntry,
+} from '../utils/logger.js'
 import { MetricsRegistry } from '../services/metrics.js'
 import { RetryPolicy, CircuitBreaker } from '../services/apiRetry.js'
 import { PluginSDK, definePlugin } from '../plugins/PluginSDK.js'
@@ -88,7 +99,7 @@ describe('Integration: Cache + Validation + Logging Pipeline', () => {
 
     // Verify logging
     expect(logBuffer.length).toBeGreaterThanOrEqual(2)
-    expect(logBuffer.every((entry) => entry.correlationId === correlationId)).toBe(true)
+    expect(logBuffer.every(entry => entry.correlationId === correlationId)).toBe(true)
     log.info('Cache-through complete', { hits: cacheHits.get(), misses: cacheMisses.get() })
   })
 
@@ -181,7 +192,7 @@ describe('Integration: Retry + CircuitBreaker + Metrics', () => {
       maxRetries: 3,
       baseDelayMs: 1,
       isRetryable: () => true,
-      onRetry: (attempt) => {
+      onRetry: attempt => {
         retryCounter.inc({ attempt: String(attempt) })
       },
     })
@@ -225,7 +236,7 @@ describe('Integration: Retry + CircuitBreaker + Metrics', () => {
     expect(circuitOpenCounter.get()).toBe(1)
 
     // Wait for reset
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     // Should recover
     const result = await breaker.execute(async () => 'recovered')
@@ -272,7 +283,7 @@ describe('Integration: Plugin SDK with Knowledge and Tools', () => {
           {
             name: 'calculate',
             description: 'Evaluate a math expression',
-            execute: async (input) => {
+            execute: async input => {
               const expr = String(input.expression)
               // Simple evaluator for test
               if (expr === '2+2') return { result: 4 }
@@ -306,7 +317,13 @@ describe('Integration: Plugin SDK with Knowledge and Tools', () => {
       {
         manifest: sdk.getPlugin('math-helper')!.manifest,
         grantedPermissions: ['tools:execute'],
-        storage: { get: () => undefined, set: () => {}, delete: () => false, clear: () => {}, keys: () => [] },
+        storage: {
+          get: () => undefined,
+          set: () => {},
+          delete: () => false,
+          clear: () => {},
+          keys: () => [],
+        },
         log: { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} },
       },
     )
@@ -334,10 +351,10 @@ describe('Integration: Validation + Schema for complex inputs', () => {
 
     // Reject injection with multiple techniques
     const attacks = [
-      "1; DROP TABLE users; --",
+      '1; DROP TABLE users; --',
       "' OR 1=1 --",
       "admin'/*",
-      "1 UNION SELECT * FROM passwords",
+      '1 UNION SELECT * FROM passwords',
       "'; WAITFOR DELAY '0:0:10'--",
     ]
 

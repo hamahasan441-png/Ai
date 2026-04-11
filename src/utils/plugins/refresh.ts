@@ -155,9 +155,7 @@ export async function refreshActivePlugins(
   } catch (e) {
     hook_load_failed = true
     logError(e)
-    logForDebugging(
-      `refreshActivePlugins: loadPluginHooks failed: ${errorMessage(e)}`,
-    )
+    logForDebugging(`refreshActivePlugins: loadPluginHooks failed: ${errorMessage(e)}`)
   }
 
   const hook_count = enabled.reduce((sum, p) => {
@@ -165,8 +163,7 @@ export async function refreshActivePlugins(
     return (
       sum +
       Object.values(p.hooksConfig).reduce(
-        (s, matchers) =>
-          s + (matchers?.reduce((h, m) => h + m.hooks.length, 0) ?? 0),
+        (s, matchers) => s + (matchers?.reduce((h, m) => h + m.hooks.length, 0) ?? 0),
         0,
       )
     )
@@ -196,10 +193,7 @@ export async function refreshActivePlugins(
  * deduplicating. Same logic as refreshPlugins()/updatePluginState(), extracted
  * so refresh.ts doesn't leave those errors stranded.
  */
-function mergePluginErrors(
-  existing: PluginError[],
-  fresh: PluginError[],
-): PluginError[] {
+function mergePluginErrors(existing: PluginError[], fresh: PluginError[]): PluginError[] {
   const preserved = existing.filter(
     e => e.source === 'lsp-manager' || e.source.startsWith('plugin:'),
   )

@@ -32,14 +32,79 @@ export interface TfIdfResult {
 
 /** Common English stop words to filter out. */
 const STOP_WORDS = new Set([
-  'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-  'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
-  'should', 'may', 'might', 'can', 'shall', 'to', 'of', 'in', 'for',
-  'on', 'with', 'at', 'by', 'from', 'as', 'into', 'about', 'that',
-  'this', 'it', 'its', 'and', 'or', 'not', 'but', 'if', 'then',
-  'so', 'up', 'out', 'no', 'just', 'also', 'very', 'what', 'how',
-  'when', 'where', 'which', 'who', 'whom', 'why', 'i', 'me', 'my',
-  'we', 'our', 'you', 'your', 'he', 'she', 'they', 'them', 'their',
+  'a',
+  'an',
+  'the',
+  'is',
+  'are',
+  'was',
+  'were',
+  'be',
+  'been',
+  'being',
+  'have',
+  'has',
+  'had',
+  'do',
+  'does',
+  'did',
+  'will',
+  'would',
+  'could',
+  'should',
+  'may',
+  'might',
+  'can',
+  'shall',
+  'to',
+  'of',
+  'in',
+  'for',
+  'on',
+  'with',
+  'at',
+  'by',
+  'from',
+  'as',
+  'into',
+  'about',
+  'that',
+  'this',
+  'it',
+  'its',
+  'and',
+  'or',
+  'not',
+  'but',
+  'if',
+  'then',
+  'so',
+  'up',
+  'out',
+  'no',
+  'just',
+  'also',
+  'very',
+  'what',
+  'how',
+  'when',
+  'where',
+  'which',
+  'who',
+  'whom',
+  'why',
+  'i',
+  'me',
+  'my',
+  'we',
+  'our',
+  'you',
+  'your',
+  'he',
+  'she',
+  'they',
+  'them',
+  'their',
 ])
 
 /** Tokenize text into lowercase words, filtering stop words and short tokens. */
@@ -63,10 +128,7 @@ export function generateNgrams(tokens: string[], n: number): string[] {
 /** Generate bigrams and trigrams from text. */
 export function getNgrams(text: string): string[] {
   const tokens = tokenize(text)
-  return [
-    ...generateNgrams(tokens, 2),
-    ...generateNgrams(tokens, 3),
-  ]
+  return [...generateNgrams(tokens, 2), ...generateNgrams(tokens, 3)]
 }
 
 // ── TF-IDF Core ──
@@ -151,9 +213,9 @@ export function ngramOverlapScore(text1: string, text2: string): number {
  * ```
  */
 export class TfIdfScorer {
-  private documents: Map<string, string> = new Map()        // id → original text
+  private documents: Map<string, string> = new Map() // id → original text
   private documentTokens: Map<string, string[]> = new Map() // id → tokens
-  private idfCache: Map<string, number> = new Map()         // term → IDF (invalidated on add/remove)
+  private idfCache: Map<string, number> = new Map() // term → IDF (invalidated on add/remove)
   private dirty = true
 
   /** Number of documents in the corpus. */
@@ -258,7 +320,10 @@ export class TfIdfScorer {
    * Score a single query against a single document (not in corpus).
    * Useful for ad-hoc comparison without adding to the index.
    */
-  scorePair(query: string, documentText: string): { tfidfScore: number; ngramScore: number; score: number } {
+  scorePair(
+    query: string,
+    documentText: string,
+  ): { tfidfScore: number; ngramScore: number; score: number } {
     const queryTokens = tokenize(query)
     const docTokens = tokenize(documentText)
 

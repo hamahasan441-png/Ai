@@ -48,7 +48,10 @@ describe('ContextualMemoryEngine', () => {
     })
 
     it('should rank by relevance', () => {
-      engine.store('React is a frontend library', { domain: 'frontend', keywords: ['react', 'frontend'] })
+      engine.store('React is a frontend library', {
+        domain: 'frontend',
+        keywords: ['react', 'frontend'],
+      })
       engine.store('Python is a programming language', { domain: 'backend', keywords: ['python'] })
 
       const results = engine.search('React frontend')

@@ -88,7 +88,11 @@ describe('Telemetry', () => {
 
     it('should support chaining', () => {
       const span = new Span('test', 't1', 's1')
-      const result = span.setAttribute('a', 1).setAttributes({ b: 2 }).addEvent('log').setStatus('OK')
+      const result = span
+        .setAttribute('a', 1)
+        .setAttributes({ b: 2 })
+        .addEvent('log')
+        .setStatus('OK')
       expect(result).toBe(span)
     })
 
@@ -182,7 +186,7 @@ describe('Telemetry', () => {
 
       const span = new Span('test', 't1', 's1')
       processor.onEnd(span.end())
-      
+
       // Manually flush to verify buffering works
       processor.flush()
       expect(exporter.getSpans().length).toBe(1)
@@ -263,7 +267,7 @@ describe('Telemetry', () => {
     })
 
     it('should trace async operations', async () => {
-      const result = await tracer.trace('operation', async (span) => {
+      const result = await tracer.trace('operation', async span => {
         span.setAttribute('key', 'value')
         return 42
       })

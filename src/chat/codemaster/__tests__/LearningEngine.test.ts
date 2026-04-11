@@ -63,7 +63,11 @@ describe('LearningEngine learnFromReview', () => {
   })
 
   it('creates distinct patterns for different categories', () => {
-    engine.learnFromReview('const x = eval(input)', 'javascript', makeFinding({ category: 'security' }))
+    engine.learnFromReview(
+      'const x = eval(input)',
+      'javascript',
+      makeFinding({ category: 'security' }),
+    )
     engine.learnFromReview('var y = 10', 'javascript', makeFinding({ category: 'style' }))
 
     expect(engine.getReviewPatterns()).toHaveLength(2)
@@ -190,7 +194,11 @@ describe('LearningEngine recurring issues and trends', () => {
   it('getTrends aggregates occurrences by category', () => {
     engine.learnFromReview('alpha code snippet one', 'javascript', makeFinding({ category: 'bug' }))
     engine.learnFromReview('beta code snippet two', 'javascript', makeFinding({ category: 'bug' }))
-    engine.learnFromReview('gamma code snippet three', 'javascript', makeFinding({ category: 'style' }))
+    engine.learnFromReview(
+      'gamma code snippet three',
+      'javascript',
+      makeFinding({ category: 'style' }),
+    )
 
     const trends = engine.getTrends()
     expect(trends['bug']).toBeGreaterThanOrEqual(2)
@@ -225,7 +233,11 @@ describe('LearningEngine pattern getters', () => {
 describe('LearningEngine serialize and deserialize', () => {
   it('round-trips review and fix patterns through serialization', () => {
     const engine = new LearningEngine()
-    engine.learnFromReview('const x = eval(input)', 'javascript', makeFinding({ category: 'security' }))
+    engine.learnFromReview(
+      'const x = eval(input)',
+      'javascript',
+      makeFinding({ category: 'security' }),
+    )
     engine.learnFromFix('var y = 1', 'const y = 1', 'javascript', 'var-to-const')
 
     const json = engine.serialize()
@@ -277,7 +289,11 @@ describe('LearningEngine pruning', () => {
       engine.learnFromReview(
         `unique code snippet number ${i} with extra words to differentiate`,
         'javascript',
-        makeFinding({ category: (['bug', 'style', 'performance', 'security', 'architecture'] as ReviewCategory[])[i % 5] }),
+        makeFinding({
+          category: (
+            ['bug', 'style', 'performance', 'security', 'architecture'] as ReviewCategory[]
+          )[i % 5],
+        }),
       )
     }
 

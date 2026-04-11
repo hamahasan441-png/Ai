@@ -67,7 +67,8 @@ describe('ScoringEngine', () => {
 
   it('calculates raw pattern score from keyword and word hits', () => {
     const result = engine.scorePattern(2, 3, 1, 0)
-    const expected = 2 * DEFAULT_PATTERN_WEIGHTS.keywordHit + 3 * DEFAULT_PATTERN_WEIGHTS.wordOverlap
+    const expected =
+      2 * DEFAULT_PATTERN_WEIGHTS.keywordHit + 3 * DEFAULT_PATTERN_WEIGHTS.wordOverlap
     expect(result.rawScore).toBe(expected)
   })
 
@@ -80,7 +81,8 @@ describe('ScoringEngine', () => {
 
   it('caps reinforcement bonus at maxReinforcementBonus', () => {
     const result = engine.scorePattern(2, 2, 1, 1000)
-    const rawScore = 2 * DEFAULT_PATTERN_WEIGHTS.keywordHit + 2 * DEFAULT_PATTERN_WEIGHTS.wordOverlap
+    const rawScore =
+      2 * DEFAULT_PATTERN_WEIGHTS.keywordHit + 2 * DEFAULT_PATTERN_WEIGHTS.wordOverlap
     const maxBonus = 1 + DEFAULT_PATTERN_WEIGHTS.maxReinforcementBonus
     expect(result.adjusted).toBeCloseTo(rawScore * maxBonus)
   })

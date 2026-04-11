@@ -258,20 +258,17 @@ describe('BayesianNetwork', () => {
     })
 
     it('throws for non-existent node', () => {
-      expect(() => bn.setCPT('nope', { '': { true: 0.5, false: 0.5 } }))
-        .toThrow(/does not exist/)
+      expect(() => bn.setCPT('nope', { '': { true: 0.5, false: 0.5 } })).toThrow(/does not exist/)
     })
 
     it('throws if row does not sum to 1', () => {
       bn.addNode('a', 'A')
-      expect(() => bn.setCPT('a', { '': { true: 0.6, false: 0.6 } }))
-        .toThrow(/sums to/)
+      expect(() => bn.setCPT('a', { '': { true: 0.6, false: 0.6 } })).toThrow(/sums to/)
     })
 
     it('throws if row is missing a state', () => {
       bn.addNode('a', 'A')
-      expect(() => bn.setCPT('a', { '': { true: 1.0 } }))
-        .toThrow(/missing state/)
+      expect(() => bn.setCPT('a', { '': { true: 1.0 } })).toThrow(/missing state/)
     })
 
     it('throws if a parent combination is missing', () => {
@@ -279,9 +276,11 @@ describe('BayesianNetwork', () => {
       bn.addNode('b', 'B')
       bn.addEdge('a', 'b')
       // Only providing 'true' row, missing 'false'
-      expect(() => bn.setCPT('b', {
-        true: { true: 0.9, false: 0.1 },
-      })).toThrow(/missing parent combination/)
+      expect(() =>
+        bn.setCPT('b', {
+          true: { true: 0.9, false: 0.1 },
+        }),
+      ).toThrow(/missing parent combination/)
     })
   })
 
@@ -423,7 +422,7 @@ describe('BayesianNetwork', () => {
       // P(c=true) = P(c=true|b=true)*P(b=true) + P(c=true|b=false)*P(b=false)
       //           = 0.9*0.8 + 0.4*0.2 = 0.72 + 0.08 = 0.80
       const result = bn.infer('c')
-      expect(result.distribution.true).toBeCloseTo(0.80, 1)
+      expect(result.distribution.true).toBeCloseTo(0.8, 1)
     })
 
     it('returns distribution summing to 1', () => {
@@ -725,8 +724,8 @@ describe('BayesianNetwork', () => {
       expect(stats.edgeCount).toBe(1)
       expect(stats.cptCount).toBe(3)
       expect(stats.evidenceCount).toBe(1)
-      expect(stats.rootNodes).toBe(2)   // a and c
-      expect(stats.leafNodes).toBe(2)   // b and c
+      expect(stats.rootNodes).toBe(2) // a and c
+      expect(stats.leafNodes).toBe(2) // b and c
       expect(stats.maxParents).toBe(1)
     })
 
@@ -742,8 +741,8 @@ describe('BayesianNetwork', () => {
     })
 
     it('computes average states per node', () => {
-      bn.addNode('a', 'A')                           // 2 states
-      bn.addNode('b', 'B', ['x', 'y', 'z'])          // 3 states
+      bn.addNode('a', 'A') // 2 states
+      bn.addNode('b', 'B', ['x', 'y', 'z']) // 3 states
       const stats = bn.getStats()
       expect(stats.averageStatesPerNode).toBeCloseTo(2.5)
     })
@@ -881,7 +880,7 @@ describe('BayesianNetwork', () => {
         'false|false': { true: 0.001, false: 0.999 },
       })
       bn.setCPT('J', {
-        true: { true: 0.90, false: 0.10 },
+        true: { true: 0.9, false: 0.1 },
         false: { true: 0.05, false: 0.95 },
       })
     })
@@ -926,9 +925,7 @@ describe('BayesianNetwork', () => {
       const json = bn.serialize()
       const restored = BayesianNetwork.deserialize(json)
       const afterResult = restored.infer('J')
-      expect(afterResult.distribution.true).toBeCloseTo(
-        beforeResult.distribution.true, 5,
-      )
+      expect(afterResult.distribution.true).toBeCloseTo(beforeResult.distribution.true, 5)
     })
   })
 })

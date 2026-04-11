@@ -136,12 +136,56 @@ function getIndent(line: string): string {
 function extractUsedVariables(codeBlock: string): string[] {
   const varPattern = /\b([a-zA-Z_$][\w$]*)\b/g
   const reserved = new Set([
-    'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'break', 'continue',
-    'return', 'const', 'let', 'var', 'function', 'class', 'new', 'this', 'true',
-    'false', 'null', 'undefined', 'typeof', 'instanceof', 'void', 'delete',
-    'throw', 'try', 'catch', 'finally', 'import', 'export', 'default', 'from',
-    'async', 'await', 'yield', 'in', 'of', 'console', 'Math', 'JSON', 'Array',
-    'Object', 'String', 'Number', 'Boolean', 'Error', 'Promise', 'Map', 'Set',
+    'if',
+    'else',
+    'for',
+    'while',
+    'do',
+    'switch',
+    'case',
+    'break',
+    'continue',
+    'return',
+    'const',
+    'let',
+    'var',
+    'function',
+    'class',
+    'new',
+    'this',
+    'true',
+    'false',
+    'null',
+    'undefined',
+    'typeof',
+    'instanceof',
+    'void',
+    'delete',
+    'throw',
+    'try',
+    'catch',
+    'finally',
+    'import',
+    'export',
+    'default',
+    'from',
+    'async',
+    'await',
+    'yield',
+    'in',
+    'of',
+    'console',
+    'Math',
+    'JSON',
+    'Array',
+    'Object',
+    'String',
+    'Number',
+    'Boolean',
+    'Error',
+    'Promise',
+    'Map',
+    'Set',
   ])
 
   const vars = new Set<string>()
@@ -165,7 +209,6 @@ function extractUsedVariables(codeBlock: string): string[] {
  * and can safely transform them.
  */
 export class AutoRefactorer {
-
   /**
    * Execute a refactoring operation.
    */
@@ -207,12 +250,26 @@ export class AutoRefactorer {
     const warnings: string[] = []
 
     if (!startLine || !endLine || startLine > endLine) {
-      return { success: false, code, description: 'Invalid line range', diff: '', warnings: ['startLine and endLine are required'], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'Invalid line range',
+        diff: '',
+        warnings: ['startLine and endLine are required'],
+        changeCount: 0,
+      }
     }
 
     const lines = getLines(code)
     if (startLine < 1 || endLine > lines.length) {
-      return { success: false, code, description: 'Line range out of bounds', diff: '', warnings: ['Line range exceeds file length'], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'Line range out of bounds',
+        diff: '',
+        warnings: ['Line range exceeds file length'],
+        changeCount: 0,
+      }
     }
 
     const extractedLines = lines.slice(startLine - 1, endLine)
@@ -236,11 +293,7 @@ export class AutoRefactorer {
       ? `${indent}const result = ${functionName}(${paramStr})`
       : `${indent}${functionName}(${paramStr})`
 
-    const newLines = [
-      ...lines.slice(0, startLine - 1),
-      callStr,
-      ...lines.slice(endLine),
-    ]
+    const newLines = [...lines.slice(0, startLine - 1), callStr, ...lines.slice(endLine)]
 
     // Add the function definition before the extraction point
     const insertPoint = Math.max(0, startLine - 2)
@@ -272,7 +325,14 @@ export class AutoRefactorer {
     const interfaceName = request.functionName ?? 'ExtractedInterface'
 
     if (!startLine || !endLine) {
-      return { success: false, code, description: 'Invalid line range', diff: '', warnings: ['startLine and endLine required'], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'Invalid line range',
+        diff: '',
+        warnings: ['startLine and endLine required'],
+        changeCount: 0,
+      }
     }
 
     const lines = getLines(code)
@@ -293,7 +353,14 @@ export class AutoRefactorer {
     }
 
     if (props.length === 0) {
-      return { success: false, code, description: 'No properties found to extract', diff: '', warnings: ['Could not detect properties'], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'No properties found to extract',
+        diff: '',
+        warnings: ['Could not detect properties'],
+        changeCount: 0,
+      }
     }
 
     const interfaceCode = `interface ${interfaceName} {\n${props.join('\n')}\n}`
@@ -321,11 +388,25 @@ export class AutoRefactorer {
     const { code, oldName, newName } = request
 
     if (!oldName || !newName) {
-      return { success: false, code, description: 'oldName and newName required', diff: '', warnings: ['Missing rename parameters'], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'oldName and newName required',
+        diff: '',
+        warnings: ['Missing rename parameters'],
+        changeCount: 0,
+      }
     }
 
     if (oldName === newName) {
-      return { success: true, code, description: 'Names are identical', diff: '', warnings: [], changeCount: 0 }
+      return {
+        success: true,
+        code,
+        description: 'Names are identical',
+        diff: '',
+        warnings: [],
+        changeCount: 0,
+      }
     }
 
     // Use word-boundary matching to avoid partial replacements
@@ -334,7 +415,14 @@ export class AutoRefactorer {
     const changeCount = (code.match(pattern) ?? []).length
 
     if (changeCount === 0) {
-      return { success: false, code, description: `Symbol '${oldName}' not found`, diff: '', warnings: [`'${oldName}' was not found in the code`], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: `Symbol '${oldName}' not found`,
+        diff: '',
+        warnings: [`'${oldName}' was not found in the code`],
+        changeCount: 0,
+      }
     }
 
     return {
@@ -355,21 +443,42 @@ export class AutoRefactorer {
     const warnings: string[] = []
 
     if (!oldName) {
-      return { success: false, code, description: 'oldName required', diff: '', warnings: ['Specify the variable to inline'], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'oldName required',
+        diff: '',
+        warnings: ['Specify the variable to inline'],
+        changeCount: 0,
+      }
     }
 
     // Find the variable declaration: const/let/var name = value
-    const declPattern = new RegExp(`(?:const|let|var)\\s+${this.escapeRegex(oldName)}\\s*=\\s*(.+?)(?:;|$)`, 'm')
+    const declPattern = new RegExp(
+      `(?:const|let|var)\\s+${this.escapeRegex(oldName)}\\s*=\\s*(.+?)(?:;|$)`,
+      'm',
+    )
     const declMatch = code.match(declPattern)
 
     if (!declMatch) {
-      return { success: false, code, description: `Variable '${oldName}' declaration not found`, diff: '', warnings: [`Could not find declaration of '${oldName}'`], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: `Variable '${oldName}' declaration not found`,
+        diff: '',
+        warnings: [`Could not find declaration of '${oldName}'`],
+        changeCount: 0,
+      }
     }
 
     const value = declMatch[1].trim()
 
     // Check if value is simple enough to inline (no side effects)
-    if (value.includes('await ') || value.includes('new ') || value.includes('(') && !value.match(/^['"`\d[{]/)) {
+    if (
+      value.includes('await ') ||
+      value.includes('new ') ||
+      (value.includes('(') && !value.match(/^['"`\d[{]/))
+    ) {
       warnings.push('Value may have side effects. Inlining could change behavior.')
     }
 
@@ -418,7 +527,14 @@ export class AutoRefactorer {
     })
 
     if (count === 0) {
-      return { success: false, code, description: 'No function declarations found to convert', diff: '', warnings: [], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'No function declarations found to convert',
+        diff: '',
+        warnings: [],
+        changeCount: 0,
+      }
     }
 
     return {
@@ -454,7 +570,14 @@ export class AutoRefactorer {
     })
 
     if (count === 0) {
-      return { success: false, code, description: 'No arrow functions found to convert', diff: '', warnings: [], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'No arrow functions found to convert',
+        diff: '',
+        warnings: [],
+        changeCount: 0,
+      }
     }
 
     return {
@@ -497,16 +620,20 @@ export class AutoRefactorer {
     })
 
     // Simplify: x !== null && x !== undefined → x != null
-    result = result.replace(
-      /(\w+)\s*!==\s*null\s*&&\s*\1\s*!==\s*undefined/g,
-      (_match, name) => {
-        count++
-        return `${name} != null`
-      },
-    )
+    result = result.replace(/(\w+)\s*!==\s*null\s*&&\s*\1\s*!==\s*undefined/g, (_match, name) => {
+      count++
+      return `${name} != null`
+    })
 
     if (count === 0) {
-      return { success: false, code, description: 'No simplifiable conditionals found', diff: '', warnings: [], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'No simplifiable conditionals found',
+        diff: '',
+        warnings: [],
+        changeCount: 0,
+      }
     }
 
     return {
@@ -527,7 +654,14 @@ export class AutoRefactorer {
     const warnings: string[] = []
 
     if (!valueLiteral || !constantName) {
-      return { success: false, code, description: 'value (oldName) and constantName (newName) required', diff: '', warnings: ['Specify the value and constant name'], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: 'value (oldName) and constantName (newName) required',
+        diff: '',
+        warnings: ['Specify the value and constant name'],
+        changeCount: 0,
+      }
     }
 
     // Escape for regex
@@ -536,14 +670,25 @@ export class AutoRefactorer {
     const count = (code.match(pattern) ?? []).length
 
     if (count === 0) {
-      return { success: false, code, description: `Value '${valueLiteral}' not found`, diff: '', warnings: [], changeCount: 0 }
+      return {
+        success: false,
+        code,
+        description: `Value '${valueLiteral}' not found`,
+        diff: '',
+        warnings: [],
+        changeCount: 0,
+      }
     }
 
     // Add constant declaration at the top of file (after imports)
     const lines = getLines(code)
     let insertLine = 0
     for (let i = 0; i < lines.length; i++) {
-      if (lines[i].startsWith('import ') || lines[i].startsWith('from ') || lines[i].startsWith('require(')) {
+      if (
+        lines[i].startsWith('import ') ||
+        lines[i].startsWith('from ') ||
+        lines[i].startsWith('require(')
+      ) {
         insertLine = i + 1
       }
     }
@@ -617,7 +762,10 @@ export class AutoRefactorer {
     }
 
     // Object literals suggest interface extraction
-    if (/\{[^}]*\w+\s*:\s*.+,/.test(code) && (language === 'typescript' || language === 'javascript')) {
+    if (
+      /\{[^}]*\w+\s*:\s*.+,/.test(code) &&
+      (language === 'typescript' || language === 'javascript')
+    ) {
       suggestions.push('extract-interface')
     }
 

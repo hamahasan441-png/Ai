@@ -4,11 +4,7 @@ import { errorMessage } from '../utils/errors.js'
 import { getDefaultSonnetModel } from '../utils/model/model.js'
 import { sideQuery } from '../utils/sideQuery.js'
 import { jsonParse } from '../utils/slowOperations.js'
-import {
-  formatMemoryManifest,
-  type MemoryHeader,
-  scanMemoryFiles,
-} from './memoryScan.js'
+import { formatMemoryManifest, type MemoryHeader, scanMemoryFiles } from './memoryScan.js'
 
 export type RelevantMemory = {
   path: string
@@ -50,12 +46,7 @@ export async function findRelevantMemories(
     return []
   }
 
-  const selectedFilenames = await selectRelevantMemories(
-    query,
-    memories,
-    signal,
-    recentTools,
-  )
+  const selectedFilenames = await selectRelevantMemories(query, memories, signal, recentTools)
   const byFilename = new Map(memories.map(m => [m.filename, m]))
   const selected = selectedFilenames
     .map(filename => byFilename.get(filename))
@@ -90,9 +81,7 @@ async function selectRelevantMemories(
   // on keyword overlap ("spawn" in query + "spawn" in a memory
   // description → false positive).
   const toolsSection =
-    recentTools.length > 0
-      ? `\n\nRecently used tools: ${recentTools.join(', ')}`
-      : ''
+    recentTools.length > 0 ? `\n\nRecently used tools: ${recentTools.join(', ')}` : ''
 
   try {
     const result = await sideQuery({
@@ -132,10 +121,7 @@ async function selectRelevantMemories(
     if (signal.aborted) {
       return []
     }
-    logForDebugging(
-      `[memdir] selectRelevantMemories failed: ${errorMessage(e)}`,
-      { level: 'warn' },
-    )
+    logForDebugging(`[memdir] selectRelevantMemories failed: ${errorMessage(e)}`, { level: 'warn' })
     return []
   }
 }

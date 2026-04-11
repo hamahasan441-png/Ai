@@ -1,11 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  TokenBudgetManager,
-  DEFAULT_BUDGET_CONFIG,
-} from '../TokenBudgetManager'
-import type {
-  TokenBudgetConfig,
-} from '../TokenBudgetManager'
+import { TokenBudgetManager, DEFAULT_BUDGET_CONFIG } from '../TokenBudgetManager'
+import type { TokenBudgetConfig } from '../TokenBudgetManager'
 
 describe('TokenBudgetManager', () => {
   let manager: TokenBudgetManager
@@ -31,7 +26,11 @@ describe('TokenBudgetManager', () => {
     })
 
     it('accepts full config', () => {
-      const cfg: TokenBudgetConfig = { maxSessionTokens: 10_000, warningThreshold: 0.7, enabled: true }
+      const cfg: TokenBudgetConfig = {
+        maxSessionTokens: 10_000,
+        warningThreshold: 0.7,
+        enabled: true,
+      }
       const m = new TokenBudgetManager(cfg)
       expect(m.getReport().maxSessionTokens).toBe(10_000)
     })

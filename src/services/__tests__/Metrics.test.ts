@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  Counter,
-  Gauge,
-  Histogram,
-  MetricsRegistry,
-} from '../../services/metrics.js'
+import { Counter, Gauge, Histogram, MetricsRegistry } from '../../services/metrics.js'
 
 describe('Counter', () => {
   let counter: Counter
@@ -212,7 +207,7 @@ describe('MetricsRegistry', () => {
 
     const snapshots = registry.snapshot()
     expect(snapshots).toHaveLength(3)
-    expect(snapshots.map((s) => s.name).sort()).toEqual(['test_c1', 'test_g1', 'test_h1'])
+    expect(snapshots.map(s => s.name).sort()).toEqual(['test_c1', 'test_g1', 'test_h1'])
   })
 
   it('resets all metrics', () => {

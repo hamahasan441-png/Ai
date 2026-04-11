@@ -53,7 +53,9 @@ export function formatQueryResults(data: {
     for (const row of data.rows) {
       const cells = data.columns!.map((col, i) => {
         const val = String(row[col] ?? '')
-        return val.length > colWidths[i]! ? val.slice(0, colWidths[i]! - 1) + '…' : val.padEnd(colWidths[i]!)
+        return val.length > colWidths[i]!
+          ? val.slice(0, colWidths[i]! - 1) + '…'
+          : val.padEnd(colWidths[i]!)
       })
       lines.push(cells.join(' | '))
     }
@@ -74,12 +76,18 @@ export function getToolUseSummary(input: {
   table?: string
 }): string {
   switch (input.command) {
-    case 'query': return `SQL: ${input.sql?.slice(0, 80) ?? '(no query)'}`
-    case 'tables': return 'List tables'
-    case 'schema': return 'Show schema'
-    case 'describe': return `Describe: ${input.table ?? '(no table)'}`
-    case 'explain': return `Explain: ${input.sql?.slice(0, 60) ?? '(no query)'}`
-    default: return input.command
+    case 'query':
+      return `SQL: ${input.sql?.slice(0, 80) ?? '(no query)'}`
+    case 'tables':
+      return 'List tables'
+    case 'schema':
+      return 'Show schema'
+    case 'describe':
+      return `Describe: ${input.table ?? '(no table)'}`
+    case 'explain':
+      return `Explain: ${input.sql?.slice(0, 60) ?? '(no query)'}`
+    default:
+      return input.command
   }
 }
 

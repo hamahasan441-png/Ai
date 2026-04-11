@@ -52,7 +52,13 @@ export function isNonEmptyString(value: unknown, field?: string): ValidationResu
   if (typeof value !== 'string' || value.trim().length === 0) {
     return {
       valid: false,
-      errors: [new ValidationError(`${field ?? 'Value'} must be a non-empty string`, 'non_empty_string', field)],
+      errors: [
+        new ValidationError(
+          `${field ?? 'Value'} must be a non-empty string`,
+          'non_empty_string',
+          field,
+        ),
+      ],
     }
   }
   return { valid: true, errors: [] }
@@ -240,13 +246,13 @@ export function detectCommandInjection(value: string, field?: string): Validatio
  */
 export function detectPathTraversal(value: string, field?: string): ValidationResult {
   const dangerous = [
-    /\.\.\//,        // Relative path traversal
-    /\.\.\\/,        // Windows path traversal
-    /~\//,           // Home directory expansion
-    /^\/etc\//,      // System config directory
-    /^\/proc\//,     // Process info
-    /^\/sys\//,      // System directory
-    /\0/,            // Null byte injection
+    /\.\.\//, // Relative path traversal
+    /\.\.\\/, // Windows path traversal
+    /~\//, // Home directory expansion
+    /^\/etc\//, // System config directory
+    /^\/proc\//, // Process info
+    /^\/sys\//, // System directory
+    /\0/, // Null byte injection
   ]
 
   for (const pattern of dangerous) {
@@ -322,7 +328,10 @@ export type ObjectSchema = Record<string, FieldSchema>
  * const result = validateSchema({ command: 'ls', timeout: 5000 }, schema)
  * ```
  */
-export function validateSchema(data: Record<string, unknown>, schema: ObjectSchema): ValidationResult {
+export function validateSchema(
+  data: Record<string, unknown>,
+  schema: ObjectSchema,
+): ValidationResult {
   const errors: ValidationError[] = []
 
   for (const [fieldName, fieldSchema] of Object.entries(schema)) {
@@ -330,9 +339,7 @@ export function validateSchema(data: Record<string, unknown>, schema: ObjectSche
 
     // Check required
     if (fieldSchema.required && (value === undefined || value === null)) {
-      errors.push(
-        new ValidationError(`${fieldName} is required`, 'required', fieldName),
-      )
+      errors.push(new ValidationError(`${fieldName} is required`, 'required', fieldName))
       continue
     }
 
@@ -428,7 +435,10 @@ export const TOOL_SCHEMAS: Record<string, ObjectSchema> = {
  * }
  * ```
  */
-export function validateToolInput(toolName: string, input: Record<string, unknown>): ValidationResult {
+export function validateToolInput(
+  toolName: string,
+  input: Record<string, unknown>,
+): ValidationResult {
   const schema = TOOL_SCHEMAS[toolName]
   if (!schema) {
     // No schema defined = pass through (gradual adoption)

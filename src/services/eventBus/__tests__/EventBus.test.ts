@@ -36,9 +36,27 @@ describe('EventBus', () => {
 
     it('should support priority ordering', async () => {
       const order: number[] = []
-      bus.on('test', () => { order.push(2) }, { priority: 20 })
-      bus.on('test', () => { order.push(1) }, { priority: 1 })
-      bus.on('test', () => { order.push(3) }, { priority: 30 })
+      bus.on(
+        'test',
+        () => {
+          order.push(2)
+        },
+        { priority: 20 },
+      )
+      bus.on(
+        'test',
+        () => {
+          order.push(1)
+        },
+        { priority: 1 },
+      )
+      bus.on(
+        'test',
+        () => {
+          order.push(3)
+        },
+        { priority: 30 },
+      )
 
       await bus.emit('test', {})
       expect(order).toEqual([1, 2, 3])
@@ -47,7 +65,7 @@ describe('EventBus', () => {
     it('should support filter option', async () => {
       const handler = vi.fn()
       bus.on('test', handler, {
-        filter: (e) => (e.payload as { value?: number }).value === 42,
+        filter: e => (e.payload as { value?: number }).value === 42,
       })
 
       await bus.emit('test', { value: 1 })
@@ -107,7 +125,7 @@ describe('EventBus', () => {
 
     it('should generate unique event IDs', async () => {
       const ids: string[] = []
-      bus.on('test', (e) => ids.push(e.id))
+      bus.on('test', e => ids.push(e.id))
 
       await bus.emit('test', {})
       await bus.emit('test', {})
@@ -187,7 +205,9 @@ describe('EventBus', () => {
         await next()
       })
 
-      bus.on('test', () => { order.push('handler') })
+      bus.on('test', () => {
+        order.push('handler')
+      })
       await bus.emit('test', {})
 
       expect(order).toEqual(['middleware', 'handler'])
@@ -209,11 +229,22 @@ describe('EventBus', () => {
     it('should chain multiple middleware', async () => {
       const order: number[] = []
 
-      bus.use(async (_e, next) => { order.push(1); await next() })
-      bus.use(async (_e, next) => { order.push(2); await next() })
-      bus.use(async (_e, next) => { order.push(3); await next() })
+      bus.use(async (_e, next) => {
+        order.push(1)
+        await next()
+      })
+      bus.use(async (_e, next) => {
+        order.push(2)
+        await next()
+      })
+      bus.use(async (_e, next) => {
+        order.push(3)
+        await next()
+      })
 
-      bus.on('test', () => { order.push(4) })
+      bus.on('test', () => {
+        order.push(4)
+      })
       await bus.emit('test', {})
 
       expect(order).toEqual([1, 2, 3, 4])
@@ -239,7 +270,9 @@ describe('EventBus', () => {
       await bus.emit('other', { v: 3 })
 
       const received: number[] = []
-      const count = bus.replay('test', (e) => { received.push((e.payload as { v: number }).v) })
+      const count = bus.replay('test', e => {
+        received.push((e.payload as { v: number }).v)
+      })
       expect(count).toBe(2)
       expect(received).toEqual([1, 2])
     })
@@ -249,7 +282,9 @@ describe('EventBus', () => {
       await bus.emit('user.deleted', { id: 2 })
 
       const received: unknown[] = []
-      const count = bus.replay('user.*', (e) => { received.push(e.payload) })
+      const count = bus.replay('user.*', e => {
+        received.push(e.payload)
+      })
       expect(count).toBe(2)
     })
 
@@ -279,7 +314,9 @@ describe('EventBus', () => {
 
   describe('dead letter queue', () => {
     it('should capture handler errors', async () => {
-      bus.on('test', () => { throw new Error('handler failed') })
+      bus.on('test', () => {
+        throw new Error('handler failed')
+      })
       await bus.emit('test', {})
 
       const dlq = bus.getDeadLetterQueue()
@@ -289,7 +326,9 @@ describe('EventBus', () => {
 
     it('should not capture errors when DLQ is disabled', async () => {
       const b = new EventBus({ enableDLQ: false })
-      b.on('test', () => { throw new Error('fail') })
+      b.on('test', () => {
+        throw new Error('fail')
+      })
       await b.emit('test', {})
 
       expect(b.getDeadLetterQueue().length).toBe(0)
@@ -310,7 +349,9 @@ describe('EventBus', () => {
     })
 
     it('should track error count', async () => {
-      bus.on('test', () => { throw new Error('fail') })
+      bus.on('test', () => {
+        throw new Error('fail')
+      })
       await bus.emit('test', {})
       expect(bus.getStats().totalErrors).toBe(1)
     })

@@ -96,9 +96,40 @@ const DOMAIN_TEMPLATES: Record<string, string[]> = {
 
 /** Keywords used to infer a domain from an observation. */
 const DOMAIN_KEYWORDS: Record<string, string[]> = {
-  science: ['experiment', 'reaction', 'molecule', 'energy', 'particle', 'cell', 'organism', 'temperature', 'chemical'],
-  technology: ['server', 'latency', 'memory', 'cpu', 'crash', 'bug', 'deploy', 'network', 'database', 'performance'],
-  logic: ['therefore', 'implies', 'contradiction', 'premise', 'conclude', 'valid', 'if', 'proof', 'deduction'],
+  science: [
+    'experiment',
+    'reaction',
+    'molecule',
+    'energy',
+    'particle',
+    'cell',
+    'organism',
+    'temperature',
+    'chemical',
+  ],
+  technology: [
+    'server',
+    'latency',
+    'memory',
+    'cpu',
+    'crash',
+    'bug',
+    'deploy',
+    'network',
+    'database',
+    'performance',
+  ],
+  logic: [
+    'therefore',
+    'implies',
+    'contradiction',
+    'premise',
+    'conclude',
+    'valid',
+    'if',
+    'proof',
+    'deduction',
+  ],
 }
 
 // ─── HypothesisEngine ──────────────────────────────────────────────────────────
@@ -153,8 +184,11 @@ export class HypothesisEngine {
   addEvidence(hypothesisId: string, evidence: Evidence): void {
     const h = this.hypotheses.get(hypothesisId)
     if (!h) return
-    if (evidence.supports) { h.evidence.push(evidence) }
-    else { h.counterEvidence.push(evidence) }
+    if (evidence.supports) {
+      h.evidence.push(evidence)
+    } else {
+      h.counterEvidence.push(evidence)
+    }
 
     if (this.config.enableBayesianUpdate) {
       h.confidence = this.bayesianUpdate(h.confidence, evidence)
@@ -177,7 +211,7 @@ export class HypothesisEngine {
     const supportStrength = this.sumStrength(h.evidence)
     const counterStrength = this.sumStrength(h.counterEvidence)
     const netStrength = supportStrength - counterStrength
-    const confidence = this.clamp(0.5 + netStrength / Math.max(totalEvidence, 1) * 0.5)
+    const confidence = this.clamp(0.5 + (netStrength / Math.max(totalEvidence, 1)) * 0.5)
 
     // Need minimum evidence to draw a firm conclusion
     let verdict: 'supported' | 'refuted' | 'inconclusive'
@@ -246,9 +280,7 @@ export class HypothesisEngine {
    * Find pairs of hypotheses that contradict each other via opposing
    * conclusions, shared evidence, or keyword negation.
    */
-  findContradictions(
-    hypotheses?: Hypothesis[],
-  ): Array<{ h1: string; h2: string; reason: string }> {
+  findContradictions(hypotheses?: Hypothesis[]): Array<{ h1: string; h2: string; reason: string }> {
     const list = hypotheses ?? [...this.hypotheses.values()]
     const contradictions: Array<{ h1: string; h2: string; reason: string }> = []
 
@@ -296,9 +328,15 @@ export class HypothesisEngine {
 
     for (const h of this.hypotheses.values()) {
       switch (h.status) {
-        case 'supported': supported++; break
-        case 'refuted': refuted++; break
-        case 'inconclusive': inconclusive++; break
+        case 'supported':
+          supported++
+          break
+        case 'refuted':
+          refuted++
+          break
+        case 'inconclusive':
+          inconclusive++
+          break
         // 'proposed' counted in total only
       }
     }
@@ -347,7 +385,8 @@ export class HypothesisEngine {
   }
 
   private extractKeyPhrases(text: string): string[] {
-    const stop = 'the a an is are was were be been being have has had do does did will would could should may might shall can to of in for on with at by from it this that and or but not no so if then than too very'
+    const stop =
+      'the a an is are was were be been being have has had do does did will would could should may might shall can to of in for on with at by from it this that and or but not no so if then than too very'
     const stopWords = new Set(stop.split(' '))
     const words = this.tokenize(text).filter(w => w.length > 2 && !stopWords.has(w))
 
@@ -360,7 +399,11 @@ export class HypothesisEngine {
   }
 
   private tokenize(text: string): string[] {
-    return text.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean)
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .split(/\s+/)
+      .filter(Boolean)
   }
 
   private sumStrength(evidenceList: Evidence[]): number {
@@ -369,9 +412,8 @@ export class HypothesisEngine {
 
   private compositeScore(h: Hypothesis): number {
     const evidenceCount = h.evidence.length + h.counterEvidence.length
-    const evidenceQuality = evidenceCount > 0
-      ? this.sumStrength(h.evidence) / Math.max(evidenceCount, 1)
-      : 0
+    const evidenceQuality =
+      evidenceCount > 0 ? this.sumStrength(h.evidence) / Math.max(evidenceCount, 1) : 0
 
     // Weighted blend of confidence and evidence quality
     return h.confidence * 0.6 + evidenceQuality * 0.3 + (evidenceCount > 0 ? 0.1 : 0)
@@ -419,8 +461,10 @@ export class HypothesisEngine {
   }
 
   private buildReasoning(
-    h: Hypothesis, supportStrength: number,
-    counterStrength: number, verdict: string,
+    h: Hypothesis,
+    supportStrength: number,
+    counterStrength: number,
+    verdict: string,
   ): string {
     const net = supportStrength - counterStrength
     return [
@@ -435,11 +479,17 @@ export class HypothesisEngine {
   private inconclusiveResult(hypothesisId: string): HypothesisTestResult {
     return {
       hypothesis: {
-        id: hypothesisId, statement: '', confidence: 0,
-        evidence: [], counterEvidence: [],
-        status: 'inconclusive', domain: 'general', createdAt: Date.now(),
+        id: hypothesisId,
+        statement: '',
+        confidence: 0,
+        evidence: [],
+        counterEvidence: [],
+        status: 'inconclusive',
+        domain: 'general',
+        createdAt: Date.now(),
       },
-      verdict: 'inconclusive', confidence: 0,
+      verdict: 'inconclusive',
+      confidence: 0,
       reasoning: `Hypothesis "${hypothesisId}" not found.`,
       newEvidence: [],
     }
@@ -453,7 +503,9 @@ export class HypothesisEngine {
     this.hypotheses.set(h.id, h)
   }
 
-  private nextId(): string { return `hyp_${++this.idCounter}_${Date.now()}` }
+  private nextId(): string {
+    return `hyp_${++this.idCounter}_${Date.now()}`
+  }
 
   private clamp(value: number, min = 0, max = 1): number {
     return Math.max(min, Math.min(max, value))

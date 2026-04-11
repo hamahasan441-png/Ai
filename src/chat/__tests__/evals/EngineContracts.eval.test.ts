@@ -17,10 +17,7 @@ import {
   ErrorAggregator,
 } from '../../pipeline/ErrorTaxonomy.js'
 
-import {
-  SeededRandom,
-  ReplayEngine,
-} from '../../pipeline/ReplayEngine.js'
+import { SeededRandom, ReplayEngine } from '../../pipeline/ReplayEngine.js'
 
 import { PromptRegistry } from '../../pipeline/PromptRegistry.js'
 
@@ -164,11 +161,15 @@ describe('ErrorTaxonomy', () => {
     })
 
     it('classifies dependency messages', () => {
-      expect(classifyError(new Error('dependency not initialized'))).toBe(EngineErrorClass.DEPENDENCY_FAIL)
+      expect(classifyError(new Error('dependency not initialized'))).toBe(
+        EngineErrorClass.DEPENDENCY_FAIL,
+      )
     })
 
     it('classifies verification messages', () => {
-      expect(classifyError(new Error('verification failed'))).toBe(EngineErrorClass.VERIFICATION_FAIL)
+      expect(classifyError(new Error('verification failed'))).toBe(
+        EngineErrorClass.VERIFICATION_FAIL,
+      )
       expect(classifyError(new Error('invalid input'))).toBe(EngineErrorClass.VERIFICATION_FAIL)
     })
 
@@ -205,7 +206,10 @@ describe('ErrorTaxonomy', () => {
 
     it('shouldRetry returns true for retryable under limit', () => {
       const err = createEngineError(
-        EngineErrorClass.NETWORK_FAIL, 'fail', 's', PipelinePhase.PHASE_1_CORE,
+        EngineErrorClass.NETWORK_FAIL,
+        'fail',
+        's',
+        PipelinePhase.PHASE_1_CORE,
       )
       expect(shouldRetry(err, 0)).toBe(true)
       expect(shouldRetry(err, 2)).toBe(true)
@@ -213,14 +217,20 @@ describe('ErrorTaxonomy', () => {
 
     it('shouldRetry returns false when limit reached', () => {
       const err = createEngineError(
-        EngineErrorClass.NETWORK_FAIL, 'fail', 's', PipelinePhase.PHASE_1_CORE,
+        EngineErrorClass.NETWORK_FAIL,
+        'fail',
+        's',
+        PipelinePhase.PHASE_1_CORE,
       )
       expect(shouldRetry(err, 3)).toBe(false)
     })
 
     it('shouldRetry returns false for non-retryable', () => {
       const err = createEngineError(
-        EngineErrorClass.CRITICAL, 'crash', 's', PipelinePhase.PHASE_1_CORE,
+        EngineErrorClass.CRITICAL,
+        'crash',
+        's',
+        PipelinePhase.PHASE_1_CORE,
       )
       expect(shouldRetry(err, 0)).toBe(false)
     })
@@ -241,8 +251,18 @@ describe('ErrorTaxonomy', () => {
     })
 
     it('adds and retrieves errors', () => {
-      const e1 = createEngineError(EngineErrorClass.NETWORK_FAIL, 'n', 'a', PipelinePhase.PHASE_1_CORE)
-      const e2 = createEngineError(EngineErrorClass.CRITICAL, 'c', 'b', PipelinePhase.PHASE_2_SEMANTIC)
+      const e1 = createEngineError(
+        EngineErrorClass.NETWORK_FAIL,
+        'n',
+        'a',
+        PipelinePhase.PHASE_1_CORE,
+      )
+      const e2 = createEngineError(
+        EngineErrorClass.CRITICAL,
+        'c',
+        'b',
+        PipelinePhase.PHASE_2_SEMANTIC,
+      )
       agg.add(e1)
       agg.add(e2)
       expect(agg.count).toBe(2)
@@ -260,28 +280,42 @@ describe('ErrorTaxonomy', () => {
     })
 
     it('filters by class', () => {
-      agg.add(createEngineError(EngineErrorClass.NETWORK_FAIL, 'n', 's', PipelinePhase.PHASE_1_CORE))
-      agg.add(createEngineError(EngineErrorClass.NETWORK_FAIL, 'n2', 's', PipelinePhase.PHASE_1_CORE))
+      agg.add(
+        createEngineError(EngineErrorClass.NETWORK_FAIL, 'n', 's', PipelinePhase.PHASE_1_CORE),
+      )
+      agg.add(
+        createEngineError(EngineErrorClass.NETWORK_FAIL, 'n2', 's', PipelinePhase.PHASE_1_CORE),
+      )
       agg.add(createEngineError(EngineErrorClass.CRITICAL, 'c', 's', PipelinePhase.PHASE_1_CORE))
       expect(agg.getByClass(EngineErrorClass.NETWORK_FAIL)).toHaveLength(2)
       expect(agg.getByClass(EngineErrorClass.CRITICAL)).toHaveLength(1)
     })
 
     it('filters by source', () => {
-      agg.add(createEngineError(EngineErrorClass.TOOL_FAIL, 't', 'ModuleA', PipelinePhase.PHASE_1_CORE))
-      agg.add(createEngineError(EngineErrorClass.TOOL_FAIL, 't', 'ModuleB', PipelinePhase.PHASE_1_CORE))
+      agg.add(
+        createEngineError(EngineErrorClass.TOOL_FAIL, 't', 'ModuleA', PipelinePhase.PHASE_1_CORE),
+      )
+      agg.add(
+        createEngineError(EngineErrorClass.TOOL_FAIL, 't', 'ModuleB', PipelinePhase.PHASE_1_CORE),
+      )
       expect(agg.getBySource('ModuleA')).toHaveLength(1)
     })
 
     it('filters by phase', () => {
       agg.add(createEngineError(EngineErrorClass.TOOL_FAIL, 't', 's', PipelinePhase.PHASE_1_CORE))
-      agg.add(createEngineError(EngineErrorClass.TOOL_FAIL, 't', 's', PipelinePhase.PHASE_6_CYBERSEC))
+      agg.add(
+        createEngineError(EngineErrorClass.TOOL_FAIL, 't', 's', PipelinePhase.PHASE_6_CYBERSEC),
+      )
       expect(agg.getByPhase(PipelinePhase.PHASE_6_CYBERSEC)).toHaveLength(1)
     })
 
     it('produces correct summary', () => {
-      agg.add(createEngineError(EngineErrorClass.NETWORK_FAIL, 'n', 's', PipelinePhase.PHASE_1_CORE))
-      agg.add(createEngineError(EngineErrorClass.NETWORK_FAIL, 'n', 's', PipelinePhase.PHASE_1_CORE))
+      agg.add(
+        createEngineError(EngineErrorClass.NETWORK_FAIL, 'n', 's', PipelinePhase.PHASE_1_CORE),
+      )
+      agg.add(
+        createEngineError(EngineErrorClass.NETWORK_FAIL, 'n', 's', PipelinePhase.PHASE_1_CORE),
+      )
       agg.add(createEngineError(EngineErrorClass.CRITICAL, 'c', 's', PipelinePhase.PHASE_1_CORE))
       const summary = agg.getSummary()
       expect(summary[EngineErrorClass.NETWORK_FAIL]).toBe(2)
@@ -432,7 +466,7 @@ describe('ReplayEngine', () => {
       engine.recordDecision(d2)
       const session = engine.stopRecording()!
 
-      const result = engine.replay(session.id, (orig) => orig)
+      const result = engine.replay(session.id, orig => orig)
       expect(result).not.toBeNull()
       expect(result!.identical).toBe(true)
       expect(result!.divergenceCount).toBe(0)
@@ -445,7 +479,7 @@ describe('ReplayEngine', () => {
       engine.recordDecision(makeDecision('s1', 'A', 'success'))
       const session = engine.stopRecording()!
 
-      const result = engine.replay(session.id, (orig) => ({
+      const result = engine.replay(session.id, orig => ({
         ...orig,
         outcome: 'failure' as const,
       }))
@@ -459,7 +493,7 @@ describe('ReplayEngine', () => {
       engine.recordDecision(makeDecision('s1', 'A', 'success', 0.9))
       const session = engine.stopRecording()!
 
-      const result = engine.replay(session.id, (orig) => ({
+      const result = engine.replay(session.id, orig => ({
         ...orig,
         confidence: 0.5,
       }))
@@ -472,7 +506,7 @@ describe('ReplayEngine', () => {
       engine.recordDecision(makeDecision('s1', 'A'))
       const session = engine.stopRecording()!
 
-      const result = engine.replay(session.id, (orig) => ({
+      const result = engine.replay(session.id, orig => ({
         ...orig,
         output: { answer: 'different' },
       }))
@@ -613,7 +647,9 @@ describe('PromptRegistry', () => {
 
     it('throws on duplicate config version', () => {
       reg.registerModelConfig(makeConfig('default', '1.0.0'))
-      expect(() => reg.registerModelConfig(makeConfig('default', '1.0.0'))).toThrow('already registered')
+      expect(() => reg.registerModelConfig(makeConfig('default', '1.0.0'))).toThrow(
+        'already registered',
+      )
     })
 
     it('activateModelConfig switches version', () => {
@@ -634,7 +670,9 @@ describe('PromptRegistry', () => {
 
     beforeEach(() => {
       reg = new PromptRegistry()
-      reg.registerTemplate(makeTemplate('greet', '1.0.0', 'Hello {{name}}, {{greeting}}!', ['name']))
+      reg.registerTemplate(
+        makeTemplate('greet', '1.0.0', 'Hello {{name}}, {{greeting}}!', ['name']),
+      )
     })
 
     it('renders with required + optional vars', () => {

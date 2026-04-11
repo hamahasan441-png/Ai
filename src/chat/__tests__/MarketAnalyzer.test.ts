@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  MarketAnalyzer,
-} from '../MarketAnalyzer'
+import { MarketAnalyzer } from '../MarketAnalyzer'
 
 // ── Helpers: reusable data generators ──
 
@@ -83,13 +81,17 @@ describe('MarketAnalyzer analyzeSentiment', () => {
   })
 
   it('detects bullish sentiment from positive keywords', () => {
-    const result = analyzer.analyzeSentiment('The market is showing a strong rally with bullish momentum and surge in buying')
+    const result = analyzer.analyzeSentiment(
+      'The market is showing a strong rally with bullish momentum and surge in buying',
+    )
     expect(result.sentiment).toBe('bullish')
     expect(result.score).toBeGreaterThan(0)
   })
 
   it('detects bearish sentiment from negative keywords', () => {
-    const result = analyzer.analyzeSentiment('Massive crash and panic selloff amid recession fears and collapse')
+    const result = analyzer.analyzeSentiment(
+      'Massive crash and panic selloff amid recession fears and collapse',
+    )
     expect(result.sentiment).toBe('bearish')
     expect(result.score).toBeLessThan(0)
   })
@@ -124,7 +126,7 @@ describe('MarketAnalyzer analyzeSentiment', () => {
   })
 
   it('handles negation patterns that partially invert sentiment', () => {
-    const result = analyzer.analyzeSentiment('not a rally, won\'t surge')
+    const result = analyzer.analyzeSentiment("not a rally, won't surge")
     expect(result.reasoning.some(r => r.includes('negation'))).toBe(true)
   })
 
@@ -282,10 +284,14 @@ describe('MarketAnalyzer analyzeVolatility', () => {
   })
 
   it('isHighVol is true only for volatile or extreme regimes', () => {
-    const resultCalm = analyzer.analyzeVolatility(Array.from({ length: 30 }, (_, i) => 100 + i * 0.001))
+    const resultCalm = analyzer.analyzeVolatility(
+      Array.from({ length: 30 }, (_, i) => 100 + i * 0.001),
+    )
     expect(resultCalm.isHighVol).toBe(false)
 
-    const resultVolatile = analyzer.analyzeVolatility(Array.from({ length: 60 }, (_, i) => 100 + (i % 2 === 0 ? 30 : -30)))
+    const resultVolatile = analyzer.analyzeVolatility(
+      Array.from({ length: 60 }, (_, i) => 100 + (i % 2 === 0 ? 30 : -30)),
+    )
     expect(resultVolatile.isHighVol).toBe(true)
   })
 
@@ -461,7 +467,9 @@ describe('MarketAnalyzer assessNewsImpact', () => {
   })
 
   it('categorizes earnings news correctly', () => {
-    const result = analyzer.assessNewsImpact('Company reports quarterly earnings beat with strong revenue')
+    const result = analyzer.assessNewsImpact(
+      'Company reports quarterly earnings beat with strong revenue',
+    )
     expect(result.category).toBe('earnings')
     expect(result.timeHorizon).toBe('short_term')
   })
@@ -497,7 +505,9 @@ describe('MarketAnalyzer assessNewsImpact', () => {
   })
 
   it('returns confidence between 0 and 1', () => {
-    const result = analyzer.assessNewsImpact('Massive earnings beat with strong revenue guidance and EPS growth')
+    const result = analyzer.assessNewsImpact(
+      'Massive earnings beat with strong revenue guidance and EPS growth',
+    )
     expect(result.confidence).toBeGreaterThanOrEqual(0)
     expect(result.confidence).toBeLessThanOrEqual(1)
   })
@@ -596,10 +606,9 @@ describe('MarketAnalyzer generateSummary', () => {
   })
 
   it('returns all expected fields', () => {
-    const summary = analyzer.generateSummary(
-      makeUptrend(),
-      ['market rally continues with strong growth'],
-    )
+    const summary = analyzer.generateSummary(makeUptrend(), [
+      'market rally continues with strong growth',
+    ])
     expect(summary.overallSentiment).toBeDefined()
     expect(summary.trendDirection).toBeDefined()
     expect(summary.volatilityRegime).toBeDefined()
@@ -610,19 +619,18 @@ describe('MarketAnalyzer generateSummary', () => {
   })
 
   it('detects bullish summary from bullish headlines and uptrend', () => {
-    const summary = analyzer.generateSummary(
-      makeUptrend(),
-      ['rally surge bullish breakout boom', 'strong growth momentum uptrend'],
-    )
+    const summary = analyzer.generateSummary(makeUptrend(), [
+      'rally surge bullish breakout boom',
+      'strong growth momentum uptrend',
+    ])
     expect(summary.overallSentiment).toBe('bullish')
     expect(summary.trendDirection).toBe('up')
   })
 
   it('detects bearish summary from bearish headlines and downtrend', () => {
-    const summary = analyzer.generateSummary(
-      makeDowntrend(),
-      ['crash panic selloff recession collapse crisis'],
-    )
+    const summary = analyzer.generateSummary(makeDowntrend(), [
+      'crash panic selloff recession collapse crisis',
+    ])
     expect(summary.overallSentiment).toBe('bearish')
     expect(summary.trendDirection).toBe('down')
   })
@@ -634,11 +642,10 @@ describe('MarketAnalyzer generateSummary', () => {
   })
 
   it('includes breadth data when provided', () => {
-    const summary = analyzer.generateSummary(
-      makeUptrend(),
-      ['bullish rally'],
-      { advancers: 400, decliners: 50 },
-    )
+    const summary = analyzer.generateSummary(makeUptrend(), ['bullish rally'], {
+      advancers: 400,
+      decliners: 50,
+    })
     expect(summary.outlook.length).toBeGreaterThan(0)
   })
 
@@ -648,18 +655,17 @@ describe('MarketAnalyzer generateSummary', () => {
   })
 
   it('identifies risks from bearish headlines', () => {
-    const summary = analyzer.generateSummary(
-      makeDowntrend(),
-      ['recession fears mount', 'bankruptcy risk increases'],
-    )
+    const summary = analyzer.generateSummary(makeDowntrend(), [
+      'recession fears mount',
+      'bankruptcy risk increases',
+    ])
     expect(summary.risks.length).toBeGreaterThan(0)
   })
 
   it('identifies opportunities from bullish headlines', () => {
-    const summary = analyzer.generateSummary(
-      makeUptrend(),
-      ['breakout rally with growth expansion'],
-    )
+    const summary = analyzer.generateSummary(makeUptrend(), [
+      'breakout rally with growth expansion',
+    ])
     expect(summary.opportunities.length).toBeGreaterThan(0)
   })
 

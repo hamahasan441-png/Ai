@@ -11,15 +11,23 @@ describe('TypeTheoryFormal', () => {
 
   describe('KB entry tests', () => {
     it('should respond to type theory and model checking queries', async () => {
-      const response = await brain.chat('explain type theory dependent type linear type refinement model checking temporal logic ltl ctl spin nusmv theorem prover coq')
+      const response = await brain.chat(
+        'explain type theory dependent type linear type refinement model checking temporal logic ltl ctl spin nusmv theorem prover coq',
+      )
       expect(response.text.length).toBeGreaterThan(50)
-      expect(response.text.toLowerCase()).toMatch(/type\s+theory|dependent|model\s+checking|temporal|theorem|coq/)
+      expect(response.text.toLowerCase()).toMatch(
+        /type\s+theory|dependent|model\s+checking|temporal|theorem|coq/,
+      )
     })
 
     it('should respond to formal verification and contracts queries', async () => {
-      const response = await brain.chat('explain formal verification program correctness safety liveness abstract interpretation design by contract precondition postcondition invariant')
+      const response = await brain.chat(
+        'explain formal verification program correctness safety liveness abstract interpretation design by contract precondition postcondition invariant',
+      )
       expect(response.text.length).toBeGreaterThan(50)
-      expect(response.text.toLowerCase()).toMatch(/formal\s+verification|correctness|abstract\s+interpretation|contract|precondition/)
+      expect(response.text.toLowerCase()).toMatch(
+        /formal\s+verification|correctness|abstract\s+interpretation|contract|precondition/,
+      )
     })
   })
 

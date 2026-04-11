@@ -28,7 +28,12 @@ function makeError(
 
 describe('createEngineError', () => {
   it('returns an object with the correct errorClass', () => {
-    const err = createEngineError(EngineErrorClass.MODEL_FAIL, 'bad model', 'src', PipelinePhase.PHASE_1_CORE)
+    const err = createEngineError(
+      EngineErrorClass.MODEL_FAIL,
+      'bad model',
+      'src',
+      PipelinePhase.PHASE_1_CORE,
+    )
     expect(err.errorClass).toBe(EngineErrorClass.MODEL_FAIL)
   })
 
@@ -38,10 +43,20 @@ describe('createEngineError', () => {
   })
 
   it('marks retryable errors correctly', () => {
-    const retryable = createEngineError(EngineErrorClass.NETWORK_FAIL, 'm', 's', PipelinePhase.PHASE_1_CORE)
+    const retryable = createEngineError(
+      EngineErrorClass.NETWORK_FAIL,
+      'm',
+      's',
+      PipelinePhase.PHASE_1_CORE,
+    )
     expect(retryable.retryable).toBe(true)
 
-    const nonRetryable = createEngineError(EngineErrorClass.CRITICAL, 'm', 's', PipelinePhase.PHASE_1_CORE)
+    const nonRetryable = createEngineError(
+      EngineErrorClass.CRITICAL,
+      'm',
+      's',
+      PipelinePhase.PHASE_1_CORE,
+    )
     expect(nonRetryable.retryable).toBe(false)
   })
 
@@ -52,7 +67,14 @@ describe('createEngineError', () => {
 
   it('captures the stack from an original error when provided', () => {
     const orig = new Error('original')
-    const err = createEngineError(EngineErrorClass.UNKNOWN, 'm', 's', PipelinePhase.PHASE_1_CORE, {}, orig)
+    const err = createEngineError(
+      EngineErrorClass.UNKNOWN,
+      'm',
+      's',
+      PipelinePhase.PHASE_1_CORE,
+      {},
+      orig,
+    )
     expect(err.stack).toBe(orig.stack)
   })
 
@@ -62,7 +84,13 @@ describe('createEngineError', () => {
   })
 
   it('stores custom metadata', () => {
-    const err = createEngineError(EngineErrorClass.TOOL_FAIL, 'm', 's', PipelinePhase.PHASE_2_SEMANTIC, { tool: 'grep' })
+    const err = createEngineError(
+      EngineErrorClass.TOOL_FAIL,
+      'm',
+      's',
+      PipelinePhase.PHASE_2_SEMANTIC,
+      { tool: 'grep' },
+    )
     expect(err.metadata).toEqual({ tool: 'grep' })
   })
 })
@@ -226,9 +254,9 @@ describe('ErrorAggregator', () => {
   })
 
   it('getAll returns errors sorted by priority (lowest number first)', () => {
-    agg.add(makeError(EngineErrorClass.UNKNOWN))       // priority 9
-    agg.add(makeError(EngineErrorClass.CRITICAL))      // priority 0
-    agg.add(makeError(EngineErrorClass.NETWORK_FAIL))  // priority 5
+    agg.add(makeError(EngineErrorClass.UNKNOWN)) // priority 9
+    agg.add(makeError(EngineErrorClass.CRITICAL)) // priority 0
+    agg.add(makeError(EngineErrorClass.NETWORK_FAIL)) // priority 5
     const all = agg.getAll()
     expect(all[0].errorClass).toBe(EngineErrorClass.CRITICAL)
     expect(all[1].errorClass).toBe(EngineErrorClass.NETWORK_FAIL)

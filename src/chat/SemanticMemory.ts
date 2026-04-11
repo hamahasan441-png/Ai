@@ -1765,22 +1765,55 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(mqlCodeQuality, mqlCodeOptimization, 'related-to', 0.85)
 
   // ── Network Security Python (Black Hat Python 3) concepts ─────────────────
-  const networkSecurityPython = memory.addConcept('Network Security Python', 'network_security_python')
-  const pythonSocketProgramming = memory.addConcept('Python Socket Programming', 'network_security_python')
+  const networkSecurityPython = memory.addConcept(
+    'Network Security Python',
+    'network_security_python',
+  )
+  const pythonSocketProgramming = memory.addConcept(
+    'Python Socket Programming',
+    'network_security_python',
+  )
   const pythonTcpProxy = memory.addConcept('Python TCP Proxy', 'network_security_python')
   const pythonSshParamiko = memory.addConcept('Python SSH Paramiko', 'network_security_python')
-  const pythonPacketSniffing = memory.addConcept('Python Packet Sniffing', 'network_security_python')
-  const pythonNetworkScanning = memory.addConcept('Python Network Scanning', 'network_security_python')
-  const pythonScapyCrafting = memory.addConcept('Python Scapy Packet Crafting', 'network_security_python')
+  const pythonPacketSniffing = memory.addConcept(
+    'Python Packet Sniffing',
+    'network_security_python',
+  )
+  const pythonNetworkScanning = memory.addConcept(
+    'Python Network Scanning',
+    'network_security_python',
+  )
+  const pythonScapyCrafting = memory.addConcept(
+    'Python Scapy Packet Crafting',
+    'network_security_python',
+  )
   const pythonWebTesting = memory.addConcept('Python Web App Testing', 'network_security_python')
-  const pythonBurpExtension = memory.addConcept('Python Burp Suite Extension', 'network_security_python')
+  const pythonBurpExtension = memory.addConcept(
+    'Python Burp Suite Extension',
+    'network_security_python',
+  )
   const pythonC2Framework = memory.addConcept('Python C2 Framework', 'network_security_python')
-  const pythonPostExploitation = memory.addConcept('Python Post-Exploitation', 'network_security_python')
-  const pythonSandboxDetection = memory.addConcept('Python Sandbox Detection', 'network_security_python')
-  const pythonExfiltration = memory.addConcept('Python Data Exfiltration', 'network_security_python')
-  const pythonProcessMonitoring = memory.addConcept('Python Process Monitoring', 'network_security_python')
+  const pythonPostExploitation = memory.addConcept(
+    'Python Post-Exploitation',
+    'network_security_python',
+  )
+  const pythonSandboxDetection = memory.addConcept(
+    'Python Sandbox Detection',
+    'network_security_python',
+  )
+  const pythonExfiltration = memory.addConcept(
+    'Python Data Exfiltration',
+    'network_security_python',
+  )
+  const pythonProcessMonitoring = memory.addConcept(
+    'Python Process Monitoring',
+    'network_security_python',
+  )
   const pythonCodeInjection = memory.addConcept('Python Code Injection', 'network_security_python')
-  const pythonBinaryProtocol = memory.addConcept('Python Binary Protocol Handling', 'network_security_python')
+  const pythonBinaryProtocol = memory.addConcept(
+    'Python Binary Protocol Handling',
+    'network_security_python',
+  )
 
   // Network Security Python relations
   memory.addRelation(pythonSocketProgramming, networkSecurityPython, 'part-of', 0.95)
@@ -1811,7 +1844,10 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(pythonBinaryProtocol, pythonSocketProgramming, 'related-to', 0.9)
 
   // ── Data Science & ML Concepts ──────────────────────────────────────────────
-  const dataScienceML = memory.addConcept('Data Science & Machine Learning', 'artificial-intelligence')
+  const dataScienceML = memory.addConcept(
+    'Data Science & Machine Learning',
+    'artificial-intelligence',
+  )
   const supervisedLearning = memory.addConcept('Supervised Learning', 'machine-learning')
   const unsupervisedLearning = memory.addConcept('Unsupervised Learning', 'machine-learning')
   const deepLearning = memory.addConcept('Deep Learning', 'machine-learning')
@@ -2428,10 +2464,19 @@ export function createProgrammingKnowledgeGraph(
 
   // ── Data Engineering / ETL concepts ────────────────────────────────────────
   const dataEngineering = memory.addConcept('Data Engineering & ETL', 'data_engineering')
-  const sparkProcessing = memory.addConcept('Apache Spark & Distributed Processing', 'data_engineering')
-  const workflowOrchestration = memory.addConcept('Workflow Orchestration (Airflow/Dagster)', 'data_engineering')
+  const sparkProcessing = memory.addConcept(
+    'Apache Spark & Distributed Processing',
+    'data_engineering',
+  )
+  const workflowOrchestration = memory.addConcept(
+    'Workflow Orchestration (Airflow/Dagster)',
+    'data_engineering',
+  )
   const modernDataStack = memory.addConcept('Modern Data Stack (dbt/Warehouse)', 'data_engineering')
-  const eventStreaming = memory.addConcept('Event Streaming & Schema Management', 'data_engineering')
+  const eventStreaming = memory.addConcept(
+    'Event Streaming & Schema Management',
+    'data_engineering',
+  )
   const dataQualityGovernance = memory.addConcept('Data Quality & Governance', 'data_engineering')
   const dataArchPatterns = memory.addConcept('Data Architecture Patterns', 'data_engineering')
   memory.addRelation(sparkProcessing, dataEngineering, 'part-of', 0.95)
@@ -2551,7 +2596,10 @@ export function createProgrammingKnowledgeGraph(
   const awsLambdaConcept = memory.addConcept('AWS Lambda & FaaS', 'edge_computing')
   const edgePlatforms = memory.addConcept('Edge Platforms (Workers/Vercel/Deno)', 'edge_computing')
   const edgeCachingConcept = memory.addConcept('Edge Caching & Serverless DBs', 'edge_computing')
-  const serverlessOrch = memory.addConcept('Serverless Orchestration & Monitoring', 'edge_computing')
+  const serverlessOrch = memory.addConcept(
+    'Serverless Orchestration & Monitoring',
+    'edge_computing',
+  )
   const coldStartOpt = memory.addConcept('Cold Start Optimization', 'edge_computing')
   memory.addRelation(awsLambdaConcept, edgeServerless, 'part-of', 0.95)
   memory.addRelation(edgePlatforms, edgeServerless, 'part-of', 0.9)
@@ -2899,7 +2947,10 @@ export function createProgrammingKnowledgeGraph(
   const stringMatchAlgorithms = memory.addConcept('String Matching Algorithms', 'algorithms')
   const probabilisticStructures = memory.addConcept('Probabilistic Data Structures', 'algorithms')
   const advancedTreeStructures = memory.addConcept('Advanced Tree Structures', 'algorithms')
-  const divideConquerGreedy = memory.addConcept('Divide-and-Conquer & Greedy Strategies', 'algorithms')
+  const divideConquerGreedy = memory.addConcept(
+    'Divide-and-Conquer & Greedy Strategies',
+    'algorithms',
+  )
   const complexityAnalysis = memory.addConcept('Algorithm Complexity Analysis', 'algorithms')
   memory.addRelation(dpAlgorithms, advancedAlgoDS, 'part-of', 0.95)
   memory.addRelation(graphPathAlgorithms, advancedAlgoDS, 'part-of', 0.95)
@@ -2934,7 +2985,10 @@ export function createProgrammingKnowledgeGraph(
   memory.addRelation(memoryModelConcept, stmConcept, 'related-to', 0.85)
 
   // ── Reactive Programming concepts ───────────────────────────────────────────
-  const reactiveProgrammingConcept = memory.addConcept('Reactive Programming & Streams', 'architecture')
+  const reactiveProgrammingConcept = memory.addConcept(
+    'Reactive Programming & Streams',
+    'architecture',
+  )
   const reactiveStreamsOps = memory.addConcept('Reactive Streams & Operators', 'architecture')
   const backpressureStrategies = memory.addConcept('Backpressure Strategies', 'architecture')
   const frpSignals = memory.addConcept('Functional Reactive Programming', 'architecture')
@@ -2955,7 +3009,10 @@ export function createProgrammingKnowledgeGraph(
 
   // ── Metaprogramming & Code Generation concepts ──────────────────────────────
   const metaprogrammingConcept = memory.addConcept('Metaprogramming & Code Generation', 'languages')
-  const runtimeReflectionConcept = memory.addConcept('Runtime Reflection & Introspection', 'languages')
+  const runtimeReflectionConcept = memory.addConcept(
+    'Runtime Reflection & Introspection',
+    'languages',
+  )
   const compileTimeMetaprog = memory.addConcept('Compile-Time Metaprogramming', 'languages')
   const astManipulationConcept = memory.addConcept('AST Manipulation & Transforms', 'languages')
   const codeGenScaffolding = memory.addConcept('Code Generation & Scaffolding', 'languages')
@@ -2976,11 +3033,17 @@ export function createProgrammingKnowledgeGraph(
   // ── Micro Frontends concepts ────────────────────────────────────────────────
   const microFrontendsConcept = memory.addConcept('Micro Frontends Architecture', 'frontend')
   const moduleFederationConcept = memory.addConcept('Module Federation & Import Maps', 'frontend')
-  const mfeCompositionPatterns = memory.addConcept('Micro Frontend Composition Patterns', 'frontend')
+  const mfeCompositionPatterns = memory.addConcept(
+    'Micro Frontend Composition Patterns',
+    'frontend',
+  )
   const mfeSharedState = memory.addConcept('Micro Frontend Shared State', 'frontend')
   const singleSpaFramework = memory.addConcept('Single-SPA Framework', 'frontend')
   const mfeWebComponents = memory.addConcept('Web Components for Micro Frontends', 'frontend')
-  const mfeDeploymentStrategies = memory.addConcept('Micro Frontend Deployment Strategies', 'frontend')
+  const mfeDeploymentStrategies = memory.addConcept(
+    'Micro Frontend Deployment Strategies',
+    'frontend',
+  )
   memory.addRelation(moduleFederationConcept, microFrontendsConcept, 'part-of', 0.95)
   memory.addRelation(mfeCompositionPatterns, microFrontendsConcept, 'part-of', 0.95)
   memory.addRelation(mfeSharedState, microFrontendsConcept, 'part-of', 0.9)
@@ -3055,8 +3118,14 @@ export function createProgrammingKnowledgeGraph(
 
   // ── API Design Patterns ──────────────────────────────────────────────────────
   const apiDesignPatternsConcept = memory.addConcept('API Design Patterns', 'architecture')
-  const restBestPracticesConcept = memory.addConcept('REST Best Practices & Standards', 'architecture')
-  const graphqlSchemaDesignConcept = memory.addConcept('GraphQL Schema Design & Federation', 'architecture')
+  const restBestPracticesConcept = memory.addConcept(
+    'REST Best Practices & Standards',
+    'architecture',
+  )
+  const graphqlSchemaDesignConcept = memory.addConcept(
+    'GraphQL Schema Design & Federation',
+    'architecture',
+  )
   const apiGatewayPatternsConcept = memory.addConcept('API Gateway & Rate Limiting', 'architecture')
   const apiVersioningConcept = memory.addConcept('API Versioning Strategies', 'architecture')
   const apiDocumentationConcept = memory.addConcept('API Documentation & OpenAPI', 'architecture')
@@ -3078,7 +3147,10 @@ export function createProgrammingKnowledgeGraph(
   const storageEnginesConcept = memory.addConcept('Storage Engines & Data Structures', 'database')
   const queryOptimizationConcept = memory.addConcept('Query Optimization & Planning', 'database')
   const transactionIsolationConcept = memory.addConcept('Transaction Isolation & MVCC', 'database')
-  const consensusAlgorithmsConcept = memory.addConcept('Consensus Algorithms & Distributed Agreement', 'database')
+  const consensusAlgorithmsConcept = memory.addConcept(
+    'Consensus Algorithms & Distributed Agreement',
+    'database',
+  )
   const walRecoveryConcept = memory.addConcept('WAL & Crash Recovery', 'database')
   const indexingStrategiesConcept = memory.addConcept('Indexing Strategies & Types', 'database')
   memory.addRelation(storageEnginesConcept, databaseInternalsConcept, 'part-of', 0.95)
@@ -3096,10 +3168,16 @@ export function createProgrammingKnowledgeGraph(
   // ── Functional Programming Deep Dive ─────────────────────────────────────────
   const functionalDeepConcept = memory.addConcept('Functional Programming Deep Dive', 'programming')
   const monadsAndFunctorsConcept = memory.addConcept('Monads & Functors', 'programming')
-  const algebraicDataTypesConcept = memory.addConcept('Algebraic Data Types & Pattern Matching', 'programming')
+  const algebraicDataTypesConcept = memory.addConcept(
+    'Algebraic Data Types & Pattern Matching',
+    'programming',
+  )
   const typeClassesTraitsConcept = memory.addConcept('Type Classes & Traits', 'programming')
   const immutableStructuresConcept = memory.addConcept('Immutable Data Structures', 'programming')
-  const effectSystemsConcept = memory.addConcept('Effect Systems & Algebraic Effects', 'programming')
+  const effectSystemsConcept = memory.addConcept(
+    'Effect Systems & Algebraic Effects',
+    'programming',
+  )
   const categoryTheoryAppliedConcept = memory.addConcept('Category Theory Applied', 'programming')
   memory.addRelation(monadsAndFunctorsConcept, functionalDeepConcept, 'part-of', 0.95)
   memory.addRelation(algebraicDataTypesConcept, functionalDeepConcept, 'part-of', 0.95)
@@ -3116,7 +3194,10 @@ export function createProgrammingKnowledgeGraph(
   // ── Low-Level & Systems Programming ──────────────────────────────────────────
   const systemsProgrammingConcept = memory.addConcept('Low-Level & Systems Programming', 'systems')
   const memoryManagementConcept = memory.addConcept('Memory Management & Allocation', 'systems')
-  const cpuArchAwarenessConcept = memory.addConcept('CPU Architecture & Cache Optimization', 'systems')
+  const cpuArchAwarenessConcept = memory.addConcept(
+    'CPU Architecture & Cache Optimization',
+    'systems',
+  )
   const linkersLoadersConcept = memory.addConcept('Linkers & Loaders', 'systems')
   const syscallsOsInterfaceConcept = memory.addConcept('System Calls & OS Interface', 'systems')
   const unsafeCodeFfiConcept = memory.addConcept('Unsafe Code & FFI', 'systems')
@@ -3140,7 +3221,10 @@ export function createProgrammingKnowledgeGraph(
   const profilingToolsConcept = memory.addConcept('Profiling & Performance Analysis', 'tooling')
   const codeNavigationConcept = memory.addConcept('Code Navigation & Intelligence', 'tooling')
   const cliToolsDevConcept = memory.addConcept('CLI Tools for Developers', 'tooling')
-  const devEnvironmentsConcept = memory.addConcept('Development Environments & Containers', 'tooling')
+  const devEnvironmentsConcept = memory.addConcept(
+    'Development Environments & Containers',
+    'tooling',
+  )
   memory.addRelation(ideMasteryConcept, developerProductivityConcept, 'part-of', 0.95)
   memory.addRelation(debuggingTechniquesConcept, developerProductivityConcept, 'part-of', 0.95)
   memory.addRelation(profilingToolsConcept, developerProductivityConcept, 'part-of', 0.9)
@@ -3158,8 +3242,14 @@ export function createProgrammingKnowledgeGraph(
   const reviewChecklistConcept = memory.addConcept('Review Checklist & Criteria', 'practices')
   const reviewTechniquesConcept = memory.addConcept('Review Techniques & Approaches', 'practices')
   const givingFeedbackConcept = memory.addConcept('Giving Constructive Feedback', 'practices')
-  const commonReviewIssuesConcept = memory.addConcept('Common Review Issues & Anti-patterns', 'practices')
-  const automatedReviewToolsConcept = memory.addConcept('Automated Review & Static Analysis', 'practices')
+  const commonReviewIssuesConcept = memory.addConcept(
+    'Common Review Issues & Anti-patterns',
+    'practices',
+  )
+  const automatedReviewToolsConcept = memory.addConcept(
+    'Automated Review & Static Analysis',
+    'practices',
+  )
   const prStrategiesConcept = memory.addConcept('PR Strategies & Workflows', 'practices')
   memory.addRelation(reviewChecklistConcept, codeReviewPracticesConcept, 'part-of', 0.95)
   memory.addRelation(reviewTechniquesConcept, codeReviewPracticesConcept, 'part-of', 0.95)
@@ -3177,7 +3267,10 @@ export function createProgrammingKnowledgeGraph(
   const cleanCodePrinciplesConcept = memory.addConcept('Clean Code Principles', 'practices')
   const namingConventionsConcept = memory.addConcept('Naming Conventions & Vocabulary', 'practices')
   const functionDesignConcept = memory.addConcept('Function Design & Purity', 'practices')
-  const errorHandlingPatternsConcept = memory.addConcept('Error Handling Patterns & Strategies', 'practices')
+  const errorHandlingPatternsConcept = memory.addConcept(
+    'Error Handling Patterns & Strategies',
+    'practices',
+  )
   const codeOrganizationConcept = memory.addConcept('Code Organization & Cohesion', 'practices')
   const commentsDocsConcept = memory.addConcept('Comments & Self-Documenting Code', 'practices')
   const testingPyramidConcept = memory.addConcept('Testing Pyramid & Trophy', 'testing')
@@ -3196,11 +3289,17 @@ export function createProgrammingKnowledgeGraph(
   // ── Version Control Advanced ─────────────────────────────────────────────────
   const versionControlAdvConcept = memory.addConcept('Version Control Advanced', 'tooling')
   const gitInternalsConcept = memory.addConcept('Git Internals & Object Model', 'tooling')
-  const branchingStrategiesConcept = memory.addConcept('Branching Strategies & Workflows', 'tooling')
+  const branchingStrategiesConcept = memory.addConcept(
+    'Branching Strategies & Workflows',
+    'tooling',
+  )
   const rebaseVsMergeConcept = memory.addConcept('Rebase vs Merge & History', 'tooling')
   const gitHooksAutomationConcept = memory.addConcept('Git Hooks & Automation', 'tooling')
   const monorepoManagementConcept = memory.addConcept('Monorepo Management & Tools', 'tooling')
-  const conflictResolutionConcept = memory.addConcept('Conflict Resolution & Merge Strategies', 'tooling')
+  const conflictResolutionConcept = memory.addConcept(
+    'Conflict Resolution & Merge Strategies',
+    'tooling',
+  )
   memory.addRelation(gitInternalsConcept, versionControlAdvConcept, 'part-of', 0.95)
   memory.addRelation(branchingStrategiesConcept, versionControlAdvConcept, 'part-of', 0.95)
   memory.addRelation(rebaseVsMergeConcept, versionControlAdvConcept, 'part-of', 0.9)
@@ -3310,11 +3409,20 @@ export function createProgrammingKnowledgeGraph(
   // ── Pragmatics & Discourse Analysis ──────────────────────────────────────────
   const pragmaticsConcept = memory.addConcept('Pragmatics & Discourse Analysis', 'linguistics')
   const speechActsConcept = memory.addConcept('Speech Acts & Cooperative Principle', 'linguistics')
-  const conversationStructureConcept = memory.addConcept('Conversation Structure & Turn-Taking', 'linguistics')
+  const conversationStructureConcept = memory.addConcept(
+    'Conversation Structure & Turn-Taking',
+    'linguistics',
+  )
   const presuppositionConcept = memory.addConcept('Presupposition & Entailment', 'linguistics')
   const politenessConcept = memory.addConcept('Politeness Theory & Face', 'linguistics')
-  const discourseCoherenceConcept = memory.addConcept('Discourse Coherence & Cohesion', 'linguistics')
-  const argumentMiningConcept = memory.addConcept('Argumentation & Narrative Structure', 'linguistics')
+  const discourseCoherenceConcept = memory.addConcept(
+    'Discourse Coherence & Cohesion',
+    'linguistics',
+  )
+  const argumentMiningConcept = memory.addConcept(
+    'Argumentation & Narrative Structure',
+    'linguistics',
+  )
   memory.addRelation(speechActsConcept, pragmaticsConcept, 'part-of', 0.95)
   memory.addRelation(conversationStructureConcept, pragmaticsConcept, 'part-of', 0.9)
   memory.addRelation(presuppositionConcept, pragmaticsConcept, 'part-of', 0.9)

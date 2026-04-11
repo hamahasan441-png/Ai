@@ -64,9 +64,7 @@ class TerminalPanel {
     const result = spawnSync('tmux', ['-V'], { encoding: 'utf-8' })
     this.hasTmux = result.status === 0
     if (!this.hasTmux) {
-      logForDebugging(
-        'Terminal panel: tmux not found, falling back to non-persistent shell',
-      )
+      logForDebugging('Terminal panel: tmux not found, falling back to non-persistent shell')
     }
     return this.hasTmux
   }
@@ -87,25 +85,12 @@ class TerminalPanel {
 
     const result = spawnSync(
       'tmux',
-      [
-        '-L',
-        socket,
-        'new-session',
-        '-d',
-        '-s',
-        TMUX_SESSION,
-        '-c',
-        cwd,
-        shell,
-        '-l',
-      ],
+      ['-L', socket, 'new-session', '-d', '-s', TMUX_SESSION, '-c', cwd, shell, '-l'],
       { encoding: 'utf-8' },
     )
 
     if (result.status !== 0) {
-      logForDebugging(
-        `Terminal panel: failed to create tmux session: ${result.stderr}`,
-      )
+      logForDebugging(`Terminal panel: failed to create tmux session: ${result.stderr}`)
       return false
     }
 
@@ -114,12 +99,32 @@ class TerminalPanel {
     // 5 spawnSync calls into 1.
     // biome-ignore format: one tmux command per line
     spawnSync('tmux', [
-      '-L', socket,
-      'bind-key', '-n', 'M-j', 'detach-client', ';',
-      'set-option', '-g', 'status-style', 'bg=default', ';',
-      'set-option', '-g', 'status-left', '', ';',
-      'set-option', '-g', 'status-right', ' Alt+J to return to Claude ', ';',
-      'set-option', '-g', 'status-right-style', 'fg=brightblack',
+      '-L',
+      socket,
+      'bind-key',
+      '-n',
+      'M-j',
+      'detach-client',
+      ';',
+      'set-option',
+      '-g',
+      'status-style',
+      'bg=default',
+      ';',
+      'set-option',
+      '-g',
+      'status-left',
+      '',
+      ';',
+      'set-option',
+      '-g',
+      'status-right',
+      ' Alt+J to return to Claude ',
+      ';',
+      'set-option',
+      '-g',
+      'status-right-style',
+      'fg=brightblack',
     ])
 
     if (!this.cleanupRegistered) {
@@ -142,11 +147,9 @@ class TerminalPanel {
   }
 
   private attachSession(): void {
-    spawnSync(
-      'tmux',
-      ['-L', getTerminalPanelSocket(), 'attach-session', '-t', TMUX_SESSION],
-      { stdio: 'inherit' },
-    )
+    spawnSync('tmux', ['-L', getTerminalPanelSocket(), 'attach-session', '-t', TMUX_SESSION], {
+      stdio: 'inherit',
+    })
   }
 
   // ── show shell ────────────────────────────────────────────────────

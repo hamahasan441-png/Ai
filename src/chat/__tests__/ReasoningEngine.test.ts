@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  ReasoningEngine,
-  type ReasoningContext,
-} from '../ReasoningEngine'
+import { ReasoningEngine, type ReasoningContext } from '../ReasoningEngine'
 
 // ── Constructor Tests ──
 
@@ -31,14 +28,14 @@ describe('ReasoningEngine constructor', () => {
     const engine = new ReasoningEngine({ maxSteps: 10 })
     // Default selfConsistencyRuns is 3, so reason() should produce 3 candidates
     const result = engine.reason('Explain sorting algorithms.')
-    const solveSteps = result.steps.filter((s) => s.phase === 'solve')
+    const solveSteps = result.steps.filter(s => s.phase === 'solve')
     expect(solveSteps.length).toBe(3)
   })
 
   it('respects custom selfConsistencyRuns', () => {
     const engine = new ReasoningEngine({ selfConsistencyRuns: 5 })
     const result = engine.reason('Explain sorting algorithms.')
-    const solveSteps = result.steps.filter((s) => s.phase === 'solve')
+    const solveSteps = result.steps.filter(s => s.phase === 'solve')
     expect(solveSteps.length).toBe(5)
   })
 })
@@ -68,7 +65,7 @@ describe('ReasoningEngine.reason', () => {
 
   it('includes all four phases in steps', () => {
     const result = engine.reason('Compare React and Vue.')
-    const phases = new Set(result.steps.map((s) => s.phase))
+    const phases = new Set(result.steps.map(s => s.phase))
     expect(phases.has('decompose')).toBe(true)
     expect(phases.has('plan')).toBe(true)
     expect(phases.has('solve')).toBe(true)
@@ -192,8 +189,7 @@ describe('ReasoningEngine.decompose', () => {
   })
 
   it('infers dependencies between related sub-problems', () => {
-    const problem =
-      'Analyze the database schema. Then optimize it for performance.'
+    const problem = 'Analyze the database schema. Then optimize it for performance.'
     const subs = engine.decompose(problem)
     expect(subs.length).toBe(2)
     // Second sub-problem references "it" → should depend on first
@@ -212,67 +208,67 @@ describe('ReasoningEngine.extractConstraints', () => {
 
   it('extracts must_have constraints from "must have" patterns', () => {
     const constraints = engine.extractConstraints('The system must have authentication.')
-    const mustHave = constraints.filter((c) => c.type === 'must_have')
+    const mustHave = constraints.filter(c => c.type === 'must_have')
     expect(mustHave.length).toBeGreaterThan(0)
   })
 
   it('extracts must_have constraints from "requires" patterns', () => {
     const constraints = engine.extractConstraints('The API requires rate limiting.')
-    const mustHave = constraints.filter((c) => c.type === 'must_have')
+    const mustHave = constraints.filter(c => c.type === 'must_have')
     expect(mustHave.length).toBeGreaterThan(0)
   })
 
   it('extracts must_have constraints from "needs to" patterns', () => {
     const constraints = engine.extractConstraints('The app needs to support offline mode.')
-    const mustHave = constraints.filter((c) => c.type === 'must_have')
+    const mustHave = constraints.filter(c => c.type === 'must_have')
     expect(mustHave.length).toBeGreaterThan(0)
   })
 
   it('extracts must_not constraints from "must not" patterns', () => {
     const constraints = engine.extractConstraints('The response must not contain sensitive data.')
-    const mustNot = constraints.filter((c) => c.type === 'must_not')
+    const mustNot = constraints.filter(c => c.type === 'must_not')
     expect(mustNot.length).toBeGreaterThan(0)
   })
 
   it('extracts must_not constraints from "avoid" patterns', () => {
     const constraints = engine.extractConstraints('Avoid using global state.')
-    const mustNot = constraints.filter((c) => c.type === 'must_not')
+    const mustNot = constraints.filter(c => c.type === 'must_not')
     expect(mustNot.length).toBeGreaterThan(0)
   })
 
   it('extracts must_not constraints from "never" patterns', () => {
     const constraints = engine.extractConstraints('Never expose internal APIs.')
-    const mustNot = constraints.filter((c) => c.type === 'must_not')
+    const mustNot = constraints.filter(c => c.type === 'must_not')
     expect(mustNot.length).toBeGreaterThan(0)
   })
 
   it('extracts preference constraints from "should" patterns', () => {
     const constraints = engine.extractConstraints('The code should be readable.')
-    const pref = constraints.filter((c) => c.type === 'preference')
+    const pref = constraints.filter(c => c.type === 'preference')
     expect(pref.length).toBeGreaterThan(0)
   })
 
   it('extracts preference constraints from "preferably" patterns', () => {
     const constraints = engine.extractConstraints('Use a typed language, preferably TypeScript.')
-    const pref = constraints.filter((c) => c.type === 'preference')
+    const pref = constraints.filter(c => c.type === 'preference')
     expect(pref.length).toBeGreaterThan(0)
   })
 
   it('extracts preference constraints from "ideally" patterns', () => {
     const constraints = engine.extractConstraints('Ideally the response time is under 200ms.')
-    const pref = constraints.filter((c) => c.type === 'preference')
+    const pref = constraints.filter(c => c.type === 'preference')
     expect(pref.length).toBeGreaterThan(0)
   })
 
   it('extracts conditional constraints from "if...then" patterns', () => {
     const constraints = engine.extractConstraints('If the user is admin then grant full access.')
-    const cond = constraints.filter((c) => c.type === 'conditional')
+    const cond = constraints.filter(c => c.type === 'conditional')
     expect(cond.length).toBeGreaterThan(0)
   })
 
   it('extracts conditional constraints from "unless" patterns', () => {
     const constraints = engine.extractConstraints('Allow access unless the token is expired.')
-    const cond = constraints.filter((c) => c.type === 'conditional')
+    const cond = constraints.filter(c => c.type === 'conditional')
     expect(cond.length).toBeGreaterThan(0)
   })
 
@@ -285,7 +281,7 @@ describe('ReasoningEngine.extractConstraints', () => {
     const input =
       'The system must have logging. Avoid downtime. The API should be versioned. If traffic spikes then auto-scale.'
     const constraints = engine.extractConstraints(input)
-    const types = new Set(constraints.map((c) => c.type))
+    const types = new Set(constraints.map(c => c.type))
     expect(types.has('must_have')).toBe(true)
     expect(types.has('must_not')).toBe(true)
     expect(types.has('preference')).toBe(true)
@@ -349,10 +345,7 @@ describe('ReasoningEngine.evaluateSolution', () => {
       problem,
       'A binary search tree is implemented by creating nodes with left and right children. Implement insert and search operations.',
     )
-    const irrelevant = engine.evaluateSolution(
-      problem,
-      'The weather is nice today.',
-    )
+    const irrelevant = engine.evaluateSolution(problem, 'The weather is nice today.')
     expect(relevant.correctness).toBeGreaterThan(irrelevant.correctness)
   })
 

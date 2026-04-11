@@ -429,15 +429,25 @@ describe('NarrativeEngine', () => {
     })
 
     it('detects plot points from keyword-rich text', () => {
-      const text = 'Suddenly a stranger arrived. The hero made a decision to change everything. The final showdown began.'
+      const text =
+        'Suddenly a stranger arrived. The hero made a decision to change everything. The final showdown began.'
       const pp = engine.extractPlotPoints(text)
       expect(pp.length).toBeGreaterThan(0)
     })
 
     it('each plot point has a type', () => {
-      const text = 'Suddenly something unexpected happened. The hero chose to reveal the hidden truth.'
+      const text =
+        'Suddenly something unexpected happened. The hero chose to reveal the hidden truth.'
       const pp = engine.extractPlotPoints(text)
-      const validTypes = ['inciting_incident', 'turning_point', 'climax', 'resolution', 'revelation', 'setback', 'milestone']
+      const validTypes = [
+        'inciting_incident',
+        'turning_point',
+        'climax',
+        'resolution',
+        'revelation',
+        'setback',
+        'milestone',
+      ]
       for (const p of pp) {
         expect(validTypes).toContain(p.type)
       }
@@ -453,7 +463,8 @@ describe('NarrativeEngine', () => {
     })
 
     it('links plot points causally to previous ones', () => {
-      const text = 'Suddenly the stranger arrived. Then the hero made a decision to change. Finally the last battle concluded.'
+      const text =
+        'Suddenly the stranger arrived. Then the hero made a decision to change. Finally the last battle concluded.'
       const pp = engine.extractPlotPoints(text)
       if (pp.length >= 2) {
         expect(pp[1].causalLinks).toContain(pp[0].id)
@@ -535,7 +546,16 @@ describe('NarrativeEngine', () => {
     it('returns a valid structure type', () => {
       for (const s of LONG_STORY.split('. ')) engine.addBeat(s + '.')
       const structure = engine.classifyStructure()
-      const validTypes = ['three_act', 'heros_journey', 'five_act', 'kishotenketsu', 'freytag_pyramid', 'in_medias_res', 'frame_narrative', 'unknown']
+      const validTypes = [
+        'three_act',
+        'heros_journey',
+        'five_act',
+        'kishotenketsu',
+        'freytag_pyramid',
+        'in_medias_res',
+        'frame_narrative',
+        'unknown',
+      ]
       expect(validTypes).toContain(structure.type)
     })
 
@@ -976,7 +996,10 @@ describe('NarrativeEngine', () => {
     })
 
     it('handles very long text in analyzeNarrative', () => {
-      const longText = Array.from({ length: 50 }, (_, i) => `Sentence number ${i} with danger and battle.`).join(' ')
+      const longText = Array.from(
+        { length: 50 },
+        (_, i) => `Sentence number ${i} with danger and battle.`,
+      ).join(' ')
       const result = engine.analyzeNarrative(longText)
       expect(result.tensionCurve.length).toBeGreaterThan(0)
     })

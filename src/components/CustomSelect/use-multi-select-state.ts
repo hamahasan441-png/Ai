@@ -4,10 +4,7 @@ import { useRegisterOverlay } from '../../context/overlayContext.js'
 import type { InputEvent } from '../../ink/events/input-event.js'
 // eslint-disable-next-line custom-rules/prefer-use-keybindings -- raw space/arrow multiselect input
 import { useInput } from '../../ink.js'
-import {
-  normalizeFullWidthDigits,
-  normalizeFullWidthSpace,
-} from '../../utils/stringUtils.js'
+import { normalizeFullWidthDigits, normalizeFullWidthSpace } from '../../utils/stringUtils.js'
 import type { OptionWithDescription } from './select.js'
 import { useSelectNavigation } from './use-select-navigation.js'
 
@@ -192,8 +189,7 @@ export function useMultiSelectState<T>({
 
   const updateSelectedValues = useCallback(
     (values: T[] | ((prev: T[]) => T[])) => {
-      const newValues =
-        typeof values === 'function' ? values(selectedValues) : values
+      const newValues = typeof values === 'function' ? values(selectedValues) : values
       setSelectedValues(newValues)
       onChange?.(newValues)
     },
@@ -203,9 +199,7 @@ export function useMultiSelectState<T>({
   const navigation = useSelectNavigation<T>({
     visibleOptionCount,
     options,
-    initialFocusValue: initialFocusLast
-      ? options[options.length - 1]?.value
-      : undefined,
+    initialFocusValue: initialFocusLast ? options[options.length - 1]?.value : undefined,
     onFocus,
     focusValue,
   })
@@ -247,9 +241,7 @@ export function useMultiSelectState<T>({
   useInput(
     (input, key, event: InputEvent) => {
       const normalizedInput = normalizeFullWidthDigits(input)
-      const focusedOption = options.find(
-        opt => opt.value === navigation.focusedValue,
-      )
+      const focusedOption = options.find(opt => opt.value === navigation.focusedValue)
       const isInInput = focusedOption?.type === 'input'
 
       // When in input field, only allow navigation keys
@@ -329,10 +321,7 @@ export function useMultiSelectState<T>({
         if (submitButtonText && onSubmit && isSubmitFocused) {
           setIsSubmitFocused(false)
           navigation.focusOption(lastOptionValue)
-        } else if (
-          onUpFromFirstItem &&
-          navigation.focusedValue === options[0]?.value
-        ) {
+        } else if (onUpFromFirstItem && navigation.focusedValue === options[0]?.value) {
           onUpFromFirstItem()
         } else {
           navigation.focusPreviousOption()

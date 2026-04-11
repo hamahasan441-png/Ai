@@ -4,10 +4,7 @@ import { queryModelWithoutStreaming } from 'src/services/api/claude.js'
 import { getEmptyToolPermissionContext } from 'src/Tool.js'
 import { AGENT_TOOL_NAME } from 'src/tools/AgentTool/constants.js'
 import { prependUserContext } from 'src/utils/api.js'
-import {
-  createUserMessage,
-  normalizeMessagesForAPI,
-} from 'src/utils/messages.js'
+import { createUserMessage, normalizeMessagesForAPI } from 'src/utils/messages.js'
 import type { ModelName } from 'src/utils/model/model.js'
 import { isAutoMemoryEnabled } from '../../memdir/paths.js'
 import {

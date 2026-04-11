@@ -31,16 +31,16 @@ export type Emotion =
 
 export interface EmotionScore {
   emotion: Emotion
-  score: number    // 0-1 intensity
+  score: number // 0-1 intensity
   confidence: number
 }
 
 export interface EmotionalAnalysis {
   primary: EmotionScore
   secondary: EmotionScore | null
-  valence: number      // -1 (negative) to +1 (positive)
-  arousal: number      // 0 (calm) to 1 (excited)
-  dominance: number    // 0 (submissive) to 1 (dominant)
+  valence: number // -1 (negative) to +1 (positive)
+  arousal: number // 0 (calm) to 1 (excited)
+  dominance: number // 0 (submissive) to 1 (dominant)
   frustrationLevel: number // 0-1
   suggestions: string[]
 }
@@ -66,38 +66,71 @@ export interface ToneAnalysis {
 
 const EMOTION_LEXICON: Record<string, Partial<Record<Emotion, number>>> = {
   // Joy
-  'happy': { joy: 0.9 }, 'great': { joy: 0.8 }, 'excellent': { joy: 0.9 },
-  'wonderful': { joy: 0.85 }, 'amazing': { joy: 0.9 }, 'love': { joy: 0.8 },
-  'fantastic': { joy: 0.9 }, 'awesome': { joy: 0.85 }, 'perfect': { joy: 0.8 },
-  'thanks': { joy: 0.5, trust: 0.4 }, 'thank': { joy: 0.5, trust: 0.4 },
-  'glad': { joy: 0.7 }, 'excited': { joy: 0.8, anticipation: 0.6 },
+  happy: { joy: 0.9 },
+  great: { joy: 0.8 },
+  excellent: { joy: 0.9 },
+  wonderful: { joy: 0.85 },
+  amazing: { joy: 0.9 },
+  love: { joy: 0.8 },
+  fantastic: { joy: 0.9 },
+  awesome: { joy: 0.85 },
+  perfect: { joy: 0.8 },
+  thanks: { joy: 0.5, trust: 0.4 },
+  thank: { joy: 0.5, trust: 0.4 },
+  glad: { joy: 0.7 },
+  excited: { joy: 0.8, anticipation: 0.6 },
   // Sadness
-  'sad': { sadness: 0.8 }, 'unfortunate': { sadness: 0.6 }, 'sorry': { sadness: 0.5 },
-  'disappointed': { sadness: 0.7 }, 'depressed': { sadness: 0.9 }, 'miss': { sadness: 0.5 },
-  'lost': { sadness: 0.6, confusion: 0.3 }, 'failed': { sadness: 0.7, frustration: 0.5 },
+  sad: { sadness: 0.8 },
+  unfortunate: { sadness: 0.6 },
+  sorry: { sadness: 0.5 },
+  disappointed: { sadness: 0.7 },
+  depressed: { sadness: 0.9 },
+  miss: { sadness: 0.5 },
+  lost: { sadness: 0.6, confusion: 0.3 },
+  failed: { sadness: 0.7, frustration: 0.5 },
   // Anger / Frustration
-  'angry': { anger: 0.9 }, 'furious': { anger: 1.0 }, 'annoyed': { anger: 0.6, frustration: 0.7 },
-  'frustrated': { frustration: 0.9, anger: 0.4 }, 'hate': { anger: 0.8, disgust: 0.5 },
-  'stupid': { anger: 0.5, frustration: 0.6 }, 'broken': { frustration: 0.7, anger: 0.3 },
-  'bug': { frustration: 0.5 }, 'crash': { frustration: 0.6, fear: 0.3 },
-  'error': { frustration: 0.5 }, 'wrong': { frustration: 0.4, anger: 0.3 },
-  'stuck': { frustration: 0.8, confusion: 0.4 }, 'impossible': { frustration: 0.7 },
+  angry: { anger: 0.9 },
+  furious: { anger: 1.0 },
+  annoyed: { anger: 0.6, frustration: 0.7 },
+  frustrated: { frustration: 0.9, anger: 0.4 },
+  hate: { anger: 0.8, disgust: 0.5 },
+  stupid: { anger: 0.5, frustration: 0.6 },
+  broken: { frustration: 0.7, anger: 0.3 },
+  bug: { frustration: 0.5 },
+  crash: { frustration: 0.6, fear: 0.3 },
+  error: { frustration: 0.5 },
+  wrong: { frustration: 0.4, anger: 0.3 },
+  stuck: { frustration: 0.8, confusion: 0.4 },
+  impossible: { frustration: 0.7 },
   // Fear
-  'afraid': { fear: 0.8 }, 'worried': { fear: 0.6, anticipation: 0.3 },
-  'scared': { fear: 0.8 }, 'dangerous': { fear: 0.7 }, 'risk': { fear: 0.4, anticipation: 0.3 },
-  'critical': { fear: 0.4 }, 'urgent': { fear: 0.5, anticipation: 0.6 },
+  afraid: { fear: 0.8 },
+  worried: { fear: 0.6, anticipation: 0.3 },
+  scared: { fear: 0.8 },
+  dangerous: { fear: 0.7 },
+  risk: { fear: 0.4, anticipation: 0.3 },
+  critical: { fear: 0.4 },
+  urgent: { fear: 0.5, anticipation: 0.6 },
   // Surprise
-  'surprised': { surprise: 0.8 }, 'unexpected': { surprise: 0.7 },
-  'wow': { surprise: 0.8, joy: 0.4 }, 'whoa': { surprise: 0.7 },
-  'suddenly': { surprise: 0.5 }, 'strange': { surprise: 0.5, confusion: 0.4 },
+  surprised: { surprise: 0.8 },
+  unexpected: { surprise: 0.7 },
+  wow: { surprise: 0.8, joy: 0.4 },
+  whoa: { surprise: 0.7 },
+  suddenly: { surprise: 0.5 },
+  strange: { surprise: 0.5, confusion: 0.4 },
   // Trust
-  'trust': { trust: 0.8 }, 'reliable': { trust: 0.7 }, 'confident': { trust: 0.7 },
-  'safe': { trust: 0.6 }, 'secure': { trust: 0.6 },
+  trust: { trust: 0.8 },
+  reliable: { trust: 0.7 },
+  confident: { trust: 0.7 },
+  safe: { trust: 0.6 },
+  secure: { trust: 0.6 },
   // Confusion
-  'confused': { confusion: 0.9 }, 'unclear': { confusion: 0.7 },
-  'understand': { confusion: 0.3 }, 'what': { confusion: 0.2 },
-  'how': { confusion: 0.2 }, 'why': { confusion: 0.3 },
-  'help': { confusion: 0.4, frustration: 0.3 },
+  confused: { confusion: 0.9 },
+  unclear: { confusion: 0.7 },
+  understand: { confusion: 0.3 },
+  what: { confusion: 0.2 },
+  how: { confusion: 0.2 },
+  why: { confusion: 0.3 },
+  help: { confusion: 0.4, frustration: 0.3 },
 }
 
 const FRUSTRATION_INDICATORS = [
@@ -265,8 +298,7 @@ export class EmotionalIntelligence {
     // Recent emotion history factor
     const recentFrustration = this.emotionHistory
       .slice(-5)
-      .filter(e => e.emotion === 'frustration' || e.emotion === 'anger')
-      .length
+      .filter(e => e.emotion === 'frustration' || e.emotion === 'anger').length
     level += recentFrustration * 0.05
 
     return Math.min(1, level)
@@ -281,7 +313,7 @@ export class EmotionalIntelligence {
     const { primary, frustrationLevel, valence } = analysis
 
     if (frustrationLevel > 0.7) {
-      return "I understand this is really frustrating. Let me help you work through this step by step."
+      return 'I understand this is really frustrating. Let me help you work through this step by step.'
     }
 
     if (frustrationLevel > 0.4) {
@@ -294,17 +326,17 @@ export class EmotionalIntelligence {
       case 'sadness':
         return "I'm sorry to hear that. Let me see how I can help."
       case 'anger':
-        return "I understand your frustration. Let me address this directly."
+        return 'I understand your frustration. Let me address this directly.'
       case 'fear':
-        return "I understand your concern. Let me provide some clarity."
+        return 'I understand your concern. Let me provide some clarity.'
       case 'surprise':
-        return valence > 0 ? "That is exciting! " : "That is unexpected. Let me look into this."
+        return valence > 0 ? 'That is exciting! ' : 'That is unexpected. Let me look into this.'
       case 'confusion':
-        return "Let me help clarify things. "
+        return 'Let me help clarify things. '
       case 'trust':
-        return "I appreciate your confidence. "
+        return 'I appreciate your confidence. '
       default:
-        return ""
+        return ''
     }
   }
 
@@ -325,13 +357,15 @@ export class EmotionalIntelligence {
       return { trend: 'stable', avgValence: 0 }
     }
 
-    const recentPositive = recent.filter(e =>
-      e.emotion === 'joy' || e.emotion === 'trust' || e.emotion === 'anticipation'
-    ).length / recent.length
+    const recentPositive =
+      recent.filter(
+        e => e.emotion === 'joy' || e.emotion === 'trust' || e.emotion === 'anticipation',
+      ).length / recent.length
 
-    const olderPositive = older.filter(e =>
-      e.emotion === 'joy' || e.emotion === 'trust' || e.emotion === 'anticipation'
-    ).length / older.length
+    const olderPositive =
+      older.filter(
+        e => e.emotion === 'joy' || e.emotion === 'trust' || e.emotion === 'anticipation',
+      ).length / older.length
 
     const diff = recentPositive - olderPositive
     const avgValence = recentPositive - (1 - recentPositive)
@@ -358,25 +392,39 @@ export class EmotionalIntelligence {
   // ── Private Helpers ──────────────────────────────────────────────────────
 
   private calculateValence(emotions: Map<Emotion, number>): number {
-    const positive = (emotions.get('joy') || 0) + (emotions.get('trust') || 0) + (emotions.get('anticipation') || 0)
-    const negative = (emotions.get('sadness') || 0) + (emotions.get('anger') || 0) + (emotions.get('fear') || 0) +
-      (emotions.get('disgust') || 0) + (emotions.get('frustration') || 0)
+    const positive =
+      (emotions.get('joy') || 0) +
+      (emotions.get('trust') || 0) +
+      (emotions.get('anticipation') || 0)
+    const negative =
+      (emotions.get('sadness') || 0) +
+      (emotions.get('anger') || 0) +
+      (emotions.get('fear') || 0) +
+      (emotions.get('disgust') || 0) +
+      (emotions.get('frustration') || 0)
     const total = positive + negative
     if (total === 0) return 0
     return (positive - negative) / total
   }
 
   private calculateArousal(emotions: Map<Emotion, number>): number {
-    const high = (emotions.get('anger') || 0) + (emotions.get('fear') || 0) +
-      (emotions.get('surprise') || 0) + (emotions.get('joy') || 0) * 0.5
+    const high =
+      (emotions.get('anger') || 0) +
+      (emotions.get('fear') || 0) +
+      (emotions.get('surprise') || 0) +
+      (emotions.get('joy') || 0) * 0.5
     const low = (emotions.get('sadness') || 0) * 0.5 + (emotions.get('trust') || 0) * 0.3
-    return Math.min(1, Math.max(0, (high - low + 0.5)))
+    return Math.min(1, Math.max(0, high - low + 0.5))
   }
 
   private calculateDominance(emotions: Map<Emotion, number>): number {
-    const dominant = (emotions.get('anger') || 0) + (emotions.get('trust') || 0) + (emotions.get('joy') || 0) * 0.5
-    const submissive = (emotions.get('fear') || 0) + (emotions.get('sadness') || 0) + (emotions.get('confusion') || 0)
-    return Math.min(1, Math.max(0, (dominant - submissive + 0.5)))
+    const dominant =
+      (emotions.get('anger') || 0) + (emotions.get('trust') || 0) + (emotions.get('joy') || 0) * 0.5
+    const submissive =
+      (emotions.get('fear') || 0) +
+      (emotions.get('sadness') || 0) +
+      (emotions.get('confusion') || 0)
+    return Math.min(1, Math.max(0, dominant - submissive + 0.5))
   }
 
   private recommendTone(detected: ToneType): ToneType {
@@ -401,7 +449,11 @@ export class EmotionalIntelligence {
     return reasons
   }
 
-  private generateSuggestions(primary: EmotionScore, frustrationLevel: number, valence: number): string[] {
+  private generateSuggestions(
+    primary: EmotionScore,
+    frustrationLevel: number,
+    valence: number,
+  ): string[] {
     const suggestions: string[] = []
 
     if (frustrationLevel > 0.5) {
@@ -416,7 +468,7 @@ export class EmotionalIntelligence {
 
     if (valence < -0.3) {
       suggestions.push('Use encouraging and supportive language')
-      suggestions.push('Validate the user\'s experience')
+      suggestions.push("Validate the user's experience")
     }
 
     if (primary.emotion === 'joy' || valence > 0.5) {

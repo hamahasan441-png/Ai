@@ -60,9 +60,7 @@ const MAX_KEYTERMS = 50
  * Combines hardcoded global coding terms with session context (project name,
  * git branch, recent files) without any model calls.
  */
-export async function getVoiceKeyterms(
-  recentFiles?: ReadonlySet<string>,
-): Promise<string[]> {
+export async function getVoiceKeyterms(recentFiles?: ReadonlySet<string>): Promise<string[]> {
   const terms = new Set<string>(GLOBAL_KEYTERMS)
 
   // Project root basename as a single term — users say "claude CLI internal"

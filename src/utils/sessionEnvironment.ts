@@ -13,11 +13,7 @@ import { getPlatform } from './platform.js'
 let sessionEnvScript: string | null | undefined = undefined
 
 export async function getSessionEnvDirPath(): Promise<string> {
-  const sessionEnvDir = join(
-    getClaudeConfigHomeDir(),
-    'session-env',
-    getSessionId(),
-  )
+  const sessionEnvDir = join(getClaudeConfigHomeDir(), 'session-env', getSessionId())
   await mkdir(sessionEnvDir, { recursive: true })
   return sessionEnvDir
 }
@@ -38,8 +34,7 @@ export async function clearCwdEnvFiles(): Promise<void> {
       files
         .filter(
           f =>
-            (f.startsWith('filechanged-hook-') ||
-              f.startsWith('cwdchanged-hook-')) &&
+            (f.startsWith('filechanged-hook-') || f.startsWith('cwdchanged-hook-')) &&
             HOOK_ENV_REGEX.test(f),
         )
         .map(f => writeFile(join(dir, f), '')),
@@ -95,9 +90,7 @@ export async function getSessionEnvironmentScript(): Promise<string | null> {
     const files = await readdir(sessionEnvDir)
     // We are sorting the hook env files by the order in which they are listed
     // in the settings.json file so that the resulting env is deterministic
-    const hookFiles = files
-      .filter(f => HOOK_ENV_REGEX.test(f))
-      .sort(sortHookEnvFiles)
+    const hookFiles = files.filter(f => HOOK_ENV_REGEX.test(f)).sort(sortHookEnvFiles)
 
     for (const file of hookFiles) {
       const filePath = join(sessionEnvDir, file)
@@ -109,24 +102,18 @@ export async function getSessionEnvironmentScript(): Promise<string | null> {
       } catch (e: unknown) {
         const code = getErrnoCode(e)
         if (code !== 'ENOENT') {
-          logForDebugging(
-            `Failed to read hook file ${filePath}: ${errorMessage(e)}`,
-          )
+          logForDebugging(`Failed to read hook file ${filePath}: ${errorMessage(e)}`)
         }
       }
     }
 
     if (hookFiles.length > 0) {
-      logForDebugging(
-        `Session environment loaded from ${hookFiles.length} hook file(s)`,
-      )
+      logForDebugging(`Session environment loaded from ${hookFiles.length} hook file(s)`)
     }
   } catch (e: unknown) {
     const code = getErrnoCode(e)
     if (code !== 'ENOENT') {
-      logForDebugging(
-        `Failed to load session environment from hooks: ${errorMessage(e)}`,
-      )
+      logForDebugging(`Failed to load session environment from hooks: ${errorMessage(e)}`)
     }
   }
 
@@ -137,9 +124,7 @@ export async function getSessionEnvironmentScript(): Promise<string | null> {
   }
 
   sessionEnvScript = scripts.join('\n')
-  logForDebugging(
-    `Session environment script ready (${sessionEnvScript.length} chars total)`,
-  )
+  logForDebugging(`Session environment script ready (${sessionEnvScript.length} chars total)`)
   return sessionEnvScript
 }
 
@@ -149,8 +134,7 @@ const HOOK_ENV_PRIORITY: Record<string, number> = {
   cwdchanged: 2,
   filechanged: 3,
 }
-const HOOK_ENV_REGEX =
-  /^(setup|sessionstart|cwdchanged|filechanged)-hook-(\d+)\.sh$/
+const HOOK_ENV_REGEX = /^(setup|sessionstart|cwdchanged|filechanged)-hook-(\d+)\.sh$/
 
 function sortHookEnvFiles(a: string, b: string): number {
   const aMatch = a.match(HOOK_ENV_REGEX)

@@ -226,7 +226,7 @@ export class TaskQueue {
       task.status = 'cancelled'
       task.completedAt = Date.now()
       this.cancelledCount++
-      this.pendingQueue = this.pendingQueue.filter((id) => id !== taskId)
+      this.pendingQueue = this.pendingQueue.filter(id => id !== taskId)
 
       if (task.dedupeKey) {
         this.dedupeMap.delete(task.dedupeKey)
@@ -272,7 +272,7 @@ export class TaskQueue {
 
   /** Retry a dead-letter task */
   retryDeadLetter(taskId: string): boolean {
-    const idx = this.deadLetterQueue.findIndex((t) => t.taskId === taskId)
+    const idx = this.deadLetterQueue.findIndex(t => t.taskId === taskId)
     if (idx === -1) return false
 
     const deadTask = this.deadLetterQueue.splice(idx, 1)[0]
@@ -303,7 +303,7 @@ export class TaskQueue {
       return Promise.resolve(this.toResult(task))
     }
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const listeners = this.listeners.get(taskId) ?? []
       listeners.push(resolve)
       this.listeners.set(taskId, listeners)
@@ -320,7 +320,7 @@ export class TaskQueue {
         this.draining = false
         throw new Error('Drain timeout exceeded')
       }
-      await new Promise((resolve) => setTimeout(resolve, 50))
+      await new Promise(resolve => setTimeout(resolve, 50))
     }
 
     this.draining = false
@@ -367,7 +367,7 @@ export class TaskQueue {
 
       // Check dependencies
       if (task.options.dependsOn && task.options.dependsOn.length > 0) {
-        const allDepsComplete = task.options.dependsOn.every((depId) => {
+        const allDepsComplete = task.options.dependsOn.every(depId => {
           const dep = this.tasks.get(depId)
           return dep && dep.status === 'completed'
         })
@@ -445,11 +445,11 @@ export class TaskQueue {
       }, timeoutMs)
 
       fn()
-        .then((result) => {
+        .then(result => {
           clearTimeout(timer)
           resolve(result)
         })
-        .catch((err) => {
+        .catch(err => {
           clearTimeout(timer)
           reject(err)
         })

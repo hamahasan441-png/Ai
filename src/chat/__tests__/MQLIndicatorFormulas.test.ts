@@ -11,7 +11,9 @@ describe('MQL Indicator Formulas Knowledge', () => {
 
   describe('KB entries', () => {
     it('knows moving average formulas (SMA, EMA, WMA, Hull)', async () => {
-      const r = await brain.chat('What are the MQL moving average formulas for SMA, EMA, WMA, and Hull MA?')
+      const r = await brain.chat(
+        'What are the MQL moving average formulas for SMA, EMA, WMA, and Hull MA?',
+      )
       expect(r.text.toLowerCase()).toMatch(/sma|ema|wma|hull|exponential|weighted|period/)
     })
 
@@ -21,8 +23,12 @@ describe('MQL Indicator Formulas Knowledge', () => {
     })
 
     it('covers Bollinger Bands, ATR, and Ichimoku formulas', async () => {
-      const r = await brain.chat('What are the Bollinger Bands ATR and Ichimoku calculation formulas in MQL?')
-      expect(r.text.toLowerCase()).toMatch(/bollinger|atr|ichimoku|stddev|true\s+range|tenkan|kijun/)
+      const r = await brain.chat(
+        'What are the Bollinger Bands ATR and Ichimoku calculation formulas in MQL?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /bollinger|atr|ichimoku|stddev|true\s+range|tenkan|kijun/,
+      )
     })
   })
 

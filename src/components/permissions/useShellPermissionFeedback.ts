@@ -98,12 +98,7 @@ export function useShellPermissionFeedback({
       }))
     }
 
-    logUnaryPermissionEvent(
-      'tool_use_single',
-      toolUseConfirm,
-      'reject',
-      hasFeedback,
-    )
+    logUnaryPermissionEvent('tool_use_single', toolUseConfirm, 'reject', hasFeedback)
 
     if (trimmedFeedback) {
       toolUseConfirm.onReject(trimmedFeedback)

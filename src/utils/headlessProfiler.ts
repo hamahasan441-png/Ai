@@ -90,9 +90,7 @@ export function headlessProfilerCheckpoint(name: string): void {
   perf.mark(`${MARK_PREFIX}${name}`)
 
   if (DETAILED_PROFILING) {
-    logForDebugging(
-      `[headlessProfiler] Checkpoint: ${name} at ${perf.now().toFixed(1)}ms`,
-    )
+    logForDebugging(`[headlessProfiler] Checkpoint: ${name} at ${perf.now().toFixed(1)}ms`)
   }
 }
 

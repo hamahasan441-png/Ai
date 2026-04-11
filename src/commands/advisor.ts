@@ -24,8 +24,7 @@ const call: LocalCommandCall = async (args, context) => {
     if (!current) {
       return {
         type: 'text',
-        value:
-          'Advisor: not set\nUse "/advisor <model>" to enable (e.g. "/advisor opus").',
+        value: 'Advisor: not set\nUse "/advisor <model>" to enable (e.g. "/advisor opus").',
       }
     }
     if (!modelSupportsAdvisor(baseModel)) {
@@ -49,9 +48,7 @@ const call: LocalCommandCall = async (args, context) => {
     updateSettingsForSource('userSettings', { advisorModel: undefined })
     return {
       type: 'text',
-      value: prev
-        ? `Advisor disabled (was ${prev}).`
-        : 'Advisor already unset.',
+      value: prev ? `Advisor disabled (was ${prev}).` : 'Advisor already unset.',
     }
   }
 
@@ -61,9 +58,7 @@ const call: LocalCommandCall = async (args, context) => {
   if (!valid) {
     return {
       type: 'text',
-      value: error
-        ? `Invalid advisor model: ${error}`
-        : `Unknown model: ${arg} (${resolvedModel})`,
+      value: error ? `Invalid advisor model: ${error}` : `Unknown model: ${arg} (${resolvedModel})`,
     }
   }
 

@@ -75,8 +75,7 @@ export function useManagePlugins({
       try {
         commands = await getPluginCommands()
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error)
+        const errorMessage = error instanceof Error ? error.message : String(error)
         errors.push({
           type: 'generic-error',
           source: 'plugin-commands',
@@ -87,8 +86,7 @@ export function useManagePlugins({
       try {
         agents = await loadPluginAgents()
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error)
+        const errorMessage = error instanceof Error ? error.message : String(error)
         errors.push({
           type: 'generic-error',
           source: 'plugin-agents',
@@ -99,8 +97,7 @@ export function useManagePlugins({
       try {
         await loadPluginHooks()
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error)
+        const errorMessage = error instanceof Error ? error.message : String(error)
         errors.push({
           type: 'generic-error',
           source: 'plugin-hooks',
@@ -189,8 +186,7 @@ export function useManagePlugins({
         return (
           sum +
           Object.values(p.hooksConfig).reduce(
-            (s, matchers) =>
-              s + (matchers?.reduce((h, m) => h + m.hooks.length, 0) ?? 0),
+            (s, matchers) => s + (matchers?.reduce((h, m) => h + m.hooks.length, 0) ?? 0),
             0,
           )
         )
@@ -215,9 +211,7 @@ export function useManagePlugins({
             ? (enabled
                 .map(p => p.name)
                 .sort()
-                .join(
-                  ',',
-                ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS)
+                .join(',') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS)
             : undefined,
       }
     } catch (error) {

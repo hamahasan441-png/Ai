@@ -4,7 +4,9 @@ import { NaturalLanguageGenerator, DEFAULT_NLG_CONFIG } from '../NaturalLanguage
 describe('NaturalLanguageGenerator', () => {
   let nlg: NaturalLanguageGenerator
 
-  beforeEach(() => { nlg = new NaturalLanguageGenerator() })
+  beforeEach(() => {
+    nlg = new NaturalLanguageGenerator()
+  })
 
   describe('constructor & config', () => {
     it('uses default config', () => {
@@ -98,7 +100,12 @@ describe('NaturalLanguageGenerator', () => {
 
   describe('text planning', () => {
     it('creates a text plan with sections', () => {
-      const plan = nlg.createTextPlan('Explain AI', ['Define AI', 'History', 'Applications', 'Future'])
+      const plan = nlg.createTextPlan('Explain AI', [
+        'Define AI',
+        'History',
+        'Applications',
+        'Future',
+      ])
       expect(plan.goal).toBe('Explain AI')
       expect(plan.sections.length).toBeGreaterThan(0)
       expect(plan.style).toBe('formal')
@@ -149,7 +156,9 @@ describe('NaturalLanguageGenerator', () => {
       expect(['easy', 'moderate']).toContain(simple.complexity)
     })
     it('counts syllables', () => {
-      const r = nlg.analyzeReadability('Understanding the phenomenological implications of epistemological frameworks.')
+      const r = nlg.analyzeReadability(
+        'Understanding the phenomenological implications of epistemological frameworks.',
+      )
       expect(r.syllableCount).toBeGreaterThan(10)
     })
   })

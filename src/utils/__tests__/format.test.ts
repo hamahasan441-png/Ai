@@ -114,9 +114,7 @@ describe('formatDuration', () => {
     })
 
     it('keeps non-trailing-zero components', () => {
-      expect(formatDuration(90000, { hideTrailingZeros: true })).toBe(
-        '1m 30s',
-      )
+      expect(formatDuration(90000, { hideTrailingZeros: true })).toBe('1m 30s')
     })
   })
 

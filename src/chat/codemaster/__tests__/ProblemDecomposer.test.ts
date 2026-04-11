@@ -90,9 +90,30 @@ describe('extractContextFiles', () => {
 describe('topologicalSort', () => {
   it('returns correct order for a linear chain', () => {
     const steps: TaskStep[] = [
-      { id: 'a', description: '', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' },
-      { id: 'b', description: '', dependencies: ['a'], filesToModify: [], estimatedLines: 0, status: 'pending' },
-      { id: 'c', description: '', dependencies: ['b'], filesToModify: [], estimatedLines: 0, status: 'pending' },
+      {
+        id: 'a',
+        description: '',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
+      {
+        id: 'b',
+        description: '',
+        dependencies: ['a'],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
+      {
+        id: 'c',
+        description: '',
+        dependencies: ['b'],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
     ]
     const order = topologicalSort(steps)
     expect(order).toEqual(['a', 'b', 'c'])
@@ -100,8 +121,22 @@ describe('topologicalSort', () => {
 
   it('handles steps with no dependencies', () => {
     const steps: TaskStep[] = [
-      { id: 'x', description: '', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' },
-      { id: 'y', description: '', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' },
+      {
+        id: 'x',
+        description: '',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
+      {
+        id: 'y',
+        description: '',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
     ]
     const order = topologicalSort(steps)
     expect(order).toHaveLength(2)
@@ -111,10 +146,38 @@ describe('topologicalSort', () => {
 
   it('handles diamond dependencies', () => {
     const steps: TaskStep[] = [
-      { id: 'a', description: '', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' },
-      { id: 'b', description: '', dependencies: ['a'], filesToModify: [], estimatedLines: 0, status: 'pending' },
-      { id: 'c', description: '', dependencies: ['a'], filesToModify: [], estimatedLines: 0, status: 'pending' },
-      { id: 'd', description: '', dependencies: ['b', 'c'], filesToModify: [], estimatedLines: 0, status: 'pending' },
+      {
+        id: 'a',
+        description: '',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
+      {
+        id: 'b',
+        description: '',
+        dependencies: ['a'],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
+      {
+        id: 'c',
+        description: '',
+        dependencies: ['a'],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
+      {
+        id: 'd',
+        description: '',
+        dependencies: ['b', 'c'],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
     ]
     const order = topologicalSort(steps)
     expect(order.indexOf('a')).toBeLessThan(order.indexOf('b'))
@@ -125,8 +188,22 @@ describe('topologicalSort', () => {
 
   it('includes all nodes even when a cycle exists', () => {
     const steps: TaskStep[] = [
-      { id: 'a', description: '', dependencies: ['b'], filesToModify: [], estimatedLines: 0, status: 'pending' },
-      { id: 'b', description: '', dependencies: ['a'], filesToModify: [], estimatedLines: 0, status: 'pending' },
+      {
+        id: 'a',
+        description: '',
+        dependencies: ['b'],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
+      {
+        id: 'b',
+        description: '',
+        dependencies: ['a'],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending',
+      },
     ]
     const order = topologicalSort(steps)
     expect(order).toHaveLength(2)
@@ -271,7 +348,7 @@ describe('ProblemDecomposer isPlanComplete', () => {
   it('returns true when all steps are failed or skipped', () => {
     let plan = decomposer.decompose('add tests')
     for (let i = 0; i < plan.steps.length; i++) {
-      const status = i % 2 === 0 ? 'failed' : 'skipped' as const
+      const status = i % 2 === 0 ? 'failed' : ('skipped' as const)
       plan = decomposer.updateStepStatus(plan, plan.steps[i].id, status)
     }
     expect(decomposer.isPlanComplete(plan)).toBe(true)

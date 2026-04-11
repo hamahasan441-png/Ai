@@ -16,21 +16,33 @@ describe('APIDesignPatterns', () => {
 
   describe('KB entry tests', () => {
     it('should match REST best practices and GraphQL schema design keywords', async () => {
-      const r = await brain.chat('explain rest best practices resource naming http methods status codes hateoas graphql schema design resolvers subscriptions federation')
+      const r = await brain.chat(
+        'explain rest best practices resource naming http methods status codes hateoas graphql schema design resolvers subscriptions federation',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/rest|resource\s+naming|http\s+methods|status\s+codes|graphql|resolvers|federation/)
+      expect(r.text.toLowerCase()).toMatch(
+        /rest|resource\s+naming|http\s+methods|status\s+codes|graphql|resolvers|federation/,
+      )
     })
 
     it('should match API versioning and documentation keywords', async () => {
-      const r = await brain.chat('explain api versioning strategies url path header content negotiation api documentation openapi swagger asyncapi postman')
+      const r = await brain.chat(
+        'explain api versioning strategies url path header content negotiation api documentation openapi swagger asyncapi postman',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/versioning|url\s+path|header|openapi|swagger|asyncapi|postman/)
+      expect(r.text.toLowerCase()).toMatch(
+        /versioning|url\s+path|header|openapi|swagger|asyncapi|postman/,
+      )
     })
 
     it('should match webhook design and API gateway keywords', async () => {
-      const r = await brain.chat('explain webhook design delivery guarantees retry policies signature verification idempotency api gateway rate limiting circuit breaking')
+      const r = await brain.chat(
+        'explain webhook design delivery guarantees retry policies signature verification idempotency api gateway rate limiting circuit breaking',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/webhook|delivery|retry|signature|idempotency|gateway|rate\s+limiting/)
+      expect(r.text.toLowerCase()).toMatch(
+        /webhook|delivery|retry|signature|idempotency|gateway|rate\s+limiting/,
+      )
     })
   })
 

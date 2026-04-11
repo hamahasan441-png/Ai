@@ -88,15 +88,11 @@ export function extractClaudeCodeHints(
     const value = attrs.value
 
     if (!SUPPORTED_VERSIONS.has(v)) {
-      logForDebugging(
-        `[claudeCodeHints] dropped hint with unsupported v=${attrs.v}`,
-      )
+      logForDebugging(`[claudeCodeHints] dropped hint with unsupported v=${attrs.v}`)
       return ''
     }
     if (!type || !SUPPORTED_TYPES.has(type)) {
-      logForDebugging(
-        `[claudeCodeHints] dropped hint with unsupported type=${type}`,
-      )
+      logForDebugging(`[claudeCodeHints] dropped hint with unsupported type=${type}`)
       return ''
     }
     if (!value) {
@@ -112,9 +108,7 @@ export function extractClaudeCodeHints(
   // remain). Collapse runs of blank lines introduced by the replace so the
   // model-visible output doesn't grow vertical whitespace.
   const collapsed =
-    hints.length > 0 || stripped !== output
-      ? stripped.replace(/\n{3,}/g, '\n\n')
-      : stripped
+    hints.length > 0 || stripped !== output ? stripped.replace(/\n{3,}/g, '\n\n') : stripped
 
   return { hints, stripped: collapsed }
 }

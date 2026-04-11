@@ -1,8 +1,5 @@
 import { z } from 'zod/v4'
-import {
-  ensureConnectedClient,
-  fetchResourcesForClient,
-} from '../../services/mcp/client.js'
+import { ensureConnectedClient, fetchResourcesForClient } from '../../services/mcp/client.js'
 import { buildTool, type ToolDef } from '../../Tool.js'
 import { errorMessage } from '../../utils/errors.js'
 import { lazySchema } from '../../utils/lazySchema.js'
@@ -14,10 +11,7 @@ import { renderToolResultMessage, renderToolUseMessage } from './UI.js'
 
 const inputSchema = lazySchema(() =>
   z.object({
-    server: z
-      .string()
-      .optional()
-      .describe('Optional server name to filter resources by'),
+    server: z.string().optional().describe('Optional server name to filter resources by'),
   }),
 )
 type InputSchema = ReturnType<typeof inputSchema>

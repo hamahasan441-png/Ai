@@ -146,10 +146,7 @@ describe('nullable variable access without null check', () => {
   const analyzer = new TypeFlowAnalyzer()
 
   it('detects access to a .find() result without a guard', () => {
-    const code = [
-      'const item = items.find(i => i.id === 1)',
-      'console.log(item.name)',
-    ].join('\n')
+    const code = ['const item = items.find(i => i.id === 1)', 'console.log(item.name)'].join('\n')
     const result = analyzer.analyze(code)
     const nullableIssues = result.issues.filter(i => i.type === 'nullable-access')
     expect(nullableIssues.length).toBeGreaterThanOrEqual(1)
@@ -157,10 +154,9 @@ describe('nullable variable access without null check', () => {
   })
 
   it('detects access to getElementById result without guard', () => {
-    const code = [
-      'const el = document.getElementById("root")',
-      'el.style.display = "none"',
-    ].join('\n')
+    const code = ['const el = document.getElementById("root")', 'el.style.display = "none"'].join(
+      '\n',
+    )
     const result = analyzer.analyze(code)
     const nullableIssues = result.issues.filter(i => i.type === 'nullable-access')
     expect(nullableIssues.length).toBeGreaterThanOrEqual(1)
@@ -362,10 +358,7 @@ describe('nullable variable tracking (guarded vs unguarded)', () => {
   const analyzer = new TypeFlowAnalyzer()
 
   it('populates unsafeAccessLines for unguarded access', () => {
-    const code = [
-      'const item = items.find(i => i.id === 1)',
-      'console.log(item.name)',
-    ].join('\n')
+    const code = ['const item = items.find(i => i.id === 1)', 'console.log(item.name)'].join('\n')
     const result = analyzer.analyze(code)
     const entry = result.nullableVars.find(v => v.name === 'item')
     expect(entry).toBeDefined()
@@ -427,10 +420,7 @@ describe('summary generation', () => {
   })
 
   it('includes issue count and severity breakdown', () => {
-    const code = [
-      'const a = val as any',
-      'const b: any = 1',
-    ].join('\n')
+    const code = ['const a = val as any', 'const b: any = 1'].join('\n')
     const result = analyzer.analyze(code)
     expect(result.summary).toMatch(/Found \d+ type safety issue/)
     expect(result.summary).toMatch(/high-severity/)
@@ -438,10 +428,7 @@ describe('summary generation', () => {
   })
 
   it('counts high and medium severity correctly', () => {
-    const code = [
-      'const a = val as any',
-      'const b = val as unknown as Foo',
-    ].join('\n')
+    const code = ['const a = val as any', 'const b = val as unknown as Foo'].join('\n')
     const result = analyzer.analyze(code)
     const highCount = result.issues.filter(
       i => i.severity === 'critical' || i.severity === 'high',

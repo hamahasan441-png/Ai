@@ -78,9 +78,7 @@ export function onChangeAppState({
       // sets mode and isUltraplanMode atomically, so the flag's
       // transition gates it. null per RFC 7396 (removes the key).
       const isUltraplan =
-        newExternal === 'plan' &&
-        newState.isUltraplanMode &&
-        !oldState.isUltraplanMode
+        newExternal === 'plan' && newState.isUltraplanMode && !oldState.isUltraplanMode
           ? true
           : null
       notifySessionMetadataChanged({
@@ -92,20 +90,14 @@ export function onChangeAppState({
   }
 
   // mainLoopModel: remove it from settings?
-  if (
-    newState.mainLoopModel !== oldState.mainLoopModel &&
-    newState.mainLoopModel === null
-  ) {
+  if (newState.mainLoopModel !== oldState.mainLoopModel && newState.mainLoopModel === null) {
     // Remove from settings
     updateSettingsForSource('userSettings', { model: undefined })
     setMainLoopModelOverride(null)
   }
 
   // mainLoopModel: add it to settings?
-  if (
-    newState.mainLoopModel !== oldState.mainLoopModel &&
-    newState.mainLoopModel !== null
-  ) {
+  if (newState.mainLoopModel !== oldState.mainLoopModel && newState.mainLoopModel !== null) {
     // Save to settings
     updateSettingsForSource('userSettings', { model: newState.mainLoopModel })
     setMainLoopModelOverride(newState.mainLoopModel)
@@ -128,10 +120,7 @@ export function onChangeAppState({
   }
 
   // verbose
-  if (
-    newState.verbose !== oldState.verbose &&
-    getGlobalConfig().verbose !== newState.verbose
-  ) {
+  if (newState.verbose !== oldState.verbose && getGlobalConfig().verbose !== newState.verbose) {
     const verbose = newState.verbose
     saveGlobalConfig(current => ({
       ...current,

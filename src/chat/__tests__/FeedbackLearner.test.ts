@@ -138,9 +138,7 @@ describe('FeedbackLearner', () => {
     })
 
     it('stores a correction signal', () => {
-      learner.processFeedback(
-        makeCorrection('wrong answer', 'right answer'),
-      )
+      learner.processFeedback(makeCorrection('wrong answer', 'right answer'))
       expect(learner.getSignals()).toHaveLength(1)
     })
 
@@ -172,8 +170,13 @@ describe('FeedbackLearner', () => {
 
     it('increments totalSignals stat for every signal type', () => {
       const types: FeedbackSignalType[] = [
-        'thumbs_up', 'thumbs_down', 'correction', 'edit',
-        'follow_up', 'regenerate', 'explicit_rating',
+        'thumbs_up',
+        'thumbs_down',
+        'correction',
+        'edit',
+        'follow_up',
+        'regenerate',
+        'explicit_rating',
       ]
       for (const type of types) {
         learner.processFeedback(makeSignal({ type }))
@@ -191,9 +194,7 @@ describe('FeedbackLearner', () => {
     it('tracks correction rate for correction and edit signals', () => {
       learner.processFeedback(makeSignal({ type: 'thumbs_up' }))
       learner.processFeedback(makeCorrection('a', 'b'))
-      learner.processFeedback(
-        makeSignal({ type: 'edit', correctedOutput: 'edited' }),
-      )
+      learner.processFeedback(makeSignal({ type: 'edit', correctedOutput: 'edited' }))
       expect(learner.getStats().correctionRate).toBeCloseTo(2 / 3)
     })
 
@@ -246,9 +247,7 @@ describe('FeedbackLearner', () => {
     })
 
     it('does not extract a lesson from a correction without correctedOutput', () => {
-      learner.processFeedback(
-        makeSignal({ type: 'correction' }),
-      )
+      learner.processFeedback(makeSignal({ type: 'correction' }))
       expect(learner.getLessons()).toHaveLength(0)
     })
 
@@ -258,9 +257,7 @@ describe('FeedbackLearner', () => {
     })
 
     it('sets lesson domain from signal', () => {
-      learner.processFeedback(
-        makeCorrection('a', 'b was wrong', { domain: 'programming' }),
-      )
+      learner.processFeedback(makeCorrection('a', 'b was wrong', { domain: 'programming' }))
       expect(learner.getLessons()[0].domain).toBe('programming')
     })
 
@@ -300,37 +297,27 @@ describe('FeedbackLearner', () => {
     })
 
     it('detects factual_error category', () => {
-      learner.processFeedback(
-        makeCorrection('2+2=5', 'That is incorrect, 2+2=4'),
-      )
+      learner.processFeedback(makeCorrection('2+2=5', 'That is incorrect, 2+2=4'))
       expect(learner.getLessons()[0].category).toBe('factual_error')
     })
 
     it('detects style_preference category', () => {
-      learner.processFeedback(
-        makeCorrection('verbose answer', 'I prefer a different style'),
-      )
+      learner.processFeedback(makeCorrection('verbose answer', 'I prefer a different style'))
       expect(learner.getLessons()[0].category).toBe('style_preference')
     })
 
     it('detects format_preference category', () => {
-      learner.processFeedback(
-        makeCorrection('plain text', 'Use bullet format please'),
-      )
+      learner.processFeedback(makeCorrection('plain text', 'Use bullet format please'))
       expect(learner.getLessons()[0].category).toBe('format_preference')
     })
 
     it('detects detail_level category', () => {
-      learner.processFeedback(
-        makeCorrection('long answer', 'This is too long, be brief'),
-      )
+      learner.processFeedback(makeCorrection('long answer', 'This is too long, be brief'))
       expect(learner.getLessons()[0].category).toBe('detail_level')
     })
 
     it('detects tone_adjustment category', () => {
-      learner.processFeedback(
-        makeCorrection('hey dude', 'Please be more formal and professional'),
-      )
+      learner.processFeedback(makeCorrection('hey dude', 'Please be more formal and professional'))
       expect(learner.getLessons()[0].category).toBe('tone_adjustment')
     })
 
@@ -349,25 +336,19 @@ describe('FeedbackLearner', () => {
     })
 
     it('detects wrong_approach category', () => {
-      learner.processFeedback(
-        makeCorrection('recursion', 'Use a different approach instead'),
-      )
+      learner.processFeedback(makeCorrection('recursion', 'Use a different approach instead'))
       expect(learner.getLessons()[0].category).toBe('wrong_approach')
     })
 
     it('detects terminology category', () => {
-      learner.processFeedback(
-        makeCorrection('the thing', 'Use the correct term for this phrase'),
-      )
+      learner.processFeedback(makeCorrection('the thing', 'Use the correct term for this phrase'))
       expect(learner.getLessons()[0].category).toBe('terminology')
     })
 
     it('prunes lessons when exceeding maxLessons', () => {
       const small = new FeedbackLearner({ maxLessons: 3 })
       for (let i = 0; i < 5; i++) {
-        small.processFeedback(
-          makeCorrection(`original_${i}`, `corrected_${i} was incorrect`),
-        )
+        small.processFeedback(makeCorrection(`original_${i}`, `corrected_${i} was incorrect`))
       }
       expect(small.getLessons().length).toBeLessThanOrEqual(3)
     })
@@ -437,9 +418,7 @@ describe('FeedbackLearner', () => {
     })
 
     it('records domain on tracked mistake', () => {
-      learner.processFeedback(
-        makeCorrection('err', 'fix was wrong', { domain: 'security' }),
-      )
+      learner.processFeedback(makeCorrection('err', 'fix was wrong', { domain: 'security' }))
       expect(learner.getMistakes()[0].domain).toBe('security')
     })
 
@@ -492,9 +471,7 @@ describe('FeedbackLearner', () => {
     })
 
     it('returns empty when output does not match any pattern', () => {
-      learner.processFeedback(
-        makeCorrection('specific alpha beta gamma', 'correction was wrong'),
-      )
+      learner.processFeedback(makeCorrection('specific alpha beta gamma', 'correction was wrong'))
       const matches = learner.checkForKnownMistakes('completely unrelated content about zeta')
       expect(matches).toHaveLength(0)
     })
@@ -503,20 +480,16 @@ describe('FeedbackLearner', () => {
       // Create a major mistake (4+ occurrences)
       for (let i = 0; i < 4; i++) {
         learner.processFeedback(
-          makeCorrection(
-            'always returns undefined from the function call',
-            'fix was wrong',
-            { domain: 'general' },
-          ),
+          makeCorrection('always returns undefined from the function call', 'fix was wrong', {
+            domain: 'general',
+          }),
         )
       }
       // Create a minor mistake in a different domain/pattern
       learner.processFeedback(
-        makeCorrection(
-          'compiles with warnings during the build process',
-          'fixed was wrong',
-          { domain: 'programming' },
-        ),
+        makeCorrection('compiles with warnings during the build process', 'fixed was wrong', {
+          domain: 'programming',
+        }),
       )
       const matches = learner.checkForKnownMistakes(
         'returns undefined from the function call and compiles with warnings during build process',
@@ -524,17 +497,15 @@ describe('FeedbackLearner', () => {
       if (matches.length >= 2) {
         // Source sorts via b.severity.localeCompare(a.severity) — alphabetical descending
         for (let i = 0; i < matches.length - 1; i++) {
-          expect(
-            matches[i].severity.localeCompare(matches[i + 1].severity),
-          ).toBeGreaterThanOrEqual(0)
+          expect(matches[i].severity.localeCompare(matches[i + 1].severity)).toBeGreaterThanOrEqual(
+            0,
+          )
         }
       }
     })
 
     it('ignores words with 3 or fewer characters in pattern matching', () => {
-      learner.processFeedback(
-        makeCorrection('a to the is and or', 'fix was wrong'),
-      )
+      learner.processFeedback(makeCorrection('a to the is and or', 'fix was wrong'))
       const matches = learner.checkForKnownMistakes('a to the is and or')
       expect(matches).toHaveLength(0)
     })
@@ -546,9 +517,7 @@ describe('FeedbackLearner', () => {
           'Fixed the initialization was wrong',
         ),
       )
-      const matches = learner.checkForKnownMistakes(
-        'the variable should be initialized properly',
-      )
+      const matches = learner.checkForKnownMistakes('the variable should be initialized properly')
       expect(matches.length).toBeGreaterThan(0)
     })
   })
@@ -611,50 +580,34 @@ describe('FeedbackLearner', () => {
     })
 
     it('detects concise length preference from shorter corrections', () => {
-      learner.processFeedback(
-        makeCorrection(
-          'A'.repeat(200),
-          'Short was wrong',
-        ),
-      )
+      learner.processFeedback(makeCorrection('A'.repeat(200), 'Short was wrong'))
       expect(learner.getPreferenceModel()!.responseLength).toBe('concise')
     })
 
     it('detects detailed length preference from longer corrections', () => {
       learner.processFeedback(
-        makeCorrection(
-          'Short',
-          'A'.repeat(200) + ' this was wrong and needs more detail',
-        ),
+        makeCorrection('Short', 'A'.repeat(200) + ' this was wrong and needs more detail'),
       )
       expect(learner.getPreferenceModel()!.responseLength).toBe('detailed')
     })
 
     it('detects step-by-step preference from numbered lists', () => {
-      learner.processFeedback(
-        makeCorrection('text', '1. First step\n2. Second step was wrong'),
-      )
+      learner.processFeedback(makeCorrection('text', '1. First step\n2. Second step was wrong'))
       expect(learner.getPreferenceModel()!.prefersStepByStep).toBe(true)
     })
 
     it('detects step-by-step preference from bullet lists', () => {
-      learner.processFeedback(
-        makeCorrection('text', '• First point\n• Second point was wrong'),
-      )
+      learner.processFeedback(makeCorrection('text', '• First point\n• Second point was wrong'))
       expect(learner.getPreferenceModel()!.prefersStepByStep).toBe(true)
     })
 
     it('detects commented code style from // comments', () => {
-      learner.processFeedback(
-        makeCorrection('code', '// this comment was wrong\nconst x = 1'),
-      )
+      learner.processFeedback(makeCorrection('code', '// this comment was wrong\nconst x = 1'))
       expect(learner.getPreferenceModel()!.codeStyle).toBe('commented')
     })
 
     it('detects commented code style from /* comments', () => {
-      learner.processFeedback(
-        makeCorrection('code', '/* block comment was wrong */\nconst x = 1'),
-      )
+      learner.processFeedback(makeCorrection('code', '/* block comment was wrong */\nconst x = 1'))
       expect(learner.getPreferenceModel()!.codeStyle).toBe('commented')
     })
 
@@ -830,12 +783,8 @@ describe('FeedbackLearner', () => {
     })
 
     it('returns top correction categories', () => {
-      learner.processFeedback(
-        makeCorrection('x', 'That is incorrect and wrong'),
-      )
-      learner.processFeedback(
-        makeCorrection('y', 'Use bullet format please'),
-      )
+      learner.processFeedback(makeCorrection('x', 'That is incorrect and wrong'))
+      learner.processFeedback(makeCorrection('y', 'Use bullet format please'))
       const categories = learner.getRewardSummary().topCorrectionCategories
       expect(categories.length).toBeGreaterThan(0)
     })
@@ -915,9 +864,7 @@ describe('FeedbackLearner', () => {
           'The function was incorrect, should return default value',
         ),
       )
-      const results = learner.findRelevantLessons(
-        'Factual correction about function returns',
-      )
+      const results = learner.findRelevantLessons('Factual correction about function returns')
       expect(results.length).toBeGreaterThan(0)
     })
 
@@ -933,9 +880,7 @@ describe('FeedbackLearner', () => {
 
     it('returns at most 10 lessons', () => {
       for (let i = 0; i < 15; i++) {
-        learner.processFeedback(
-          makeCorrection(`error ${i}`, `Factual correction ${i} was wrong`),
-        )
+        learner.processFeedback(makeCorrection(`error ${i}`, `Factual correction ${i} was wrong`))
       }
       const results = learner.findRelevantLessons('Factual correction error')
       expect(results.length).toBeLessThanOrEqual(10)
@@ -943,12 +888,17 @@ describe('FeedbackLearner', () => {
 
     it('sorts results by relevance score descending', () => {
       learner.processFeedback(
-        makeCorrection('security vulnerability exploit', 'Fixed security was wrong', { domain: 'security' }),
+        makeCorrection('security vulnerability exploit', 'Fixed security was wrong', {
+          domain: 'security',
+        }),
       )
       learner.processFeedback(
         makeCorrection('unrelated topic', 'Fixed was wrong', { domain: 'general' }),
       )
-      const results = learner.findRelevantLessons('Factual correction security vulnerability', 'security')
+      const results = learner.findRelevantLessons(
+        'Factual correction security vulnerability',
+        'security',
+      )
       if (results.length >= 2) {
         // First result should be the more relevant one
         expect(results[0].domain).toBe('security')
@@ -956,9 +906,7 @@ describe('FeedbackLearner', () => {
     })
 
     it('returns empty for completely unrelated context', () => {
-      learner.processFeedback(
-        makeCorrection('alpha beta gamma', 'delta epsilon was wrong'),
-      )
+      learner.processFeedback(makeCorrection('alpha beta gamma', 'delta epsilon was wrong'))
       const results = learner.findRelevantLessons('xyz quantum physics')
       expect(results).toHaveLength(0)
     })
@@ -1196,8 +1144,9 @@ describe('FeedbackLearner', () => {
       expect(restored.getSignals().length).toBe(learner.getSignals().length)
       expect(restored.getLessons().length).toBe(learner.getLessons().length)
       expect(restored.getMistakes().length).toBe(learner.getMistakes().length)
-      expect(restored.getCalibrationSummary().totalRecords)
-        .toBe(learner.getCalibrationSummary().totalRecords)
+      expect(restored.getCalibrationSummary().totalRecords).toBe(
+        learner.getCalibrationSummary().totalRecords,
+      )
     })
   })
 
@@ -1283,20 +1232,13 @@ describe('FeedbackLearner', () => {
 
     it('preference model handles correction with no length change', () => {
       const text = 'exactly same length text here'
-      learner.processFeedback(
-        makeCorrection(text, text.replace('same', 'diff') + ' wrong'),
-      )
+      learner.processFeedback(makeCorrection(text, text.replace('same', 'diff') + ' wrong'))
       // Should not crash and model should exist
       expect(learner.getPreferenceModel()).not.toBeNull()
     })
 
     it('serialization then deserialization preserves preference model fields', () => {
-      learner.processFeedback(
-        makeCorrection(
-          'A'.repeat(200),
-          'Short was wrong',
-        ),
-      )
+      learner.processFeedback(makeCorrection('A'.repeat(200), 'Short was wrong'))
       const json = learner.serialize()
       const restored = FeedbackLearner.deserialize(json)
       const model = restored.getPreferenceModel()

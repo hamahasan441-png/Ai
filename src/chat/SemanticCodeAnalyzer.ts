@@ -82,7 +82,16 @@ export interface DetectedAntiPattern {
 
 export interface CodeSymbol {
   name: string
-  kind: 'class' | 'function' | 'variable' | 'interface' | 'enum' | 'type' | 'module' | 'method' | 'property'
+  kind:
+    | 'class'
+    | 'function'
+    | 'variable'
+    | 'interface'
+    | 'enum'
+    | 'type'
+    | 'module'
+    | 'method'
+    | 'property'
   scope: string
   references: number
   complexity: number
@@ -184,7 +193,9 @@ export class SemanticCodeAnalyzer {
     const patterns = this.config.enablePatternDetection ? this.detectPatterns(code) : []
     const antiPatterns = this.config.enableAntiPatternDetection ? this.detectAntiPatterns(code) : []
     const dependencies = this.config.enableDependencyAnalysis ? this.analyzeDependencies(code) : []
-    const quality = this.config.enableQualityMetrics ? this.measureQuality(code) : this.emptyQuality()
+    const quality = this.config.enableQualityMetrics
+      ? this.measureQuality(code)
+      : this.emptyQuality()
 
     const durationMs = Date.now() - start
     this.analysisTimesMs.push(durationMs)
@@ -193,9 +204,7 @@ export class SemanticCodeAnalyzer {
       this.analysisTimesMs.reduce((a, b) => a + b, 0) / this.analysisTimesMs.length,
     )
 
-    const confidence = round2(
-      Math.min(1, 0.3 + symbols.length * 0.02 + patterns.length * 0.05),
-    )
+    const confidence = round2(Math.min(1, 0.3 + symbols.length * 0.02 + patterns.length * 0.05))
 
     const parts: string[] = []
     parts.push(`Found ${symbols.length} symbols`)
@@ -229,7 +238,8 @@ export class SemanticCodeAnalyzer {
     const enumRe = /(?:export\s+)?enum\s+([A-Z]\w*)/g
     const typeRe = /(?:export\s+)?type\s+([A-Z]\w*)\s*=/g
     const varRe = /(?:export\s+)?(?:const|let|var)\s+(\w+)\s*[=:]/g
-    const methodRe = /^\s+(?:public\s+|private\s+|protected\s+)?(?:static\s+)?(?:async\s+)?(\w+)\s*\(/gm
+    const methodRe =
+      /^\s+(?:public\s+|private\s+|protected\s+)?(?:static\s+)?(?:async\s+)?(\w+)\s*\(/gm
 
     const addSymbols = (re: RegExp, kind: CodeSymbol['kind'], scope: string) => {
       let m: RegExpExecArray | null
@@ -262,7 +272,13 @@ export class SemanticCodeAnalyzer {
       if (seen.has(name) || symbols.length >= this.config.maxSymbols) continue
       seen.add(name)
       const refs = countMatches(code, new RegExp(`\\b${name}\\b`, 'g'))
-      symbols.push({ name, kind: 'variable', scope: 'module', references: Math.max(0, refs - 1), complexity: 0 })
+      symbols.push({
+        name,
+        kind: 'variable',
+        scope: 'module',
+        references: Math.max(0, refs - 1),
+        complexity: 0,
+      })
     }
 
     this.stats.totalSymbolsExtracted += symbols.length
@@ -405,7 +421,10 @@ export class SemanticCodeAnalyzer {
     }
 
     // Iterator: next/hasNext or Symbol.iterator
-    if (/Symbol\.iterator/i.test(code) || (/\bnext\s*\(\)/.test(code) && /\bhasNext\s*\(\)/.test(code))) {
+    if (
+      /Symbol\.iterator/i.test(code) ||
+      (/\bnext\s*\(\)/.test(code) && /\bhasNext\s*\(\)/.test(code))
+    ) {
       patterns.push({
         type: 'iterator',
         confidence: 0.8,
@@ -457,7 +476,10 @@ export class SemanticCodeAnalyzer {
     const lines = code.split('\n')
 
     // God Class: too many methods (>15)
-    const methodCount = countMatches(code, /^\s+(?:public\s+|private\s+|protected\s+)?(?:static\s+)?(?:async\s+)?\w+\s*\(/gm)
+    const methodCount = countMatches(
+      code,
+      /^\s+(?:public\s+|private\s+|protected\s+)?(?:static\s+)?(?:async\s+)?\w+\s*\(/gm,
+    )
     if (methodCount > 15) {
       antiPatterns.push({
         type: 'god_class',
@@ -470,7 +492,11 @@ export class SemanticCodeAnalyzer {
     }
 
     // Long Method: functions > 50 lines
-    const funcStarts = [...code.matchAll(/(?:function\s+\w+|(?:public|private|protected)\s+(?:static\s+)?(?:async\s+)?\w+)\s*\([^)]*\)\s*(?::\s*\w[^{]*)?\s*\{/g)]
+    const funcStarts = [
+      ...code.matchAll(
+        /(?:function\s+\w+|(?:public|private|protected)\s+(?:static\s+)?(?:async\s+)?\w+)\s*\([^)]*\)\s*(?::\s*\w[^{]*)?\s*\{/g,
+      ),
+    ]
     for (const match of funcStarts) {
       const startLine = code.substring(0, match.index).split('\n').length
       let braceDepth = 0
@@ -515,8 +541,14 @@ export class SemanticCodeAnalyzer {
     }
 
     // Data Clump: same parameter groups repeated
-    const paramLists = [...code.matchAll(/\(([^)]{20,})\)/g)]
-      .map(m => m[1].split(',').map(p => p.trim().split(/[:\s]/)[0].trim()).filter(Boolean).sort().join(','))
+    const paramLists = [...code.matchAll(/\(([^)]{20,})\)/g)].map(m =>
+      m[1]
+        .split(',')
+        .map(p => p.trim().split(/[:\s]/)[0].trim())
+        .filter(Boolean)
+        .sort()
+        .join(','),
+    )
     const paramFreq = new Map<string, number>()
     for (const pl of paramLists) {
       paramFreq.set(pl, (paramFreq.get(pl) ?? 0) + 1)
@@ -535,12 +567,11 @@ export class SemanticCodeAnalyzer {
     }
 
     // Primitive Obsession: many primitive params
-    const longPrimParams = [...code.matchAll(/\(([^)]*)\)/g)]
-      .filter(m => {
-        const params = m[1].split(',')
-        const primitives = params.filter(p => /:\s*(string|number|boolean)\b/.test(p))
-        return params.length >= 5 && primitives.length >= 4
-      })
+    const longPrimParams = [...code.matchAll(/\(([^)]*)\)/g)].filter(m => {
+      const params = m[1].split(',')
+      const primitives = params.filter(p => /:\s*(string|number|boolean)\b/.test(p))
+      return params.length >= 5 && primitives.length >= 4
+    })
     if (longPrimParams.length > 0) {
       antiPatterns.push({
         type: 'primitive_obsession',
@@ -615,7 +646,9 @@ export class SemanticCodeAnalyzer {
     const edges: DependencyEdge[] = []
 
     // Import dependencies
-    const imports = [...code.matchAll(/import\s+(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+['"]([^'"]+)['"]/g)]
+    const imports = [
+      ...code.matchAll(/import\s+(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+['"]([^'"]+)['"]/g),
+    ]
     for (const imp of imports) {
       const target = imp[1].replace(/^\.\//, '').replace(/\.js$/, '')
       edges.push({ source: 'module', target, type: 'import', strength: 1.0 })
@@ -647,7 +680,27 @@ export class SemanticCodeAnalyzer {
     const seenTypes = new Set<string>()
     for (const tu of typeUsages) {
       const name = tu[1]
-      if (!seenTypes.has(name) && !['Map', 'Set', 'Array', 'Promise', 'Record', 'Partial', 'Readonly', 'ReadonlyArray', 'RegExp', 'Date', 'Error', 'Function', 'Object', 'String', 'Number', 'Boolean'].includes(name)) {
+      if (
+        !seenTypes.has(name) &&
+        ![
+          'Map',
+          'Set',
+          'Array',
+          'Promise',
+          'Record',
+          'Partial',
+          'Readonly',
+          'ReadonlyArray',
+          'RegExp',
+          'Date',
+          'Error',
+          'Function',
+          'Object',
+          'String',
+          'Number',
+          'Boolean',
+        ].includes(name)
+      ) {
         seenTypes.add(name)
         edges.push({ source: 'module', target: name, type: 'use', strength: 0.5 })
       }
@@ -668,17 +721,18 @@ export class SemanticCodeAnalyzer {
     const codeLines = lines.filter(l => l.trim().length > 0 && !l.trim().startsWith('//')).length
 
     // Cyclomatic complexity
-    const cyclomaticComplexity = 1
-      + countMatches(code, /\bif\b/g)
-      + countMatches(code, /\belse\s+if\b/g)
-      + countMatches(code, /\bfor\b/g)
-      + countMatches(code, /\bwhile\b/g)
-      + countMatches(code, /\bcase\b/g)
-      + countMatches(code, /\bcatch\b/g)
-      + countMatches(code, /&&/g)
-      + countMatches(code, /\|\|/g)
-      + countMatches(code, /\?\?/g)
-      + countMatches(code, /\?(?!\?)/g)
+    const cyclomaticComplexity =
+      1 +
+      countMatches(code, /\bif\b/g) +
+      countMatches(code, /\belse\s+if\b/g) +
+      countMatches(code, /\bfor\b/g) +
+      countMatches(code, /\bwhile\b/g) +
+      countMatches(code, /\bcase\b/g) +
+      countMatches(code, /\bcatch\b/g) +
+      countMatches(code, /&&/g) +
+      countMatches(code, /\|\|/g) +
+      countMatches(code, /\?\?/g) +
+      countMatches(code, /\?(?!\?)/g)
 
     // Cognitive complexity (nesting-aware)
     let cognitiveComplexity = 0
@@ -694,8 +748,10 @@ export class SemanticCodeAnalyzer {
     }
 
     // Documentation coverage
-    const commentLines = lines.filter(l => l.trim().startsWith('//') || l.trim().startsWith('*') || l.trim().startsWith('/*')).length
-    const documentationCoverage = round2(Math.min(1, commentLines / Math.max(1, codeLines) * 2))
+    const commentLines = lines.filter(
+      l => l.trim().startsWith('//') || l.trim().startsWith('*') || l.trim().startsWith('/*'),
+    ).length
+    const documentationCoverage = round2(Math.min(1, (commentLines / Math.max(1, codeLines)) * 2))
 
     // Coupling: unique external references
     const externalRefs = new Set(
@@ -710,24 +766,46 @@ export class SemanticCodeAnalyzer {
 
     // Maintainability Index (simplified MI formula)
     const halsteadVolume = Math.max(1, codeLines * Math.log2(Math.max(2, tokenize(code).length)))
-    const mi = Math.max(0, Math.min(100,
-      171 - 5.2 * Math.log(halsteadVolume) - 0.23 * cyclomaticComplexity - 16.2 * Math.log(Math.max(1, codeLines)),
-    ))
+    const mi = Math.max(
+      0,
+      Math.min(
+        100,
+        171 -
+          5.2 * Math.log(halsteadVolume) -
+          0.23 * cyclomaticComplexity -
+          16.2 * Math.log(Math.max(1, codeLines)),
+      ),
+    )
     const maintainabilityIndex = round2(mi)
 
     // Readability
     const avgLineLength = lines.reduce((s, l) => s + l.length, 0) / Math.max(1, totalLines)
     const longLines = lines.filter(l => l.length > 120).length
-    const readabilityScore = round2(Math.max(0, Math.min(100,
-      100 - (avgLineLength - 40) * 0.5 - longLines * 2 - cyclomaticComplexity * 0.5,
-    )))
+    const readabilityScore = round2(
+      Math.max(
+        0,
+        Math.min(
+          100,
+          100 - (avgLineLength - 40) * 0.5 - longLines * 2 - cyclomaticComplexity * 0.5,
+        ),
+      ),
+    )
 
     // Testability
-    const publicMethods = countMatches(code, /(?:public\s+|export\s+)(?:async\s+)?(?:function\s+)?\w+\s*\(/g)
+    const publicMethods = countMatches(
+      code,
+      /(?:public\s+|export\s+)(?:async\s+)?(?:function\s+)?\w+\s*\(/g,
+    )
     const privateMethods = countMatches(code, /private\s+/g)
-    const testabilityScore = round2(Math.max(0, Math.min(100,
-      80 + publicMethods * 2 - privateMethods - cyclomaticComplexity * 1.5 - nestingLevel * 3,
-    )))
+    const testabilityScore = round2(
+      Math.max(
+        0,
+        Math.min(
+          100,
+          80 + publicMethods * 2 - privateMethods - cyclomaticComplexity * 1.5 - nestingLevel * 3,
+        ),
+      ),
+    )
 
     // Duplicate ratio (simple n-gram check)
     const duplicateRatio = this.computeDuplicateRatio(lines)
@@ -784,16 +862,22 @@ export class SemanticCodeAnalyzer {
     const antiPatterns = this.detectAntiPatterns(code)
 
     if (quality.cyclomaticComplexity > this.config.complexityThreshold) {
-      suggestions.push(`Reduce cyclomatic complexity (${quality.cyclomaticComplexity}) by extracting helper functions`)
+      suggestions.push(
+        `Reduce cyclomatic complexity (${quality.cyclomaticComplexity}) by extracting helper functions`,
+      )
     }
     if (quality.maintainabilityIndex < 40) {
-      suggestions.push(`Improve maintainability index (${quality.maintainabilityIndex}/100) — reduce method size and complexity`)
+      suggestions.push(
+        `Improve maintainability index (${quality.maintainabilityIndex}/100) — reduce method size and complexity`,
+      )
     }
     if (quality.documentationCoverage < 0.2) {
       suggestions.push('Add documentation comments — current coverage is below 20%')
     }
     if (quality.duplicateRatio > 0.15) {
-      suggestions.push(`Reduce code duplication (${round2(quality.duplicateRatio * 100)}%) — extract shared logic`)
+      suggestions.push(
+        `Reduce code duplication (${round2(quality.duplicateRatio * 100)}%) — extract shared logic`,
+      )
     }
     if (quality.readabilityScore < 50) {
       suggestions.push('Improve readability — shorten long lines and reduce nesting')
@@ -814,8 +898,12 @@ export class SemanticCodeAnalyzer {
 
   // ── Accessors ───────────────────────────────────────────────────────────────
 
-  getStats(): Readonly<SemanticCodeAnalyzerStats> { return { ...this.stats } }
-  getConfig(): Readonly<SemanticCodeAnalyzerConfig> { return { ...this.config } }
+  getStats(): Readonly<SemanticCodeAnalyzerStats> {
+    return { ...this.stats }
+  }
+  getConfig(): Readonly<SemanticCodeAnalyzerConfig> {
+    return { ...this.config }
+  }
 
   // ── Persistence ─────────────────────────────────────────────────────────────
 
@@ -827,7 +915,10 @@ export class SemanticCodeAnalyzer {
   }
 
   static deserialize(json: string): SemanticCodeAnalyzer {
-    const data = JSON.parse(json) as { config: SemanticCodeAnalyzerConfig; stats: SemanticCodeAnalyzerStats }
+    const data = JSON.parse(json) as {
+      config: SemanticCodeAnalyzerConfig
+      stats: SemanticCodeAnalyzerStats
+    }
     const instance = new SemanticCodeAnalyzer(data.config)
     Object.assign(instance.stats, data.stats)
     return instance

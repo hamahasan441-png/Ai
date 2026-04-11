@@ -7,9 +7,7 @@ describe('difference', () => {
   })
 
   it('returns a copy of a when b is empty', () => {
-    expect(difference(new Set([1, 2, 3]), new Set())).toEqual(
-      new Set([1, 2, 3]),
-    )
+    expect(difference(new Set([1, 2, 3]), new Set())).toEqual(new Set([1, 2, 3]))
   })
 
   it('returns empty set when a is empty', () => {
@@ -17,15 +15,11 @@ describe('difference', () => {
   })
 
   it('returns all of a when sets are disjoint', () => {
-    expect(difference(new Set([1, 2]), new Set([3, 4]))).toEqual(
-      new Set([1, 2]),
-    )
+    expect(difference(new Set([1, 2]), new Set([3, 4]))).toEqual(new Set([1, 2]))
   })
 
   it('removes overlapping elements', () => {
-    expect(difference(new Set([1, 2, 3]), new Set([2, 3, 4]))).toEqual(
-      new Set([1]),
-    )
+    expect(difference(new Set([1, 2, 3]), new Set([2, 3, 4]))).toEqual(new Set([1]))
   })
 
   it('returns empty set when a is a subset of b', () => {
@@ -33,9 +27,7 @@ describe('difference', () => {
   })
 
   it('returns empty set when sets are identical', () => {
-    expect(difference(new Set([1, 2, 3]), new Set([1, 2, 3]))).toEqual(
-      new Set(),
-    )
+    expect(difference(new Set([1, 2, 3]), new Set([1, 2, 3]))).toEqual(new Set())
   })
 })
 
@@ -109,15 +101,11 @@ describe('union', () => {
   })
 
   it('combines disjoint sets', () => {
-    expect(union(new Set([1, 2]), new Set([3, 4]))).toEqual(
-      new Set([1, 2, 3, 4]),
-    )
+    expect(union(new Set([1, 2]), new Set([3, 4]))).toEqual(new Set([1, 2, 3, 4]))
   })
 
   it('deduplicates overlapping elements', () => {
-    expect(union(new Set([1, 2, 3]), new Set([2, 3, 4]))).toEqual(
-      new Set([1, 2, 3, 4]),
-    )
+    expect(union(new Set([1, 2, 3]), new Set([2, 3, 4]))).toEqual(new Set([1, 2, 3, 4]))
   })
 
   it('returns equivalent set when both are identical', () => {

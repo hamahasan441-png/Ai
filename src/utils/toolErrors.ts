@@ -10,8 +10,7 @@ export function formatError(error: unknown): string {
     return String(error)
   }
   const parts = getErrorParts(error)
-  const fullMessage =
-    parts.filter(Boolean).join('\n').trim() || 'Command failed with no output'
+  const fullMessage = parts.filter(Boolean).join('\n').trim() || 'Command failed with no output'
   if (fullMessage.length <= 10000) {
     return fullMessage
   }
@@ -63,16 +62,9 @@ function formatValidationPath(path: PropertyKey[]): string {
  * @param error The Zod error object
  * @returns A formatted error message string
  */
-export function formatZodValidationError(
-  toolName: string,
-  error: ZodError,
-): string {
+export function formatZodValidationError(toolName: string, error: ZodError): string {
   const missingParams = error.issues
-    .filter(
-      err =>
-        err.code === 'invalid_type' &&
-        err.message.includes('received undefined'),
-    )
+    .filter(err => err.code === 'invalid_type' && err.message.includes('received undefined'))
     .map(err => formatValidationPath(err.path))
 
   const unexpectedParams = error.issues
@@ -80,11 +72,7 @@ export function formatZodValidationError(
     .flatMap(err => err.keys)
 
   const typeMismatchParams = error.issues
-    .filter(
-      err =>
-        err.code === 'invalid_type' &&
-        !err.message.includes('received undefined'),
-    )
+    .filter(err => err.code === 'invalid_type' && !err.message.includes('received undefined'))
     .map(err => {
       const typeErr = err as { expected: string }
       const receivedMatch = err.message.match(/received (\w+)/)

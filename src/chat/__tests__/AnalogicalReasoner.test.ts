@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  AnalogicalReasoner,
-  type StructureElement,
-} from '../AnalogicalReasoner'
+import { AnalogicalReasoner, type StructureElement } from '../AnalogicalReasoner'
 
 // ── Constructor Tests ──
 
@@ -283,11 +280,7 @@ describe('AnalogicalReasoner generateByAnalogy', () => {
   })
 
   it('handles unknown language pair gracefully with generic translation', () => {
-    const result = reasoner.generateByAnalogy(
-      'print("hello")',
-      'haskell',
-      'fortran',
-    )
+    const result = reasoner.generateByAnalogy('print("hello")', 'haskell', 'fortran')
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
   })
@@ -302,11 +295,7 @@ describe('AnalogicalReasoner generateByAnalogy', () => {
   })
 
   it('generates a generic translation when no specific pair matches', () => {
-    const result = reasoner.generateByAnalogy(
-      'some code',
-      'python',
-      'rust',
-    )
+    const result = reasoner.generateByAnalogy('some code', 'python', 'rust')
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
   })
@@ -364,21 +353,13 @@ describe('AnalogicalReasoner transferSolution', () => {
   })
 
   it('tracks source and target domains in result', () => {
-    const result = reasoner.transferSolution(
-      'Use SQL joins to combine data',
-      'SQL',
-      'NoSQL',
-    )
+    const result = reasoner.transferSolution('Use SQL joins to combine data', 'SQL', 'NoSQL')
     expect(result.sourceDomain).toBe('SQL')
     expect(result.targetDomain).toBe('NoSQL')
   })
 
   it('has a confidence score between 0 and 1', () => {
-    const result = reasoner.transferSolution(
-      'Use event listeners',
-      'synchronous',
-      'asynchronous',
-    )
+    const result = reasoner.transferSolution('Use event listeners', 'synchronous', 'asynchronous')
     expect(result.confidence).toBeGreaterThanOrEqual(0)
     expect(result.confidence).toBeLessThanOrEqual(1)
   })

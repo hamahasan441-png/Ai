@@ -176,8 +176,8 @@ const CORRECTION_CATEGORY_SIGNALS: Record<CorrectionCategory, string[]> = {
   format_preference: ['format', 'layout', 'structure', 'organize', 'bullet', 'numbered'],
   detail_level: ['more detail', 'less detail', 'too long', 'too short', 'brief', 'elaborate'],
   tone_adjustment: ['formal', 'casual', 'professional', 'friendly', 'serious', 'lighter'],
-  missing_information: ['missing', 'forgot', 'also mention', 'didn\'t include', 'left out', 'add'],
-  unnecessary_information: ['too much', 'unnecessary', 'remove', 'don\'t need', 'excess', 'trim'],
+  missing_information: ['missing', 'forgot', 'also mention', "didn't include", 'left out', 'add'],
+  unnecessary_information: ['too much', 'unnecessary', 'remove', "don't need", 'excess', 'trim'],
   wrong_approach: ['different approach', 'instead', 'better way', 'wrong method', 'try using'],
   terminology: ['term', 'word', 'phrase', 'call it', 'named', 'referred to as'],
 }
@@ -308,8 +308,9 @@ export class FeedbackLearner {
 
     // Enforce max lessons
     if (this.lessons.size > this.config.maxLessons) {
-      const oldest = [...this.lessons.entries()]
-        .sort(([, a], [, b]) => a.createdAt - b.createdAt)[0]
+      const oldest = [...this.lessons.entries()].sort(
+        ([, a], [, b]) => a.createdAt - b.createdAt,
+      )[0]
       if (oldest) this.lessons.delete(oldest[0])
     }
   }
@@ -331,7 +332,12 @@ export class FeedbackLearner {
 
   // ── Mistake tracking ───────────────────────────────────────────────────
 
-  private trackMistake(original: string, corrected: string, domain: string, category: CorrectionCategory): void {
+  private trackMistake(
+    original: string,
+    corrected: string,
+    domain: string,
+    category: CorrectionCategory,
+  ): void {
     // Generate a pattern key from the original
     const patternKey = `${category}_${domain}_${original.slice(0, 50).toLowerCase().replace(/\s+/g, '_')}`
 
@@ -341,7 +347,8 @@ export class FeedbackLearner {
         ...existing,
         occurrences: existing.occurrences + 1,
         lastOccurrence: Date.now(),
-        severity: existing.occurrences >= 3 ? 'major' : existing.occurrences >= 1 ? 'moderate' : 'minor',
+        severity:
+          existing.occurrences >= 3 ? 'major' : existing.occurrences >= 1 ? 'moderate' : 'minor',
       }
       this.mistakes.set(patternKey, updated)
     } else {
@@ -360,8 +367,9 @@ export class FeedbackLearner {
 
     // Enforce max mistakes
     if (this.mistakes.size > this.config.maxMistakes) {
-      const oldest = [...this.mistakes.entries()]
-        .sort(([, a], [, b]) => a.lastOccurrence - b.lastOccurrence)[0]
+      const oldest = [...this.mistakes.entries()].sort(
+        ([, a], [, b]) => a.lastOccurrence - b.lastOccurrence,
+      )[0]
       if (oldest) this.mistakes.delete(oldest[0])
     }
   }
@@ -559,10 +567,16 @@ export class FeedbackLearner {
     const half = Math.floor(relevant.length / 2)
     const firstHalf = relevant.slice(0, half)
     const secondHalf = relevant.slice(half)
-    const firstPositive = firstHalf.filter(s => s.type === 'thumbs_up').length / Math.max(firstHalf.length, 1)
-    const secondPositive = secondHalf.filter(s => s.type === 'thumbs_up').length / Math.max(secondHalf.length, 1)
-    const trend = secondPositive > firstPositive + 0.05 ? 'improving' as const :
-      secondPositive < firstPositive - 0.05 ? 'declining' as const : 'stable' as const
+    const firstPositive =
+      firstHalf.filter(s => s.type === 'thumbs_up').length / Math.max(firstHalf.length, 1)
+    const secondPositive =
+      secondHalf.filter(s => s.type === 'thumbs_up').length / Math.max(secondHalf.length, 1)
+    const trend =
+      secondPositive > firstPositive + 0.05
+        ? ('improving' as const)
+        : secondPositive < firstPositive - 0.05
+          ? ('declining' as const)
+          : ('stable' as const)
 
     return {
       totalSignals: relevant.length,
@@ -583,9 +597,12 @@ export class FeedbackLearner {
 
     for (const lesson of this.lessons.values()) {
       let score = 0
-      const lessonWords = lesson.lesson.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+      const lessonWords = lesson.lesson
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 3)
       const matchCount = lessonWords.filter(w => lower.includes(w)).length
-      score += matchCount / Math.max(lessonWords.length, 1) * 0.5
+      score += (matchCount / Math.max(lessonWords.length, 1)) * 0.5
 
       if (domain && lesson.domain === domain) score += 0.3
       score += lesson.confidence * 0.2
@@ -626,15 +643,14 @@ export class FeedbackLearner {
       totalSignalsReceived: this.stats.totalSignals,
       totalLessonsLearned: this.stats.totalLessons,
       totalMistakesTracked: this.stats.totalMistakes,
-      avgCalibrationError: this.stats.calibrationCount > 0
-        ? this.stats.totalCalibrationError / this.stats.calibrationCount
-        : 0,
-      positiveSignalRate: this.stats.totalSignals > 0
-        ? this.stats.positiveSignals / this.stats.totalSignals
-        : 0,
-      correctionRate: this.stats.totalSignals > 0
-        ? this.stats.corrections / this.stats.totalSignals
-        : 0,
+      avgCalibrationError:
+        this.stats.calibrationCount > 0
+          ? this.stats.totalCalibrationError / this.stats.calibrationCount
+          : 0,
+      positiveSignalRate:
+        this.stats.totalSignals > 0 ? this.stats.positiveSignals / this.stats.totalSignals : 0,
+      correctionRate:
+        this.stats.totalSignals > 0 ? this.stats.corrections / this.stats.totalSignals : 0,
     }
   }
 

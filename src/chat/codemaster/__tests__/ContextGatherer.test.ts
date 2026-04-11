@@ -117,12 +117,7 @@ describe('extractSymbols — TypeScript/JavaScript', () => {
   })
 
   it('extracts JSDoc description from preceding block comment', () => {
-    const code = [
-      '/**',
-      ' * Does greeting stuff.',
-      ' */',
-      'export function greet() {}',
-    ].join('\n')
+    const code = ['/**', ' * Does greeting stuff.', ' */', 'export function greet() {}'].join('\n')
     const symbols = cg.extractSymbols(code, 'file.ts')
     expect(symbols[0].description).toContain('greeting')
   })
@@ -308,10 +303,7 @@ describe('extractImports — TypeScript/JavaScript', () => {
   })
 
   it('extracts multiple import lines', () => {
-    const code = [
-      "import { a } from './a'",
-      "import { b } from './b'",
-    ].join('\n')
+    const code = ["import { a } from './a'", "import { b } from './b'"].join('\n')
     const imports = cg.extractImports(code, 'file.ts')
     expect(imports).toHaveLength(2)
   })
@@ -375,7 +367,11 @@ describe('scoreRelevance', () => {
   })
 
   it('returns higher score when content matches task keywords', () => {
-    const score = cg.scoreRelevance('src/utils.ts', 'function authenticate() {}', 'authenticate users')
+    const score = cg.scoreRelevance(
+      'src/utils.ts',
+      'function authenticate() {}',
+      'authenticate users',
+    )
     expect(score).toBeGreaterThan(0)
   })
 
@@ -500,22 +496,26 @@ describe('summarizeFile', () => {
 describe('gatherContext', () => {
   function makeFiles(): Map<string, string> {
     const files = new Map<string, string>()
-    files.set('src/auth.ts', [
-      "import { hash } from './crypto'",
-      'export function login(user: string) {}',
-      'export function logout() {}',
-    ].join('\n'))
-    files.set('src/crypto.ts', [
-      'export function hash(data: string): string { return data }',
-    ].join('\n'))
-    files.set('src/index.ts', [
-      "import { login } from './auth'",
-      'export { login }',
-    ].join('\n'))
-    files.set('test/auth.test.ts', [
-      "import { login } from '../src/auth'",
-      "describe('login', () => { it('works', () => {}) })",
-    ].join('\n'))
+    files.set(
+      'src/auth.ts',
+      [
+        "import { hash } from './crypto'",
+        'export function login(user: string) {}',
+        'export function logout() {}',
+      ].join('\n'),
+    )
+    files.set(
+      'src/crypto.ts',
+      ['export function hash(data: string): string { return data }'].join('\n'),
+    )
+    files.set('src/index.ts', ["import { login } from './auth'", 'export { login }'].join('\n'))
+    files.set(
+      'test/auth.test.ts',
+      [
+        "import { login } from '../src/auth'",
+        "describe('login', () => { it('works', () => {}) })",
+      ].join('\n'),
+    )
     files.set('docs/readme.md', 'Some documentation')
     return files
   }
@@ -573,7 +573,9 @@ describe('gatherContext', () => {
   it('sorts primary files by relevance descending', () => {
     const ctx = cg.gatherContext('fix auth login', makeFiles())
     for (let i = 1; i < ctx.primaryFiles.length; i++) {
-      expect(ctx.primaryFiles[i - 1].relevance).toBeGreaterThanOrEqual(ctx.primaryFiles[i].relevance)
+      expect(ctx.primaryFiles[i - 1].relevance).toBeGreaterThanOrEqual(
+        ctx.primaryFiles[i].relevance,
+      )
     }
   })
 
@@ -606,9 +608,24 @@ describe('gatherContext', () => {
 
 describe('findDependents', () => {
   const graph: ImportRelation[] = [
-    { sourceFile: 'src/app.ts', targetFile: './auth', importedSymbols: ['login'], isTypeOnly: false },
-    { sourceFile: 'src/index.ts', targetFile: './auth', importedSymbols: ['logout'], isTypeOnly: false },
-    { sourceFile: 'src/app.ts', targetFile: './utils', importedSymbols: ['format'], isTypeOnly: false },
+    {
+      sourceFile: 'src/app.ts',
+      targetFile: './auth',
+      importedSymbols: ['login'],
+      isTypeOnly: false,
+    },
+    {
+      sourceFile: 'src/index.ts',
+      targetFile: './auth',
+      importedSymbols: ['logout'],
+      isTypeOnly: false,
+    },
+    {
+      sourceFile: 'src/app.ts',
+      targetFile: './utils',
+      importedSymbols: ['format'],
+      isTypeOnly: false,
+    },
   ]
 
   it('finds all files that import from a target', () => {
@@ -639,8 +656,18 @@ describe('findDependents', () => {
 
 describe('findDependencies', () => {
   const graph: ImportRelation[] = [
-    { sourceFile: 'src/app.ts', targetFile: './auth', importedSymbols: ['login'], isTypeOnly: false },
-    { sourceFile: 'src/app.ts', targetFile: './utils', importedSymbols: ['format'], isTypeOnly: false },
+    {
+      sourceFile: 'src/app.ts',
+      targetFile: './auth',
+      importedSymbols: ['login'],
+      isTypeOnly: false,
+    },
+    {
+      sourceFile: 'src/app.ts',
+      targetFile: './utils',
+      importedSymbols: ['format'],
+      isTypeOnly: false,
+    },
     { sourceFile: 'src/index.ts', targetFile: './app', importedSymbols: [], isTypeOnly: false },
   ]
 
@@ -668,17 +695,12 @@ describe('findDependencies', () => {
 describe('traceSymbol', () => {
   function makeTraceFiles(): Map<string, string> {
     const files = new Map<string, string>()
-    files.set('src/math.ts', [
-      'export function add(a: number, b: number) { return a + b }',
-    ].join('\n'))
-    files.set('src/app.ts', [
-      "import { add } from './math'",
-      'const result = add(1, 2)',
-    ].join('\n'))
-    files.set('src/other.ts', [
-      '// no usage of add here',
-      'const x = 42',
-    ].join('\n'))
+    files.set(
+      'src/math.ts',
+      ['export function add(a: number, b: number) { return a + b }'].join('\n'),
+    )
+    files.set('src/app.ts', ["import { add } from './math'", 'const result = add(1, 2)'].join('\n'))
+    files.set('src/other.ts', ['// no usage of add here', 'const x = 42'].join('\n'))
     return files
   }
 

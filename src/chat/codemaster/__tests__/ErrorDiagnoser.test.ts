@@ -1,10 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { ErrorDiagnoser } from '../ErrorDiagnoser.js'
-import type {
-  DiagnosedError,
-  DiagnosticReport,
-  StackFrame,
-} from '../ErrorDiagnoser.js'
+import type { DiagnosedError, DiagnosticReport, StackFrame } from '../ErrorDiagnoser.js'
 
 describe('ErrorDiagnoser', () => {
   let diagnoser: ErrorDiagnoser
@@ -21,8 +17,8 @@ describe('ErrorDiagnoser', () => {
     it('should diagnose TypeError', () => {
       const result = diagnoser.diagnose(
         "TypeError: Cannot read properties of undefined (reading 'name')\n" +
-        '    at processUser (src/users.ts:42:10)\n' +
-        '    at main (src/index.ts:10:5)',
+          '    at processUser (src/users.ts:42:10)\n' +
+          '    at main (src/index.ts:10:5)',
       )
       expect(result.errorType).toBe('TypeError')
       expect(result.category).toBe('type-error')
@@ -32,8 +28,8 @@ describe('ErrorDiagnoser', () => {
     it('should find root cause in user code', () => {
       const result = diagnoser.diagnose(
         "TypeError: Cannot read properties of undefined (reading 'name')\n" +
-        '    at processUser (src/users.ts:42:10)\n' +
-        '    at main (src/index.ts:10:5)',
+          '    at processUser (src/users.ts:42:10)\n' +
+          '    at main (src/index.ts:10:5)',
       )
       expect(result.rootCauseFile).toBe('src/users.ts')
       expect(result.rootCauseLine).toBe(42)
@@ -44,22 +40,21 @@ describe('ErrorDiagnoser', () => {
         "TypeError: Cannot read properties of undefined (reading 'name')",
       )
       expect(result.suggestedFixes.length).toBeGreaterThan(0)
-      expect(result.suggestedFixes.some(f => f.description.includes('optional chaining'))).toBe(true)
+      expect(result.suggestedFixes.some(f => f.description.includes('optional chaining'))).toBe(
+        true,
+      )
     })
 
     it('should diagnose ReferenceError', () => {
       const result = diagnoser.diagnose(
-        'ReferenceError: myVar is not defined\n' +
-        '    at Object.<anonymous> (src/app.ts:5:3)',
+        'ReferenceError: myVar is not defined\n' + '    at Object.<anonymous> (src/app.ts:5:3)',
       )
       expect(result.errorType).toBe('ReferenceError')
       expect(result.category).toBe('reference-error')
     })
 
     it('should diagnose SyntaxError', () => {
-      const result = diagnoser.diagnose(
-        'SyntaxError: Unexpected token )',
-      )
+      const result = diagnoser.diagnose('SyntaxError: Unexpected token )')
       expect(result.errorType).toBe('SyntaxError')
       expect(result.category).toBe('syntax-error')
       expect(result.severity).toBe('critical')
@@ -67,8 +62,7 @@ describe('ErrorDiagnoser', () => {
 
     it('should diagnose module not found errors', () => {
       const result = diagnoser.diagnose(
-        "Error: Cannot find module 'lodash'\n" +
-        '    at Object.<anonymous> (src/utils.ts:1:1)',
+        "Error: Cannot find module 'lodash'\n" + '    at Object.<anonymous> (src/utils.ts:1:1)',
       )
       expect(result.category).toBe('import-error')
       expect(result.suggestedFixes.some(f => f.description.includes('npm install'))).toBe(true)
@@ -91,31 +85,25 @@ describe('ErrorDiagnoser', () => {
     })
 
     it('should diagnose EACCES errors', () => {
-      const result = diagnoser.diagnose(
-        'Error: EACCES: permission denied',
-      )
+      const result = diagnoser.diagnose('Error: EACCES: permission denied')
       expect(result.category).toBe('permission-error')
     })
 
     it('should diagnose ECONNREFUSED errors', () => {
-      const result = diagnoser.diagnose(
-        'Error: ECONNREFUSED 127.0.0.1:5432',
-      )
+      const result = diagnoser.diagnose('Error: ECONNREFUSED 127.0.0.1:5432')
       expect(result.category).toBe('network-error')
     })
 
     it('should generate a summary', () => {
       const result = diagnoser.diagnose(
         "TypeError: Cannot read properties of undefined (reading 'name')\n" +
-        '    at processUser (src/users.ts:42:10)',
+          '    at processUser (src/users.ts:42:10)',
       )
       expect(result.summary).toContain('TypeError')
     })
 
     it('should handle timeout errors', () => {
-      const result = diagnoser.diagnose(
-        'Error: ETIMEDOUT: connection timed out',
-      )
+      const result = diagnoser.diagnose('Error: ETIMEDOUT: connection timed out')
       expect(result.category).toBe('timeout-error')
     })
 
@@ -128,9 +116,7 @@ describe('ErrorDiagnoser', () => {
     })
 
     it('should handle assertion errors', () => {
-      const result = diagnoser.diagnose(
-        'AssertionError: expected true to equal false',
-      )
+      const result = diagnoser.diagnose('AssertionError: expected true to equal false')
       expect(result.category).toBe('assertion-error')
     })
   })
@@ -157,7 +143,9 @@ describe('ErrorDiagnoser', () => {
     })
 
     it('should detect TypeScript from TS error', () => {
-      expect(diagnoser.detectLanguage('error TS2322: Type mismatch at src/app.ts(10,5)')).toBe('typescript')
+      expect(diagnoser.detectLanguage('error TS2322: Type mismatch at src/app.ts(10,5)')).toBe(
+        'typescript',
+      )
     })
 
     it('should default to JavaScript', () => {
@@ -177,8 +165,8 @@ describe('ErrorDiagnoser', () => {
     it('should parse Node.js stack trace', () => {
       const frames = diagnoser.parseStackTrace(
         '    at processUser (src/users.ts:42:10)\n' +
-        '    at main (src/index.ts:10:5)\n' +
-        '    at Module._compile (node_modules/module.js:200:10)',
+          '    at main (src/index.ts:10:5)\n' +
+          '    at Module._compile (node_modules/module.js:200:10)',
       )
       expect(frames.length).toBe(3)
       expect(frames[0].functionName).toBe('processUser')
@@ -190,7 +178,7 @@ describe('ErrorDiagnoser', () => {
     it('should detect user code vs library code', () => {
       const frames = diagnoser.parseStackTrace(
         '    at processUser (src/users.ts:42:10)\n' +
-        '    at Object.<anonymous> (node_modules/express/lib/router.js:100:5)',
+          '    at Object.<anonymous> (node_modules/express/lib/router.js:100:5)',
       )
       expect(frames[0].isUserCode).toBe(true)
       expect(frames[1].isUserCode).toBe(false)
@@ -206,7 +194,7 @@ describe('ErrorDiagnoser', () => {
     it('should parse Python stack trace', () => {
       const frames = diagnoser.parseStackTrace(
         'File "app/main.py", line 42, in process_user\n' +
-        'File "app/utils.py", line 10, in validate',
+          'File "app/utils.py", line 10, in validate',
         'python',
       )
       expect(frames.length).toBe(2)
@@ -216,10 +204,7 @@ describe('ErrorDiagnoser', () => {
     })
 
     it('should parse Go stack trace', () => {
-      const frames = diagnoser.parseStackTrace(
-        'main.go:42\ncmd/server.go:10',
-        'go',
-      )
+      const frames = diagnoser.parseStackTrace('main.go:42\ncmd/server.go:10', 'go')
       expect(frames.length).toBe(2)
       expect(frames[0].filePath).toBe('main.go')
       expect(frames[0].line).toBe(42)
@@ -235,9 +220,7 @@ describe('ErrorDiagnoser', () => {
     })
 
     it('should handle anonymous functions', () => {
-      const frames = diagnoser.parseStackTrace(
-        '    at src/index.ts:5:3',
-      )
+      const frames = diagnoser.parseStackTrace('    at src/index.ts:5:3')
       expect(frames[0].functionName).toBe('<anonymous>')
     })
   })
@@ -252,11 +235,15 @@ describe('ErrorDiagnoser', () => {
     })
 
     it('should categorize syntax errors', () => {
-      expect(diagnoser.categorize('SyntaxError: unexpected token', 'SyntaxError')).toBe('syntax-error')
+      expect(diagnoser.categorize('SyntaxError: unexpected token', 'SyntaxError')).toBe(
+        'syntax-error',
+      )
     })
 
     it('should categorize reference errors', () => {
-      expect(diagnoser.categorize('ReferenceError: x is not defined', 'ReferenceError')).toBe('reference-error')
+      expect(diagnoser.categorize('ReferenceError: x is not defined', 'ReferenceError')).toBe(
+        'reference-error',
+      )
     })
 
     it('should categorize import errors', () => {
@@ -325,7 +312,7 @@ describe('ErrorDiagnoser', () => {
   describe('generateReport', () => {
     it('should generate report for single error', () => {
       const report = diagnoser.generateReport([
-        "TypeError: Cannot read properties of undefined\n    at main (src/app.ts:10:5)",
+        'TypeError: Cannot read properties of undefined\n    at main (src/app.ts:10:5)',
       ])
       expect(report.errors).toHaveLength(1)
       expect(report.summary).toBeTruthy()
@@ -333,24 +320,20 @@ describe('ErrorDiagnoser', () => {
 
     it('should generate report for multiple errors', () => {
       const report = diagnoser.generateReport([
-        "TypeError: Cannot read properties of undefined\n    at main (src/app.ts:10:5)",
-        "SyntaxError: Unexpected token\n    at parse (src/parser.ts:20:3)",
+        'TypeError: Cannot read properties of undefined\n    at main (src/app.ts:10:5)',
+        'SyntaxError: Unexpected token\n    at parse (src/parser.ts:20:3)',
       ])
       expect(report.errors).toHaveLength(2)
       expect(report.summary).toContain('2 errors')
     })
 
     it('should collect involved files', () => {
-      const report = diagnoser.generateReport([
-        "Error: failed\n    at func (src/app.ts:10:5)",
-      ])
+      const report = diagnoser.generateReport(['Error: failed\n    at func (src/app.ts:10:5)'])
       expect(report.involvedFiles).toContain('src/app.ts')
     })
 
     it('should determine overall severity', () => {
-      const report = diagnoser.generateReport([
-        'SyntaxError: Unexpected token',
-      ])
+      const report = diagnoser.generateReport(['SyntaxError: Unexpected token'])
       expect(report.overallSeverity).toBe('critical')
     })
 
@@ -379,14 +362,15 @@ describe('ErrorDiagnoser', () => {
     })
 
     it('should match type assignment error pattern', () => {
-      const result = diagnoser.diagnose("error TS2322: Type 'string' is not assignable to type 'number'")
+      const result = diagnoser.diagnose(
+        "error TS2322: Type 'string' is not assignable to type 'number'",
+      )
       expect(result.relatedPatterns.length).toBeGreaterThan(0)
     })
 
     it('should match Python import error', () => {
       const result = diagnoser.diagnose(
-        'Traceback (most recent call last):\n' +
-        'ImportError: No module named requests',
+        'Traceback (most recent call last):\n' + 'ImportError: No module named requests',
       )
       expect(result.category).toBe('import-error')
       expect(result.suggestedFixes.length).toBeGreaterThan(0)
@@ -394,8 +378,7 @@ describe('ErrorDiagnoser', () => {
 
     it('should match Python indentation error', () => {
       const result = diagnoser.diagnose(
-        'File "main.py", line 5\n' +
-        'IndentationError: unexpected indent',
+        'File "main.py", line 5\n' + 'IndentationError: unexpected indent',
       )
       expect(result.relatedPatterns.some(p => p.includes('indentation'))).toBe(true)
     })

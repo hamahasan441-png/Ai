@@ -145,9 +145,7 @@ export class TerminalQuerier {
    * Never rejects; never times out on its own. If you never call flush()
    * and the terminal doesn't respond, the promise remains pending.
    */
-  send<T extends TerminalResponse>(
-    query: TerminalQuery<T>,
-  ): Promise<T | undefined> {
+  send<T extends TerminalResponse>(query: TerminalQuery<T>): Promise<T | undefined> {
     return new Promise(resolve => {
       this.queue.push({
         kind: 'query',

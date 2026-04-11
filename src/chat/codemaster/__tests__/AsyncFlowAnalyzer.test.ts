@@ -126,9 +126,7 @@ async function load() {
 }
 `
       const result = analyzer.analyze(code)
-      const issue = result.issues.find(
-        i => i.type === 'missing-await' && i.title.includes('fetch'),
-      )
+      const issue = result.issues.find(i => i.type === 'missing-await' && i.title.includes('fetch'))
       expect(issue).toBeDefined()
     })
 
@@ -373,7 +371,7 @@ try {
 `
       const result = analyzer.analyze(code)
       const issue = result.issues.find(
-        i => i.type === 'error-swallowing' && i.title.includes("error"),
+        i => i.type === 'error-swallowing' && i.title.includes('error'),
       )
       expect(issue).toBeDefined()
       expect(issue!.severity).toBe('medium')

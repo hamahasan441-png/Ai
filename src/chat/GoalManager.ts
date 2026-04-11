@@ -22,7 +22,14 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type GoalStatus = 'pending' | 'active' | 'blocked' | 'suspended' | 'completed' | 'failed' | 'abandoned'
+export type GoalStatus =
+  | 'pending'
+  | 'active'
+  | 'blocked'
+  | 'suspended'
+  | 'completed'
+  | 'failed'
+  | 'abandoned'
 
 export type GoalPriority = 'critical' | 'high' | 'medium' | 'low'
 
@@ -37,7 +44,7 @@ export interface GoalDefinition {
   readonly successCriteria: string[]
   readonly deadline: number | null
   status: GoalStatus
-  progress: number  // 0-1
+  progress: number // 0-1
   readonly createdAt: number
   updatedAt: number
   completedAt: number | null
@@ -81,7 +88,7 @@ export interface GoalManagerConfig {
   readonly maxGoals: number
   readonly maxSubGoalDepth: number
   readonly maxMilestones: number
-  readonly autoDecomposeThreshold: number  // complexity above this gets auto-decomposed
+  readonly autoDecomposeThreshold: number // complexity above this gets auto-decomposed
   readonly conflictCheckEnabled: boolean
   readonly maxAchievementHistory: number
 }
@@ -117,12 +124,40 @@ const PRIORITY_WEIGHTS: Record<GoalPriority, number> = {
 
 /** Goal decomposition templates. */
 const DECOMPOSITION_TEMPLATES: Record<string, string[]> = {
-  learn: ['Research the topic', 'Understand core concepts', 'Practice with examples', 'Test understanding'],
-  build: ['Gather requirements', 'Design architecture', 'Implement core features', 'Test and validate', 'Deploy'],
+  learn: [
+    'Research the topic',
+    'Understand core concepts',
+    'Practice with examples',
+    'Test understanding',
+  ],
+  build: [
+    'Gather requirements',
+    'Design architecture',
+    'Implement core features',
+    'Test and validate',
+    'Deploy',
+  ],
   analyze: ['Collect data', 'Identify patterns', 'Draw conclusions', 'Validate findings'],
-  fix: ['Reproduce the issue', 'Identify root cause', 'Implement fix', 'Verify fix', 'Add regression test'],
-  optimize: ['Profile current performance', 'Identify bottlenecks', 'Implement optimizations', 'Measure improvement'],
-  research: ['Define research question', 'Survey literature', 'Collect evidence', 'Synthesize findings', 'Present conclusions'],
+  fix: [
+    'Reproduce the issue',
+    'Identify root cause',
+    'Implement fix',
+    'Verify fix',
+    'Add regression test',
+  ],
+  optimize: [
+    'Profile current performance',
+    'Identify bottlenecks',
+    'Implement optimizations',
+    'Measure improvement',
+  ],
+  research: [
+    'Define research question',
+    'Survey literature',
+    'Collect evidence',
+    'Synthesize findings',
+    'Present conclusions',
+  ],
   default: ['Plan approach', 'Execute main task', 'Verify results', 'Document outcomes'],
 }
 
@@ -146,7 +181,12 @@ function classifyGoalType(title: string): string {
 }
 
 function tokenize(text: string): Set<string> {
-  return new Set(text.toLowerCase().split(/\s+/).filter(t => t.length > 2))
+  return new Set(
+    text
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(t => t.length > 2),
+  )
 }
 
 // ─── Engine ────────────────────────────────────────────────────────────────────
@@ -156,7 +196,11 @@ export class GoalManager {
   private readonly goals: Map<string, GoalDefinition> = new Map()
   private readonly milestones: Map<string, GoalMilestone> = new Map()
   private readonly conflicts: GoalConflict[] = []
-  private readonly achievementHistory: Array<{ goalId: string; title: string; completedAt: number }> = []
+  private readonly achievementHistory: Array<{
+    goalId: string
+    title: string
+    completedAt: number
+  }> = []
   private stats = {
     totalCreated: 0,
     totalCompleted: 0,
@@ -173,14 +217,18 @@ export class GoalManager {
   // ── Goal CRUD ──────────────────────────────────────────────────────────
 
   /** Create a new goal. */
-  createGoal(title: string, description: string, options: {
-    priority?: GoalPriority
-    parentId?: string | null
-    dependencies?: string[]
-    successCriteria?: string[]
-    deadline?: number | null
-    tags?: string[]
-  } = {}): GoalDefinition {
+  createGoal(
+    title: string,
+    description: string,
+    options: {
+      priority?: GoalPriority
+      parentId?: string | null
+      dependencies?: string[]
+      successCriteria?: string[]
+      deadline?: number | null
+      tags?: string[]
+    } = {},
+  ): GoalDefinition {
     const goal: GoalDefinition = {
       id: generateId('goal'),
       title,
@@ -272,7 +320,11 @@ export class GoalManager {
 
     // Check milestones
     for (const milestone of this.milestones.values()) {
-      if (milestone.goalId === goalId && !milestone.achieved && goal.progress >= milestone.targetProgress) {
+      if (
+        milestone.goalId === goalId &&
+        !milestone.achieved &&
+        goal.progress >= milestone.targetProgress
+      ) {
         ;(milestone as { achieved: boolean }).achieved = true
         ;(milestone as { achievedAt: number | null }).achievedAt = Date.now()
       }
@@ -561,7 +613,7 @@ export class GoalManager {
       const bPrio = PRIORITY_WEIGHTS[b.priority]
       const aUrgency = a.deadline ? Math.max(0, 1 - (a.deadline - now) / 86400000) : 0
       const bUrgency = b.deadline ? Math.max(0, 1 - (b.deadline - now) / 86400000) : 0
-      return (bPrio + bUrgency) - (aPrio + aUrgency)
+      return bPrio + bUrgency - (aPrio + aUrgency)
     })
   }
 
@@ -606,7 +658,10 @@ export class GoalManager {
     let oldest: GoalDefinition | null = null
     let oldestTime = Infinity
     for (const goal of this.goals.values()) {
-      if ((goal.status === 'completed' || goal.status === 'abandoned') && goal.updatedAt < oldestTime) {
+      if (
+        (goal.status === 'completed' || goal.status === 'abandoned') &&
+        goal.updatedAt < oldestTime
+      ) {
         oldest = goal
         oldestTime = goal.updatedAt
       }
@@ -661,9 +716,12 @@ export class GoalManager {
         for (const m of data.milestones) engine.milestones.set(m.id, m)
       }
       if (Array.isArray(data.conflicts)) engine.conflicts.push(...data.conflicts)
-      if (Array.isArray(data.achievementHistory)) engine.achievementHistory.push(...data.achievementHistory)
+      if (Array.isArray(data.achievementHistory))
+        engine.achievementHistory.push(...data.achievementHistory)
       if (data.stats) Object.assign(engine.stats, data.stats)
-    } catch { /* fresh engine on failure */ }
+    } catch {
+      /* fresh engine on failure */
+    }
     return engine
   }
 }

@@ -99,11 +99,7 @@ export async function refreshOverageCreditGrantCache(): Promise<void> {
       existing.amount_minor_units === info.amount_minor_units &&
       existing.currency === info.currency
     // When data is unchanged and timestamp is still fresh, skip the write entirely
-    if (
-      dataUnchanged &&
-      prevCached &&
-      Date.now() - prevCached.timestamp <= CACHE_TTL_MS
-    ) {
+    if (dataUnchanged && prevCached && Date.now() - prevCached.timestamp <= CACHE_TTL_MS) {
       return prev
     }
     const entry: CachedGrantEntry = {

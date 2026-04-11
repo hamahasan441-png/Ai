@@ -34,7 +34,12 @@ describe('MemoryConsolidator', () => {
   describe('consolidate', () => {
     it('consolidates assistant turns', () => {
       const turns: SessionTurn[] = [
-        { role: 'assistant', content: 'TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.', timestamp: Date.now() },
+        {
+          role: 'assistant',
+          content:
+            'TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.',
+          timestamp: Date.now(),
+        },
       ]
       const conflicts = consolidator.consolidate(turns)
       expect(conflicts).toHaveLength(0)
@@ -50,9 +55,7 @@ describe('MemoryConsolidator', () => {
     })
 
     it('skips short turns', () => {
-      const turns: SessionTurn[] = [
-        { role: 'assistant', content: 'Yes.', timestamp: Date.now() },
-      ]
+      const turns: SessionTurn[] = [{ role: 'assistant', content: 'Yes.', timestamp: Date.now() }]
       consolidator.consolidate(turns)
       expect(consolidator.entryCount).toBe(0)
     })
@@ -81,8 +84,17 @@ describe('MemoryConsolidator', () => {
 
     it('consolidates multiple turns at once', () => {
       const turns: SessionTurn[] = [
-        { role: 'assistant', content: 'React is a JavaScript library for building user interfaces with components.', timestamp: Date.now() },
-        { role: 'assistant', content: 'Node.js is a runtime environment that lets you run JavaScript on the server side.', timestamp: Date.now() },
+        {
+          role: 'assistant',
+          content: 'React is a JavaScript library for building user interfaces with components.',
+          timestamp: Date.now(),
+        },
+        {
+          role: 'assistant',
+          content:
+            'Node.js is a runtime environment that lets you run JavaScript on the server side.',
+          timestamp: Date.now(),
+        },
         { role: 'user', content: 'Tell me about Python', timestamp: Date.now() },
       ]
       consolidator.consolidate(turns)
@@ -91,7 +103,11 @@ describe('MemoryConsolidator', () => {
 
     it('increments consolidation count', () => {
       const turns: SessionTurn[] = [
-        { role: 'assistant', content: 'Binary search is a divide and conquer algorithm with O(log n) complexity.', timestamp: Date.now() },
+        {
+          role: 'assistant',
+          content: 'Binary search is a divide and conquer algorithm with O(log n) complexity.',
+          timestamp: Date.now(),
+        },
       ]
       consolidator.consolidate(turns)
       consolidator.consolidate(turns)

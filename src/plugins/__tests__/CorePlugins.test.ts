@@ -51,13 +51,10 @@ describe('Plugin Registration', () => {
     expect(enabled.length).toBeGreaterThan(0)
   })
 
-  it.each(EXPECTED_PLUGIN_NAMES)(
-    'registers the "%s" plugin',
-    (name) => {
-      const def = getBuiltinPluginDefinition(name)
-      expect(def).toBeDefined()
-    },
-  )
+  it.each(EXPECTED_PLUGIN_NAMES)('registers the "%s" plugin', name => {
+    const def = getBuiltinPluginDefinition(name)
+    expect(def).toBeDefined()
+  })
 
   it('each plugin has a name', () => {
     for (const name of EXPECTED_PLUGIN_NAMES) {
@@ -128,13 +125,13 @@ describe('Plugin Properties', () => {
 
   it('translator appears in disabled list by default', () => {
     const { disabled } = getBuiltinPlugins()
-    const names = disabled.map((p) => p.name)
+    const names = disabled.map(p => p.name)
     expect(names).toContain('translator')
   })
 
   it('enabled-by-default plugins appear in the enabled list', () => {
     const { enabled } = getBuiltinPlugins()
-    const names = enabled.map((p) => p.name)
+    const names = enabled.map(p => p.name)
     expect(names).toContain('code-formatter')
     expect(names).toContain('doc-generator')
     expect(names).toContain('test-runner')
@@ -324,7 +321,7 @@ describe('Plugin Skills', () => {
 
   it('getBuiltinPluginSkillCommands returns commands for enabled plugins only', () => {
     const commands = getBuiltinPluginSkillCommands()
-    const commandNames = commands.map((c) => c.name)
+    const commandNames = commands.map(c => c.name)
     // 5 enabled plugins × 1 skill each = 5 commands
     expect(commands).toHaveLength(5)
     // translator is disabled by default, so its skill should not appear

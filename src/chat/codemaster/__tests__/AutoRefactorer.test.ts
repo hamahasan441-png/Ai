@@ -21,7 +21,9 @@ describe('AutoRefactorer', () => {
     })
 
     it('dispatches rename-symbol', () => {
-      const res = r.refactor(req({ code: 'let foo = 1', kind: 'rename-symbol', oldName: 'foo', newName: 'bar' }))
+      const res = r.refactor(
+        req({ code: 'let foo = 1', kind: 'rename-symbol', oldName: 'foo', newName: 'bar' }),
+      )
       expect(res.success).toBe(true)
       expect(res.code).toContain('bar')
     })
@@ -117,7 +119,9 @@ describe('AutoRefactorer', () => {
   describe('extractInterface()', () => {
     it('extracts properties from an object literal', () => {
       const code = 'const obj = {\n  name: "Alice",\n  age: 30,\n}'
-      const res = r.extractInterface(req({ code, kind: 'extract-interface', startLine: 1, endLine: 4, functionName: 'Person' }))
+      const res = r.extractInterface(
+        req({ code, kind: 'extract-interface', startLine: 1, endLine: 4, functionName: 'Person' }),
+      )
       expect(res.success).toBe(true)
       expect(res.extractedCode).toContain('interface Person')
       expect(res.extractedCode).toContain('name: string')
@@ -127,7 +131,9 @@ describe('AutoRefactorer', () => {
 
     it('returns failure for empty block with no properties', () => {
       const code = 'const obj = {\n}\n'
-      const res = r.extractInterface(req({ code, kind: 'extract-interface', startLine: 1, endLine: 2 }))
+      const res = r.extractInterface(
+        req({ code, kind: 'extract-interface', startLine: 1, endLine: 2 }),
+      )
       expect(res.success).toBe(false)
       expect(res.description).toBe('No properties found to extract')
     })
@@ -151,7 +157,9 @@ describe('AutoRefactorer', () => {
         '  w: someVar,',
         '}',
       ].join('\n')
-      const res = r.extractInterface(req({ code, kind: 'extract-interface', startLine: 1, endLine: 9, functionName: 'T' }))
+      const res = r.extractInterface(
+        req({ code, kind: 'extract-interface', startLine: 1, endLine: 9, functionName: 'T' }),
+      )
       expect(res.success).toBe(true)
       const ext = res.extractedCode!
       expect(ext).toContain('s: string')
@@ -166,7 +174,9 @@ describe('AutoRefactorer', () => {
 
     it('uses default interface name when functionName not provided', () => {
       const code = 'const obj = {\n  x: 1,\n}'
-      const res = r.extractInterface(req({ code, kind: 'extract-interface', startLine: 1, endLine: 3 }))
+      const res = r.extractInterface(
+        req({ code, kind: 'extract-interface', startLine: 1, endLine: 3 }),
+      )
       expect(res.success).toBe(true)
       expect(res.extractedCode).toContain('interface ExtractedInterface')
     })
@@ -178,7 +188,9 @@ describe('AutoRefactorer', () => {
   describe('renameSymbol()', () => {
     it('renames all occurrences of a symbol', () => {
       const code = 'const foo = 1\nconst bar = foo + 2\nconsole.log(foo)'
-      const res = r.renameSymbol(req({ code, kind: 'rename-symbol', oldName: 'foo', newName: 'baz' }))
+      const res = r.renameSymbol(
+        req({ code, kind: 'rename-symbol', oldName: 'foo', newName: 'baz' }),
+      )
       expect(res.success).toBe(true)
       expect(res.code).not.toContain('foo')
       expect(res.code).toContain('baz')
@@ -204,13 +216,17 @@ describe('AutoRefactorer', () => {
     })
 
     it('returns failure when symbol not found', () => {
-      const res = r.renameSymbol(req({ code: 'let a = 1', kind: 'rename-symbol', oldName: 'zz', newName: 'yy' }))
+      const res = r.renameSymbol(
+        req({ code: 'let a = 1', kind: 'rename-symbol', oldName: 'zz', newName: 'yy' }),
+      )
       expect(res.success).toBe(false)
       expect(res.description).toContain('not found')
     })
 
     it('handles same old and new names', () => {
-      const res = r.renameSymbol(req({ code: 'let a = 1', kind: 'rename-symbol', oldName: 'a', newName: 'a' }))
+      const res = r.renameSymbol(
+        req({ code: 'let a = 1', kind: 'rename-symbol', oldName: 'a', newName: 'a' }),
+      )
       expect(res.success).toBe(true)
       expect(res.description).toBe('Names are identical')
       expect(res.changeCount).toBe(0)
@@ -218,7 +234,9 @@ describe('AutoRefactorer', () => {
 
     it('uses word boundaries to avoid partial replacements', () => {
       const code = 'let fooBar = foo + aFoo'
-      const res = r.renameSymbol(req({ code, kind: 'rename-symbol', oldName: 'foo', newName: 'baz' }))
+      const res = r.renameSymbol(
+        req({ code, kind: 'rename-symbol', oldName: 'foo', newName: 'baz' }),
+      )
       expect(res.code).toContain('fooBar')
       expect(res.code).toContain('baz +')
       expect(res.code).toContain('aFoo')
@@ -253,7 +271,9 @@ describe('AutoRefactorer', () => {
     })
 
     it('returns failure when variable not found', () => {
-      const res = r.inlineVariable(req({ code: 'let a = 1', kind: 'inline-variable', oldName: 'missing' }))
+      const res = r.inlineVariable(
+        req({ code: 'let a = 1', kind: 'inline-variable', oldName: 'missing' }),
+      )
       expect(res.success).toBe(false)
       expect(res.description).toContain('not found')
     })
@@ -421,7 +441,9 @@ describe('AutoRefactorer', () => {
   describe('extractConstant()', () => {
     it('extracts a magic number into a named constant', () => {
       const code = 'const tax = price * 0.08'
-      const res = r.extractConstant(req({ code, kind: 'extract-constant', oldName: '0.08', newName: 'TAX_RATE' }))
+      const res = r.extractConstant(
+        req({ code, kind: 'extract-constant', oldName: '0.08', newName: 'TAX_RATE' }),
+      )
       expect(res.success).toBe(true)
       expect(res.code).toContain('const TAX_RATE = 0.08')
       expect(res.code).toContain('price * TAX_RATE')
@@ -430,13 +452,17 @@ describe('AutoRefactorer', () => {
 
     it('replaces multiple occurrences', () => {
       const code = 'a = 3.14\nb = 3.14\nc = 3.14'
-      const res = r.extractConstant(req({ code, kind: 'extract-constant', oldName: '3.14', newName: 'PI' }))
+      const res = r.extractConstant(
+        req({ code, kind: 'extract-constant', oldName: '3.14', newName: 'PI' }),
+      )
       expect(res.success).toBe(true)
       expect(res.changeCount).toBe(3)
     })
 
     it('returns failure when value not found', () => {
-      const res = r.extractConstant(req({ code: 'x = 1', kind: 'extract-constant', oldName: '99', newName: 'C' }))
+      const res = r.extractConstant(
+        req({ code: 'x = 1', kind: 'extract-constant', oldName: '99', newName: 'C' }),
+      )
       expect(res.success).toBe(false)
       expect(res.description).toContain('not found')
     })
@@ -453,7 +479,9 @@ describe('AutoRefactorer', () => {
 
     it('warns when many occurrences are replaced', () => {
       const vals = Array(7).fill('val = 100').join('\n')
-      const res = r.extractConstant(req({ code: vals, kind: 'extract-constant', oldName: '100', newName: 'MAX' }))
+      const res = r.extractConstant(
+        req({ code: vals, kind: 'extract-constant', oldName: '100', newName: 'MAX' }),
+      )
       expect(res.success).toBe(true)
       expect(res.warnings.length).toBeGreaterThan(0)
       expect(res.warnings[0]).toContain('occurrences')
@@ -461,7 +489,9 @@ describe('AutoRefactorer', () => {
 
     it('inserts constant after imports', () => {
       const code = 'import a from "a"\nimport b from "b"\nconst x = 42 + 42'
-      const res = r.extractConstant(req({ code, kind: 'extract-constant', oldName: '42', newName: 'ANSWER' }))
+      const res = r.extractConstant(
+        req({ code, kind: 'extract-constant', oldName: '42', newName: 'ANSWER' }),
+      )
       expect(res.success).toBe(true)
       const lines = res.code.split('\n')
       const importIdx = lines.findIndex(l => l.startsWith('import b'))

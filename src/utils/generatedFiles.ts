@@ -84,8 +84,7 @@ const EXCLUDED_FILENAME_PATTERNS = [
  */
 export function isGeneratedFile(filePath: string): boolean {
   // Normalize path separators for consistent pattern matching (patterns use posix-style /)
-  const normalizedPath =
-    posix.sep + filePath.split(sep).join(posix.sep).replace(/^\/+/, '')
+  const normalizedPath = posix.sep + filePath.split(sep).join(posix.sep).replace(/^\/+/, '')
   const fileName = basename(filePath).toLowerCase()
   const ext = extname(filePath).toLowerCase()
 

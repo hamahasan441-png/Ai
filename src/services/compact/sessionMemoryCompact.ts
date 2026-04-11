@@ -23,10 +23,7 @@ import {
   getFeatureValue_CACHED_MAY_BE_STALE,
 } from '../analytics/growthbook.js'
 import { logEvent } from '../analytics/index.js'
-import {
-  isSessionMemoryEmpty,
-  truncateSessionMemoryForCompact,
-} from '../SessionMemory/prompts.js'
+import { isSessionMemoryEmpty, truncateSessionMemoryForCompact } from '../SessionMemory/prompts.js'
 import {
   getLastSummarizedMessageId,
   getSessionMemoryContent,
@@ -71,9 +68,7 @@ let configInitialized = false
 /**
  * Set the session memory compact configuration
  */
-export function setSessionMemoryCompactConfig(
-  config: Partial<SessionMemoryCompactConfig>,
-): void {
+export function setSessionMemoryCompactConfig(config: Partial<SessionMemoryCompactConfig>): void {
   smCompactConfig = {
     ...smCompactConfig,
     ...config,
@@ -106,9 +101,10 @@ async function initSessionMemoryCompactConfig(): Promise<void> {
   configInitialized = true
 
   // Load config from GrowthBook, merging with defaults
-  const remoteConfig = await getDynamicConfig_BLOCKS_ON_INIT<
-    Partial<SessionMemoryCompactConfig>
-  >('tengu_sm_compact_config', {})
+  const remoteConfig = await getDynamicConfig_BLOCKS_ON_INIT<Partial<SessionMemoryCompactConfig>>(
+    'tengu_sm_compact_config',
+    {},
+  )
 
   // Only use remote values if they are explicitly set (positive numbers)
   // This ensures sensible defaults aren't overridden by zero values
@@ -180,9 +176,7 @@ function hasToolUseWithIds(message: Message, toolUseIds: Set<string>): boolean {
   if (!Array.isArray(content)) {
     return false
   }
-  return content.some(
-    block => block.type === 'tool_use' && toolUseIds.has(block.id),
-  )
+  return content.some(block => block.type === 'tool_use' && toolUseIds.has(block.id))
 }
 
 /**
@@ -261,9 +255,7 @@ export function adjustIndexToPreserveAPIInvariants(
     }
 
     // Only look for tool_uses that are NOT already in the kept range
-    const neededToolUseIds = new Set(
-      allToolResultIds.filter(id => !toolUseIdsInKeptRange.has(id)),
-    )
+    const neededToolUseIds = new Set(allToolResultIds.filter(id => !toolUseIdsInKeptRange.has(id)))
 
     // Find the assistant message(s) with matching tool_use blocks
     for (let i = adjustedIndex - 1; i >= 0 && neededToolUseIds.size > 0; i--) {
@@ -271,10 +263,7 @@ export function adjustIndexToPreserveAPIInvariants(
       if (hasToolUseWithIds(message, neededToolUseIds)) {
         adjustedIndex = i
         // Remove found tool_use_ids from the set
-        if (
-          message.type === 'assistant' &&
-          Array.isArray(message.message.content)
-        ) {
+        if (message.type === 'assistant' && Array.isArray(message.message.content)) {
           for (const block of message.message.content) {
             if (block.type === 'tool_use' && neededToolUseIds.has(block.id)) {
               neededToolUseIds.delete(block.id)
@@ -334,8 +323,7 @@ export function calculateMessagesToKeepIndex(
   // Start from the message after lastSummarizedIndex
   // If lastSummarizedIndex is -1 (not found) or messages.length (no summarized id),
   // we start with no messages kept
-  let startIndex =
-    lastSummarizedIndex >= 0 ? lastSummarizedIndex + 1 : messages.length
+  let startIndex = lastSummarizedIndex >= 0 ? lastSummarizedIndex + 1 : messages.length
 
   // Calculate current tokens and text-block message count from startIndex to end
   let totalTokens = 0
@@ -354,10 +342,7 @@ export function calculateMessagesToKeepIndex(
   }
 
   // Check if we already meet both minimums
-  if (
-    totalTokens >= config.minTokens &&
-    textBlockMessageCount >= config.minTextBlockMessages
-  ) {
+  if (totalTokens >= config.minTokens && textBlockMessageCount >= config.minTextBlockMessages) {
     return adjustIndexToPreserveAPIInvariants(messages, startIndex)
   }
 
@@ -384,10 +369,7 @@ export function calculateMessagesToKeepIndex(
     }
 
     // Stop if we meet both minimums
-    if (
-      totalTokens >= config.minTokens &&
-      textBlockMessageCount >= config.minTextBlockMessages
-    ) {
+    if (totalTokens >= config.minTokens && textBlockMessageCount >= config.minTextBlockMessages) {
       break
     }
   }
@@ -409,14 +391,8 @@ export function shouldUseSessionMemoryCompaction(): boolean {
     return false
   }
 
-  const sessionMemoryFlag = getFeatureValue_CACHED_MAY_BE_STALE(
-    'tengu_session_memory',
-    false,
-  )
-  const smCompactFlag = getFeatureValue_CACHED_MAY_BE_STALE(
-    'tengu_sm_compact',
-    false,
-  )
+  const sessionMemoryFlag = getFeatureValue_CACHED_MAY_BE_STALE('tengu_session_memory', false)
+  const smCompactFlag = getFeatureValue_CACHED_MAY_BE_STALE('tengu_sm_compact', false)
   const shouldUse = sessionMemoryFlag && smCompactFlag
 
   // Log flag states for debugging (ant-only to avoid noise in external logs)
@@ -451,22 +427,14 @@ function createCompactionResultFromSessionMemory(
   )
   const preCompactDiscovered = extractDiscoveredToolNames(messages)
   if (preCompactDiscovered.size > 0) {
-    boundaryMarker.compactMetadata.preCompactDiscoveredTools = [
-      ...preCompactDiscovered,
-    ].sort()
+    boundaryMarker.compactMetadata.preCompactDiscoveredTools = [...preCompactDiscovered].sort()
   }
 
   // Truncate oversized sections to prevent session memory from consuming
   // the entire post-compact token budget
-  const { truncatedContent, wasTruncated } =
-    truncateSessionMemoryForCompact(sessionMemory)
+  const { truncatedContent, wasTruncated } = truncateSessionMemoryForCompact(sessionMemory)
 
-  let summaryContent = getCompactUserSummaryMessage(
-    truncatedContent,
-    true,
-    transcriptPath,
-    true,
-  )
+  let summaryContent = getCompactUserSummaryMessage(truncatedContent, true, transcriptPath, true)
 
   if (wasTruncated) {
     const memoryPath = getSessionMemoryPath()
@@ -547,9 +515,7 @@ export async function trySessionMemoryCompaction(
 
     if (lastSummarizedMessageId) {
       // Normal case: we know exactly which messages have been summarized
-      lastSummarizedIndex = messages.findIndex(
-        msg => msg.uuid === lastSummarizedMessageId,
-      )
+      lastSummarizedIndex = messages.findIndex(msg => msg.uuid === lastSummarizedMessageId)
 
       if (lastSummarizedIndex === -1) {
         // The summarized message ID doesn't exist in current messages
@@ -568,17 +534,12 @@ export async function trySessionMemoryCompaction(
     // Calculate the starting index for messages to keep
     // This starts from lastSummarizedIndex, expands to meet minimums,
     // and adjusts to not split tool_use/tool_result pairs
-    const startIndex = calculateMessagesToKeepIndex(
-      messages,
-      lastSummarizedIndex,
-    )
+    const startIndex = calculateMessagesToKeepIndex(messages, lastSummarizedIndex)
     // Filter out old compact boundary messages from messagesToKeep.
     // After REPL pruning, old boundaries re-yielded from messagesToKeep would
     // trigger an unwanted second prune (isCompactBoundaryMessage returns true),
     // discarding the new boundary and summary.
-    const messagesToKeep = messages
-      .slice(startIndex)
-      .filter(m => !isCompactBoundaryMessage(m))
+    const messagesToKeep = messages.slice(startIndex).filter(m => !isCompactBoundaryMessage(m))
 
     // Run session start hooks to restore CLAUDE.md and other context
     const hookResults = await processSessionStartHooks('compact', {
@@ -602,10 +563,7 @@ export async function trySessionMemoryCompaction(
     const postCompactTokenCount = estimateMessageTokens(postCompactMessages)
 
     // Only check threshold if one was provided (for autocompact)
-    if (
-      autoCompactThreshold !== undefined &&
-      postCompactTokenCount >= autoCompactThreshold
-    ) {
+    if (autoCompactThreshold !== undefined && postCompactTokenCount >= autoCompactThreshold) {
       logEvent('tengu_sm_compact_threshold_exceeded', {
         postCompactTokenCount,
         autoCompactThreshold,

@@ -22,7 +22,15 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type StageType = 'extract' | 'transform' | 'load' | 'validate' | 'enrich' | 'deduplicate' | 'aggregate' | 'filter'
+export type StageType =
+  | 'extract'
+  | 'transform'
+  | 'load'
+  | 'validate'
+  | 'enrich'
+  | 'deduplicate'
+  | 'aggregate'
+  | 'filter'
 
 export type DataType = 'string' | 'number' | 'boolean' | 'date' | 'array' | 'object' | 'null'
 
@@ -51,7 +59,7 @@ export interface PipelineStage {
   readonly outputSchemaId: string
   readonly config: Record<string, unknown>
   readonly estimatedLatencyMs: number
-  readonly estimatedThroughput: number  // records/sec
+  readonly estimatedThroughput: number // records/sec
 }
 
 export interface Pipeline {
@@ -136,7 +144,13 @@ export class DataPipelineEngine {
   private readonly schemas = new Map<string, DataSchema>()
   private readonly pipelines = new Map<string, Pipeline>()
   private readonly qualityRules = new Map<string, QualityRule>()
-  private stats = { totalPipelines: 0, totalSchemas: 0, totalStages: 0, totalQualityChecks: 0, feedbackCount: 0 }
+  private stats = {
+    totalPipelines: 0,
+    totalSchemas: 0,
+    totalStages: 0,
+    totalQualityChecks: 0,
+    feedbackCount: 0,
+  }
 
   constructor(config: Partial<DataPipelineEngineConfig> = {}) {
     this.config = { ...DEFAULT_DATA_PIPELINE_CONFIG, ...config }
@@ -144,12 +158,25 @@ export class DataPipelineEngine {
 
   // ── Schema management ────────────────────────────────────────────────
 
-  defineSchema(name: string, fields: Array<{ name: string; type: DataType; nullable?: boolean; description?: string; constraints?: string[] }>, version: string = '1.0'): DataSchema {
+  defineSchema(
+    name: string,
+    fields: Array<{
+      name: string
+      type: DataType
+      nullable?: boolean
+      description?: string
+      constraints?: string[]
+    }>,
+    version: string = '1.0',
+  ): DataSchema {
     const id = `schema_${++this.stats.totalSchemas}`
     const schema: DataSchema = {
-      id, name, version,
+      id,
+      name,
+      version,
       fields: fields.map(f => ({
-        name: f.name, type: f.type,
+        name: f.name,
+        type: f.type,
         nullable: f.nullable ?? false,
         description: f.description ?? '',
         constraints: f.constraints ?? [],
@@ -163,7 +190,10 @@ export class DataPipelineEngine {
     return this.schemas.get(id) ?? null
   }
 
-  validateRecord(schemaId: string, record: Record<string, unknown>): { valid: boolean; errors: string[] } {
+  validateRecord(
+    schemaId: string,
+    record: Record<string, unknown>,
+  ): { valid: boolean; errors: string[] } {
     const schema = this.schemas.get(schemaId)
     if (!schema) return { valid: false, errors: ['Schema not found'] }
 
@@ -174,8 +204,16 @@ export class DataPipelineEngine {
         if (!field.nullable) errors.push(`Field '${field.name}' is required but missing`)
         continue
       }
-      const actualType = Array.isArray(value) ? 'array' : typeof value === 'object' ? 'object' : typeof value
-      if (field.type !== 'null' && actualType !== field.type && !(field.type === 'date' && typeof value === 'string')) {
+      const actualType = Array.isArray(value)
+        ? 'array'
+        : typeof value === 'object'
+          ? 'object'
+          : typeof value
+      if (
+        field.type !== 'null' &&
+        actualType !== field.type &&
+        !(field.type === 'date' && typeof value === 'string')
+      ) {
         errors.push(`Field '${field.name}' expected type '${field.type}' but got '${actualType}'`)
       }
     }
@@ -184,9 +222,22 @@ export class DataPipelineEngine {
 
   // ── Pipeline creation ────────────────────────────────────────────────
 
-  createPipeline(name: string, description: string, sourceSchemaId: string, sinkSchemaId: string): Pipeline {
+  createPipeline(
+    name: string,
+    description: string,
+    sourceSchemaId: string,
+    sinkSchemaId: string,
+  ): Pipeline {
     const id = `pipe_${++this.stats.totalPipelines}`
-    const pipeline: Pipeline = { id, name, description, stages: [], sourceSchemaId, sinkSchemaId, createdAt: Date.now() }
+    const pipeline: Pipeline = {
+      id,
+      name,
+      description,
+      stages: [],
+      sourceSchemaId,
+      sinkSchemaId,
+      createdAt: Date.now(),
+    }
     this.pipelines.set(id, pipeline)
     return pipeline
   }
@@ -195,13 +246,27 @@ export class DataPipelineEngine {
     return this.pipelines.get(id) ?? null
   }
 
-  addStage(pipelineId: string, name: string, type: StageType, inputSchemaId: string, outputSchemaId: string, config: Record<string, unknown> = {}, latencyMs?: number, throughput?: number): PipelineStage | null {
+  addStage(
+    pipelineId: string,
+    name: string,
+    type: StageType,
+    inputSchemaId: string,
+    outputSchemaId: string,
+    config: Record<string, unknown> = {},
+    latencyMs?: number,
+    throughput?: number,
+  ): PipelineStage | null {
     const pipeline = this.pipelines.get(pipelineId)
     if (!pipeline) return null
 
     const id = `stage_${++this.stats.totalStages}`
     const stage: PipelineStage = {
-      id, name, type, inputSchemaId, outputSchemaId, config,
+      id,
+      name,
+      type,
+      inputSchemaId,
+      outputSchemaId,
+      config,
       estimatedLatencyMs: latencyMs ?? this.config.defaultLatencyMs,
       estimatedThroughput: throughput ?? 1000,
     }
@@ -211,10 +276,20 @@ export class DataPipelineEngine {
 
   // ── Quality rules ────────────────────────────────────────────────────
 
-  addQualityRule(fieldName: string, ruleType: QualityRuleType, params: Record<string, unknown> = {}, severity: 'error' | 'warning' | 'info' = 'error', message?: string): QualityRule {
+  addQualityRule(
+    fieldName: string,
+    ruleType: QualityRuleType,
+    params: Record<string, unknown> = {},
+    severity: 'error' | 'warning' | 'info' = 'error',
+    message?: string,
+  ): QualityRule {
     const id = `qr_${this.qualityRules.size + 1}`
     const rule: QualityRule = {
-      id, fieldName, ruleType, params, severity,
+      id,
+      fieldName,
+      ruleType,
+      params,
+      severity,
       message: message ?? `Quality rule '${ruleType}' on field '${fieldName}'`,
     }
     this.qualityRules.set(id, rule)
@@ -234,7 +309,13 @@ export class DataPipelineEngine {
         switch (rule.ruleType) {
           case 'not_null':
             if (value === null || value === undefined) {
-              violations.push({ ruleId: rule.id, field: rule.fieldName, message: rule.message, severity: rule.severity, value })
+              violations.push({
+                ruleId: rule.id,
+                field: rule.fieldName,
+                message: rule.message,
+                severity: rule.severity,
+                value,
+              })
               rulePassed = false
             }
             break
@@ -242,7 +323,13 @@ export class DataPipelineEngine {
             const values = records.map(r => r[rule.fieldName])
             const uniq = new Set(values)
             if (uniq.size !== values.length) {
-              violations.push({ ruleId: rule.id, field: rule.fieldName, message: `Duplicate values in '${rule.fieldName}'`, severity: rule.severity, value })
+              violations.push({
+                ruleId: rule.id,
+                field: rule.fieldName,
+                message: `Duplicate values in '${rule.fieldName}'`,
+                severity: rule.severity,
+                value,
+              })
               rulePassed = false
             }
             break
@@ -252,7 +339,13 @@ export class DataPipelineEngine {
             const max = rule.params.max as number | undefined
             if (typeof value === 'number') {
               if ((min !== undefined && value < min) || (max !== undefined && value > max)) {
-                violations.push({ ruleId: rule.id, field: rule.fieldName, message: `Value ${value} out of range [${min ?? '-∞'}, ${max ?? '∞'}]`, severity: rule.severity, value })
+                violations.push({
+                  ruleId: rule.id,
+                  field: rule.fieldName,
+                  message: `Value ${value} out of range [${min ?? '-∞'}, ${max ?? '∞'}]`,
+                  severity: rule.severity,
+                  value,
+                })
                 rulePassed = false
               }
             }
@@ -261,7 +354,13 @@ export class DataPipelineEngine {
           case 'pattern': {
             const pattern = rule.params.pattern as string | undefined
             if (pattern && typeof value === 'string' && !new RegExp(pattern).test(value)) {
-              violations.push({ ruleId: rule.id, field: rule.fieldName, message: `Value doesn't match pattern '${pattern}'`, severity: rule.severity, value })
+              violations.push({
+                ruleId: rule.id,
+                field: rule.fieldName,
+                message: `Value doesn't match pattern '${pattern}'`,
+                severity: rule.severity,
+                value,
+              })
               rulePassed = false
             }
             break
@@ -306,14 +405,22 @@ export class DataPipelineEngine {
     if (!pipeline || pipeline.stages.length === 0) return null
 
     const totalLatency = pipeline.stages.reduce((s, st) => s + st.estimatedLatencyMs, 0)
-    const bottleneck = [...pipeline.stages].sort((a, b) => a.estimatedThroughput - b.estimatedThroughput)[0]
+    const bottleneck = [...pipeline.stages].sort(
+      (a, b) => a.estimatedThroughput - b.estimatedThroughput,
+    )[0]
     const minThroughput = bottleneck.estimatedThroughput
 
     const suggestions: string[] = []
-    if (totalLatency > 5000) suggestions.push('Consider parallelizing independent stages to reduce total latency')
-    if (minThroughput < 100) suggestions.push(`Optimize bottleneck stage '${bottleneck.name}' (${minThroughput} records/sec)`)
-    if (pipeline.stages.filter(s => s.type === 'validate').length === 0) suggestions.push('Add a validation stage for data quality assurance')
-    if (pipeline.stages.length > 10) suggestions.push('Consider merging sequential transform stages to reduce overhead')
+    if (totalLatency > 5000)
+      suggestions.push('Consider parallelizing independent stages to reduce total latency')
+    if (minThroughput < 100)
+      suggestions.push(
+        `Optimize bottleneck stage '${bottleneck.name}' (${minThroughput} records/sec)`,
+      )
+    if (pipeline.stages.filter(s => s.type === 'validate').length === 0)
+      suggestions.push('Add a validation stage for data quality assurance')
+    if (pipeline.stages.length > 10)
+      suggestions.push('Consider merging sequential transform stages to reduce overhead')
 
     return {
       totalLatencyMs: totalLatency,
@@ -330,7 +437,9 @@ export class DataPipelineEngine {
     return { ...this.stats }
   }
 
-  provideFeedback(): void { this.stats.feedbackCount++ }
+  provideFeedback(): void {
+    this.stats.feedbackCount++
+  }
 
   serialize(): string {
     return JSON.stringify({

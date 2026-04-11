@@ -9,7 +9,8 @@ import {
 function makeAlts(n: number): Alternative[] {
   const crIds = ['c0', 'c1', 'c2']
   return Array.from({ length: n }, (_, i) => ({
-    id: `alt${i}`, name: `Alt ${i}`,
+    id: `alt${i}`,
+    name: `Alt ${i}`,
     scores: Object.fromEntries(crIds.map((c, j) => [c, 5 + i * 2 + j])),
     metadata: {},
   }))
@@ -17,7 +18,9 @@ function makeAlts(n: number): Alternative[] {
 
 function makeCrits(n: number): Criterion[] {
   return Array.from({ length: n }, (_, i) => ({
-    id: `c${i}`, name: `Criterion ${i}`, weight: 1 / n,
+    id: `c${i}`,
+    name: `Criterion ${i}`,
+    weight: 1 / n,
     direction: (i % 2 === 0 ? 'maximize' : 'minimize') as 'maximize' | 'minimize',
     scale: { min: 0, max: 20 },
   }))
@@ -25,13 +28,28 @@ function makeCrits(n: number): Criterion[] {
 
 function makeTree(): DecisionNode {
   return {
-    id: 'root', type: 'choice', label: 'Invest?', value: 0, probability: 1,
+    id: 'root',
+    type: 'choice',
+    label: 'Invest?',
+    value: 0,
+    probability: 1,
     children: [
       {
-        id: 'invest', type: 'chance', label: 'Invest', value: 0, probability: 1,
+        id: 'invest',
+        type: 'chance',
+        label: 'Invest',
+        value: 0,
+        probability: 1,
         children: [
           { id: 'win', type: 'terminal', label: 'Win', value: 100, probability: 0.6, children: [] },
-          { id: 'lose', type: 'terminal', label: 'Lose', value: -50, probability: 0.4, children: [] },
+          {
+            id: 'lose',
+            type: 'terminal',
+            label: 'Lose',
+            value: -50,
+            probability: 0.4,
+            children: [],
+          },
         ],
       },
       { id: 'hold', type: 'terminal', label: 'Hold', value: 10, probability: 1, children: [] },
@@ -42,7 +60,9 @@ function makeTree(): DecisionNode {
 describe('DecisionEngine', () => {
   let engine: DecisionEngine
 
-  beforeEach(() => { engine = new DecisionEngine() })
+  beforeEach(() => {
+    engine = new DecisionEngine()
+  })
 
   describe('constructor', () => {
     it('creates with defaults', () => {
@@ -62,11 +82,15 @@ describe('DecisionEngine', () => {
     })
     it('scores between 0 and 1', () => {
       const r = engine.weightedScore(makeAlts(3), makeCrits(3))
-      for (const x of r.ranking) { expect(x.score).toBeGreaterThanOrEqual(0); expect(x.score).toBeLessThanOrEqual(1) }
+      for (const x of r.ranking) {
+        expect(x.score).toBeGreaterThanOrEqual(0)
+        expect(x.score).toBeLessThanOrEqual(1)
+      }
     })
     it('sorted descending', () => {
       const r = engine.weightedScore(makeAlts(4), makeCrits(3))
-      for (let i = 1; i < r.ranking.length; i++) expect(r.ranking[i - 1].score).toBeGreaterThanOrEqual(r.ranking[i].score)
+      for (let i = 1; i < r.ranking.length; i++)
+        expect(r.ranking[i - 1].score).toBeGreaterThanOrEqual(r.ranking[i].score)
     })
     it('handles empty alts', () => {
       const r = engine.weightedScore([], makeCrits(2))
@@ -82,18 +106,28 @@ describe('DecisionEngine', () => {
     })
     it('scores between 0 and 1', () => {
       const r = engine.topsis(makeAlts(4), makeCrits(3))
-      for (const x of r.ranking) { expect(x.score).toBeGreaterThanOrEqual(0); expect(x.score).toBeLessThanOrEqual(1) }
+      for (const x of r.ranking) {
+        expect(x.score).toBeGreaterThanOrEqual(0)
+        expect(x.score).toBeLessThanOrEqual(1)
+      }
     })
   })
 
   describe('ahpPairwise', () => {
     it('computes priorities', () => {
-      const r = engine.ahpPairwise(makeAlts(3), makeCrits(3), [[1, 3, 5], [1 / 3, 1, 2], [1 / 5, 1 / 2, 1]])
+      const r = engine.ahpPairwise(makeAlts(3), makeCrits(3), [
+        [1, 3, 5],
+        [1 / 3, 1, 2],
+        [1 / 5, 1 / 2, 1],
+      ])
       expect(r.ranking.length).toBe(3)
       expect(r.method).toBe('ahp')
     })
     it('assigns positive scores', () => {
-      const r = engine.ahpPairwise(makeAlts(2), makeCrits(2), [[1, 2], [0.5, 1]])
+      const r = engine.ahpPairwise(makeAlts(2), makeCrits(2), [
+        [1, 2],
+        [0.5, 1],
+      ])
       for (const x of r.ranking) expect(x.score).toBeGreaterThanOrEqual(0)
     })
   })
@@ -119,7 +153,8 @@ describe('DecisionEngine', () => {
       expect(engine.getBelief('H1')?.hypothesis).toBe('H1')
     })
     it('lists all beliefs', () => {
-      engine.createBelief('A', 0.4); engine.createBelief('B', 0.6)
+      engine.createBelief('A', 0.4)
+      engine.createBelief('B', 0.6)
       expect(engine.listBeliefs().length).toBe(2)
     })
     it('returns undefined for unknown hypothesis', () => {
@@ -134,19 +169,55 @@ describe('DecisionEngine', () => {
 
   describe('analyzeGame', () => {
     it('finds Nash equilibria', () => {
-      const r = engine.analyzeGame(['P0', 'P1'], [['C', 'D'], ['C', 'D']], [[[3, 3], [0, 5]], [[5, 0], [1, 1]]])
+      const r = engine.analyzeGame(
+        ['P0', 'P1'],
+        [
+          ['C', 'D'],
+          ['C', 'D'],
+        ],
+        [
+          [
+            [3, 3],
+            [0, 5],
+          ],
+          [
+            [5, 0],
+            [1, 1],
+          ],
+        ],
+      )
       expect(r.nashEquilibria).toBeDefined()
       expect(Array.isArray(r.nashEquilibria)).toBe(true)
     })
     it('identifies dominant strategies', () => {
-      const r = engine.analyzeGame(['P0', 'P1'], [['A', 'B'], ['A', 'B']], [[[4, 4], [0, 5]], [[5, 0], [1, 1]]])
+      const r = engine.analyzeGame(
+        ['P0', 'P1'],
+        [
+          ['A', 'B'],
+          ['A', 'B'],
+        ],
+        [
+          [
+            [4, 4],
+            [0, 5],
+          ],
+          [
+            [5, 0],
+            [1, 1],
+          ],
+        ],
+      )
       expect(r.dominantStrategies).toBeDefined()
     })
   })
 
   describe('minimax', () => {
     it('selects best worst-case strategy', () => {
-      const r = engine.minimax([[3, -2, 4], [-1, 5, -3], [2, 1, 0]])
+      const r = engine.minimax([
+        [3, -2, 4],
+        [-1, 5, -3],
+        [2, 1, 0],
+      ])
       expect(typeof r.strategy).toBe('number')
       expect(typeof r.value).toBe('number')
     })
@@ -159,7 +230,14 @@ describe('DecisionEngine', () => {
       expect(Object.keys(r.expectedValues).length).toBeGreaterThan(0)
     })
     it('terminal node', () => {
-      const t: DecisionNode = { id: 't', type: 'terminal', label: 'End', value: 42, probability: 1, children: [] }
+      const t: DecisionNode = {
+        id: 't',
+        type: 'terminal',
+        label: 'End',
+        value: 42,
+        probability: 1,
+        children: [],
+      }
       const r = engine.evaluateTree(t)
       expect(r.expectedValues['End']).toBe(42)
     })
@@ -167,17 +245,29 @@ describe('DecisionEngine', () => {
 
   describe('evaluateProspect', () => {
     it('computes prospect value', () => {
-      const r = engine.evaluateProspect([{ value: 100, probability: 0.5 }, { value: -50, probability: 0.5 }])
+      const r = engine.evaluateProspect([
+        { value: 100, probability: 0.5 },
+        { value: -50, probability: 0.5 },
+      ])
       expect(typeof r.prospectValue).toBe('number')
       expect(r.riskProfile).toBeDefined()
     })
     it('separates gains and losses', () => {
-      const r = engine.evaluateProspect([{ value: 50, probability: 0.3 }, { value: -30, probability: 0.7 }])
+      const r = engine.evaluateProspect([
+        { value: 50, probability: 0.3 },
+        { value: -30, probability: 0.7 },
+      ])
       expect(r.gains.length).toBeGreaterThan(0)
       expect(r.losses.length).toBeGreaterThan(0)
     })
     it('uses reference point', () => {
-      const r = engine.evaluateProspect([{ value: 60, probability: 0.5 }, { value: 40, probability: 0.5 }], 50)
+      const r = engine.evaluateProspect(
+        [
+          { value: 60, probability: 0.5 },
+          { value: 40, probability: 0.5 },
+        ],
+        50,
+      )
       expect(r.gains.length).toBeGreaterThan(0)
       expect(r.losses.length).toBeGreaterThan(0)
     })
@@ -210,12 +300,27 @@ describe('DecisionEngine', () => {
 
   describe('bordaCount', () => {
     it('ranks alternatives', () => {
-      const r = engine.bordaCount(['S1', 'S2', 'S3'], [[0, 1, 2], [1, 0, 2], [0, 2, 1]], ['A', 'B', 'C'])
+      const r = engine.bordaCount(
+        ['S1', 'S2', 'S3'],
+        [
+          [0, 1, 2],
+          [1, 0, 2],
+          [0, 2, 1],
+        ],
+        ['A', 'B', 'C'],
+      )
       expect(r.ranking.length).toBe(3)
       expect(r.aggregation).toBe('borda')
     })
     it('consensus between 0 and 1', () => {
-      const r = engine.bordaCount(['S1', 'S2'], [[0, 1], [1, 0]], ['A', 'B'])
+      const r = engine.bordaCount(
+        ['S1', 'S2'],
+        [
+          [0, 1],
+          [1, 0],
+        ],
+        ['A', 'B'],
+      )
       expect(r.consensus).toBeGreaterThanOrEqual(0)
       expect(r.consensus).toBeLessThanOrEqual(1)
     })
@@ -223,7 +328,15 @@ describe('DecisionEngine', () => {
 
   describe('condorcet', () => {
     it('pairwise ranking', () => {
-      const r = engine.condorcet(['S1', 'S2', 'S3'], [[0, 1, 2], [0, 2, 1], [1, 0, 2]], ['A', 'B', 'C'])
+      const r = engine.condorcet(
+        ['S1', 'S2', 'S3'],
+        [
+          [0, 1, 2],
+          [0, 2, 1],
+          [1, 0, 2],
+        ],
+        ['A', 'B', 'C'],
+      )
       expect(r.ranking.length).toBe(3)
       expect(r.aggregation).toBe('condorcet')
     })
@@ -231,7 +344,15 @@ describe('DecisionEngine', () => {
 
   describe('plurality', () => {
     it('first-place votes', () => {
-      const r = engine.plurality(['S1', 'S2', 'S3'], [[0, 1, 2], [0, 1, 2], [1, 0, 2]], ['A', 'B', 'C'])
+      const r = engine.plurality(
+        ['S1', 'S2', 'S3'],
+        [
+          [0, 1, 2],
+          [0, 1, 2],
+          [1, 0, 2],
+        ],
+        ['A', 'B', 'C'],
+      )
       expect(r.ranking.length).toBe(3)
       expect(r.aggregation).toBe('plurality')
       expect(r.ranking[0].alternativeId).toBe('A')
@@ -304,7 +425,9 @@ describe('DecisionEngine', () => {
       expect(r.getBelief('H1')?.posterior).toBeCloseTo(0.6, 1)
       expect(r.getJournal().length).toBe(1)
     })
-    it('valid JSON', () => { expect(() => JSON.parse(engine.serialize())).not.toThrow() })
+    it('valid JSON', () => {
+      expect(() => JSON.parse(engine.serialize())).not.toThrow()
+    })
     it('preserves stats', () => {
       engine.evaluateProspect([{ value: 50, probability: 1 }])
       const r = DecisionEngine.deserialize(engine.serialize())

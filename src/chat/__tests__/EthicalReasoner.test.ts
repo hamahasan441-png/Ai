@@ -6,7 +6,11 @@ import { EthicalReasoner, DEFAULT_ETHICAL_CONFIG } from '../EthicalReasoner.js'
 describe('DEFAULT_ETHICAL_CONFIG', () => {
   it('should include all five frameworks', () => {
     expect(DEFAULT_ETHICAL_CONFIG.frameworks).toEqual([
-      'utilitarian', 'deontological', 'virtue', 'care', 'rights',
+      'utilitarian',
+      'deontological',
+      'virtue',
+      'care',
+      'rights',
     ])
   })
 
@@ -208,7 +212,9 @@ describe('evaluateAction()', () => {
 describe('identifyStakeholders()', () => {
   it('should detect employees', () => {
     const reasoner = new EthicalReasoner()
-    const stakeholders = reasoner.identifyStakeholders('The employees were affected by the decision.')
+    const stakeholders = reasoner.identifyStakeholders(
+      'The employees were affected by the decision.',
+    )
     expect(stakeholders.some(s => s.name === 'Employees')).toBe(true)
   })
 
@@ -220,13 +226,17 @@ describe('identifyStakeholders()', () => {
 
   it('should detect children', () => {
     const reasoner = new EthicalReasoner()
-    const stakeholders = reasoner.identifyStakeholders('Children are vulnerable and need protection.')
+    const stakeholders = reasoner.identifyStakeholders(
+      'Children are vulnerable and need protection.',
+    )
     expect(stakeholders.some(s => s.name === 'Children')).toBe(true)
   })
 
   it('should detect community', () => {
     const reasoner = new EthicalReasoner()
-    const stakeholders = reasoner.identifyStakeholders('The community will benefit from this project.')
+    const stakeholders = reasoner.identifyStakeholders(
+      'The community will benefit from this project.',
+    )
     expect(stakeholders.some(s => s.name === 'Community')).toBe(true)
   })
 
@@ -244,7 +254,9 @@ describe('identifyStakeholders()', () => {
 
   it('should detect students', () => {
     const reasoner = new EthicalReasoner()
-    const stakeholders = reasoner.identifyStakeholders('Students are affected by tuition increases.')
+    const stakeholders = reasoner.identifyStakeholders(
+      'Students are affected by tuition increases.',
+    )
     expect(stakeholders.some(s => s.name === 'Students')).toBe(true)
   })
 
@@ -288,9 +300,7 @@ describe('identifyStakeholders()', () => {
 
   it('should not duplicate stakeholder names', () => {
     const reasoner = new EthicalReasoner()
-    const stakeholders = reasoner.identifyStakeholders(
-      'Employee employee employees workers staff',
-    )
+    const stakeholders = reasoner.identifyStakeholders('Employee employee employees workers staff')
     const names = stakeholders.map(s => s.name)
     expect(new Set(names).size).toBe(names.length)
   })
@@ -321,7 +331,9 @@ describe('identifyStakeholders()', () => {
 
   it('should infer positive impact from beneficial language', () => {
     const reasoner = new EthicalReasoner()
-    const stakeholders = reasoner.identifyStakeholders('Employees benefit from the new policy and are helped.')
+    const stakeholders = reasoner.identifyStakeholders(
+      'Employees benefit from the new policy and are helped.',
+    )
     const emp = stakeholders.find(s => s.name === 'Employees')
     expect(emp).toBeDefined()
     expect(emp!.impact).toBe('positive')
@@ -592,9 +604,7 @@ describe('suggestEthicalAction()', () => {
 
   it('should mention a framework name in the recommendation', () => {
     const reasoner = new EthicalReasoner()
-    const suggestion = reasoner.suggestEthicalAction(
-      'protect liberty freedom privacy rights',
-    )
+    const suggestion = reasoner.suggestEthicalAction('protect liberty freedom privacy rights')
     const frameworks = ['utilitarian', 'deontological', 'virtue', 'care', 'rights']
     const mentionsFramework = frameworks.some(fw => suggestion.includes(fw))
     expect(mentionsFramework).toBe(true)

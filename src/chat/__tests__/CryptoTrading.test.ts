@@ -11,21 +11,29 @@ describe('Cryptocurrency Trading Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about crypto trading and DeFi', async () => {
-      const r = await brain.chat('explain cryptocurrency trading bitcoin ethereum defi decentralized finance yield farming liquidity pool amm')
+      const r = await brain.chat(
+        'explain cryptocurrency trading bitcoin ethereum defi decentralized finance yield farming liquidity pool amm',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/crypto|bitcoin|ethereum|defi|liquidity|yield|amm/)
     })
 
     it('answers about on-chain analysis and tokenomics', async () => {
-      const r = await brain.chat('explain on chain analysis blockchain metrics whale tracking tokenomics supply vesting nft trading')
+      const r = await brain.chat(
+        'explain on chain analysis blockchain metrics whale tracking tokenomics supply vesting nft trading',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/on.chain|whale|tokenomics|supply|nft|blockchain/)
     })
 
     it('answers about crypto risk and market cycles', async () => {
-      const r = await brain.chat('explain crypto risk management leverage liquidation funding rate bitcoin halving market cycle stablecoin')
+      const r = await brain.chat(
+        'explain crypto risk management leverage liquidation funding rate bitcoin halving market cycle stablecoin',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/leverage|liquidation|funding|halving|cycle|stablecoin|risk/)
+      expect(r.text.toLowerCase()).toMatch(
+        /leverage|liquidation|funding|halving|cycle|stablecoin|risk/,
+      )
     })
   })
 

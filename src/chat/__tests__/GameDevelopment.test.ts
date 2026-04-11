@@ -13,9 +13,13 @@ describe('Game Development Knowledge', () => {
 
   describe('Unity Engine', () => {
     it('explains Unity MonoBehaviour lifecycle and C# scripting', async () => {
-      const r = await brain.chat('How does the Unity MonoBehaviour lifecycle work with C# scripting?')
+      const r = await brain.chat(
+        'How does the Unity MonoBehaviour lifecycle work with C# scripting?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/unity|monobehaviour|lifecycle|awake|start|update|c#|script/)
+      expect(r.text.toLowerCase()).toMatch(
+        /unity|monobehaviour|lifecycle|awake|start|update|c#|script/,
+      )
     })
 
     it('describes Unity physics with Rigidbody and Colliders', async () => {
@@ -33,13 +37,19 @@ describe('Game Development Knowledge', () => {
 
   describe('Unreal Engine', () => {
     it('explains Unreal Engine C++ and Blueprint system', async () => {
-      const r = await brain.chat('How does the Unreal Engine UE5 work with C++ and Blueprint visual scripting for game actor components?')
+      const r = await brain.chat(
+        'How does the Unreal Engine UE5 work with C++ and Blueprint visual scripting for game actor components?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/unreal|engine|blueprint|c\+\+|actor|component|ue[45]|nanite|lumen|gameplay/)
+      expect(r.text.toLowerCase()).toMatch(
+        /unreal|engine|blueprint|c\+\+|actor|component|ue[45]|nanite|lumen|gameplay/,
+      )
     })
 
     it('describes UE5 Nanite and Lumen features', async () => {
-      const r = await brain.chat('What are the Unreal Engine UE5 Nanite and Lumen rendering features?')
+      const r = await brain.chat(
+        'What are the Unreal Engine UE5 Nanite and Lumen rendering features?',
+      )
       expect(r.text.toLowerCase()).toMatch(/unreal|ue5|nanite|lumen|render|geometry|illumination/)
     })
   })
@@ -48,7 +58,9 @@ describe('Game Development Knowledge', () => {
 
   describe('Godot Engine', () => {
     it('explains Godot GDScript and scene tree', async () => {
-      const r = await brain.chat('How does the Godot game engine GDScript and scene tree system work?')
+      const r = await brain.chat(
+        'How does the Godot game engine GDScript and scene tree system work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/godot|gdscript|scene|tree|node|signal/)
     })
@@ -58,9 +70,13 @@ describe('Game Development Knowledge', () => {
 
   describe('Game Physics', () => {
     it('explains game physics collision detection', async () => {
-      const r = await brain.chat('How does game physics engine collision detection work with broad and narrow phase?')
+      const r = await brain.chat(
+        'How does game physics engine collision detection work with broad and narrow phase?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/collision|broad\s*phase|narrow\s*phase|physics|rigid\s*body|gjk|sat/)
+      expect(r.text.toLowerCase()).toMatch(
+        /collision|broad\s*phase|narrow\s*phase|physics|rigid\s*body|gjk|sat/,
+      )
     })
   })
 
@@ -68,14 +84,18 @@ describe('Game Development Knowledge', () => {
 
   describe('Game Architecture', () => {
     it('explains Entity Component System ECS pattern', async () => {
-      const r = await brain.chat('How does the Entity Component System ECS game architecture pattern work?')
+      const r = await brain.chat(
+        'How does the Entity Component System ECS game architecture pattern work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/entity|component|system|ecs|data.oriented|cache/)
     })
 
     it('describes behavior trees for game AI', async () => {
       const r = await brain.chat('How do behavior tree game AI decision making systems work?')
-      expect(r.text.toLowerCase()).toMatch(/behavior\s*tree|selector|sequence|state\s*machine|ai|game/)
+      expect(r.text.toLowerCase()).toMatch(
+        /behavior\s*tree|selector|sequence|state\s*machine|ai|game/,
+      )
     })
   })
 
@@ -83,9 +103,13 @@ describe('Game Development Knowledge', () => {
 
   describe('Multiplayer Networking', () => {
     it('explains game networking and rollback netcode', async () => {
-      const r = await brain.chat('How does game networking multiplayer synchronization with rollback netcode work?')
+      const r = await brain.chat(
+        'How does game networking multiplayer synchronization with rollback netcode work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/network|multiplayer|rollback|predict|server|client|synch/)
+      expect(r.text.toLowerCase()).toMatch(
+        /network|multiplayer|rollback|predict|server|client|synch/,
+      )
     })
   })
 
@@ -93,7 +117,9 @@ describe('Game Development Knowledge', () => {
 
   describe('Game Shaders', () => {
     it('explains game shader programming HLSL/GLSL', async () => {
-      const r = await brain.chat('How does game shader programming work with HLSL and GLSL vertex fragment shaders?')
+      const r = await brain.chat(
+        'How does game shader programming work with HLSL and GLSL vertex fragment shaders?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/shader|hlsl|glsl|vertex|fragment|render|gpu|pbr/)
     })
@@ -103,7 +129,9 @@ describe('Game Development Knowledge', () => {
 
   describe('Game AI & Pathfinding', () => {
     it('explains A* pathfinding and NavMesh', async () => {
-      const r = await brain.chat('How does A-star pathfinding with navigation mesh NavMesh work in game AI?')
+      const r = await brain.chat(
+        'How does A-star pathfinding with navigation mesh NavMesh work in game AI?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/a.?star|pathfind|navmesh|navigation|mesh|ai|heuristic/)
     })

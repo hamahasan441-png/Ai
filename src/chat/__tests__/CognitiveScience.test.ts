@@ -11,21 +11,33 @@ describe('Cognitive Science & Learning Theory Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about cognitive science and memory systems', async () => {
-      const r = await brain.chat('explain cognitive science cognition perception attention memory working memory short term long term episodic semantic')
+      const r = await brain.chat(
+        'explain cognitive science cognition perception attention memory working memory short term long term episodic semantic',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/cognitive|memory|working\s*memory|episodic|semantic|perception|attention/)
+      expect(r.text.toLowerCase()).toMatch(
+        /cognitive|memory|working\s*memory|episodic|semantic|perception|attention/,
+      )
     })
 
     it('answers about mental models and cognitive biases', async () => {
-      const r = await brain.chat('explain mental model schema frame script metacognition cognitive bias heuristic anchoring confirmation availability')
+      const r = await brain.chat(
+        'explain mental model schema frame script metacognition cognitive bias heuristic anchoring confirmation availability',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/mental\s*model|schema|metacognition|bias|heuristic|anchoring|confirmation/)
+      expect(r.text.toLowerCase()).toMatch(
+        /mental\s*model|schema|metacognition|bias|heuristic|anchoring|confirmation/,
+      )
     })
 
     it('answers about learning theories and transfer', async () => {
-      const r = await brain.chat('explain learning theory constructivism scaffolding zone proximal development transfer learning analogy abstraction distributed cognition')
+      const r = await brain.chat(
+        'explain learning theory constructivism scaffolding zone proximal development transfer learning analogy abstraction distributed cognition',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/learning|constructivism|scaffolding|zone|transfer|analogy|cognition/)
+      expect(r.text.toLowerCase()).toMatch(
+        /learning|constructivism|scaffolding|zone|transfer|analogy|cognition/,
+      )
     })
   })
 

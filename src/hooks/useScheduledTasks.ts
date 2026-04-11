@@ -37,11 +37,7 @@ type Props = {
  * Scheduler core (timer, file watcher, fire logic) lives in cronScheduler.ts
  * so SDK/-p mode can share it — see print.ts for the headless wiring.
  */
-export function useScheduledTasks({
-  isLoading,
-  assistantMode = false,
-  setMessages,
-}: Props): void {
+export function useScheduledTasks({ isLoading, assistantMode = false, setMessages }: Props): void {
   // Latest-value ref so the scheduler's isLoading() getter doesn't capture
   // a stale closure. The effect mounts once; isLoading changes every turn.
   const isLoadingRef = useRef(isLoading)
@@ -90,10 +86,7 @@ export function useScheduledTasks({
       // Normal fires receive the full CronTask so we can route by agentId.
       onFireTask: task => {
         if (task.agentId) {
-          const teammate = findTeammateTaskByAgentId(
-            task.agentId,
-            store.getState().tasks,
-          )
+          const teammate = findTeammateTaskByAgentId(task.agentId, store.getState().tasks)
           if (teammate && !isTerminalTaskStatus(teammate.status)) {
             injectUserMessageToTeammate(teammate.id, task.prompt, setAppState)
             return

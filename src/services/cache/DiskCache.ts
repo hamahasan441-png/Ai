@@ -19,7 +19,7 @@ interface DiskCacheEntry<T> {
   key: string
   value: T
   createdAt: number
-  expiresAt: number | null  // null = never expires
+  expiresAt: number | null // null = never expires
   version: number
 }
 
@@ -36,7 +36,7 @@ export interface DiskCacheConfig {
 }
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
-const DEFAULT_MAX_SIZE = 100 * 1024 * 1024  // 100MB
+const DEFAULT_MAX_SIZE = 100 * 1024 * 1024 // 100MB
 
 /**
  * Persistent file-based cache with TTL and size limits.
@@ -129,7 +129,11 @@ export class DiskCache {
       fs.renameSync(tempPath, filePath)
     } catch {
       // Clean up temp file on failure
-      try { fs.unlinkSync(tempPath) } catch { /* ignore */ }
+      try {
+        fs.unlinkSync(tempPath)
+      } catch {
+        /* ignore */
+      }
     }
   }
 
@@ -147,7 +151,9 @@ export class DiskCache {
         fs.unlinkSync(filePath)
         return true
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return false
   }
 
@@ -166,7 +172,9 @@ export class DiskCache {
           count++
         }
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     return count
   }
@@ -186,18 +194,26 @@ export class DiskCache {
           const raw = fs.readFileSync(filePath, 'utf-8')
           const entry = JSON.parse(raw) as DiskCacheEntry<unknown>
 
-          if (entry.version !== this.config.version ||
-              (entry.expiresAt !== null && now > entry.expiresAt)) {
+          if (
+            entry.version !== this.config.version ||
+            (entry.expiresAt !== null && now > entry.expiresAt)
+          ) {
             fs.unlinkSync(filePath)
             pruned++
           }
         } catch {
           // Remove corrupt files
-          try { fs.unlinkSync(filePath) } catch { /* ignore */ }
+          try {
+            fs.unlinkSync(filePath)
+          } catch {
+            /* ignore */
+          }
           pruned++
         }
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     return pruned
   }
@@ -212,9 +228,13 @@ export class DiskCache {
         try {
           const stat = fs.statSync(path.join(this.config.baseDir, file))
           totalSize += stat.size
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return totalSize
   }
 
@@ -226,9 +246,13 @@ export class DiskCache {
         if (!file.endsWith('.json')) continue
         try {
           fs.unlinkSync(path.join(this.config.baseDir, file))
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     this.hits = 0
     this.misses = 0
   }
@@ -238,15 +262,15 @@ export class DiskCache {
     let entries = 0
     try {
       entries = fs.readdirSync(this.config.baseDir).filter(f => f.endsWith('.json')).length
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     return {
       entries,
       hits: this.hits,
       misses: this.misses,
-      hitRate: this.hits + this.misses > 0
-        ? this.hits / (this.hits + this.misses)
-        : 0,
+      hitRate: this.hits + this.misses > 0 ? this.hits / (this.hits + this.misses) : 0,
       baseDir: this.config.baseDir,
     }
   }

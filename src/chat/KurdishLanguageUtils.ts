@@ -54,51 +54,143 @@ export interface KurdishMonth {
 /** Kurdish proverb collection — traditional sayings with translations. */
 const PROVERBS: readonly KurdishProverb[] = [
   // ── Wisdom & Life ──
-  { ckb: 'ئاو کە بچێتەوە بنی گۆم، شوێنی خۆی دەبینێتەوە', eng: 'Water finds its own level', category: 'wisdom' },
-  { ckb: 'بەردێک بە دوو دەست هەڵناگیرێت', eng: 'A stone cannot be lifted with two fingers', category: 'wisdom' },
+  {
+    ckb: 'ئاو کە بچێتەوە بنی گۆم، شوێنی خۆی دەبینێتەوە',
+    eng: 'Water finds its own level',
+    category: 'wisdom',
+  },
+  {
+    ckb: 'بەردێک بە دوو دەست هەڵناگیرێت',
+    eng: 'A stone cannot be lifted with two fingers',
+    category: 'wisdom',
+  },
   { ckb: 'دەم گرتن ئاڵتوونە', eng: 'Silence is golden', category: 'wisdom' },
-  { ckb: 'زۆر قسەکردن نیشانەی بێ ئاقڵییە', eng: 'Too much talking is a sign of foolishness', category: 'wisdom' },
-  { ckb: 'دوای هەر تاریکییەک ڕووناکی هەیە', eng: 'After every darkness there is light', category: 'wisdom' },
+  {
+    ckb: 'زۆر قسەکردن نیشانەی بێ ئاقڵییە',
+    eng: 'Too much talking is a sign of foolishness',
+    category: 'wisdom',
+  },
+  {
+    ckb: 'دوای هەر تاریکییەک ڕووناکی هەیە',
+    eng: 'After every darkness there is light',
+    category: 'wisdom',
+  },
   { ckb: 'ئاگر بەبێ دووکەڵ نابێت', eng: 'There is no fire without smoke', category: 'wisdom' },
-  { ckb: 'کەسێک کە ڕاستگۆ بێت، دنیا هی ئەوە', eng: 'The world belongs to the truthful', category: 'wisdom' },
+  {
+    ckb: 'کەسێک کە ڕاستگۆ بێت، دنیا هی ئەوە',
+    eng: 'The world belongs to the truthful',
+    category: 'wisdom',
+  },
   { ckb: 'گوڵ بە بێ دڕکە نابێت', eng: 'There is no rose without thorns', category: 'wisdom' },
-  { ckb: 'دار بە باری بۆنی خۆیەوە دەناسرێت', eng: 'A tree is known by its fruit', category: 'wisdom' },
+  {
+    ckb: 'دار بە باری بۆنی خۆیەوە دەناسرێت',
+    eng: 'A tree is known by its fruit',
+    category: 'wisdom',
+  },
   { ckb: 'مار بە خێزان نییە', eng: 'A snake has no family (evil is alone)', category: 'wisdom' },
 
   // ── Friendship & Unity ──
-  { ckb: 'هاوڕێی باش لە زێڕ باشترە', eng: 'A good friend is better than gold', category: 'friendship' },
+  {
+    ckb: 'هاوڕێی باش لە زێڕ باشترە',
+    eng: 'A good friend is better than gold',
+    category: 'friendship',
+  },
   { ckb: 'یەکگرتن هێزە', eng: 'Unity is strength', category: 'friendship' },
-  { ckb: 'دوو دەست کە پاکبکرێن، ڕووی دەشۆن', eng: 'Two hands wash each other and both wash the face', category: 'friendship' },
-  { ckb: 'دراوسێی باش لە برای دوور باشترە', eng: 'A good neighbor is better than a distant brother', category: 'friendship' },
-  { ckb: 'بەیەکەوە نیعمەتین، بەتەنها زەحمەتین', eng: 'Together is a blessing, alone is a hardship', category: 'friendship' },
+  {
+    ckb: 'دوو دەست کە پاکبکرێن، ڕووی دەشۆن',
+    eng: 'Two hands wash each other and both wash the face',
+    category: 'friendship',
+  },
+  {
+    ckb: 'دراوسێی باش لە برای دوور باشترە',
+    eng: 'A good neighbor is better than a distant brother',
+    category: 'friendship',
+  },
+  {
+    ckb: 'بەیەکەوە نیعمەتین، بەتەنها زەحمەتین',
+    eng: 'Together is a blessing, alone is a hardship',
+    category: 'friendship',
+  },
 
   // ── Hard Work & Perseverance ──
-  { ckb: 'بەبێ ماندووبوون، سەرکەوتن نییە', eng: 'Without effort there is no success', category: 'perseverance' },
-  { ckb: 'ڕێگای هەزار میل بە یەک هەنگاو دەست پێ دەکات', eng: 'A journey of a thousand miles begins with a single step', category: 'perseverance' },
-  { ckb: 'سەبر تاڵە بەڵام بەرەکەتی شیرینە', eng: 'Patience is bitter, but its fruit is sweet', category: 'perseverance' },
-  { ckb: 'کاری ئەمڕۆ بۆ سبەی مەهێڵەوە', eng: 'Do not leave today\'s work for tomorrow', category: 'perseverance' },
-  { ckb: 'داری بڵند باکەی زۆرترە', eng: 'The taller the tree, the more wind it faces', category: 'perseverance' },
+  {
+    ckb: 'بەبێ ماندووبوون، سەرکەوتن نییە',
+    eng: 'Without effort there is no success',
+    category: 'perseverance',
+  },
+  {
+    ckb: 'ڕێگای هەزار میل بە یەک هەنگاو دەست پێ دەکات',
+    eng: 'A journey of a thousand miles begins with a single step',
+    category: 'perseverance',
+  },
+  {
+    ckb: 'سەبر تاڵە بەڵام بەرەکەتی شیرینە',
+    eng: 'Patience is bitter, but its fruit is sweet',
+    category: 'perseverance',
+  },
+  {
+    ckb: 'کاری ئەمڕۆ بۆ سبەی مەهێڵەوە',
+    eng: "Do not leave today's work for tomorrow",
+    category: 'perseverance',
+  },
+  {
+    ckb: 'داری بڵند باکەی زۆرترە',
+    eng: 'The taller the tree, the more wind it faces',
+    category: 'perseverance',
+  },
 
   // ── Knowledge & Learning ──
   { ckb: 'زانایی سامانی ڕاستەقینەیە', eng: 'Knowledge is true wealth', category: 'knowledge' },
   { ckb: 'کتێب باشترین هاوڕێیە', eng: 'Books are the best friends', category: 'knowledge' },
   { ckb: 'فێربوون تەمەنی نییە', eng: 'Learning has no age limit', category: 'knowledge' },
-  { ckb: 'نەزانی عەیب نییە، نەپرسین عەیبە', eng: 'Not knowing is not a shame, not asking is', category: 'knowledge' },
-  { ckb: 'قەلەمی زانایان بەهێزترە لە شمشێری پاڵەوانان', eng: 'The pen of scholars is mightier than the sword of warriors', category: 'knowledge' },
+  {
+    ckb: 'نەزانی عەیب نییە، نەپرسین عەیبە',
+    eng: 'Not knowing is not a shame, not asking is',
+    category: 'knowledge',
+  },
+  {
+    ckb: 'قەلەمی زانایان بەهێزترە لە شمشێری پاڵەوانان',
+    eng: 'The pen of scholars is mightier than the sword of warriors',
+    category: 'knowledge',
+  },
 
   // ── Family & Home ──
   { ckb: 'ماڵ وەکوو ئاشیانەی بەرزە', eng: 'Home is like a high nest', category: 'family' },
-  { ckb: 'دەست دایک گەرمە', eng: 'A mother\'s hand is warm', category: 'family' },
-  { ckb: 'کوڕی باش ناوی باوکی بڵندکەرەوە', eng: 'A good son elevates his father\'s name', category: 'family' },
-  { ckb: 'شەو هەر درێژ بێت، بەیانی دەبێت', eng: 'However long the night, dawn will come', category: 'family' },
+  { ckb: 'دەست دایک گەرمە', eng: "A mother's hand is warm", category: 'family' },
+  {
+    ckb: 'کوڕی باش ناوی باوکی بڵندکەرەوە',
+    eng: "A good son elevates his father's name",
+    category: 'family',
+  },
+  {
+    ckb: 'شەو هەر درێژ بێت، بەیانی دەبێت',
+    eng: 'However long the night, dawn will come',
+    category: 'family',
+  },
   { ckb: 'نان و خوێ هاوسایەیە', eng: 'Bread and salt make neighbors', category: 'family' },
 
   // ── Kurdish Identity ──
-  { ckb: 'کورد هاوڕێی چیایە', eng: 'Kurds have no friends but the mountains', category: 'identity' },
-  { ckb: 'زمانم هەیە، نەتەوەم هەیە', eng: 'I have my language, I have my nation', category: 'identity' },
-  { ckb: 'چیاکان بکوژن، بەڵام خاکی نیشتمان نافرۆشم', eng: 'Mountains may crush me, but I won\'t sell my homeland', category: 'identity' },
+  {
+    ckb: 'کورد هاوڕێی چیایە',
+    eng: 'Kurds have no friends but the mountains',
+    category: 'identity',
+  },
+  {
+    ckb: 'زمانم هەیە، نەتەوەم هەیە',
+    eng: 'I have my language, I have my nation',
+    category: 'identity',
+  },
+  {
+    ckb: 'چیاکان بکوژن، بەڵام خاکی نیشتمان نافرۆشم',
+    eng: "Mountains may crush me, but I won't sell my homeland",
+    category: 'identity',
+  },
   { ckb: 'نەورۆز بە ئاگر دەستپێ دەکات', eng: 'Newroz begins with fire', category: 'identity' },
-  { ckb: 'کوردایەتی بە دڵ و خوێن دەژین', eng: 'Kurdishness lives in heart and blood', category: 'identity' },
+  {
+    ckb: 'کوردایەتی بە دڵ و خوێن دەژین',
+    eng: 'Kurdishness lives in heart and blood',
+    category: 'identity',
+  },
 ]
 
 /** Cardinal numbers: 0–20, 30, 40, 50, 60, 70, 80, 90, 100, 1000. */
@@ -210,7 +302,7 @@ const GREETINGS: ReadonlyMap<string, string> = new Map([
   ['بەخێربێن', 'Welcome (to a group)'],
   ['چۆنی؟', 'How are you? (informal)'],
   ['چۆنیت؟', 'How are you? (formal)'],
-  ['باشم سوپاس', 'I\'m fine, thanks'],
+  ['باشم سوپاس', "I'm fine, thanks"],
   ['خوات لەگەڵ', 'God be with you (goodbye)'],
   ['بەسلامەت', 'Goodbye / Stay safe'],
   ['سوپاس', 'Thank you'],
@@ -300,7 +392,8 @@ export class KurdishLanguageUtils {
     // 1000–9999
     const thousands = Math.floor(n / 1000)
     const remainder = n % 1000
-    const thousandsPart = thousands === 1 ? 'هەزار' : `${CARDINAL_NUMBERS.get(thousands) ?? ''} هەزار`
+    const thousandsPart =
+      thousands === 1 ? 'هەزار' : `${CARDINAL_NUMBERS.get(thousands) ?? ''} هەزار`
     if (remainder === 0) return thousandsPart
     return `${thousandsPart} و ${this.numberToKurdish(remainder)}`
   }

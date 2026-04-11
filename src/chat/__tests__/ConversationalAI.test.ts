@@ -11,21 +11,33 @@ describe('Conversational AI & Dialogue Systems Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about conversational AI and dialogue systems', async () => {
-      const r = await brain.chat('explain conversational ai chatbot dialogue system virtual assistant dialogue management state tracking slot filling')
+      const r = await brain.chat(
+        'explain conversational ai chatbot dialogue system virtual assistant dialogue management state tracking slot filling',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/dialogue|chatbot|slot\s*fill|state\s*track|conversational|nlu/)
+      expect(r.text.toLowerCase()).toMatch(
+        /dialogue|chatbot|slot\s*fill|state\s*track|conversational|nlu/,
+      )
     })
 
     it('answers about intent recognition and entity extraction', async () => {
-      const r = await brain.chat('explain intent recognition classification nlu entity extraction named entity recognition ner slot dialogue policy')
+      const r = await brain.chat(
+        'explain intent recognition classification nlu entity extraction named entity recognition ner slot dialogue policy',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/intent|entity|ner|recognition|classification|dialogue\s*policy/)
+      expect(r.text.toLowerCase()).toMatch(
+        /intent|entity|ner|recognition|classification|dialogue\s*policy/,
+      )
     })
 
     it('answers about conversation context and response generation', async () => {
-      const r = await brain.chat('explain conversation context window memory multi turn dialogue management response generation template retrieval generative')
+      const r = await brain.chat(
+        'explain conversation context window memory multi turn dialogue management response generation template retrieval generative',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/context|memory|multi.turn|response|generation|retrieval/)
+      expect(r.text.toLowerCase()).toMatch(
+        /context|memory|multi.turn|response|generation|retrieval/,
+      )
     })
   })
 

@@ -168,9 +168,17 @@ export interface CodeAgentStats {
 function detectLanguageFromPath(filePath: string): ScaffoldLanguage {
   const ext = filePath.split('.').pop()?.toLowerCase() ?? ''
   const map: Record<string, ScaffoldLanguage> = {
-    ts: 'typescript', tsx: 'typescript', mts: 'typescript', cts: 'typescript',
-    js: 'javascript', jsx: 'javascript', mjs: 'javascript', cjs: 'javascript',
-    py: 'python', go: 'go', rs: 'rust',
+    ts: 'typescript',
+    tsx: 'typescript',
+    mts: 'typescript',
+    cts: 'typescript',
+    js: 'javascript',
+    jsx: 'javascript',
+    mjs: 'javascript',
+    cjs: 'javascript',
+    py: 'python',
+    go: 'go',
+    rs: 'rust',
   }
   return map[ext] ?? 'typescript'
 }
@@ -257,7 +265,11 @@ function buildComment(text: string, lang: ScaffoldLanguage): string {
 // ╚═══════════════════════════════════════════════════════════════════════════════╝
 
 /** Generate a package.json file. */
-function generatePackageJson(name: string, template: ProjectTemplate, lang: ScaffoldLanguage): string {
+function generatePackageJson(
+  name: string,
+  template: ProjectTemplate,
+  lang: ScaffoldLanguage,
+): string {
   const isTs = lang === 'typescript'
   const base: Record<string, unknown> = {
     name: toKebabCase(name),
@@ -487,7 +499,12 @@ jobs:
 }
 
 /** Generate a README.md. */
-function generateReadme(name: string, template: ProjectTemplate, lang: ScaffoldLanguage, files: AgentFile[]): string {
+function generateReadme(
+  name: string,
+  template: ProjectTemplate,
+  lang: ScaffoldLanguage,
+  files: AgentFile[],
+): string {
   const pascalName = toPascalCase(name)
   return `# ${pascalName}
 
@@ -495,16 +512,27 @@ function generateReadme(name: string, template: ProjectTemplate, lang: ScaffoldL
 
 ## Overview
 
-${template === 'rest-api' ? 'A RESTful API server' :
-  template === 'react-app' ? 'A React application' :
-  template === 'cli-tool' ? 'A command-line tool' :
-  template === 'library' ? 'A reusable library' :
-  template === 'express-server' ? 'An Express.js server' :
-  template === 'fullstack' ? 'A full-stack application' :
-  template === 'microservice' ? 'A microservice' :
-  template === 'discord-bot' ? 'A Discord bot' :
-  template === 'chrome-extension' ? 'A Chrome extension' :
-  'A project'} built with ${lang === 'typescript' ? 'TypeScript' : lang}.
+${
+  template === 'rest-api'
+    ? 'A RESTful API server'
+    : template === 'react-app'
+      ? 'A React application'
+      : template === 'cli-tool'
+        ? 'A command-line tool'
+        : template === 'library'
+          ? 'A reusable library'
+          : template === 'express-server'
+            ? 'An Express.js server'
+            : template === 'fullstack'
+              ? 'A full-stack application'
+              : template === 'microservice'
+                ? 'A microservice'
+                : template === 'discord-bot'
+                  ? 'A Discord bot'
+                  : template === 'chrome-extension'
+                    ? 'A Chrome extension'
+                    : 'A project'
+} built with ${lang === 'typescript' ? 'TypeScript' : lang}.
 
 ## Getting Started
 
@@ -626,11 +654,15 @@ export function createServer()${isTs ? ': http.Server' : ''} {
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import * as controller from './controller'
 
-${isTs ? `interface ParsedRequest extends IncomingMessage {
+${
+  isTs
+    ? `interface ParsedRequest extends IncomingMessage {
   body?: unknown
   params?: Record<string, string>
 }
-` : ''}
+`
+    : ''
+}
 export async function router(req${isTs ? ': ParsedRequest' : ''}, res${resType})${typeVoid} {
   const url = req.url ?? '/'
   const method = req.method ?? 'GET'
@@ -675,12 +707,16 @@ export async function router(req${isTs ? ': ParsedRequest' : ''}, res${resType})
 
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
-${isTs ? `interface Item {
+${
+  isTs
+    ? `interface Item {
   id: string
   name: string
   createdAt: string
 }
-` : ''}
+`
+    : ''
+}
 /** In-memory store (replace with database in production). */
 const store${isTs ? ': Map<string, Item>' : ''} = new Map()
 
@@ -831,7 +867,9 @@ export { create${pascal} } from './factory'
   // src/types.ts
   const typesContent = `${buildComment(`Types and interfaces for ${pascal}`, lang)}
 
-${isTs ? `export interface ${pascal}Config {
+${
+  isTs
+    ? `export interface ${pascal}Config {
   /** Enable debug logging. */
   debug?: boolean
   /** Maximum retries on failure. */
@@ -850,7 +888,8 @@ export interface ${pascal}Result<T = unknown> {
   /** Duration in milliseconds. */
   durationMs: number
 }
-` : `/**
+`
+    : `/**
  * @typedef {Object} ${pascal}Config
  * @property {boolean} [debug]
  * @property {number} [maxRetries]
@@ -864,7 +903,8 @@ export interface ${pascal}Result<T = unknown> {
  * @property {string|null} error
  * @property {number} durationMs
  */
-`}
+`
+}
 `
   files.push({
     path: `src/types.${ext}`,
@@ -879,7 +919,9 @@ export interface ${pascal}Result<T = unknown> {
 
 ${isTs ? `import type { ${pascal}Config, ${pascal}Result } from './types'` : ''}
 
-${isTs ? `export class ${pascal} {
+${
+  isTs
+    ? `export class ${pascal} {
   private config: Required<${pascal}Config>
 
   constructor(config?: ${pascal}Config) {
@@ -926,7 +968,8 @@ ${isTs ? `export class ${pascal} {
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
-}` : `class ${pascal} {
+}`
+    : `class ${pascal} {
   constructor(config) {
     this.config = {
       debug: config?.debug ?? false,
@@ -962,7 +1005,8 @@ ${isTs ? `export class ${pascal} {
 }
 
 module.exports = { ${pascal} }
-`}
+`
+}
 `
   files.push({
     path: `src/${camel}.${ext}`,
@@ -1108,7 +1152,9 @@ main()
   // src/args.ts
   const argsContent = `${buildComment('CLI argument parser', lang)}
 
-${isTs ? `export interface CliArgs {
+${
+  isTs
+    ? `export interface CliArgs {
   command: string
   help: boolean
   version: boolean
@@ -1116,7 +1162,9 @@ ${isTs ? `export interface CliArgs {
   output: string
   args: string[]
 }
-` : ''}
+`
+    : ''
+}
 export function parseArgs(argv${isTs ? ': string[]' : ''})${isTs ? ': CliArgs' : ''} {
   const result${isTs ? ': CliArgs' : ''} = {
     command: '',
@@ -1236,19 +1284,23 @@ function generateMicroserviceFiles(name: string, lang: ScaffoldLanguage): AgentF
   // Add a config module
   const configContent = `${buildComment('Service configuration — environment-based', lang)}
 
-${isTs ? `export interface ServiceConfig {
+${
+  isTs
+    ? `export interface ServiceConfig {
   port: number
   host: string
   env: 'development' | 'production' | 'test'
   logLevel: 'debug' | 'info' | 'warn' | 'error'
 }
-` : ''}
+`
+    : ''
+}
 export function loadConfig()${isTs ? ': ServiceConfig' : ''} {
   return {
     port: parseInt(process.env['PORT'] ?? '3000', 10),
     host: process.env['HOST'] ?? '0.0.0.0',
-    env: (process.env['NODE_ENV'] ?? 'development')${isTs ? ' as ServiceConfig[\'env\']' : ''},
-    logLevel: (process.env['LOG_LEVEL'] ?? 'info')${isTs ? ' as ServiceConfig[\'logLevel\']' : ''},
+    env: (process.env['NODE_ENV'] ?? 'development')${isTs ? " as ServiceConfig['env']" : ''},
+    logLevel: (process.env['LOG_LEVEL'] ?? 'info')${isTs ? " as ServiceConfig['logLevel']" : ''},
   }
 }
 `
@@ -1412,10 +1464,7 @@ export class CodeAgent {
     this.stats.filesCreated += files.length
     this.stats.linesGenerated += totalLines
 
-    const instructions = [
-      `cd ${toKebabCase(name)}`,
-      'npm install',
-    ]
+    const instructions = [`cd ${toKebabCase(name)}`, 'npm install']
     if (language === 'typescript') instructions.push('npm run build')
     instructions.push('npm run dev')
     instructions.push('npm test')
@@ -1452,13 +1501,15 @@ export class CodeAgent {
     const isTest = pathLower.includes('test') || pathLower.includes('spec')
     const isType = pathLower.includes('types') || pathLower.includes('interfaces')
     const isMiddleware = lower.includes('middleware') || pathLower.includes('middleware')
-    const isUtil = lower.includes('util') || pathLower.includes('util') || pathLower.includes('helper')
+    const isUtil =
+      lower.includes('util') || pathLower.includes('util') || pathLower.includes('helper')
     const isConfig = lower.includes('config') || pathLower.includes('config')
     const isService = lower.includes('service') || pathLower.includes('service')
     const isModel = lower.includes('model') || pathLower.includes('model')
     const isController = lower.includes('controller') || pathLower.includes('controller')
     const isHook = pathLower.includes('use') || lower.includes('hook')
-    const isComponent = pathLower.includes('.tsx') || pathLower.includes('.jsx') || lower.includes('component')
+    const isComponent =
+      pathLower.includes('.tsx') || pathLower.includes('.jsx') || lower.includes('component')
 
     // Build imports from existing files
     const importsAdded: string[] = []
@@ -1466,8 +1517,8 @@ export class CodeAgent {
       for (const existing of request.existingFiles) {
         if (existing.exports && existing.exports.length > 0) {
           // Smart import: only import types that match the description
-          const relevant = existing.exports.filter(exp =>
-            lower.includes(exp.toLowerCase()) || request.description.includes(exp)
+          const relevant = existing.exports.filter(
+            exp => lower.includes(exp.toLowerCase()) || request.description.includes(exp),
           )
           if (relevant.length > 0) {
             const importLine = generateImport(existing.path, relevant, lang)
@@ -1552,7 +1603,11 @@ export class CodeAgent {
     const position = request.position ?? 'bottom'
 
     // Generate the new code
-    const baseName = request.path.split('/').pop()?.replace(/\.\w+$/, '') ?? 'module'
+    const baseName =
+      request.path
+        .split('/')
+        .pop()
+        ?.replace(/\.\w+$/, '') ?? 'module'
     const pascal = toPascalCase(baseName)
     const addedCode = this.generateCodeSnippet(pascal, request.description, lang)
 
@@ -1629,7 +1684,9 @@ export class CodeAgent {
         } else {
           // Check if symbol already has export keyword
           const symbolLine = lines.findIndex(l => {
-            const re = new RegExp(`\\b(function|class|interface|type|const|let)\\s+${request.symbolName}\\b`)
+            const re = new RegExp(
+              `\\b(function|class|interface|type|const|let)\\s+${request.symbolName}\\b`,
+            )
             return re.test(l)
           })
           if (symbolLine >= 0 && !lines[symbolLine]!.startsWith('export')) {
@@ -1659,9 +1716,18 @@ export class CodeAgent {
   /** Get list of supported templates. */
   getTemplates(): ProjectTemplate[] {
     return [
-      'rest-api', 'react-app', 'cli-tool', 'library', 'express-server',
-      'fullstack', 'microservice', 'monorepo', 'chrome-extension',
-      'discord-bot', 'next-app', 'electron-app',
+      'rest-api',
+      'react-app',
+      'cli-tool',
+      'library',
+      'express-server',
+      'fullstack',
+      'microservice',
+      'monorepo',
+      'chrome-extension',
+      'discord-bot',
+      'next-app',
+      'electron-app',
     ]
   }
 
@@ -1669,7 +1735,12 @@ export class CodeAgent {
   // ║  PRIVATE — File generators per file type                               ║
   // ╚═════════════════════════════════════════════════════════════════════════╝
 
-  private generateTestFile(pascal: string, baseName: string, desc: string, _lang: ScaffoldLanguage): string {
+  private generateTestFile(
+    pascal: string,
+    baseName: string,
+    desc: string,
+    _lang: ScaffoldLanguage,
+  ): string {
     const camel = toCamelCase(baseName)
     return `import { describe, it, expect } from 'vitest'
 import { ${pascal} } from '../${camel}'
@@ -1726,10 +1797,14 @@ export type ${pascal}Status = 'idle' | 'loading' | 'success' | 'error'
     const camel = toCamelCase(pascal)
     return `${buildComment(`${pascal} middleware — ${desc}`, lang)}
 
-${isTs ? `import type { IncomingMessage, ServerResponse } from 'node:http'
+${
+  isTs
+    ? `import type { IncomingMessage, ServerResponse } from 'node:http'
 
 type NextFunction = () => Promise<void> | void
-` : ''}
+`
+    : ''
+}
 export function ${camel}Middleware(req${isTs ? ': IncomingMessage' : ''}, res${isTs ? ': ServerResponse' : ''}, next${isTs ? ': NextFunction' : ''})${isTs ? ': void' : ''} {
   const start = Date.now()
 
@@ -1780,14 +1855,18 @@ export function isEmpty(value${isTs ? ': unknown' : ''})${isTs ? ': boolean' : '
     const isTs = lang === 'typescript'
     return `${buildComment(`${pascal} configuration — ${desc}`, lang)}
 
-${isTs ? `export interface AppConfig {
+${
+  isTs
+    ? `export interface AppConfig {
   port: number
   host: string
   env: string
   debug: boolean
   logLevel: 'debug' | 'info' | 'warn' | 'error'
 }
-` : ''}
+`
+    : ''
+}
 export const config${isTs ? ': AppConfig' : ''} = {
   port: parseInt(process.env['PORT'] ?? '3000', 10),
   host: process.env['HOST'] ?? 'localhost',
@@ -1806,12 +1885,16 @@ export function loadConfig(overrides${isTs ? '?: Partial<AppConfig>' : ''} = {})
     const isTs = lang === 'typescript'
     return `${buildComment(`${pascal} service — ${desc}`, lang)}
 
-${isTs ? `export interface ${pascal}Data {
+${
+  isTs
+    ? `export interface ${pascal}Data {
   id: string
   createdAt: string
   updatedAt: string
 }
-` : ''}
+`
+    : ''
+}
 export class ${pascal} {
   private store${isTs ? `: Map<string, ${pascal}Data>` : ''} = new Map()
 
@@ -1854,7 +1937,9 @@ export function create${pascal}()${isTs ? `: ${pascal}` : ''} {
     const isTs = lang === 'typescript'
     return `${buildComment(`${pascal} model — ${desc}`, lang)}
 
-${isTs ? `export interface ${pascal} {
+${
+  isTs
+    ? `export interface ${pascal} {
   id: string
   name: string
   status: 'active' | 'inactive' | 'pending'
@@ -1866,7 +1951,9 @@ export interface Create${pascal}Input {
   name: string
   status?: ${pascal}['status']
 }
-` : ''}
+`
+    : ''
+}
 export function create${pascal}(input${isTs ? `: Create${pascal}Input` : ''})${isTs ? `: ${pascal}` : ''} {
   const now = new Date()
   return {
@@ -1915,8 +2002,14 @@ export function destroy(_req${isTs ? ': IncomingMessage' : ''}, res${isTs ? ': S
 `
   }
 
-  private generateHookFile(pascal: string, baseName: string, desc: string, lang: ScaffoldLanguage): string {
-    if (lang !== 'typescript') return `// Hook: ${desc}\nexport function use${pascal}() { return {} }\n`
+  private generateHookFile(
+    pascal: string,
+    baseName: string,
+    desc: string,
+    lang: ScaffoldLanguage,
+  ): string {
+    if (lang !== 'typescript')
+      return `// Hook: ${desc}\nexport function use${pascal}() { return {} }\n`
     return `${buildComment(`use${pascal} hook — ${desc}`, lang)}
 
 import { useState, useCallback } from 'react'
@@ -1983,7 +2076,12 @@ export function ${pascal}({ children, className }: ${pascal}Props): JSX.Element 
 `
   }
 
-  private generateGenericFile(pascal: string, desc: string, lang: ScaffoldLanguage, style: string): string {
+  private generateGenericFile(
+    pascal: string,
+    desc: string,
+    lang: ScaffoldLanguage,
+    style: string,
+  ): string {
     const isTs = lang === 'typescript'
     const comment = buildComment(`${pascal} — ${desc}`, lang)
 
@@ -1998,10 +2096,14 @@ export class ${pascal} {
 
     return `${comment}
 
-${isTs ? `export interface ${pascal}Options {
+${
+  isTs
+    ? `export interface ${pascal}Options {
   debug?: boolean
 }
-` : ''}
+`
+    : ''
+}
 export class ${pascal} {
   ${isTs ? 'private options: Required<' + pascal + 'Options>' : ''}
 

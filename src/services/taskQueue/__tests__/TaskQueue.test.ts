@@ -88,9 +88,18 @@ describe('TaskQueue', () => {
     it('should process multiple tasks concurrently', async () => {
       queue.start()
       const ids = [
-        queue.enqueue(async () => { await sleep(50); return 1 }),
-        queue.enqueue(async () => { await sleep(50); return 2 }),
-        queue.enqueue(async () => { await sleep(50); return 3 }),
+        queue.enqueue(async () => {
+          await sleep(50)
+          return 1
+        }),
+        queue.enqueue(async () => {
+          await sleep(50)
+          return 2
+        }),
+        queue.enqueue(async () => {
+          await sleep(50)
+          return 3
+        }),
       ]
       const results = await Promise.all(ids.map(id => queue.waitFor(id)))
       expect(results.every(r => r.status === 'completed')).toBe(true)
@@ -120,9 +129,24 @@ describe('TaskQueue', () => {
       const order: string[] = []
       const q = new TaskQueue({ concurrency: 1, pollInterval: 10 })
 
-      q.enqueue(async () => { order.push('low') }, { priority: 'low' })
-      q.enqueue(async () => { order.push('critical') }, { priority: 'critical' })
-      q.enqueue(async () => { order.push('high') }, { priority: 'high' })
+      q.enqueue(
+        async () => {
+          order.push('low')
+        },
+        { priority: 'low' },
+      )
+      q.enqueue(
+        async () => {
+          order.push('critical')
+        },
+        { priority: 'critical' },
+      )
+      q.enqueue(
+        async () => {
+          order.push('high')
+        },
+        { priority: 'high' },
+      )
 
       q.start()
       await sleep(200)
@@ -137,11 +161,14 @@ describe('TaskQueue', () => {
     it('should retry failed tasks', async () => {
       queue.start()
       let attempts = 0
-      const id = queue.enqueue(async () => {
-        attempts++
-        if (attempts < 3) throw new Error('fail')
-        return 'success'
-      }, { maxRetries: 3, retryDelay: 10 })
+      const id = queue.enqueue(
+        async () => {
+          attempts++
+          if (attempts < 3) throw new Error('fail')
+          return 'success'
+        },
+        { maxRetries: 3, retryDelay: 10 },
+      )
 
       const result = await queue.waitFor(id)
       expect(result.status).toBe('completed')
@@ -152,7 +179,9 @@ describe('TaskQueue', () => {
     it('should move to dead letter queue after max retries', async () => {
       queue.start()
       const id = queue.enqueue(
-        async () => { throw new Error('always fails') },
+        async () => {
+          throw new Error('always fails')
+        },
         { maxRetries: 2, retryDelay: 10 },
       )
 
@@ -164,7 +193,10 @@ describe('TaskQueue', () => {
     it('should handle timeout', async () => {
       queue.start()
       const id = queue.enqueue(
-        async () => { await sleep(5000); return 1 },
+        async () => {
+          await sleep(5000)
+          return 1
+        },
         { timeout: 50, maxRetries: 1, retryDelay: 10 },
       )
 
@@ -183,7 +215,10 @@ describe('TaskQueue', () => {
 
     it('should not cancel running tasks', async () => {
       queue.start()
-      const id = queue.enqueue(async () => { await sleep(200); return 1 })
+      const id = queue.enqueue(async () => {
+        await sleep(200)
+        return 1
+      })
       await sleep(50) // Let it start
       const cancelled = queue.cancel(id)
       expect(cancelled).toBe(false)
@@ -222,7 +257,9 @@ describe('TaskQueue', () => {
     it('should track failed stats', async () => {
       queue.start()
       const id = queue.enqueue(
-        async () => { throw new Error('fail') },
+        async () => {
+          throw new Error('fail')
+        },
         { maxRetries: 1, retryDelay: 10 },
       )
       await queue.waitFor(id)
@@ -236,7 +273,9 @@ describe('TaskQueue', () => {
     it('should store failed tasks in DLQ', async () => {
       queue.start()
       const id = queue.enqueue(
-        async () => { throw new Error('dead') },
+        async () => {
+          throw new Error('dead')
+        },
         { maxRetries: 1, retryDelay: 10 },
       )
       await queue.waitFor(id)
@@ -275,9 +314,16 @@ describe('TaskQueue', () => {
       const order: number[] = []
       queue.start()
 
-      const id1 = queue.enqueue(async () => { await sleep(50); order.push(1); return 1 })
+      const id1 = queue.enqueue(async () => {
+        await sleep(50)
+        order.push(1)
+        return 1
+      })
       const id2 = queue.enqueue(
-        async () => { order.push(2); return 2 },
+        async () => {
+          order.push(2)
+          return 2
+        },
         { dependsOn: [id1] },
       )
 
@@ -304,8 +350,14 @@ describe('TaskQueue', () => {
   describe('drain', () => {
     it('should wait for all tasks to complete', async () => {
       queue.start()
-      queue.enqueue(async () => { await sleep(50); return 1 })
-      queue.enqueue(async () => { await sleep(50); return 2 })
+      queue.enqueue(async () => {
+        await sleep(50)
+        return 1
+      })
+      queue.enqueue(async () => {
+        await sleep(50)
+        return 2
+      })
 
       await queue.drain(5000)
       const stats = queue.getStats()
@@ -315,7 +367,10 @@ describe('TaskQueue', () => {
 
     it('should reject new enqueues during drain', async () => {
       queue.start()
-      queue.enqueue(async () => { await sleep(200); return 1 })
+      queue.enqueue(async () => {
+        await sleep(200)
+        return 1
+      })
 
       const drainPromise = queue.drain(5000)
       expect(() => queue.enqueue(async () => 2)).toThrow('draining')

@@ -274,7 +274,10 @@ describe('ConversationSummarizer Q&A Tracking Fix', () => {
     summarizer.addTurn('user', 'What is the difference between staging and production?')
 
     // Answer about staging vs production (should mark Q2 answered, not Q1)
-    summarizer.addTurn('assistant', 'The difference between staging and production is that staging is a testing environment while production serves real users.')
+    summarizer.addTurn(
+      'assistant',
+      'The difference between staging and production is that staging is a testing environment while production serves real users.',
+    )
 
     const summary = summarizer.getSummary()
     // Q1 (deploy) should still be open, Q2 (difference staging/production) should be answered
@@ -284,7 +287,10 @@ describe('ConversationSummarizer Q&A Tracking Fix', () => {
 
   it('should handle multiple questions answered in order', () => {
     summarizer.addTurn('user', 'What is Docker?')
-    summarizer.addTurn('assistant', 'Docker is a containerization platform that packages applications.')
+    summarizer.addTurn(
+      'assistant',
+      'Docker is a containerization platform that packages applications.',
+    )
     summarizer.addTurn('user', 'What is Kubernetes?')
     summarizer.addTurn('assistant', 'Kubernetes is a container orchestration platform.')
 

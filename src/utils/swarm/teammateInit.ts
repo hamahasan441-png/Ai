@@ -11,11 +11,7 @@ import { addFunctionHook } from '../hooks/sessionHooks.js'
 import { applyPermissionUpdate } from '../permissions/PermissionUpdate.js'
 import { jsonStringify } from '../slowOperations.js'
 import { getTeammateColor } from '../teammate.js'
-import {
-  createIdleNotification,
-  getLastPeerDmSummary,
-  writeToMailbox,
-} from '../teammateMailbox.js'
+import { createIdleNotification, getLastPeerDmSummary, writeToMailbox } from '../teammateMailbox.js'
 import { readTeamFile, setMemberActive } from './teamHelpers.js'
 
 /**
@@ -60,20 +56,17 @@ export function initializeTeammateHooks(
 
       setAppState(prev => ({
         ...prev,
-        toolPermissionContext: applyPermissionUpdate(
-          prev.toolPermissionContext,
-          {
-            type: 'addRules',
-            rules: [
-              {
-                toolName: allowedPath.toolName,
-                ruleContent,
-              },
-            ],
-            behavior: 'allow',
-            destination: 'session',
-          },
-        ),
+        toolPermissionContext: applyPermissionUpdate(prev.toolPermissionContext, {
+          type: 'addRules',
+          rules: [
+            {
+              toolName: allowedPath.toolName,
+              ruleContent,
+            },
+          ],
+          behavior: 'allow',
+          destination: 'session',
+        }),
       }))
     }
   }
@@ -116,9 +109,7 @@ export function initializeTeammateHooks(
         timestamp: new Date().toISOString(),
         color: getTeammateColor(),
       })
-      logForDebugging(
-        `[TeammateInit] Sent idle notification to leader ${leadAgentName}`,
-      )
+      logForDebugging(`[TeammateInit] Sent idle notification to leader ${leadAgentName}`)
       return true // Don't block the Stop
     },
     'Failed to send idle notification to team leader',

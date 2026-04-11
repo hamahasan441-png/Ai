@@ -14,18 +14,11 @@ import { count } from '../array.js'
 import { getCwd } from '../cwd.js'
 import { toError } from '../errors.js'
 import { logError } from '../log.js'
-import {
-  createUserMessage,
-  extractTag,
-  extractTextContent,
-} from '../messages.js'
+import { createUserMessage, extractTag, extractTextContent } from '../messages.js'
 import { getSmallFastModel } from '../model/model.js'
 import { jsonParse } from '../slowOperations.js'
 import { asSystemPrompt } from '../systemPromptType.js'
-import {
-  type ApiQueryHookConfig,
-  createApiQueryHook,
-} from './apiQueryHookHelper.js'
+import { type ApiQueryHookConfig, createApiQueryHook } from './apiQueryHookHelper.js'
 import { registerPostSamplingHook } from './postSamplingHooks.js'
 
 const TURN_BATCH_SIZE = 5
@@ -42,12 +35,9 @@ function formatRecentMessages(messages: Message[]): string {
     .map(m => {
       const role = m.type === 'user' ? 'User' : 'Assistant'
       const content = m.message.content
-      if (typeof content === 'string')
-        return `${role}: ${content.slice(0, 500)}`
+      if (typeof content === 'string') return `${role}: ${content.slice(0, 500)}`
       const text = content
-        .filter(
-          (b): b is Extract<typeof b, { type: 'text' }> => b.type === 'text',
-        )
+        .filter((b): b is Extract<typeof b, { type: 'text' }> => b.type === 'text')
         .map(b => b.text)
         .join('\n')
       return `${role}: ${text.slice(0, 500)}`
@@ -153,8 +143,7 @@ Output <updates>[]</updates> if no updates are needed.`,
             .length as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           uuid: result.uuid as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           // _PROTO_skill_name routes to the privileged skill_name BQ column.
-          _PROTO_skill_name:
-            skillName as AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
+          _PROTO_skill_name: skillName as AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
         })
 
         context.toolUseContext.setAppState(prev => ({
@@ -201,9 +190,7 @@ export async function applySkillImprovement(
   try {
     currentContent = await fs.readFile(filePath, 'utf-8')
   } catch {
-    logError(
-      new Error(`Failed to read skill file for improvement: ${filePath}`),
-    )
+    logError(new Error(`Failed to read skill file for improvement: ${filePath}`))
     return
   }
 
@@ -253,9 +240,7 @@ Rules:
 
   const updatedContent = extractTag(responseText, 'updated_file')
   if (!updatedContent) {
-    logError(
-      new Error('Skill improvement apply: no updated_file tag in response'),
-    )
+    logError(new Error('Skill improvement apply: no updated_file tag in response'))
     return
   }
 

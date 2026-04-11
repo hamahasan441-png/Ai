@@ -151,7 +151,7 @@ describe('ReplayEngine', () => {
     engine.recordDecision(dec)
     const session = engine.stopRecording()!
 
-    const result = engine.replay(session.id, (orig) => orig)
+    const result = engine.replay(session.id, orig => orig)
     expect(result).not.toBeNull()
     expect(result!.identical).toBe(true)
     expect(result!.divergenceCount).toBe(0)
@@ -162,7 +162,7 @@ describe('ReplayEngine', () => {
     engine.recordDecision(makeDecision({ outcome: 'success' }))
     const session = engine.stopRecording()!
 
-    const result = engine.replay(session.id, (orig) => ({
+    const result = engine.replay(session.id, orig => ({
       ...orig,
       outcome: 'failure',
     }))
@@ -176,7 +176,7 @@ describe('ReplayEngine', () => {
     engine.recordDecision(makeDecision({ confidence: 0.9 }))
     const session = engine.stopRecording()!
 
-    const result = engine.replay(session.id, (orig) => ({
+    const result = engine.replay(session.id, orig => ({
       ...orig,
       confidence: 0.9 + CONFIDENCE_MATCH_TOLERANCE + 0.01,
     }))
@@ -188,7 +188,7 @@ describe('ReplayEngine', () => {
     engine.recordDecision(makeDecision({ output: { a: 1 } }))
     const session = engine.stopRecording()!
 
-    const result = engine.replay(session.id, (orig) => ({
+    const result = engine.replay(session.id, orig => ({
       ...orig,
       output: { a: 2 },
     }))

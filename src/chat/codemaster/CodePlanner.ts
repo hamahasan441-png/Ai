@@ -41,12 +41,7 @@ export interface PlannedChange {
 }
 
 /** Types of file changes. */
-export type ChangeType =
-  | 'create'
-  | 'modify'
-  | 'delete'
-  | 'rename'
-  | 'move'
+export type ChangeType = 'create' | 'modify' | 'delete' | 'rename' | 'move'
 
 /** Risk assessment levels. */
 export type RiskLevel = 'critical' | 'high' | 'medium' | 'low' | 'minimal'
@@ -110,13 +105,71 @@ interface TaskPattern {
 }
 
 const TASK_PATTERNS: TaskPattern[] = [
-  { intent: 'new-feature', keywords: ['add', 'create', 'implement', 'build', 'new', 'introduce', 'develop', 'scaffold'], weight: 1.0 },
-  { intent: 'refactor', keywords: ['refactor', 'restructure', 'reorganize', 'clean', 'simplify', 'extract', 'rename', 'move', 'split'], weight: 1.0 },
-  { intent: 'fix-bug', keywords: ['fix', 'bug', 'error', 'crash', 'broken', 'issue', 'problem', 'wrong', 'fail'], weight: 1.2 },
-  { intent: 'optimize', keywords: ['optimize', 'performance', 'speed', 'faster', 'slow', 'memory', 'cache', 'efficient', 'reduce'], weight: 1.0 },
-  { intent: 'add-tests', keywords: ['test', 'testing', 'unit', 'integration', 'coverage', 'spec', 'assert', 'mock'], weight: 1.0 },
-  { intent: 'documentation', keywords: ['document', 'docs', 'readme', 'comment', 'jsdoc', 'explain', 'describe', 'api'], weight: 0.8 },
-  { intent: 'security', keywords: ['security', 'vulnerability', 'auth', 'permission', 'sanitize', 'validate', 'encrypt', 'xss', 'injection'], weight: 1.1 },
+  {
+    intent: 'new-feature',
+    keywords: ['add', 'create', 'implement', 'build', 'new', 'introduce', 'develop', 'scaffold'],
+    weight: 1.0,
+  },
+  {
+    intent: 'refactor',
+    keywords: [
+      'refactor',
+      'restructure',
+      'reorganize',
+      'clean',
+      'simplify',
+      'extract',
+      'rename',
+      'move',
+      'split',
+    ],
+    weight: 1.0,
+  },
+  {
+    intent: 'fix-bug',
+    keywords: ['fix', 'bug', 'error', 'crash', 'broken', 'issue', 'problem', 'wrong', 'fail'],
+    weight: 1.2,
+  },
+  {
+    intent: 'optimize',
+    keywords: [
+      'optimize',
+      'performance',
+      'speed',
+      'faster',
+      'slow',
+      'memory',
+      'cache',
+      'efficient',
+      'reduce',
+    ],
+    weight: 1.0,
+  },
+  {
+    intent: 'add-tests',
+    keywords: ['test', 'testing', 'unit', 'integration', 'coverage', 'spec', 'assert', 'mock'],
+    weight: 1.0,
+  },
+  {
+    intent: 'documentation',
+    keywords: ['document', 'docs', 'readme', 'comment', 'jsdoc', 'explain', 'describe', 'api'],
+    weight: 0.8,
+  },
+  {
+    intent: 'security',
+    keywords: [
+      'security',
+      'vulnerability',
+      'auth',
+      'permission',
+      'sanitize',
+      'validate',
+      'encrypt',
+      'xss',
+      'injection',
+    ],
+    weight: 1.1,
+  },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -124,30 +177,44 @@ const TASK_PATTERNS: TaskPattern[] = [
 // ══════════════════════════════════════════════════════════════════════════════
 
 const EXT_TO_LANGUAGE: Record<string, AnalysisLanguage> = {
-  '.ts': 'typescript', '.tsx': 'typescript',
-  '.js': 'javascript', '.jsx': 'javascript', '.mjs': 'javascript',
+  '.ts': 'typescript',
+  '.tsx': 'typescript',
+  '.js': 'javascript',
+  '.jsx': 'javascript',
+  '.mjs': 'javascript',
   '.py': 'python',
   '.rs': 'rust',
   '.go': 'go',
   '.java': 'java',
-  '.c': 'c', '.h': 'c',
-  '.cpp': 'cpp', '.cc': 'cpp', '.cxx': 'cpp', '.hpp': 'cpp',
+  '.c': 'c',
+  '.h': 'c',
+  '.cpp': 'cpp',
+  '.cc': 'cpp',
+  '.cxx': 'cpp',
+  '.hpp': 'cpp',
   '.cs': 'csharp',
   '.swift': 'swift',
-  '.kt': 'kotlin', '.kts': 'kotlin',
+  '.kt': 'kotlin',
+  '.kts': 'kotlin',
   '.rb': 'ruby',
   '.php': 'php',
-  '.html': 'html', '.htm': 'html',
-  '.css': 'css', '.scss': 'css', '.less': 'css',
+  '.html': 'html',
+  '.htm': 'html',
+  '.css': 'css',
+  '.scss': 'css',
+  '.less': 'css',
   '.sql': 'sql',
-  '.sh': 'bash', '.bash': 'bash',
+  '.sh': 'bash',
+  '.bash': 'bash',
   '.ps1': 'powershell',
-  '.r': 'r', '.R': 'r',
+  '.r': 'r',
+  '.R': 'r',
   '.dart': 'dart',
   '.scala': 'scala',
   '.lua': 'lua',
   '.hs': 'haskell',
-  '.ex': 'elixir', '.exs': 'elixir',
+  '.ex': 'elixir',
+  '.exs': 'elixir',
 }
 
 function detectLanguageFromPath(filePath: string): AnalysisLanguage {
@@ -200,7 +267,8 @@ export class CodePlanner {
    * Detect files mentioned in a task description.
    */
   detectMentionedFiles(description: string): string[] {
-    const filePattern = /(?:^|\s)([\w./\\-]+\.(?:ts|tsx|js|jsx|py|rs|go|java|c|cpp|cs|rb|php|html|css|sql|sh|kt|swift|dart|scala|hs|ex|exs|mjs|json|yaml|yml|toml|xml|md))\b/gi
+    const filePattern =
+      /(?:^|\s)([\w./\\-]+\.(?:ts|tsx|js|jsx|py|rs|go|java|c|cpp|cs|rb|php|html|css|sql|sh|kt|swift|dart|scala|hs|ex|exs|mjs|json|yaml|yml|toml|xml|md))\b/gi
     const matches: string[] = []
     let m: RegExpExecArray | null
     while ((m = filePattern.exec(description)) !== null) {
@@ -224,7 +292,10 @@ export class CodePlanner {
       const fileName = file.split('/').pop()?.toLowerCase() ?? ''
 
       // Match test-related tasks to test files
-      if ((lower.includes('test') || lower.includes('spec')) && (fileName.includes('test') || fileName.includes('spec'))) {
+      if (
+        (lower.includes('test') || lower.includes('spec')) &&
+        (fileName.includes('test') || fileName.includes('spec'))
+      ) {
         affected.push(file)
         continue
       }
@@ -251,7 +322,9 @@ export class CodePlanner {
   /**
    * Assess risk level of a planned change.
    */
-  assessRisk(change: Pick<PlannedChange, 'changeType' | 'filePath' | 'linesAdded' | 'linesRemoved'>): RiskLevel {
+  assessRisk(
+    change: Pick<PlannedChange, 'changeType' | 'filePath' | 'linesAdded' | 'linesRemoved'>,
+  ): RiskLevel {
     // Deleting files is always high risk
     if (change.changeType === 'delete') return 'high'
 
@@ -267,7 +340,12 @@ export class CodePlanner {
 
     // Config/infra files are higher risk
     const path = change.filePath.toLowerCase()
-    if (path.includes('config') || path.includes('package.json') || path.includes('tsconfig') || path.includes('.env')) {
+    if (
+      path.includes('config') ||
+      path.includes('package.json') ||
+      path.includes('tsconfig') ||
+      path.includes('.env')
+    ) {
       return 'medium'
     }
 
@@ -565,13 +643,13 @@ export class CodePlanner {
   private generateTitle(description: string, intent: TaskIntent): string {
     const intentLabels: Record<TaskIntent, string> = {
       'new-feature': '✨ New Feature',
-      'refactor': '♻️ Refactor',
+      refactor: '♻️ Refactor',
       'fix-bug': '🐛 Bug Fix',
-      'optimize': '⚡ Optimization',
+      optimize: '⚡ Optimization',
       'add-tests': '🧪 Add Tests',
-      'documentation': '📝 Documentation',
-      'security': '🔒 Security',
-      'general': '📋 Task',
+      documentation: '📝 Documentation',
+      security: '🔒 Security',
+      general: '📋 Task',
     }
 
     const label = intentLabels[intent]
@@ -582,7 +660,11 @@ export class CodePlanner {
   /**
    * Generate a human-readable plan summary.
    */
-  private generateSummary(changes: PlannedChange[], intent: TaskIntent, effort: EffortEstimate): string {
+  private generateSummary(
+    changes: PlannedChange[],
+    intent: TaskIntent,
+    effort: EffortEstimate,
+  ): string {
     const creates = changes.filter(c => c.changeType === 'create').length
     const modifies = changes.filter(c => c.changeType === 'modify').length
     const deletes = changes.filter(c => c.changeType === 'delete').length

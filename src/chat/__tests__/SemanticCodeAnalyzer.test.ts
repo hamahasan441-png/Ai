@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  SemanticCodeAnalyzer,
-} from '../SemanticCodeAnalyzer.js'
+import { SemanticCodeAnalyzer } from '../SemanticCodeAnalyzer.js'
 
 describe('SemanticCodeAnalyzer', () => {
   let analyzer: SemanticCodeAnalyzer
@@ -110,7 +108,8 @@ describe('SemanticCodeAnalyzer', () => {
     })
 
     it('should extract methods', () => {
-      const code = 'class A {\n  public getData(): string { return "" }\n  private setData(v: string) {}\n}'
+      const code =
+        'class A {\n  public getData(): string { return "" }\n  private setData(v: string) {}\n}'
       const symbols = analyzer.extractSymbols(code)
       const method = symbols.find(s => s.name === 'getData')
       expect(method).toBeDefined()
@@ -310,7 +309,8 @@ describe('SemanticCodeAnalyzer', () => {
 
   describe('measureQuality', () => {
     it('should compute cyclomatic complexity', () => {
-      const code = 'function f(x: number) { if (x > 0) { for (let i = 0; i < x; i++) {} } else if (x < 0) { while (x++) {} } }'
+      const code =
+        'function f(x: number) { if (x > 0) { for (let i = 0; i < x; i++) {} } else if (x < 0) { while (x++) {} } }'
       const quality = analyzer.measureQuality(code)
       expect(quality.cyclomaticComplexity).toBeGreaterThan(3)
     })
@@ -427,10 +427,17 @@ describe('SemanticCodeAnalyzer', () => {
 
   describe('suggestImprovements', () => {
     it('should suggest reducing complexity for complex code', () => {
-      const lines = Array.from({ length: 20 }, (_, i) => `if (x${i}) { for (let i = 0; i < 10; i++) {} }`).join('\n')
+      const lines = Array.from(
+        { length: 20 },
+        (_, i) => `if (x${i}) { for (let i = 0; i < 10; i++) {} }`,
+      ).join('\n')
       const suggestions = analyzer.suggestImprovements(lines)
       expect(suggestions.length).toBeGreaterThan(0)
-      expect(suggestions.some(s => s.toLowerCase().includes('complexity') || s.toLowerCase().includes('maintain'))).toBe(true)
+      expect(
+        suggestions.some(
+          s => s.toLowerCase().includes('complexity') || s.toLowerCase().includes('maintain'),
+        ),
+      ).toBe(true)
     })
 
     it('should return empty for clean code', () => {

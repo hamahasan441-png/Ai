@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  ConceptMapper,
-} from '../ConceptMapper'
+import { ConceptMapper } from '../ConceptMapper'
 
 // ── Constructor Tests ──
 
@@ -392,9 +390,7 @@ describe('ConceptMapper spreadActivation', () => {
     const result = mapper.spreadActivation(programming.id)
     expect(result.totalActivated).toBeGreaterThan(0)
     expect(result.steps).toBeGreaterThan(0)
-    const startEntry = result.activatedConcepts.find(
-      ac => ac.conceptId === programming.id,
-    )
+    const startEntry = result.activatedConcepts.find(ac => ac.conceptId === programming.id)
     expect(startEntry).toBeDefined()
     expect(startEntry!.activation).toBe(1)
   })
@@ -418,9 +414,7 @@ describe('ConceptMapper spreadActivation', () => {
   it('respects custom initial energy', () => {
     const ds = mapper.findConcept('Data Structure')!
     const result = mapper.spreadActivation(ds.id, 2.0)
-    const startEntry = result.activatedConcepts.find(
-      ac => ac.conceptId === ds.id,
-    )
+    const startEntry = result.activatedConcepts.find(ac => ac.conceptId === ds.id)
     expect(startEntry).toBeDefined()
     expect(startEntry!.activation).toBe(2)
   })
@@ -461,9 +455,7 @@ describe('ConceptMapper infer', () => {
   it('includes sibling similarity inferences for is_a siblings', () => {
     const array = mapper.findConcept('Array')!
     const inferences = mapper.infer(array.id)
-    const siblingRules = inferences.filter(
-      inf => inf.ruleApplied === 'sibling_similarity',
-    )
+    const siblingRules = inferences.filter(inf => inf.ruleApplied === 'sibling_similarity')
     expect(siblingRules.length).toBeGreaterThan(0)
   })
 })

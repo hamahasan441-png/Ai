@@ -1,12 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  CollaborationEngine,
-  DEFAULT_COLLABORATION_CONFIG,
-} from '../CollaborationEngine'
-import type {
-  AgentDescriptor,
-  AgentResponse,
-} from '../CollaborationEngine'
+import { CollaborationEngine, DEFAULT_COLLABORATION_CONFIG } from '../CollaborationEngine'
+import type { AgentDescriptor, AgentResponse } from '../CollaborationEngine'
 
 describe('CollaborationEngine', () => {
   let engine: CollaborationEngine
@@ -90,7 +84,14 @@ describe('CollaborationEngine', () => {
     })
 
     it('supports all agent roles', () => {
-      const roles = ['analyzer', 'generator', 'critic', 'verifier', 'synthesizer', 'specialist'] as const
+      const roles = [
+        'analyzer',
+        'generator',
+        'critic',
+        'verifier',
+        'synthesizer',
+        'specialist',
+      ] as const
       for (const role of roles) {
         engine.registerAgent(makeAgent({ id: `r_${role}`, role }))
       }
@@ -104,7 +105,10 @@ describe('CollaborationEngine', () => {
 
   describe('task management', () => {
     it('creates a collaboration task', () => {
-      const task = engine.createTask('Analyze code for vulnerabilities', ['security', 'code_analysis'])
+      const task = engine.createTask('Analyze code for vulnerabilities', [
+        'security',
+        'code_analysis',
+      ])
       expect(task.id).toBeTruthy()
       expect(task.status).toBe('pending')
     })
@@ -197,12 +201,22 @@ describe('CollaborationEngine', () => {
       const task = engine.createTask('Analyze', ['analysis'])
 
       engine.submitResponse({
-        agentId: 'a1', taskId: task.id, content: 'Found SQL injection vulnerability',
-        confidence: 0.9, reasoning: 'Pattern match', timestamp: Date.now(), metadata: {},
+        agentId: 'a1',
+        taskId: task.id,
+        content: 'Found SQL injection vulnerability',
+        confidence: 0.9,
+        reasoning: 'Pattern match',
+        timestamp: Date.now(),
+        metadata: {},
       })
       engine.submitResponse({
-        agentId: 'a2', taskId: task.id, content: 'Found SQL injection vulnerability in the code',
-        confidence: 0.85, reasoning: 'Code review', timestamp: Date.now(), metadata: {},
+        agentId: 'a2',
+        taskId: task.id,
+        content: 'Found SQL injection vulnerability in the code',
+        confidence: 0.85,
+        reasoning: 'Code review',
+        timestamp: Date.now(),
+        metadata: {},
       })
 
       const result = engine.synthesize(task.id)
@@ -223,8 +237,13 @@ describe('CollaborationEngine', () => {
     it('marks task as completed after synthesis', () => {
       const task = engine.createTask('Test', ['cap'])
       engine.submitResponse({
-        agentId: 'a1', taskId: task.id, content: 'Result',
-        confidence: 0.9, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a1',
+        taskId: task.id,
+        content: 'Result',
+        confidence: 0.9,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
       engine.synthesize(task.id)
       expect(engine.getTask(task.id)!.status).toBe('completed')
@@ -233,8 +252,13 @@ describe('CollaborationEngine', () => {
     it('uses best confidence for single response', () => {
       const task = engine.createTask('Test', ['cap'], { consensusRequired: false })
       engine.submitResponse({
-        agentId: 'a1', taskId: task.id, content: 'Solo result',
-        confidence: 0.95, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a1',
+        taskId: task.id,
+        content: 'Solo result',
+        confidence: 0.95,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
       const result = engine.synthesize(task.id)
       expect(result!.confidence).toBe(0.95)
@@ -246,12 +270,22 @@ describe('CollaborationEngine', () => {
       const task = engine.createTask('Check code quality', ['analysis'])
 
       engine.submitResponse({
-        agentId: 'a1', taskId: task.id, content: 'The code quality is excellent and meets all standards',
-        confidence: 0.9, reasoning: 'R1', timestamp: Date.now(), metadata: {},
+        agentId: 'a1',
+        taskId: task.id,
+        content: 'The code quality is excellent and meets all standards',
+        confidence: 0.9,
+        reasoning: 'R1',
+        timestamp: Date.now(),
+        metadata: {},
       })
       engine.submitResponse({
-        agentId: 'a2', taskId: task.id, content: 'The code quality is not excellent and fails all standards',
-        confidence: 0.7, reasoning: 'R2', timestamp: Date.now(), metadata: {},
+        agentId: 'a2',
+        taskId: task.id,
+        content: 'The code quality is not excellent and fails all standards',
+        confidence: 0.7,
+        reasoning: 'R2',
+        timestamp: Date.now(),
+        metadata: {},
       })
 
       const result = engine.synthesize(task.id)
@@ -261,12 +295,22 @@ describe('CollaborationEngine', () => {
     it('computes consensus level', () => {
       const task = engine.createTask('Check', ['cap'])
       engine.submitResponse({
-        agentId: 'a1', taskId: task.id, content: 'Same result',
-        confidence: 0.9, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a1',
+        taskId: task.id,
+        content: 'Same result',
+        confidence: 0.9,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
       engine.submitResponse({
-        agentId: 'a2', taskId: task.id, content: 'Same result',
-        confidence: 0.85, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a2',
+        taskId: task.id,
+        content: 'Same result',
+        confidence: 0.85,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
       const result = engine.synthesize(task.id)
       expect(result!.consensusLevel).toBeGreaterThan(0)
@@ -391,12 +435,22 @@ describe('CollaborationEngine', () => {
 
       const task = byConfidence.createTask('Check', ['cap'])
       byConfidence.submitResponse({
-        agentId: 'a1', taskId: task.id, content: 'The system is working correctly and passes all checks',
-        confidence: 0.9, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a1',
+        taskId: task.id,
+        content: 'The system is working correctly and passes all checks',
+        confidence: 0.9,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
       byConfidence.submitResponse({
-        agentId: 'a2', taskId: task.id, content: 'The system is not working correctly and fails all checks',
-        confidence: 0.5, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a2',
+        taskId: task.id,
+        content: 'The system is not working correctly and fails all checks',
+        confidence: 0.5,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
 
       const result = byConfidence.synthesize(task.id)
@@ -410,12 +464,22 @@ describe('CollaborationEngine', () => {
 
       const task = byAuth.createTask('Check', ['cap'])
       byAuth.submitResponse({
-        agentId: 'a1', taskId: task.id, content: 'Verified: the code works fine and has no bugs',
-        confidence: 0.8, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a1',
+        taskId: task.id,
+        content: 'Verified: the code works fine and has no bugs',
+        confidence: 0.8,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
       byAuth.submitResponse({
-        agentId: 'a2', taskId: task.id, content: 'Generated: the code does not work fine and has many bugs',
-        confidence: 0.9, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a2',
+        taskId: task.id,
+        content: 'Generated: the code does not work fine and has many bugs',
+        confidence: 0.9,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
 
       const result = byAuth.synthesize(task.id)
@@ -426,12 +490,22 @@ describe('CollaborationEngine', () => {
       const byVote = new CollaborationEngine({ conflictResolutionStrategy: 'voting' })
       const task = byVote.createTask('Check', ['cap'])
       byVote.submitResponse({
-        agentId: 'a1', taskId: task.id, content: 'The approach is correct and efficient',
-        confidence: 0.8, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a1',
+        taskId: task.id,
+        content: 'The approach is correct and efficient',
+        confidence: 0.8,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
       byVote.submitResponse({
-        agentId: 'a2', taskId: task.id, content: 'The approach is not correct and inefficient',
-        confidence: 0.7, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a2',
+        taskId: task.id,
+        content: 'The approach is not correct and inefficient',
+        confidence: 0.7,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
 
       const result = byVote.synthesize(task.id)
@@ -457,8 +531,13 @@ describe('CollaborationEngine', () => {
     it('tracks completed tasks', () => {
       const task = engine.createTask('T', ['c'], { consensusRequired: false })
       engine.submitResponse({
-        agentId: 'a1', taskId: task.id, content: 'Done',
-        confidence: 0.9, reasoning: 'R', timestamp: Date.now(), metadata: {},
+        agentId: 'a1',
+        taskId: task.id,
+        content: 'Done',
+        confidence: 0.9,
+        reasoning: 'R',
+        timestamp: Date.now(),
+        metadata: {},
       })
       engine.synthesize(task.id)
       expect(engine.getStats().totalTasksCompleted).toBe(1)

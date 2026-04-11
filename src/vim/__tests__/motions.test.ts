@@ -152,21 +152,21 @@ describe('resolveMotion', () => {
 })
 
 describe('isInclusiveMotion', () => {
-  it.each(['e', 'E', '$'])('returns true for %s', (key) => {
+  it.each(['e', 'E', '$'])('returns true for %s', key => {
     expect(isInclusiveMotion(key)).toBe(true)
   })
 
-  it.each(['h', 'l', 'w', 'b', 'j', 'k', '0', '^'])('returns false for %s', (key) => {
+  it.each(['h', 'l', 'w', 'b', 'j', 'k', '0', '^'])('returns false for %s', key => {
     expect(isInclusiveMotion(key)).toBe(false)
   })
 })
 
 describe('isLinewiseMotion', () => {
-  it.each(['j', 'k', 'G', 'gg'])('returns true for %s', (key) => {
+  it.each(['j', 'k', 'G', 'gg'])('returns true for %s', key => {
     expect(isLinewiseMotion(key)).toBe(true)
   })
 
-  it.each(['h', 'l', 'w', 'e', '$', '0', '^', 'b'])('returns false for %s', (key) => {
+  it.each(['h', 'l', 'w', 'e', '$', '0', '^', 'b'])('returns false for %s', key => {
     expect(isLinewiseMotion(key)).toBe(false)
   })
 

@@ -4,11 +4,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  BrainEvalHarness,
-  GOLDEN_CASES,
-  DEFAULT_EVAL_CONFIG,
-} from '../BrainEvalHarness.js'
+import { BrainEvalHarness, GOLDEN_CASES, DEFAULT_EVAL_CONFIG } from '../BrainEvalHarness.js'
 import type { EvalCase, EvalTarget } from '../BrainEvalHarness.js'
 
 // ── Mock Brain ──
@@ -21,7 +17,7 @@ class MockBrain implements EvalTarget {
   }
 
   async chat(input: string): Promise<{ text: string; durationMs: number }> {
-    const text = this.responses.get(input) ?? 'I don\'t know.'
+    const text = this.responses.get(input) ?? "I don't know."
     return { text, durationMs: 5 }
   }
 }
@@ -186,7 +182,9 @@ describe('BrainEvalHarness', () => {
 
     it('handles brain errors gracefully', async () => {
       const failBrain: EvalTarget = {
-        async chat() { throw new Error('Brain exploded') },
+        async chat() {
+          throw new Error('Brain exploded')
+        },
       }
       const evalCase: EvalCase = {
         id: 'fail-1',
@@ -241,9 +239,30 @@ describe('BrainEvalHarness', () => {
   describe('runCategory', () => {
     it('runs only the specified category', async () => {
       const mixedHarness = new BrainEvalHarness([
-        { id: 'cat-1', category: 'math', input: 'Q1', expectedKeywords: ['1'], forbiddenKeywords: [], difficulty: 'easy' },
-        { id: 'cat-2', category: 'coding', input: 'Q2', expectedKeywords: ['2'], forbiddenKeywords: [], difficulty: 'easy' },
-        { id: 'cat-3', category: 'math', input: 'Q3', expectedKeywords: ['3'], forbiddenKeywords: [], difficulty: 'easy' },
+        {
+          id: 'cat-1',
+          category: 'math',
+          input: 'Q1',
+          expectedKeywords: ['1'],
+          forbiddenKeywords: [],
+          difficulty: 'easy',
+        },
+        {
+          id: 'cat-2',
+          category: 'coding',
+          input: 'Q2',
+          expectedKeywords: ['2'],
+          forbiddenKeywords: [],
+          difficulty: 'easy',
+        },
+        {
+          id: 'cat-3',
+          category: 'math',
+          input: 'Q3',
+          expectedKeywords: ['3'],
+          forbiddenKeywords: [],
+          difficulty: 'easy',
+        },
       ])
 
       const report = await mixedHarness.runCategory(brain, 'math')
@@ -256,7 +275,14 @@ describe('BrainEvalHarness', () => {
   describe('regression detection', () => {
     it('detects regressions compared to baseline', async () => {
       const cases: EvalCase[] = [
-        { id: 'reg-1', category: 'math', input: 'Q', expectedKeywords: ['answer'], forbiddenKeywords: [], difficulty: 'easy' },
+        {
+          id: 'reg-1',
+          category: 'math',
+          input: 'Q',
+          expectedKeywords: ['answer'],
+          forbiddenKeywords: [],
+          difficulty: 'easy',
+        },
       ]
       const regHarness = new BrainEvalHarness(cases)
 
@@ -302,7 +328,14 @@ describe('BrainEvalHarness', () => {
   describe('report structure', () => {
     it('includes all required fields', async () => {
       const singleHarness = new BrainEvalHarness([
-        { id: 'struct-1', category: 'math', input: 'Q', expectedKeywords: ['a'], forbiddenKeywords: [], difficulty: 'easy' },
+        {
+          id: 'struct-1',
+          category: 'math',
+          input: 'Q',
+          expectedKeywords: ['a'],
+          forbiddenKeywords: [],
+          difficulty: 'easy',
+        },
       ])
       brain.setResponse('Q', 'a')
       const report = await singleHarness.runAll(brain)

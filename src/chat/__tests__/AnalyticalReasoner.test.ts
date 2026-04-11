@@ -118,7 +118,9 @@ describe('AnalyticalReasoner', () => {
     it('should create PEST analysis', () => {
       const result = engine.pest('Tech Industry', {
         political: [{ description: 'Data privacy laws', impact: 'negative', significance: 0.8 }],
-        economic: [{ description: 'Digital economy growth', impact: 'positive', significance: 0.9 }],
+        economic: [
+          { description: 'Digital economy growth', impact: 'positive', significance: 0.9 },
+        ],
         social: [{ description: 'Remote work trend', impact: 'positive', significance: 0.7 }],
         technological: [{ description: 'AI advancement', impact: 'positive', significance: 0.95 }],
       })
@@ -185,12 +187,16 @@ describe('AnalyticalReasoner', () => {
     it('should evaluate options', () => {
       const result = engine.decisionMatrix(
         'Best framework?',
-        [{ name: 'performance', weight: 0.4 }, { name: 'ease', weight: 0.3 }, { name: 'ecosystem', weight: 0.3 }],
+        [
+          { name: 'performance', weight: 0.4 },
+          { name: 'ease', weight: 0.3 },
+          { name: 'ecosystem', weight: 0.3 },
+        ],
         [
           { name: 'React', scores: { performance: 8, ease: 7, ecosystem: 9 } },
           { name: 'Vue', scores: { performance: 7, ease: 9, ecosystem: 7 } },
           { name: 'Svelte', scores: { performance: 9, ease: 8, ecosystem: 5 } },
-        ]
+        ],
       )
       expect(result.framework).toBe('decision_matrix')
       expect(result.winner).toBeDefined()
@@ -205,7 +211,7 @@ describe('AnalyticalReasoner', () => {
         [
           { name: 'A', scores: { quality: 10 } },
           { name: 'B', scores: { quality: 5 } },
-        ]
+        ],
       )
       expect(result.winner).toBe('A')
     })
@@ -215,8 +221,14 @@ describe('AnalyticalReasoner', () => {
     it('should compute positive ROI', () => {
       const result = engine.costBenefit(
         'Upgrade servers',
-        [{ description: 'Hardware', value: 10000 }, { description: 'Labor', value: 5000 }],
-        [{ description: 'Performance gain', value: 25000 }, { description: 'Reduced downtime', value: 5000 }]
+        [
+          { description: 'Hardware', value: 10000 },
+          { description: 'Labor', value: 5000 },
+        ],
+        [
+          { description: 'Performance gain', value: 25000 },
+          { description: 'Reduced downtime', value: 5000 },
+        ],
       )
       expect(result.framework).toBe('cost_benefit')
       expect(result.roi).toBeGreaterThan(0)
@@ -228,7 +240,7 @@ describe('AnalyticalReasoner', () => {
       const result = engine.costBenefit(
         'Expensive change',
         [{ description: 'Cost', value: 100000 }],
-        [{ description: 'Minor benefit', value: 5000 }]
+        [{ description: 'Minor benefit', value: 5000 }],
       )
       expect(result.roi).toBeLessThan(0)
       expect(result.recommendation).toContain('Not recommended')
@@ -238,7 +250,7 @@ describe('AnalyticalReasoner', () => {
       const result = engine.costBenefit(
         'Test',
         [{ description: 'Cost', value: 1000, confidence: 0.5 }],
-        [{ description: 'Benefit', value: 1000, confidence: 1.0 }]
+        [{ description: 'Benefit', value: 1000, confidence: 1.0 }],
       )
       expect(result.totalBenefit).toBeGreaterThan(result.totalCost)
     })
@@ -258,7 +270,9 @@ describe('AnalyticalReasoner', () => {
     })
 
     it('should recommend pest for macro factors', () => {
-      expect(engine.recommendFramework('How do political and economic factors affect us?')).toBe('pest')
+      expect(engine.recommendFramework('How do political and economic factors affect us?')).toBe(
+        'pest',
+      )
     })
 
     it('should recommend porter for competitive analysis', () => {
@@ -266,11 +280,15 @@ describe('AnalyticalReasoner', () => {
     })
 
     it('should recommend decision_matrix for comparisons', () => {
-      expect(engine.recommendFramework('How do we compare these options and select the best?')).toBe('decision_matrix')
+      expect(
+        engine.recommendFramework('How do we compare these options and select the best?'),
+      ).toBe('decision_matrix')
     })
 
     it('should recommend cost_benefit for investment decisions', () => {
-      expect(engine.recommendFramework('Is this investment worth it? What is the ROI?')).toBe('cost_benefit')
+      expect(engine.recommendFramework('Is this investment worth it? What is the ROI?')).toBe(
+        'cost_benefit',
+      )
     })
   })
 

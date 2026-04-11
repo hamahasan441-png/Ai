@@ -6,10 +6,7 @@ import type { AggregatedHookResult } from '../hooks.js'
 import type { HookCommand } from '../settings/types.js'
 import { isHookEqual } from './hooksSettings.js'
 
-type OnHookSuccess = (
-  hook: HookCommand | FunctionHook,
-  result: AggregatedHookResult,
-) => void
+type OnHookSuccess = (hook: HookCommand | FunctionHook, result: AggregatedHookResult) => void
 
 /** Function hook callback - returns true if check passes, false to block */
 export type FunctionHookCallback = (
@@ -74,15 +71,7 @@ export function addSessionHook(
   onHookSuccess?: OnHookSuccess,
   skillRoot?: string,
 ): void {
-  addHookToSession(
-    setAppState,
-    sessionId,
-    event,
-    matcher,
-    hook,
-    onHookSuccess,
-    skillRoot,
-  )
+  addHookToSession(setAppState, sessionId, event, matcher, hook, onHookSuccess, skillRoot)
 }
 
 /**
@@ -139,26 +128,20 @@ export function removeFunctionHook(
           return h.hook.id !== hookId
         })
 
-        return updatedHooks.length > 0
-          ? { ...matcher, hooks: updatedHooks }
-          : null
+        return updatedHooks.length > 0 ? { ...matcher, hooks: updatedHooks } : null
       })
       .filter((m): m is SessionHookMatcher => m !== null)
 
     const newHooks =
       updatedMatchers.length > 0
         ? { ...store.hooks, [event]: updatedMatchers }
-        : Object.fromEntries(
-            Object.entries(store.hooks).filter(([e]) => e !== event),
-          )
+        : Object.fromEntries(Object.entries(store.hooks).filter(([e]) => e !== event))
 
     prev.sessionHooks.set(sessionId, { hooks: newHooks })
     return prev
   })
 
-  logForDebugging(
-    `Removed function hook ${hookId} for event ${event} in session ${sessionId}`,
-  )
+  logForDebugging(`Removed function hook ${hookId} for event ${event} in session ${sessionId}`)
 }
 
 /**
@@ -210,9 +193,7 @@ function addHookToSession(
     return prev
   })
 
-  logForDebugging(
-    `Added session hook for event ${event} in session ${sessionId}`,
-  )
+  logForDebugging(`Added session hook for event ${event} in session ${sessionId}`)
 }
 
 /**
@@ -239,20 +220,14 @@ export function removeSessionHook(
     // Remove the hook from all matchers
     const updatedMatchers = eventMatchers
       .map(matcher => {
-        const updatedHooks = matcher.hooks.filter(
-          h => !isHookEqual(h.hook, hook),
-        )
+        const updatedHooks = matcher.hooks.filter(h => !isHookEqual(h.hook, hook))
 
-        return updatedHooks.length > 0
-          ? { ...matcher, hooks: updatedHooks }
-          : null
+        return updatedHooks.length > 0 ? { ...matcher, hooks: updatedHooks } : null
       })
       .filter((m): m is SessionHookMatcher => m !== null)
 
     const newHooks =
-      updatedMatchers.length > 0
-        ? { ...store.hooks, [event]: updatedMatchers }
-        : { ...store.hooks }
+      updatedMatchers.length > 0 ? { ...store.hooks, [event]: updatedMatchers } : { ...store.hooks }
 
     if (updatedMatchers.length === 0) {
       delete newHooks[event]
@@ -262,9 +237,7 @@ export function removeSessionHook(
     return prev
   })
 
-  logForDebugging(
-    `Removed session hook for event ${event} in session ${sessionId}`,
-  )
+  logForDebugging(`Removed session hook for event ${event} in session ${sessionId}`)
 }
 
 // Extended hook matcher that includes optional skillRoot for skill-scoped hooks
@@ -279,16 +252,12 @@ export type SessionDerivedHookMatcher = {
  * @param sessionMatchers The session hook matchers to convert
  * @returns Regular hook matchers (with optional skillRoot preserved)
  */
-function convertToHookMatchers(
-  sessionMatchers: SessionHookMatcher[],
-): SessionDerivedHookMatcher[] {
+function convertToHookMatchers(sessionMatchers: SessionHookMatcher[]): SessionDerivedHookMatcher[] {
   return sessionMatchers.map(sm => ({
     matcher: sm.matcher,
     skillRoot: sm.skillRoot,
     // Filter out function hooks - they can't be persisted to HookMatcher format
-    hooks: sm.hooks
-      .map(h => h.hook)
-      .filter((h): h is HookCommand => h.type !== 'function'),
+    hooks: sm.hooks.map(h => h.hook).filter((h): h is HookCommand => h.type !== 'function'),
   }))
 }
 
@@ -354,15 +323,11 @@ export function getSessionFunctionHooks(
 
   const result = new Map<HookEvent, FunctionHookMatcher[]>()
 
-  const extractFunctionHooks = (
-    sessionMatchers: SessionHookMatcher[],
-  ): FunctionHookMatcher[] => {
+  const extractFunctionHooks = (sessionMatchers: SessionHookMatcher[]): FunctionHookMatcher[] => {
     return sessionMatchers
       .map(sm => ({
         matcher: sm.matcher,
-        hooks: sm.hooks
-          .map(h => h.hook)
-          .filter((h): h is FunctionHook => h.type === 'function'),
+        hooks: sm.hooks.map(h => h.hook).filter((h): h is FunctionHook => h.type === 'function'),
       }))
       .filter(m => m.hooks.length > 0)
   }

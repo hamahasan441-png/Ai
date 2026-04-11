@@ -18,12 +18,33 @@ export type Severity = 'critical' | 'high' | 'medium' | 'low' | 'info'
 
 /** Supported analysis languages (extends ProgrammingLanguage from AiChat.ts). */
 export type AnalysisLanguage =
-  | 'typescript' | 'javascript' | 'python' | 'rust' | 'go'
-  | 'java' | 'c' | 'cpp' | 'csharp' | 'swift'
-  | 'kotlin' | 'ruby' | 'php' | 'html' | 'css'
-  | 'sql' | 'bash' | 'powershell' | 'r' | 'dart'
-  | 'scala' | 'lua' | 'haskell' | 'elixir'
-  | 'mql4' | 'mql5' | 'pinescript'
+  | 'typescript'
+  | 'javascript'
+  | 'python'
+  | 'rust'
+  | 'go'
+  | 'java'
+  | 'c'
+  | 'cpp'
+  | 'csharp'
+  | 'swift'
+  | 'kotlin'
+  | 'ruby'
+  | 'php'
+  | 'html'
+  | 'css'
+  | 'sql'
+  | 'bash'
+  | 'powershell'
+  | 'r'
+  | 'dart'
+  | 'scala'
+  | 'lua'
+  | 'haskell'
+  | 'elixir'
+  | 'mql4'
+  | 'mql5'
+  | 'pinescript'
   | 'unknown'
 
 /** Complexity metrics for code analysis. */
@@ -128,8 +149,13 @@ export interface CodeAnalysis {
 
 /** Categories for code review findings. */
 export type ReviewCategory =
-  | 'bug' | 'security' | 'performance' | 'style'
-  | 'architecture' | 'best-practice' | 'documentation'
+  | 'bug'
+  | 'security'
+  | 'performance'
+  | 'style'
+  | 'architecture'
+  | 'best-practice'
+  | 'documentation'
 
 /** A single finding from a code review. */
 export interface ReviewFinding {
@@ -220,8 +246,14 @@ export interface FixResult {
 
 /** Classification of user intent. */
 export type TaskIntent =
-  | 'new-feature' | 'refactor' | 'fix-bug' | 'optimize'
-  | 'add-tests' | 'documentation' | 'security' | 'general'
+  | 'new-feature'
+  | 'refactor'
+  | 'fix-bug'
+  | 'optimize'
+  | 'add-tests'
+  | 'documentation'
+  | 'security'
+  | 'general'
 
 /** Status of a task step. */
 export type StepStatus = 'pending' | 'in-progress' | 'completed' | 'failed' | 'skipped'

@@ -69,7 +69,10 @@ describe('AutoLearning — Enhanced Self-Learning', () => {
       brain.learn('What is Rust?', 'Rust is a memory-safe systems language.')
       // Then correct it
       await brain.chat('What is Rust?')
-      brain.feedback(false, 'Rust is a memory-safe systems programming language with no garbage collector.')
+      brain.feedback(
+        false,
+        'Rust is a memory-safe systems programming language with no garbage collector.',
+      )
       // The pattern count should reflect the correction was learned
       const stats = brain.getStats()
       expect(stats.totalLearnings).toBeGreaterThanOrEqual(2) // original + correction
@@ -105,7 +108,11 @@ describe('AutoLearning — Enhanced Self-Learning', () => {
     it('triggers generalization after 5 patterns in same category', async () => {
       // Learn 5 patterns in the same category
       for (let i = 0; i < 5; i++) {
-        brain.learn(`question about sorting algorithm variant ${i}`, `answer about sorting ${i}`, 'algorithms')
+        brain.learn(
+          `question about sorting algorithm variant ${i}`,
+          `answer about sorting ${i}`,
+          'algorithms',
+        )
       }
       // Trigger a chat that includes auto-learning flow
       await brain.chat('Tell me about sorting algorithms and quicksort implementation')

@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  SchemaBuilder,
-  OpenAPIBuilder,
-  AIOpenAPISpec,
-  createAIOpenAPISpec,
-} from '../openapi.js'
+import { SchemaBuilder, OpenAPIBuilder, AIOpenAPISpec, createAIOpenAPISpec } from '../openapi.js'
 import type { OpenAPISpec, SchemaObject } from '../openapi.js'
 
 // ── SchemaBuilder ──
@@ -47,12 +42,18 @@ describe('SchemaBuilder', () => {
   })
 
   it('required() marks fields as required', () => {
-    const result = sb.object({ a: { type: 'string' } }).required(['a']).build()
+    const result = sb
+      .object({ a: { type: 'string' } })
+      .required(['a'])
+      .build()
     expect(result.required).toEqual(['a'])
   })
 
   it('required() without arguments does not set required', () => {
-    const result = sb.object({ a: { type: 'string' } }).required().build()
+    const result = sb
+      .object({ a: { type: 'string' } })
+      .required()
+      .build()
     expect(result.required).toBeUndefined()
   })
 
@@ -222,7 +223,10 @@ describe('OpenAPIBuilder', () => {
   it('addPath supports multiple methods on the same path', () => {
     builder
       .addPath('/items', 'get', { summary: 'List', responses: { '200': { description: 'OK' } } })
-      .addPath('/items', 'post', { summary: 'Create', responses: { '201': { description: 'Created' } } })
+      .addPath('/items', 'post', {
+        summary: 'Create',
+        responses: { '201': { description: 'Created' } },
+      })
     const spec = builder.build()
     expect(spec.paths['/items'].get).toBeDefined()
     expect(spec.paths['/items'].post).toBeDefined()
@@ -375,7 +379,7 @@ describe('AIOpenAPISpec', () => {
   // ── Tags ──
 
   it('defines expected tags', () => {
-    const tagNames = spec.tags!.map((t) => t.name)
+    const tagNames = spec.tags!.map(t => t.name)
     expect(tagNames).toContain('Chat')
     expect(tagNames).toContain('Embeddings')
     expect(tagNames).toContain('Code')
@@ -541,9 +545,15 @@ describe('AIOpenAPISpec', () => {
 
   it('all POST endpoints have a requestBody', () => {
     const postPaths = [
-      '/api/chat', '/api/chat/stream', '/api/embeddings',
-      '/api/code/analyze', '/api/code/review', '/api/code/fix', '/api/code/generate',
-      '/api/tools/{toolName}/execute', '/api/workflow/start',
+      '/api/chat',
+      '/api/chat/stream',
+      '/api/embeddings',
+      '/api/code/analyze',
+      '/api/code/review',
+      '/api/code/fix',
+      '/api/code/generate',
+      '/api/tools/{toolName}/execute',
+      '/api/workflow/start',
     ]
     for (const path of postPaths) {
       expect(spec.paths[path].post!.requestBody).toBeDefined()
@@ -578,14 +588,24 @@ describe('AIOpenAPISpec', () => {
   })
 
   it('code endpoints share the same tag', () => {
-    const codePaths = ['/api/code/analyze', '/api/code/review', '/api/code/fix', '/api/code/generate']
+    const codePaths = [
+      '/api/code/analyze',
+      '/api/code/review',
+      '/api/code/fix',
+      '/api/code/generate',
+    ]
     for (const p of codePaths) {
       expect(spec.paths[p].post!.tags).toContain('Code')
     }
   })
 
   it('code endpoints have 400 and 401 error responses', () => {
-    const codePaths = ['/api/code/analyze', '/api/code/review', '/api/code/fix', '/api/code/generate']
+    const codePaths = [
+      '/api/code/analyze',
+      '/api/code/review',
+      '/api/code/fix',
+      '/api/code/generate',
+    ]
     for (const p of codePaths) {
       const responses = spec.paths[p].post!.responses
       expect(responses['400']).toBeDefined()

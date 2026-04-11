@@ -165,7 +165,9 @@ export class Histogram {
   constructor(name: string, description: string, bucketBoundaries?: number[]) {
     this.name = name
     this.description = description
-    this._bucketBoundaries = bucketBoundaries ?? [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+    this._bucketBoundaries = bucketBoundaries ?? [
+      5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000,
+    ]
   }
 
   /** Record an observation. */
@@ -323,7 +325,11 @@ function keyToLabels(key: string): Labels {
   return labels
 }
 
-function computeHistogramSummary(labels: Labels, observations: number[], boundaries: number[]): MetricValue {
+function computeHistogramSummary(
+  labels: Labels,
+  observations: number[],
+  boundaries: number[],
+): MetricValue {
   const sorted = [...observations].sort((a, b) => a - b)
   const count = sorted.length
   const sum = sorted.reduce((a, b) => a + b, 0)
@@ -338,7 +344,7 @@ function computeHistogramSummary(labels: Labels, observations: number[], boundar
   // Buckets (cumulative)
   const buckets: Record<string, number> = {}
   for (const boundary of boundaries) {
-    buckets[String(boundary)] = sorted.filter((v) => v <= boundary).length
+    buckets[String(boundary)] = sorted.filter(v => v <= boundary).length
   }
   buckets['+Inf'] = count
 

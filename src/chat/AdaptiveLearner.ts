@@ -26,126 +26,126 @@
 /** Configuration for the AdaptiveLearner module. */
 export interface AdaptiveLearnerConfig {
   /** Maximum number of extracted facts to store. */
-  maxFacts: number;
+  maxFacts: number
   /** Maximum number of generalized rules to store. */
-  maxRules: number;
+  maxRules: number
   /** Maximum number of mistake lessons to store. */
-  maxMistakes: number;
+  maxMistakes: number
   /** Enable fact extraction from natural language. */
-  enableFactExtraction: boolean;
+  enableFactExtraction: boolean
   /** Enable concept generalization from examples. */
-  enableGeneralization: boolean;
+  enableGeneralization: boolean
   /** Enable cross-domain transfer learning. */
-  enableTransferLearning: boolean;
+  enableTransferLearning: boolean
   /** Enable learning from mistakes and corrections. */
-  enableMistakeLearning: boolean;
+  enableMistakeLearning: boolean
   /** Minimum number of examples required before generalizing a rule. */
-  generalizationMinExamples: number;
+  generalizationMinExamples: number
   /** Confidence discount factor applied to cross-domain transfers (0–1). */
-  transferConfidenceDiscount: number;
+  transferConfidenceDiscount: number
 }
 
 /** Runtime statistics for the AdaptiveLearner module. */
 export interface AdaptiveLearnerStats {
-  totalFactsExtracted: number;
-  totalRulesGeneralized: number;
-  totalTransfers: number;
-  totalMistakesRecorded: number;
-  totalCalibrations: number;
-  totalFeedbacks: number;
-  factsStored: number;
-  rulesStored: number;
-  mistakesStored: number;
-  conceptsTracked: number;
-  averageConfidence: number;
-  createdAt: string;
-  lastUsedAt: string;
+  totalFactsExtracted: number
+  totalRulesGeneralized: number
+  totalTransfers: number
+  totalMistakesRecorded: number
+  totalCalibrations: number
+  totalFeedbacks: number
+  factsStored: number
+  rulesStored: number
+  mistakesStored: number
+  conceptsTracked: number
+  averageConfidence: number
+  createdAt: string
+  lastUsedAt: string
 }
 
 /** A structured fact extracted from natural language. */
 export interface ExtractedFact {
   /** The subject of the fact (e.g. "React"). */
-  subject: string;
+  subject: string
   /** The relation between subject and object (e.g. "uses"). */
-  relation: string;
+  relation: string
   /** The object of the fact (e.g. "JSX"). */
-  object: string;
+  object: string
   /** Confidence score for the extraction (0–1). */
-  confidence: number;
+  confidence: number
   /** The original source text. */
-  source: string;
+  source: string
   /** Whether the fact is a negation. */
-  negated: boolean;
+  negated: boolean
 }
 
 /** A single training example used for generalization. */
 export interface Example {
   /** The input text or concept. */
-  input: string;
+  input: string
   /** The output or observed result. */
-  output: string;
+  output: string
   /** The domain this example belongs to. */
-  domain: string;
+  domain: string
   /** Tags for categorization and matching. */
-  tags: string[];
+  tags: string[]
 }
 
 /** A generalized rule abstracted from multiple examples. */
 export interface GeneralizedRule {
   /** The generalized pattern description. */
-  pattern: string;
+  pattern: string
   /** Source examples that support this rule. */
-  examples: string[];
+  examples: string[]
   /** Counter-examples that conflict with this rule. */
-  counterExamples: string[];
+  counterExamples: string[]
   /** Confidence in the rule (0–1). */
-  confidence: number;
+  confidence: number
   /** The domain this rule applies to. */
-  domain: string;
+  domain: string
   /** Timestamp when the rule was created. */
-  createdAt: number;
+  createdAt: number
 }
 
 /** Result of a cross-domain knowledge transfer. */
 export interface TransferResult {
   /** The concept being transferred. */
-  concept: string;
+  concept: string
   /** The domain the knowledge originates from. */
-  sourceDomain: string;
+  sourceDomain: string
   /** The domain the knowledge is being applied to. */
-  targetDomain: string;
+  targetDomain: string
   /** The transferred knowledge statement. */
-  transferredKnowledge: string;
+  transferredKnowledge: string
   /** Confidence in the transfer (0–1). */
-  confidence: number;
+  confidence: number
   /** Mappings between source and target domain elements. */
-  mappings: DomainMapping[];
+  mappings: DomainMapping[]
 }
 
 /** A mapping between elements in two domains. */
 export interface DomainMapping {
   /** Element in the source domain. */
-  sourceElement: string;
+  sourceElement: string
   /** Corresponding element in the target domain. */
-  targetElement: string;
+  targetElement: string
   /** Similarity score between the two elements (0–1). */
-  similarity: number;
+  similarity: number
 }
 
 /** A lesson learned from a mistake. */
 export interface MistakeLesson {
   /** The original incorrect prediction. */
-  prediction: string;
+  prediction: string
   /** The correct answer. */
-  actual: string;
+  actual: string
   /** Category of the mistake. */
-  category: MistakeCategory;
+  category: MistakeCategory
   /** Explanation of why the mistake occurred. */
-  reason: string;
+  reason: string
   /** Rule to prevent repeating this mistake. */
-  correctionRule: string;
+  correctionRule: string
   /** Context in which the mistake was made. */
-  context: string;
+  context: string
 }
 
 /** Categories of mistakes the learner can identify. */
@@ -155,61 +155,61 @@ export type MistakeCategory =
   | 'wrong_context'
   | 'overgeneralization'
   | 'undergeneralization'
-  | 'missing_knowledge';
+  | 'missing_knowledge'
 
 /** A record of a single prediction for calibration tracking. */
 export interface PredictionRecord {
   /** The predicted answer or value. */
-  predicted: string;
+  predicted: string
   /** The actual/correct answer or value. */
-  actual: string;
+  actual: string
   /** Confidence assigned to the prediction (0–1). */
-  confidence: number;
+  confidence: number
   /** Domain of the prediction. */
-  domain: string;
+  domain: string
   /** Timestamp of the prediction. */
-  timestamp: number;
+  timestamp: number
 }
 
 /** Report produced by confidence calibration analysis. */
 export interface CalibrationReport {
   /** Brier score measuring prediction accuracy (lower is better, 0–1). */
-  brierScore: number;
+  brierScore: number
   /** Degree of overconfidence (positive means too confident). */
-  overconfidence: number;
+  overconfidence: number
   /** Degree of underconfidence (positive means not confident enough). */
-  underconfidence: number;
+  underconfidence: number
   /** Total number of predictions analyzed. */
-  totalPredictions: number;
+  totalPredictions: number
   /** Accuracy grouped by confidence bins (e.g. "0.8-0.9" → 0.75). */
-  accuracyByConfidenceBin: Map<string, number>;
+  accuracyByConfidenceBin: Map<string, number>
   /** Per-domain calibration adjustment factors. */
-  domainCalibration: Map<string, number>;
+  domainCalibration: Map<string, number>
 }
 
 /** Internal state for serialization/deserialization. */
 interface AdaptiveLearnerState {
-  config: AdaptiveLearnerConfig;
-  stats: AdaptiveLearnerStats;
-  facts: ExtractedFact[];
-  rules: GeneralizedRule[];
-  mistakes: MistakeLesson[];
-  predictions: PredictionRecord[];
-  conceptGraph: Record<string, string[]>;
-  masteredConcepts: string[];
-  domainMappings: Record<string, Record<string, string>>;
-  mistakeFrequency: Record<string, number>;
-  calibrationAdjustments: Record<string, number>;
+  config: AdaptiveLearnerConfig
+  stats: AdaptiveLearnerStats
+  facts: ExtractedFact[]
+  rules: GeneralizedRule[]
+  mistakes: MistakeLesson[]
+  predictions: PredictionRecord[]
+  conceptGraph: Record<string, string[]>
+  masteredConcepts: string[]
+  domainMappings: Record<string, Record<string, string>>
+  mistakeFrequency: Record<string, number>
+  calibrationAdjustments: Record<string, number>
 }
 
 /** Serializable version of CalibrationReport (Maps → plain objects). */
 interface _SerializableCalibrationReport {
-  brierScore: number;
-  overconfidence: number;
-  underconfidence: number;
-  totalPredictions: number;
-  accuracyByConfidenceBin: Record<string, number>;
-  domainCalibration: Record<string, number>;
+  brierScore: number
+  overconfidence: number
+  underconfidence: number
+  totalPredictions: number
+  accuracyByConfidenceBin: Record<string, number>
+  domainCalibration: Record<string, number>
 }
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
@@ -222,11 +222,11 @@ interface _SerializableCalibrationReport {
  */
 interface FactPattern {
   /** Regex to match against input text. */
-  regex: RegExp;
+  regex: RegExp
   /** The relation this pattern captures (e.g. "uses", "is a"). */
-  relation: string;
+  relation: string
   /** Base confidence for matches with this pattern (0–1). */
-  baseConfidence: number;
+  baseConfidence: number
 }
 
 /** All supported fact extraction patterns with their relations. */
@@ -242,7 +242,7 @@ const FACT_PATTERNS: FactPattern[] = [
   { regex: /^(.+?)\s+improves\s+(.+)$/i, relation: 'improves', baseConfidence: 0.8 },
   { regex: /^(.+?)\s+replaces\s+(.+)$/i, relation: 'replaces', baseConfidence: 0.85 },
   { regex: /^(.+?)\s+extends\s+(.+)$/i, relation: 'extends', baseConfidence: 0.85 },
-];
+]
 
 /** Negation patterns that invert the relation. */
 const NEGATION_PATTERNS: FactPattern[] = [
@@ -252,12 +252,16 @@ const NEGATION_PATTERNS: FactPattern[] = [
   { regex: /^(.+?)\s+does\s+not\s+have\s+(.+)$/i, relation: 'has', baseConfidence: 0.78 },
   { regex: /^(.+?)\s+does\s+not\s+enable\s+(.+)$/i, relation: 'enables', baseConfidence: 0.83 },
   { regex: /^(.+?)\s+does\s+not\s+require\s+(.+)$/i, relation: 'requires', baseConfidence: 0.88 },
-  { regex: /^(.+?)\s+is\s+not\s+built\s+with\s+(.+)$/i, relation: 'is built with', baseConfidence: 0.88 },
+  {
+    regex: /^(.+?)\s+is\s+not\s+built\s+with\s+(.+)$/i,
+    relation: 'is built with',
+    baseConfidence: 0.88,
+  },
   { regex: /^(.+?)\s+does\s+not\s+support\s+(.+)$/i, relation: 'supports', baseConfidence: 0.83 },
   { regex: /^(.+?)\s+does\s+not\s+improve\s+(.+)$/i, relation: 'improves', baseConfidence: 0.78 },
   { regex: /^(.+?)\s+does\s+not\s+replace\s+(.+)$/i, relation: 'replaces', baseConfidence: 0.83 },
   { regex: /^(.+?)\s+does\s+not\s+extend\s+(.+)$/i, relation: 'extends', baseConfidence: 0.83 },
-];
+]
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §3  DOMAIN KNOWLEDGE — Built-in domain similarity and concept mappings     ║
@@ -265,78 +269,142 @@ const NEGATION_PATTERNS: FactPattern[] = [
 
 /** Built-in domain similarity scores used for transfer learning. */
 const DOMAIN_SIMILARITY: Record<string, Record<string, number>> = {
-  frontend: { backend: 0.6, mobile: 0.7, desktop: 0.5, devops: 0.3, database: 0.3, testing: 0.5, security: 0.4 },
-  backend: { frontend: 0.6, mobile: 0.4, desktop: 0.4, devops: 0.5, database: 0.7, testing: 0.6, security: 0.5 },
-  mobile: { frontend: 0.7, backend: 0.4, desktop: 0.6, devops: 0.3, database: 0.3, testing: 0.5, security: 0.4 },
-  desktop: { frontend: 0.5, backend: 0.4, mobile: 0.6, devops: 0.3, database: 0.4, testing: 0.5, security: 0.4 },
-  devops: { frontend: 0.3, backend: 0.5, mobile: 0.3, desktop: 0.3, database: 0.4, testing: 0.6, security: 0.6 },
-  database: { frontend: 0.3, backend: 0.7, mobile: 0.3, desktop: 0.4, devops: 0.4, testing: 0.5, security: 0.5 },
-  testing: { frontend: 0.5, backend: 0.6, mobile: 0.5, desktop: 0.5, devops: 0.6, database: 0.5, security: 0.5 },
-  security: { frontend: 0.4, backend: 0.5, mobile: 0.4, desktop: 0.4, devops: 0.6, database: 0.5, testing: 0.5 },
-};
+  frontend: {
+    backend: 0.6,
+    mobile: 0.7,
+    desktop: 0.5,
+    devops: 0.3,
+    database: 0.3,
+    testing: 0.5,
+    security: 0.4,
+  },
+  backend: {
+    frontend: 0.6,
+    mobile: 0.4,
+    desktop: 0.4,
+    devops: 0.5,
+    database: 0.7,
+    testing: 0.6,
+    security: 0.5,
+  },
+  mobile: {
+    frontend: 0.7,
+    backend: 0.4,
+    desktop: 0.6,
+    devops: 0.3,
+    database: 0.3,
+    testing: 0.5,
+    security: 0.4,
+  },
+  desktop: {
+    frontend: 0.5,
+    backend: 0.4,
+    mobile: 0.6,
+    devops: 0.3,
+    database: 0.4,
+    testing: 0.5,
+    security: 0.4,
+  },
+  devops: {
+    frontend: 0.3,
+    backend: 0.5,
+    mobile: 0.3,
+    desktop: 0.3,
+    database: 0.4,
+    testing: 0.6,
+    security: 0.6,
+  },
+  database: {
+    frontend: 0.3,
+    backend: 0.7,
+    mobile: 0.3,
+    desktop: 0.4,
+    devops: 0.4,
+    testing: 0.5,
+    security: 0.5,
+  },
+  testing: {
+    frontend: 0.5,
+    backend: 0.6,
+    mobile: 0.5,
+    desktop: 0.5,
+    devops: 0.6,
+    database: 0.5,
+    security: 0.5,
+  },
+  security: {
+    frontend: 0.4,
+    backend: 0.5,
+    mobile: 0.4,
+    desktop: 0.4,
+    devops: 0.6,
+    database: 0.5,
+    testing: 0.5,
+  },
+}
 
 /** Built-in concept mappings between domains for transfer learning. */
 const DOMAIN_CONCEPT_MAPPINGS: Record<string, Record<string, Record<string, string>>> = {
   frontend: {
     backend: {
-      'component': 'module',
+      component: 'module',
       'state management': 'session management',
-      'routing': 'routing',
-      'rendering': 'response generation',
+      routing: 'routing',
+      rendering: 'response generation',
       'event handling': 'request handling',
       'virtual DOM': 'ORM',
-      'CSS': 'configuration',
-      'props': 'parameters',
+      CSS: 'configuration',
+      props: 'parameters',
     },
     mobile: {
-      'component': 'widget',
+      component: 'widget',
       'state management': 'state management',
-      'routing': 'navigation',
-      'rendering': 'rendering',
-      'CSS': 'styles',
+      routing: 'navigation',
+      rendering: 'rendering',
+      CSS: 'styles',
       'event handling': 'gesture handling',
     },
   },
   backend: {
     frontend: {
-      'module': 'component',
+      module: 'component',
       'session management': 'state management',
-      'routing': 'routing',
+      routing: 'routing',
       'response generation': 'rendering',
       'request handling': 'event handling',
-      'ORM': 'virtual DOM',
-      'middleware': 'higher-order component',
-      'parameters': 'props',
+      ORM: 'virtual DOM',
+      middleware: 'higher-order component',
+      parameters: 'props',
     },
     database: {
       'API endpoint': 'stored procedure',
-      'middleware': 'trigger',
-      'caching': 'indexing',
-      'validation': 'constraint',
-      'authentication': 'access control',
+      middleware: 'trigger',
+      caching: 'indexing',
+      validation: 'constraint',
+      authentication: 'access control',
     },
   },
   testing: {
     frontend: {
       'unit test': 'component test',
       'integration test': 'integration test',
-      'mock': 'mock',
-      'fixture': 'test data',
-      'assertion': 'assertion',
+      mock: 'mock',
+      fixture: 'test data',
+      assertion: 'assertion',
       'test runner': 'test runner',
-      'coverage': 'coverage',
+      coverage: 'coverage',
     },
     backend: {
       'unit test': 'unit test',
       'integration test': 'integration test',
-      'mock': 'mock',
-      'fixture': 'fixture',
-      'assertion': 'assertion',
+      mock: 'mock',
+      fixture: 'fixture',
+      assertion: 'assertion',
       'test runner': 'test runner',
-      'coverage': 'coverage',
+      coverage: 'coverage',
     },
   },
-};
+}
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §4  CURRICULUM — Built-in concept prerequisites and difficulty ratings     ║
@@ -346,115 +414,115 @@ const DOMAIN_CONCEPT_MAPPINGS: Record<string, Record<string, Record<string, stri
 const CONCEPT_PREREQUISITES: Record<string, string[]> = {
   'react hooks': ['react components', 'javascript functions', 'state management'],
   'react components': ['javascript', 'html', 'jsx'],
-  'jsx': ['javascript', 'html'],
+  jsx: ['javascript', 'html'],
   'state management': ['variables', 'data structures'],
-  'redux': ['state management', 'react components', 'functional programming'],
-  'typescript': ['javascript', 'type systems'],
+  redux: ['state management', 'react components', 'functional programming'],
+  typescript: ['javascript', 'type systems'],
   'type systems': ['variables', 'data structures'],
   'async/await': ['promises', 'javascript functions'],
-  'promises': ['callbacks', 'javascript functions'],
-  'callbacks': ['javascript functions'],
+  promises: ['callbacks', 'javascript functions'],
+  callbacks: ['javascript functions'],
   'javascript functions': ['javascript', 'variables'],
   'rest api': ['http', 'json', 'client-server architecture'],
-  'graphql': ['rest api', 'type systems', 'query languages'],
-  'microservices': ['rest api', 'docker', 'distributed systems'],
-  'docker': ['linux', 'networking', 'configuration'],
-  'kubernetes': ['docker', 'networking', 'distributed systems'],
+  graphql: ['rest api', 'type systems', 'query languages'],
+  microservices: ['rest api', 'docker', 'distributed systems'],
+  docker: ['linux', 'networking', 'configuration'],
+  kubernetes: ['docker', 'networking', 'distributed systems'],
   'distributed systems': ['networking', 'data structures', 'algorithms'],
   'machine learning': ['statistics', 'linear algebra', 'python'],
   'deep learning': ['machine learning', 'neural networks', 'calculus'],
   'neural networks': ['machine learning', 'linear algebra'],
   'css grid': ['css', 'layout'],
   'css flexbox': ['css', 'layout'],
-  'css': ['html'],
-  'html': [],
-  'javascript': ['programming basics'],
-  'python': ['programming basics'],
+  css: ['html'],
+  html: [],
+  javascript: ['programming basics'],
+  python: ['programming basics'],
   'programming basics': ['variables', 'control flow', 'data structures'],
-  'variables': [],
+  variables: [],
   'control flow': ['variables'],
   'data structures': ['variables', 'control flow'],
-  'algorithms': ['data structures', 'control flow'],
+  algorithms: ['data structures', 'control flow'],
   'functional programming': ['javascript functions', 'data structures'],
   'object-oriented programming': ['data structures', 'javascript functions'],
   'design patterns': ['object-oriented programming', 'algorithms'],
-  'testing': ['programming basics'],
+  testing: ['programming basics'],
   'unit testing': ['testing', 'javascript functions'],
   'integration testing': ['unit testing', 'rest api'],
   'ci/cd': ['testing', 'docker', 'version control'],
   'version control': ['programming basics'],
-  'sql': ['data structures', 'query languages'],
+  sql: ['data structures', 'query languages'],
   'query languages': ['data structures'],
-  'nosql': ['data structures', 'json'],
-  'json': ['data structures'],
-  'http': ['networking'],
-  'networking': [],
-  'linux': [],
-  'statistics': ['mathematics'],
+  nosql: ['data structures', 'json'],
+  json: ['data structures'],
+  http: ['networking'],
+  networking: [],
+  linux: [],
+  statistics: ['mathematics'],
   'linear algebra': ['mathematics'],
-  'calculus': ['mathematics'],
-  'mathematics': [],
-  'layout': ['html'],
-  'configuration': [],
+  calculus: ['mathematics'],
+  mathematics: [],
+  layout: ['html'],
+  configuration: [],
   'client-server architecture': ['networking'],
-};
+}
 
 /** Built-in concept difficulty ratings (0–1). */
 const CONCEPT_DIFFICULTY: Record<string, number> = {
-  'variables': 0.05,
+  variables: 0.05,
   'control flow': 0.1,
-  'html': 0.1,
-  'css': 0.15,
-  'layout': 0.15,
-  'configuration': 0.1,
-  'networking': 0.15,
-  'linux': 0.2,
-  'json': 0.1,
-  'mathematics': 0.2,
+  html: 0.1,
+  css: 0.15,
+  layout: 0.15,
+  configuration: 0.1,
+  networking: 0.15,
+  linux: 0.2,
+  json: 0.1,
+  mathematics: 0.2,
   'programming basics': 0.15,
   'data structures': 0.25,
-  'javascript': 0.2,
-  'python': 0.2,
+  javascript: 0.2,
+  python: 0.2,
   'javascript functions': 0.25,
-  'callbacks': 0.35,
+  callbacks: 0.35,
   'version control': 0.2,
-  'testing': 0.25,
-  'http': 0.25,
+  testing: 0.25,
+  http: 0.25,
   'query languages': 0.25,
-  'sql': 0.3,
-  'nosql': 0.35,
+  sql: 0.3,
+  nosql: 0.35,
   'type systems': 0.3,
   'css flexbox': 0.3,
   'css grid': 0.35,
-  'jsx': 0.3,
-  'promises': 0.4,
-  'statistics': 0.4,
+  jsx: 0.3,
+  promises: 0.4,
+  statistics: 0.4,
   'linear algebra': 0.45,
-  'calculus': 0.5,
+  calculus: 0.5,
   'react components': 0.35,
   'state management': 0.4,
-  'typescript': 0.4,
+  typescript: 0.4,
   'async/await': 0.45,
   'functional programming': 0.45,
   'object-oriented programming': 0.4,
-  'algorithms': 0.45,
+  algorithms: 0.45,
   'rest api': 0.4,
   'client-server architecture': 0.35,
   'unit testing': 0.35,
   'react hooks': 0.5,
-  'redux': 0.55,
-  'docker': 0.5,
+  redux: 0.55,
+  docker: 0.5,
   'design patterns': 0.55,
   'integration testing': 0.45,
-  'graphql': 0.55,
+  graphql: 0.55,
   'machine learning': 0.6,
   'neural networks': 0.65,
   'ci/cd': 0.55,
-  'microservices': 0.65,
+  microservices: 0.65,
   'distributed systems': 0.7,
   'deep learning': 0.75,
-  'kubernetes': 0.7,
-};
+  kubernetes: 0.7,
+}
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §5  ADAPTIVE LEARNER CLASS — Main intelligence module                      ║
@@ -474,17 +542,17 @@ const CONCEPT_DIFFICULTY: Record<string, number> = {
  * All methods are deterministic and require no external dependencies.
  */
 export class AdaptiveLearner {
-  private config: AdaptiveLearnerConfig;
-  private stats: AdaptiveLearnerStats;
-  private facts: ExtractedFact[];
-  private rules: GeneralizedRule[];
-  private mistakes: MistakeLesson[];
-  private predictions: PredictionRecord[];
-  private conceptGraph: Map<string, string[]>;
-  private masteredConcepts: Set<string>;
-  private domainMappings: Map<string, Map<string, string>>;
-  private mistakeFrequency: Map<string, number>;
-  private calibrationAdjustments: Map<string, number>;
+  private config: AdaptiveLearnerConfig
+  private stats: AdaptiveLearnerStats
+  private facts: ExtractedFact[]
+  private rules: GeneralizedRule[]
+  private mistakes: MistakeLesson[]
+  private predictions: PredictionRecord[]
+  private conceptGraph: Map<string, string[]>
+  private masteredConcepts: Set<string>
+  private domainMappings: Map<string, Map<string, string>>
+  private mistakeFrequency: Map<string, number>
+  private calibrationAdjustments: Map<string, number>
 
   /** Create a new AdaptiveLearner with optional partial configuration. */
   constructor(config?: Partial<AdaptiveLearnerConfig>) {
@@ -498,9 +566,9 @@ export class AdaptiveLearner {
       enableMistakeLearning: config?.enableMistakeLearning ?? true,
       generalizationMinExamples: config?.generalizationMinExamples ?? 3,
       transferConfidenceDiscount: config?.transferConfidenceDiscount ?? 0.3,
-    };
+    }
 
-    const now = new Date().toISOString();
+    const now = new Date().toISOString()
     this.stats = {
       totalFactsExtracted: 0,
       totalRulesGeneralized: 0,
@@ -515,23 +583,23 @@ export class AdaptiveLearner {
       averageConfidence: 0,
       createdAt: now,
       lastUsedAt: now,
-    };
+    }
 
-    this.facts = [];
-    this.rules = [];
-    this.mistakes = [];
-    this.predictions = [];
-    this.conceptGraph = new Map();
-    this.masteredConcepts = new Set();
-    this.domainMappings = new Map();
-    this.mistakeFrequency = new Map();
-    this.calibrationAdjustments = new Map();
+    this.facts = []
+    this.rules = []
+    this.mistakes = []
+    this.predictions = []
+    this.conceptGraph = new Map()
+    this.masteredConcepts = new Set()
+    this.domainMappings = new Map()
+    this.mistakeFrequency = new Map()
+    this.calibrationAdjustments = new Map()
 
     // Initialize concept graph from built-in prerequisites
     for (const [concept, prereqs] of Object.entries(CONCEPT_PREREQUISITES)) {
-      this.conceptGraph.set(concept, [...prereqs]);
+      this.conceptGraph.set(concept, [...prereqs])
     }
-    this.stats.conceptsTracked = this.conceptGraph.size;
+    this.stats.conceptsTracked = this.conceptGraph.size
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -558,55 +626,63 @@ export class AdaptiveLearner {
    * ```
    */
   extractFacts(text: string): ExtractedFact[] {
-    if (!this.config.enableFactExtraction) return [];
-    this.stats.lastUsedAt = new Date().toISOString();
+    if (!this.config.enableFactExtraction) return []
+    this.stats.lastUsedAt = new Date().toISOString()
 
-    const sentences = this.splitSentences(text);
-    const extractedFacts: ExtractedFact[] = [];
+    const sentences = this.splitSentences(text)
+    const extractedFacts: ExtractedFact[] = []
 
     for (const sentence of sentences) {
-      const trimmed = sentence.trim();
-      if (trimmed.length < 3) continue;
+      const trimmed = sentence.trim()
+      if (trimmed.length < 3) continue
 
       // Try negation patterns first (more specific)
-      let matched = false;
+      let matched = false
       for (const pattern of NEGATION_PATTERNS) {
-        const match = trimmed.match(pattern.regex);
+        const match = trimmed.match(pattern.regex)
         if (match && match[1] && match[2]) {
           const fact: ExtractedFact = {
             subject: match[1].trim(),
             relation: pattern.relation,
             object: match[2].trim(),
-            confidence: this.adjustConfidenceForLength(pattern.baseConfidence, match[1].trim(), match[2].trim()),
+            confidence: this.adjustConfidenceForLength(
+              pattern.baseConfidence,
+              match[1].trim(),
+              match[2].trim(),
+            ),
             source: trimmed,
             negated: true,
-          };
-          if (!this.isDuplicateFact(fact, extractedFacts)) {
-            extractedFacts.push(fact);
           }
-          matched = true;
-          break;
+          if (!this.isDuplicateFact(fact, extractedFacts)) {
+            extractedFacts.push(fact)
+          }
+          matched = true
+          break
         }
       }
 
-      if (matched) continue;
+      if (matched) continue
 
       // Try positive patterns
       for (const pattern of FACT_PATTERNS) {
-        const match = trimmed.match(pattern.regex);
+        const match = trimmed.match(pattern.regex)
         if (match && match[1] && match[2]) {
           const fact: ExtractedFact = {
             subject: match[1].trim(),
             relation: pattern.relation,
             object: match[2].trim(),
-            confidence: this.adjustConfidenceForLength(pattern.baseConfidence, match[1].trim(), match[2].trim()),
+            confidence: this.adjustConfidenceForLength(
+              pattern.baseConfidence,
+              match[1].trim(),
+              match[2].trim(),
+            ),
             source: trimmed,
             negated: false,
-          };
-          if (!this.isDuplicateFact(fact, extractedFacts)) {
-            extractedFacts.push(fact);
           }
-          break;
+          if (!this.isDuplicateFact(fact, extractedFacts)) {
+            extractedFacts.push(fact)
+          }
+          break
         }
       }
     }
@@ -615,23 +691,23 @@ export class AdaptiveLearner {
     for (const fact of extractedFacts) {
       if (this.facts.length >= this.config.maxFacts) {
         // Evict the lowest-confidence fact
-        let minIdx = 0;
+        let minIdx = 0
         for (let i = 1; i < this.facts.length; i++) {
           if (this.facts[i]!.confidence < this.facts[minIdx]!.confidence) {
-            minIdx = i;
+            minIdx = i
           }
         }
         if (fact.confidence > this.facts[minIdx]!.confidence) {
-          this.facts[minIdx] = fact;
+          this.facts[minIdx] = fact
         }
       } else {
-        this.facts.push(fact);
+        this.facts.push(fact)
       }
     }
 
-    this.stats.totalFactsExtracted += extractedFacts.length;
-    this.stats.factsStored = this.facts.length;
-    return extractedFacts;
+    this.stats.totalFactsExtracted += extractedFacts.length
+    this.stats.factsStored = this.facts.length
+    return extractedFacts
   }
 
   /**
@@ -642,7 +718,7 @@ export class AdaptiveLearner {
     return text
       .split(/[.!?;]\s*/g)
       .map(s => s.trim())
-      .filter(s => s.length > 0);
+      .filter(s => s.length > 0)
   }
 
   /**
@@ -650,17 +726,17 @@ export class AdaptiveLearner {
    * Very short or very long subjects/objects get a slight confidence penalty.
    */
   private adjustConfidenceForLength(base: number, subject: string, object: string): number {
-    let adjustment = 0;
+    let adjustment = 0
     // Penalize very short subjects/objects (likely noise)
-    if (subject.length < 2 || object.length < 2) adjustment -= 0.15;
+    if (subject.length < 2 || object.length < 2) adjustment -= 0.15
     // Penalize very long subjects/objects (likely not a clean fact)
-    if (subject.length > 50) adjustment -= 0.1;
-    if (object.length > 50) adjustment -= 0.1;
+    if (subject.length > 50) adjustment -= 0.1
+    if (object.length > 50) adjustment -= 0.1
     // Boost for moderate-length, clean-looking terms
     if (subject.length >= 2 && subject.length <= 30 && object.length >= 2 && object.length <= 30) {
-      adjustment += 0.05;
+      adjustment += 0.05
     }
-    return Math.max(0, Math.min(1, base + adjustment));
+    return Math.max(0, Math.min(1, base + adjustment))
   }
 
   /**
@@ -668,20 +744,20 @@ export class AdaptiveLearner {
    * Two facts are duplicates if they share the same subject, relation, object, and negation.
    */
   private isDuplicateFact(fact: ExtractedFact, existing: ExtractedFact[]): boolean {
-    const normSubject = fact.subject.toLowerCase();
-    const normObject = fact.object.toLowerCase();
+    const normSubject = fact.subject.toLowerCase()
+    const normObject = fact.object.toLowerCase()
     return existing.some(
       e =>
         e.subject.toLowerCase() === normSubject &&
         e.relation === fact.relation &&
         e.object.toLowerCase() === normObject &&
         e.negated === fact.negated,
-    );
+    )
   }
 
   /** Get all currently stored facts. */
   getFacts(): readonly ExtractedFact[] {
-    return this.facts;
+    return this.facts
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -709,43 +785,47 @@ export class AdaptiveLearner {
    * ```
    */
   generalize(examples: Example[]): GeneralizedRule[] {
-    if (!this.config.enableGeneralization) return [];
-    if (examples.length < this.config.generalizationMinExamples) return [];
-    this.stats.lastUsedAt = new Date().toISOString();
+    if (!this.config.enableGeneralization) return []
+    if (examples.length < this.config.generalizationMinExamples) return []
+    this.stats.lastUsedAt = new Date().toISOString()
 
-    const newRules: GeneralizedRule[] = [];
+    const newRules: GeneralizedRule[] = []
 
     // Group examples by domain
-    const byDomain = this.groupByDomain(examples);
+    const byDomain = this.groupByDomain(examples)
 
     for (const [domain, domainExamples] of Object.entries(byDomain)) {
-      if (domainExamples.length < this.config.generalizationMinExamples) continue;
+      if (domainExamples.length < this.config.generalizationMinExamples) continue
 
       // Find common tags across examples
-      const commonTags = this.findCommonTags(domainExamples);
+      const commonTags = this.findCommonTags(domainExamples)
 
       // Find common output patterns
-      const outputPatterns = this.findCommonOutputPatterns(domainExamples);
+      const outputPatterns = this.findCommonOutputPatterns(domainExamples)
 
       for (const outputPattern of outputPatterns) {
         // Count how many examples match this pattern
-        const matchingExamples = domainExamples.filter(
-          ex => ex.output.toLowerCase().includes(outputPattern.toLowerCase()),
-        );
+        const matchingExamples = domainExamples.filter(ex =>
+          ex.output.toLowerCase().includes(outputPattern.toLowerCase()),
+        )
         const nonMatchingExamples = domainExamples.filter(
           ex => !ex.output.toLowerCase().includes(outputPattern.toLowerCase()),
-        );
+        )
 
-        const coverage = matchingExamples.length / domainExamples.length;
-        const consistency = matchingExamples.length / (matchingExamples.length + nonMatchingExamples.length);
+        const coverage = matchingExamples.length / domainExamples.length
+        const consistency =
+          matchingExamples.length / (matchingExamples.length + nonMatchingExamples.length)
 
         // Build the generalized pattern description
-        const tagDescription = commonTags.length > 0 ? commonTags.join(' ') + ' ' : '';
-        const pattern = `${domain} ${tagDescription}${outputPattern}`;
+        const tagDescription = commonTags.length > 0 ? commonTags.join(' ') + ' ' : ''
+        const pattern = `${domain} ${tagDescription}${outputPattern}`
 
         // Calculate confidence from coverage, consistency, and number of examples
-        const exampleBonus = Math.min(0.2, (matchingExamples.length - this.config.generalizationMinExamples) * 0.05);
-        const confidence = Math.min(1, (coverage * 0.4 + consistency * 0.4 + 0.2) + exampleBonus);
+        const exampleBonus = Math.min(
+          0.2,
+          (matchingExamples.length - this.config.generalizationMinExamples) * 0.05,
+        )
+        const confidence = Math.min(1, coverage * 0.4 + consistency * 0.4 + 0.2 + exampleBonus)
 
         const rule: GeneralizedRule = {
           pattern,
@@ -754,11 +834,11 @@ export class AdaptiveLearner {
           confidence,
           domain,
           createdAt: Date.now(),
-        };
+        }
 
         // Only add rules with reasonable confidence
         if (confidence >= 0.3) {
-          newRules.push(rule);
+          newRules.push(rule)
         }
       }
     }
@@ -767,53 +847,53 @@ export class AdaptiveLearner {
     for (const rule of newRules) {
       if (this.rules.length >= this.config.maxRules) {
         // Evict the lowest-confidence rule
-        let minIdx = 0;
+        let minIdx = 0
         for (let i = 1; i < this.rules.length; i++) {
           if (this.rules[i]!.confidence < this.rules[minIdx]!.confidence) {
-            minIdx = i;
+            minIdx = i
           }
         }
         if (rule.confidence > this.rules[minIdx]!.confidence) {
-          this.rules[minIdx] = rule;
+          this.rules[minIdx] = rule
         }
       } else {
-        this.rules.push(rule);
+        this.rules.push(rule)
       }
     }
 
-    this.stats.totalRulesGeneralized += newRules.length;
-    this.stats.rulesStored = this.rules.length;
-    return newRules;
+    this.stats.totalRulesGeneralized += newRules.length
+    this.stats.rulesStored = this.rules.length
+    return newRules
   }
 
   /** Group examples by their domain property. */
   private groupByDomain(examples: Example[]): Record<string, Example[]> {
-    const groups: Record<string, Example[]> = {};
+    const groups: Record<string, Example[]> = {}
     for (const ex of examples) {
-      const domain = ex.domain.toLowerCase();
-      if (!groups[domain]) groups[domain] = [];
-      groups[domain].push(ex);
+      const domain = ex.domain.toLowerCase()
+      if (!groups[domain]) groups[domain] = []
+      groups[domain].push(ex)
     }
-    return groups;
+    return groups
   }
 
   /** Find tags that appear in at least half of the examples. */
   private findCommonTags(examples: Example[]): string[] {
-    const tagCounts = new Map<string, number>();
+    const tagCounts = new Map<string, number>()
     for (const ex of examples) {
       for (const tag of ex.tags) {
-        const lower = tag.toLowerCase();
-        tagCounts.set(lower, (tagCounts.get(lower) ?? 0) + 1);
+        const lower = tag.toLowerCase()
+        tagCounts.set(lower, (tagCounts.get(lower) ?? 0) + 1)
       }
     }
-    const threshold = examples.length / 2;
-    const common: string[] = [];
+    const threshold = examples.length / 2
+    const common: string[] = []
     for (const [tag, count] of tagCounts) {
       if (count >= threshold) {
-        common.push(tag);
+        common.push(tag)
       }
     }
-    return common.sort();
+    return common.sort()
   }
 
   /**
@@ -821,34 +901,37 @@ export class AdaptiveLearner {
    * Extracts words that appear in at least half of the outputs.
    */
   private findCommonOutputPatterns(examples: Example[]): string[] {
-    const wordCounts = new Map<string, number>();
+    const wordCounts = new Map<string, number>()
     for (const ex of examples) {
-      const words = ex.output.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-      const uniqueWords = new Set(words);
+      const words = ex.output
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 2)
+      const uniqueWords = new Set(words)
       for (const word of uniqueWords) {
-        wordCounts.set(word, (wordCounts.get(word) ?? 0) + 1);
+        wordCounts.set(word, (wordCounts.get(word) ?? 0) + 1)
       }
     }
 
-    const threshold = examples.length / 2;
-    const commonWords: string[] = [];
+    const threshold = examples.length / 2
+    const commonWords: string[] = []
     for (const [word, count] of wordCounts) {
       if (count >= threshold) {
-        commonWords.push(word);
+        commonWords.push(word)
       }
     }
 
     // Build phrase from common words (sorted by frequency descending)
-    commonWords.sort((a, b) => (wordCounts.get(b) ?? 0) - (wordCounts.get(a) ?? 0));
+    commonWords.sort((a, b) => (wordCounts.get(b) ?? 0) - (wordCounts.get(a) ?? 0))
 
-    if (commonWords.length === 0) return [];
+    if (commonWords.length === 0) return []
     // Return the top common words as potential patterns
-    return [commonWords.slice(0, 4).join(' ')];
+    return [commonWords.slice(0, 4).join(' ')]
   }
 
   /** Get all currently stored generalized rules. */
   getRules(): readonly GeneralizedRule[] {
-    return this.rules;
+    return this.rules
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -879,58 +962,55 @@ export class AdaptiveLearner {
    * ```
    */
   transferKnowledge(sourceDomain: string, targetDomain: string, concept: string): TransferResult {
-    this.stats.lastUsedAt = new Date().toISOString();
-    this.stats.totalTransfers++;
+    this.stats.lastUsedAt = new Date().toISOString()
+    this.stats.totalTransfers++
 
-    const srcLower = sourceDomain.toLowerCase();
-    const tgtLower = targetDomain.toLowerCase();
-    const conceptLower = concept.toLowerCase();
+    const srcLower = sourceDomain.toLowerCase()
+    const tgtLower = targetDomain.toLowerCase()
+    const conceptLower = concept.toLowerCase()
 
     // Calculate domain similarity
-    const domainSim = this.getDomainSimilarity(srcLower, tgtLower);
+    const domainSim = this.getDomainSimilarity(srcLower, tgtLower)
 
     // Find concept mappings
-    const mappings = this.findConceptMappings(srcLower, tgtLower, conceptLower);
+    const mappings = this.findConceptMappings(srcLower, tgtLower, conceptLower)
 
     // Find the best mapping for this specific concept
-    let transferredKnowledge: string;
-    let bestMapping: DomainMapping | undefined;
+    let transferredKnowledge: string
+    let bestMapping: DomainMapping | undefined
 
     for (const m of mappings) {
       if (m.sourceElement.toLowerCase() === conceptLower) {
-        bestMapping = m;
-        break;
+        bestMapping = m
+        break
       }
     }
 
     if (bestMapping) {
-      transferredKnowledge =
-        `In ${targetDomain}, the analogous concept to ${concept} is ${bestMapping.targetElement}`;
+      transferredKnowledge = `In ${targetDomain}, the analogous concept to ${concept} is ${bestMapping.targetElement}`
     } else if (mappings.length > 0) {
       // Use partial mappings to suggest a transfer
-      const closestMapping = mappings[0]!;
-      transferredKnowledge =
-        `In ${targetDomain}, ${concept} from ${sourceDomain} may relate to concepts similar to ${closestMapping.targetElement}`;
+      const closestMapping = mappings[0]!
+      transferredKnowledge = `In ${targetDomain}, ${concept} from ${sourceDomain} may relate to concepts similar to ${closestMapping.targetElement}`
     } else {
-      transferredKnowledge =
-        `The concept ${concept} from ${sourceDomain} may apply to ${targetDomain} with adaptations for domain-specific differences`;
+      transferredKnowledge = `The concept ${concept} from ${sourceDomain} may apply to ${targetDomain} with adaptations for domain-specific differences`
     }
 
     // Also check if any stored rules from the source domain could transfer
-    const sourceRules = this.rules.filter(r => r.domain.toLowerCase() === srcLower);
+    const sourceRules = this.rules.filter(r => r.domain.toLowerCase() === srcLower)
     for (const rule of sourceRules) {
       if (rule.pattern.toLowerCase().includes(conceptLower)) {
-        transferredKnowledge += `. Related rule: ${rule.pattern}`;
-        break;
+        transferredKnowledge += `. Related rule: ${rule.pattern}`
+        break
       }
     }
 
     // Apply confidence discount for cross-domain transfer
-    const baseConfidence = bestMapping ? bestMapping.similarity : domainSim * 0.5;
+    const baseConfidence = bestMapping ? bestMapping.similarity : domainSim * 0.5
     const confidence = Math.max(
       0,
       Math.min(1, baseConfidence * (1 - this.config.transferConfidenceDiscount)),
-    );
+    )
 
     return {
       concept,
@@ -939,19 +1019,19 @@ export class AdaptiveLearner {
       transferredKnowledge,
       confidence,
       mappings,
-    };
+    }
   }
 
   /** Get the similarity score between two domains (0–1). */
   private getDomainSimilarity(source: string, target: string): number {
-    if (source === target) return 1.0;
-    const sourceMap = DOMAIN_SIMILARITY[source];
-    if (sourceMap && sourceMap[target] !== undefined) return sourceMap[target];
+    if (source === target) return 1.0
+    const sourceMap = DOMAIN_SIMILARITY[source]
+    if (sourceMap && sourceMap[target] !== undefined) return sourceMap[target]
     // Check reverse direction
-    const targetMap = DOMAIN_SIMILARITY[target];
-    if (targetMap && targetMap[source] !== undefined) return targetMap[source];
+    const targetMap = DOMAIN_SIMILARITY[target]
+    if (targetMap && targetMap[source] !== undefined) return targetMap[source]
     // Unknown domains get a low default similarity
-    return 0.2;
+    return 0.2
   }
 
   /**
@@ -959,28 +1039,28 @@ export class AdaptiveLearner {
    * Combines built-in mappings with any learned domain mappings.
    */
   private findConceptMappings(source: string, target: string, concept: string): DomainMapping[] {
-    const mappings: DomainMapping[] = [];
-    const domainSim = this.getDomainSimilarity(source, target);
+    const mappings: DomainMapping[] = []
+    const domainSim = this.getDomainSimilarity(source, target)
 
     // Check built-in concept mappings
-    const builtInSource = DOMAIN_CONCEPT_MAPPINGS[source];
+    const builtInSource = DOMAIN_CONCEPT_MAPPINGS[source]
     if (builtInSource) {
-      const builtInTarget = builtInSource[target];
+      const builtInTarget = builtInSource[target]
       if (builtInTarget) {
         for (const [src, tgt] of Object.entries(builtInTarget)) {
-          const similarity = src.toLowerCase() === concept ? domainSim + 0.2 : domainSim * 0.5;
+          const similarity = src.toLowerCase() === concept ? domainSim + 0.2 : domainSim * 0.5
           mappings.push({
             sourceElement: src,
             targetElement: tgt,
             similarity: Math.min(1, similarity),
-          });
+          })
         }
       }
     }
 
     // Check stored domain mappings
-    const key = `${source}→${target}`;
-    const learned = this.domainMappings.get(key);
+    const key = `${source}→${target}`
+    const learned = this.domainMappings.get(key)
     if (learned) {
       for (const [src, tgt] of learned) {
         if (!mappings.some(m => m.sourceElement === src && m.targetElement === tgt)) {
@@ -988,14 +1068,14 @@ export class AdaptiveLearner {
             sourceElement: src,
             targetElement: tgt,
             similarity: domainSim * 0.7,
-          });
+          })
         }
       }
     }
 
     // Sort by similarity descending
-    mappings.sort((a, b) => b.similarity - a.similarity);
-    return mappings;
+    mappings.sort((a, b) => b.similarity - a.similarity)
+    return mappings
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -1029,17 +1109,17 @@ export class AdaptiveLearner {
    * ```
    */
   learnFromMistake(prediction: string, actual: string, context: string): MistakeLesson {
-    this.stats.lastUsedAt = new Date().toISOString();
-    this.stats.totalMistakesRecorded++;
+    this.stats.lastUsedAt = new Date().toISOString()
+    this.stats.totalMistakesRecorded++
 
     // Categorize the mistake
-    const category = this.categorizeMistake(prediction, actual, context);
+    const category = this.categorizeMistake(prediction, actual, context)
 
     // Generate the reason for the mistake
-    const reason = this.generateMistakeReason(prediction, actual, category);
+    const reason = this.generateMistakeReason(prediction, actual, category)
 
     // Generate a correction rule
-    const correctionRule = this.generateCorrectionRule(prediction, actual, category, context);
+    const correctionRule = this.generateCorrectionRule(prediction, actual, category, context)
 
     const lesson: MistakeLesson = {
       prediction,
@@ -1048,21 +1128,21 @@ export class AdaptiveLearner {
       reason,
       correctionRule,
       context,
-    };
+    }
 
     // Track mistake frequency
-    const currentFreq = this.mistakeFrequency.get(category) ?? 0;
-    this.mistakeFrequency.set(category, currentFreq + 1);
+    const currentFreq = this.mistakeFrequency.get(category) ?? 0
+    this.mistakeFrequency.set(category, currentFreq + 1)
 
     // Store the lesson (up to maxMistakes)
     if (this.mistakes.length >= this.config.maxMistakes) {
       // Evict oldest mistake
-      this.mistakes.shift();
+      this.mistakes.shift()
     }
-    this.mistakes.push(lesson);
+    this.mistakes.push(lesson)
 
-    this.stats.mistakesStored = this.mistakes.length;
-    return lesson;
+    this.stats.mistakesStored = this.mistakes.length
+    return lesson
   }
 
   /**
@@ -1070,63 +1150,82 @@ export class AdaptiveLearner {
    * Uses heuristics to determine the most likely category.
    */
   private categorizeMistake(prediction: string, actual: string, context: string): MistakeCategory {
-    const predLower = prediction.toLowerCase();
-    const actLower = actual.toLowerCase();
-    const ctxLower = context.toLowerCase();
+    const predLower = prediction.toLowerCase()
+    const actLower = actual.toLowerCase()
+    const ctxLower = context.toLowerCase()
 
     // Check for outdated info indicators
-    const outdatedKeywords = ['deprecated', 'old', 'legacy', 'outdated', 'was', 'previously', 'used to', 'no longer'];
+    const outdatedKeywords = [
+      'deprecated',
+      'old',
+      'legacy',
+      'outdated',
+      'was',
+      'previously',
+      'used to',
+      'no longer',
+    ]
     if (outdatedKeywords.some(kw => actLower.includes(kw) || ctxLower.includes(kw))) {
-      return 'outdated_info';
+      return 'outdated_info'
     }
 
     // Check for context mismatch
-    const predWords = new Set(predLower.split(/\s+/));
-    const actWords = new Set(actLower.split(/\s+/));
-    const commonWords = [...predWords].filter(w => actWords.has(w));
-    const overlapRatio = commonWords.length / Math.max(predWords.size, actWords.size);
+    const predWords = new Set(predLower.split(/\s+/))
+    const actWords = new Set(actLower.split(/\s+/))
+    const commonWords = [...predWords].filter(w => actWords.has(w))
+    const overlapRatio = commonWords.length / Math.max(predWords.size, actWords.size)
 
     // High overlap but wrong answer often means wrong context
     if (overlapRatio > 0.5 && overlapRatio < 0.9) {
-      return 'wrong_context';
+      return 'wrong_context'
     }
 
     // Check for overgeneralization (prediction is more general than actual)
-    const generalTerms = ['all', 'every', 'always', 'any', 'never', 'none'];
-    const specificTerms = ['some', 'certain', 'specific', 'particular', 'only', 'except'];
-    if (generalTerms.some(t => predLower.includes(t)) && specificTerms.some(t => actLower.includes(t))) {
-      return 'overgeneralization';
+    const generalTerms = ['all', 'every', 'always', 'any', 'never', 'none']
+    const specificTerms = ['some', 'certain', 'specific', 'particular', 'only', 'except']
+    if (
+      generalTerms.some(t => predLower.includes(t)) &&
+      specificTerms.some(t => actLower.includes(t))
+    ) {
+      return 'overgeneralization'
     }
 
     // Check for undergeneralization (prediction is too specific)
-    if (specificTerms.some(t => predLower.includes(t)) && generalTerms.some(t => actLower.includes(t))) {
-      return 'undergeneralization';
+    if (
+      specificTerms.some(t => predLower.includes(t)) &&
+      generalTerms.some(t => actLower.includes(t))
+    ) {
+      return 'undergeneralization'
     }
 
     // Check for missing knowledge (prediction is very different)
     if (overlapRatio < 0.2) {
-      return 'missing_knowledge';
+      return 'missing_knowledge'
     }
 
     // Default: factual error
-    return 'factual_error';
+    return 'factual_error'
   }
 
   /** Generate a human-readable reason explaining why a mistake occurred. */
-  private generateMistakeReason(prediction: string, actual: string, category: MistakeCategory): string {
+  private generateMistakeReason(
+    prediction: string,
+    actual: string,
+    category: MistakeCategory,
+  ): string {
     switch (category) {
       case 'factual_error':
-        return `Incorrect fact: stated "${prediction}" when the correct answer is "${actual}"`;
+        return `Incorrect fact: stated "${prediction}" when the correct answer is "${actual}"`
       case 'outdated_info':
-        return `Used outdated information: "${prediction}" is no longer accurate; current answer is "${actual}"`;
+        return `Used outdated information: "${prediction}" is no longer accurate; current answer is "${actual}"`
       case 'wrong_context':
-        return `Applied knowledge from wrong context: "${prediction}" may be correct elsewhere but "${actual}" is correct here`;
+        return `Applied knowledge from wrong context: "${prediction}" may be correct elsewhere but "${actual}" is correct here`
       case 'overgeneralization':
-        return `Overgeneralized: "${prediction}" is too broad; the specific answer is "${actual}"`;
+        return `Overgeneralized: "${prediction}" is too broad; the specific answer is "${actual}"`
       case 'undergeneralization':
-        return `Undergeneralized: "${prediction}" is too narrow; the broader answer is "${actual}"`;
+        return `Undergeneralized: "${prediction}" is too narrow; the broader answer is "${actual}"`
       case 'missing_knowledge':
-        return `Missing knowledge: could not connect "${prediction}" to the correct answer "${actual}"`;
+        return `Missing knowledge: could not connect "${prediction}" to the correct answer "${actual}"`
     }
   }
 
@@ -1139,28 +1238,28 @@ export class AdaptiveLearner {
   ): string {
     switch (category) {
       case 'factual_error':
-        return `When discussing ${context}, use "${actual}" instead of "${prediction}"`;
+        return `When discussing ${context}, use "${actual}" instead of "${prediction}"`
       case 'outdated_info':
-        return `Update: "${prediction}" is outdated. The current correct answer is "${actual}"`;
+        return `Update: "${prediction}" is outdated. The current correct answer is "${actual}"`
       case 'wrong_context':
-        return `In the context of ${context}, the correct answer is "${actual}", not "${prediction}"`;
+        return `In the context of ${context}, the correct answer is "${actual}", not "${prediction}"`
       case 'overgeneralization':
-        return `Avoid generalizing: in ${context}, be specific — "${actual}" rather than "${prediction}"`;
+        return `Avoid generalizing: in ${context}, be specific — "${actual}" rather than "${prediction}"`
       case 'undergeneralization':
-        return `Broaden scope: in ${context}, the answer should be "${actual}" not just "${prediction}"`;
+        return `Broaden scope: in ${context}, the answer should be "${actual}" not just "${prediction}"`
       case 'missing_knowledge':
-        return `Learn: in ${context}, the answer is "${actual}" (previously unknown)`;
+        return `Learn: in ${context}, the answer is "${actual}" (previously unknown)`
     }
   }
 
   /** Get the frequency of mistakes by category. */
   getMistakeFrequency(): ReadonlyMap<string, number> {
-    return this.mistakeFrequency;
+    return this.mistakeFrequency
   }
 
   /** Get all stored mistake lessons. */
   getMistakes(): readonly MistakeLesson[] {
-    return this.mistakes;
+    return this.mistakes
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -1186,15 +1285,15 @@ export class AdaptiveLearner {
    * ```
    */
   calibrate(predictions: PredictionRecord[]): CalibrationReport {
-    this.stats.lastUsedAt = new Date().toISOString();
-    this.stats.totalCalibrations++;
+    this.stats.lastUsedAt = new Date().toISOString()
+    this.stats.totalCalibrations++
 
     // Store predictions for tracking
     for (const pred of predictions) {
-      this.predictions.push(pred);
+      this.predictions.push(pred)
     }
 
-    const allPredictions = this.predictions;
+    const allPredictions = this.predictions
     if (allPredictions.length === 0) {
       return {
         brierScore: 0,
@@ -1203,98 +1302,106 @@ export class AdaptiveLearner {
         totalPredictions: 0,
         accuracyByConfidenceBin: new Map(),
         domainCalibration: new Map(),
-      };
+      }
     }
 
     // Calculate Brier score: mean of (confidence - outcome)^2
-    let brierSum = 0;
-    let overconfidenceSum = 0;
-    let underconfidenceSum = 0;
-    let overconfidenceCount = 0;
-    let underconfidenceCount = 0;
+    let brierSum = 0
+    let overconfidenceSum = 0
+    let underconfidenceSum = 0
+    let overconfidenceCount = 0
+    let underconfidenceCount = 0
 
     // Bins for calibration: [0, 0.1), [0.1, 0.2), ..., [0.9, 1.0]
-    const binCorrect = new Map<string, number>();
-    const binTotal = new Map<string, number>();
+    const binCorrect = new Map<string, number>()
+    const binTotal = new Map<string, number>()
     const binLabels = [
-      '0.0-0.1', '0.1-0.2', '0.2-0.3', '0.3-0.4', '0.4-0.5',
-      '0.5-0.6', '0.6-0.7', '0.7-0.8', '0.8-0.9', '0.9-1.0',
-    ];
+      '0.0-0.1',
+      '0.1-0.2',
+      '0.2-0.3',
+      '0.3-0.4',
+      '0.4-0.5',
+      '0.5-0.6',
+      '0.6-0.7',
+      '0.7-0.8',
+      '0.8-0.9',
+      '0.9-1.0',
+    ]
     for (const label of binLabels) {
-      binCorrect.set(label, 0);
-      binTotal.set(label, 0);
+      binCorrect.set(label, 0)
+      binTotal.set(label, 0)
     }
 
     // Per-domain tracking
-    const domainCorrect = new Map<string, number>();
-    const domainTotal = new Map<string, number>();
-    const domainConfidenceSum = new Map<string, number>();
+    const domainCorrect = new Map<string, number>()
+    const domainTotal = new Map<string, number>()
+    const domainConfidenceSum = new Map<string, number>()
 
     for (const pred of allPredictions) {
-      const isCorrect = pred.predicted.toLowerCase().trim() === pred.actual.toLowerCase().trim();
-      const outcome = isCorrect ? 1 : 0;
-      const confidence = Math.max(0, Math.min(1, pred.confidence));
+      const isCorrect = pred.predicted.toLowerCase().trim() === pred.actual.toLowerCase().trim()
+      const outcome = isCorrect ? 1 : 0
+      const confidence = Math.max(0, Math.min(1, pred.confidence))
 
       // Brier score component
-      brierSum += (confidence - outcome) * (confidence - outcome);
+      brierSum += (confidence - outcome) * (confidence - outcome)
 
       // Overconfidence/underconfidence tracking
       if (confidence > outcome) {
-        overconfidenceSum += confidence - outcome;
-        overconfidenceCount++;
+        overconfidenceSum += confidence - outcome
+        overconfidenceCount++
       } else if (confidence < outcome) {
-        underconfidenceSum += outcome - confidence;
-        underconfidenceCount++;
+        underconfidenceSum += outcome - confidence
+        underconfidenceCount++
       }
 
       // Bin tracking
-      const binIndex = Math.min(9, Math.floor(confidence * 10));
-      const binLabel = binLabels[binIndex]!;
-      binTotal.set(binLabel, (binTotal.get(binLabel) ?? 0) + 1);
+      const binIndex = Math.min(9, Math.floor(confidence * 10))
+      const binLabel = binLabels[binIndex]!
+      binTotal.set(binLabel, (binTotal.get(binLabel) ?? 0) + 1)
       if (isCorrect) {
-        binCorrect.set(binLabel, (binCorrect.get(binLabel) ?? 0) + 1);
+        binCorrect.set(binLabel, (binCorrect.get(binLabel) ?? 0) + 1)
       }
 
       // Domain tracking
-      const domain = pred.domain.toLowerCase();
-      domainTotal.set(domain, (domainTotal.get(domain) ?? 0) + 1);
-      domainConfidenceSum.set(domain, (domainConfidenceSum.get(domain) ?? 0) + confidence);
+      const domain = pred.domain.toLowerCase()
+      domainTotal.set(domain, (domainTotal.get(domain) ?? 0) + 1)
+      domainConfidenceSum.set(domain, (domainConfidenceSum.get(domain) ?? 0) + confidence)
       if (isCorrect) {
-        domainCorrect.set(domain, (domainCorrect.get(domain) ?? 0) + 1);
+        domainCorrect.set(domain, (domainCorrect.get(domain) ?? 0) + 1)
       }
     }
 
-    const brierScore = brierSum / allPredictions.length;
-    const overconfidence = overconfidenceCount > 0 ? overconfidenceSum / overconfidenceCount : 0;
-    const underconfidence = underconfidenceCount > 0 ? underconfidenceSum / underconfidenceCount : 0;
+    const brierScore = brierSum / allPredictions.length
+    const overconfidence = overconfidenceCount > 0 ? overconfidenceSum / overconfidenceCount : 0
+    const underconfidence = underconfidenceCount > 0 ? underconfidenceSum / underconfidenceCount : 0
 
     // Calculate accuracy by confidence bin
-    const accuracyByConfidenceBin = new Map<string, number>();
+    const accuracyByConfidenceBin = new Map<string, number>()
     for (const label of binLabels) {
-      const total = binTotal.get(label) ?? 0;
+      const total = binTotal.get(label) ?? 0
       if (total > 0) {
-        accuracyByConfidenceBin.set(label, (binCorrect.get(label) ?? 0) / total);
+        accuracyByConfidenceBin.set(label, (binCorrect.get(label) ?? 0) / total)
       }
     }
 
     // Calculate per-domain calibration adjustments
-    const domainCalibration = new Map<string, number>();
+    const domainCalibration = new Map<string, number>()
     for (const [domain, total] of domainTotal) {
-      const correct = domainCorrect.get(domain) ?? 0;
-      const avgConf = (domainConfidenceSum.get(domain) ?? 0) / total;
-      const actualAccuracy = correct / total;
+      const correct = domainCorrect.get(domain) ?? 0
+      const avgConf = (domainConfidenceSum.get(domain) ?? 0) / total
+      const actualAccuracy = correct / total
       // Positive means overconfident (reduce), negative means underconfident (boost)
-      const adjustment = avgConf - actualAccuracy;
-      domainCalibration.set(domain, adjustment);
-      this.calibrationAdjustments.set(domain, adjustment);
+      const adjustment = avgConf - actualAccuracy
+      domainCalibration.set(domain, adjustment)
+      this.calibrationAdjustments.set(domain, adjustment)
     }
 
     // Update average confidence stat
-    let totalConf = 0;
+    let totalConf = 0
     for (const pred of allPredictions) {
-      totalConf += pred.confidence;
+      totalConf += pred.confidence
     }
-    this.stats.averageConfidence = totalConf / allPredictions.length;
+    this.stats.averageConfidence = totalConf / allPredictions.length
 
     return {
       brierScore,
@@ -1303,7 +1410,7 @@ export class AdaptiveLearner {
       totalPredictions: allPredictions.length,
       accuracyByConfidenceBin,
       domainCalibration,
-    };
+    }
   }
 
   /**
@@ -1315,7 +1422,7 @@ export class AdaptiveLearner {
    * @returns The adjustment factor, or 0 if no calibration data exists.
    */
   getCalibrationAdjustment(domain: string): number {
-    return this.calibrationAdjustments.get(domain.toLowerCase()) ?? 0;
+    return this.calibrationAdjustments.get(domain.toLowerCase()) ?? 0
   }
 
   /**
@@ -1326,8 +1433,8 @@ export class AdaptiveLearner {
    * @returns The adjusted confidence value (0–1).
    */
   adjustConfidence(rawConfidence: number, domain: string): number {
-    const adjustment = this.getCalibrationAdjustment(domain);
-    return Math.max(0, Math.min(1, rawConfidence - adjustment));
+    const adjustment = this.getCalibrationAdjustment(domain)
+    return Math.max(0, Math.min(1, rawConfidence - adjustment))
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -1345,21 +1452,21 @@ export class AdaptiveLearner {
    * @returns A difficulty score between 0 (trivial) and 1 (very hard).
    */
   assessComplexity(concept: string): number {
-    this.stats.lastUsedAt = new Date().toISOString();
-    const lower = concept.toLowerCase();
+    this.stats.lastUsedAt = new Date().toISOString()
+    const lower = concept.toLowerCase()
 
     // Check built-in difficulty
     if (CONCEPT_DIFFICULTY[lower] !== undefined) {
-      return CONCEPT_DIFFICULTY[lower];
+      return CONCEPT_DIFFICULTY[lower]
     }
 
     // Estimate difficulty from prerequisite chain depth
-    const prereqs = this.getPrerequisites(lower);
-    if (prereqs.length === 0) return 0.3; // Unknown concept with no prereqs
+    const prereqs = this.getPrerequisites(lower)
+    if (prereqs.length === 0) return 0.3 // Unknown concept with no prereqs
 
     // Deeper prerequisite chains indicate higher difficulty
-    const maxDepth = this.getPrerequisiteDepth(lower);
-    return Math.min(1, 0.2 + maxDepth * 0.12);
+    const maxDepth = this.getPrerequisiteDepth(lower)
+    return Math.min(1, 0.2 + maxDepth * 0.12)
   }
 
   /**
@@ -1372,74 +1479,74 @@ export class AdaptiveLearner {
    * @returns The concepts sorted in recommended learning order.
    */
   suggestLearningOrder(concepts: string[]): string[] {
-    this.stats.lastUsedAt = new Date().toISOString();
-    const normalized = concepts.map(c => c.toLowerCase());
+    this.stats.lastUsedAt = new Date().toISOString()
+    const normalized = concepts.map(c => c.toLowerCase())
 
     // Collect all concepts including prerequisites
-    const allConcepts = new Set<string>();
+    const allConcepts = new Set<string>()
     for (const concept of normalized) {
-      allConcepts.add(concept);
+      allConcepts.add(concept)
       for (const prereq of this.getPrerequisites(concept)) {
         if (normalized.includes(prereq)) {
-          allConcepts.add(prereq);
+          allConcepts.add(prereq)
         }
       }
     }
 
     // Build adjacency list for topological sort
-    const inDegree = new Map<string, number>();
-    const adjacency = new Map<string, string[]>();
+    const inDegree = new Map<string, number>()
+    const adjacency = new Map<string, string[]>()
     for (const concept of allConcepts) {
-      inDegree.set(concept, 0);
-      adjacency.set(concept, []);
+      inDegree.set(concept, 0)
+      adjacency.set(concept, [])
     }
 
     for (const concept of allConcepts) {
-      const prereqs = this.getPrerequisites(concept);
+      const prereqs = this.getPrerequisites(concept)
       for (const prereq of prereqs) {
         if (allConcepts.has(prereq)) {
-          adjacency.get(prereq)!.push(concept);
-          inDegree.set(concept, (inDegree.get(concept) ?? 0) + 1);
+          adjacency.get(prereq)!.push(concept)
+          inDegree.set(concept, (inDegree.get(concept) ?? 0) + 1)
         }
       }
     }
 
     // Kahn's algorithm for topological sort
-    const queue: string[] = [];
+    const queue: string[] = []
     for (const [concept, degree] of inDegree) {
       if (degree === 0) {
-        queue.push(concept);
+        queue.push(concept)
       }
     }
 
     // Sort queue by difficulty (easiest first) for stable ordering
-    queue.sort((a, b) => this.assessComplexity(a) - this.assessComplexity(b));
+    queue.sort((a, b) => this.assessComplexity(a) - this.assessComplexity(b))
 
-    const result: string[] = [];
+    const result: string[] = []
     while (queue.length > 0) {
-      const concept = queue.shift()!;
-      result.push(concept);
+      const concept = queue.shift()!
+      result.push(concept)
 
       for (const dependent of adjacency.get(concept) ?? []) {
-        const newDegree = (inDegree.get(dependent) ?? 1) - 1;
-        inDegree.set(dependent, newDegree);
+        const newDegree = (inDegree.get(dependent) ?? 1) - 1
+        inDegree.set(dependent, newDegree)
         if (newDegree === 0) {
           // Insert in sorted order by difficulty
-          let inserted = false;
+          let inserted = false
           for (let i = 0; i < queue.length; i++) {
             if (this.assessComplexity(dependent) < this.assessComplexity(queue[i]!)) {
-              queue.splice(i, 0, dependent);
-              inserted = true;
-              break;
+              queue.splice(i, 0, dependent)
+              inserted = true
+              break
             }
           }
-          if (!inserted) queue.push(dependent);
+          if (!inserted) queue.push(dependent)
         }
       }
     }
 
     // Filter to only the originally requested concepts, preserving the sorted order
-    return result.filter(c => normalized.includes(c));
+    return result.filter(c => normalized.includes(c))
   }
 
   /**
@@ -1451,8 +1558,8 @@ export class AdaptiveLearner {
    * @returns An array of prerequisite concept names.
    */
   getPrerequisites(concept: string): string[] {
-    const lower = concept.toLowerCase();
-    return this.conceptGraph.get(lower) ?? CONCEPT_PREREQUISITES[lower] ?? [];
+    const lower = concept.toLowerCase()
+    return this.conceptGraph.get(lower) ?? CONCEPT_PREREQUISITES[lower] ?? []
   }
 
   /**
@@ -1460,25 +1567,25 @@ export class AdaptiveLearner {
    * Uses iterative depth-first traversal to avoid stack overflow.
    */
   private getPrerequisiteDepth(concept: string): number {
-    const visited = new Set<string>();
-    const stack: Array<{ concept: string; depth: number }> = [{ concept, depth: 0 }];
-    let maxDepth = 0;
+    const visited = new Set<string>()
+    const stack: Array<{ concept: string; depth: number }> = [{ concept, depth: 0 }]
+    let maxDepth = 0
 
     while (stack.length > 0) {
-      const { concept: current, depth } = stack.pop()!;
-      if (visited.has(current)) continue;
-      visited.add(current);
-      if (depth > maxDepth) maxDepth = depth;
+      const { concept: current, depth } = stack.pop()!
+      if (visited.has(current)) continue
+      visited.add(current)
+      if (depth > maxDepth) maxDepth = depth
 
-      const prereqs = this.getPrerequisites(current);
+      const prereqs = this.getPrerequisites(current)
       for (const prereq of prereqs) {
         if (!visited.has(prereq)) {
-          stack.push({ concept: prereq, depth: depth + 1 });
+          stack.push({ concept: prereq, depth: depth + 1 })
         }
       }
     }
 
-    return maxDepth;
+    return maxDepth
   }
 
   /**
@@ -1487,7 +1594,7 @@ export class AdaptiveLearner {
    * @param concept - The concept that has been mastered.
    */
   markMastered(concept: string): void {
-    this.masteredConcepts.add(concept.toLowerCase());
+    this.masteredConcepts.add(concept.toLowerCase())
   }
 
   /**
@@ -1497,7 +1604,7 @@ export class AdaptiveLearner {
    * @returns True if the concept is marked as mastered.
    */
   isMastered(concept: string): boolean {
-    return this.masteredConcepts.has(concept.toLowerCase());
+    return this.masteredConcepts.has(concept.toLowerCase())
   }
 
   /**
@@ -1506,7 +1613,7 @@ export class AdaptiveLearner {
    * @returns A readonly set of mastered concept names.
    */
   getMasteredConcepts(): ReadonlySet<string> {
-    return this.masteredConcepts;
+    return this.masteredConcepts
   }
 
   /**
@@ -1516,13 +1623,13 @@ export class AdaptiveLearner {
    * @param prerequisite - The prerequisite concept.
    */
   addPrerequisite(concept: string, prerequisite: string): void {
-    const lower = concept.toLowerCase();
-    const prereqLower = prerequisite.toLowerCase();
-    const existing = this.conceptGraph.get(lower) ?? [];
+    const lower = concept.toLowerCase()
+    const prereqLower = prerequisite.toLowerCase()
+    const existing = this.conceptGraph.get(lower) ?? []
     if (!existing.includes(prereqLower)) {
-      existing.push(prereqLower);
-      this.conceptGraph.set(lower, existing);
-      this.stats.conceptsTracked = this.conceptGraph.size;
+      existing.push(prereqLower)
+      this.conceptGraph.set(lower, existing)
+      this.stats.conceptsTracked = this.conceptGraph.size
     }
   }
 
@@ -1540,25 +1647,25 @@ export class AdaptiveLearner {
    * @param correction - Optional correction text if the output was wrong.
    */
   feedback(correct: boolean, correction?: string): void {
-    this.stats.totalFeedbacks++;
-    this.stats.lastUsedAt = new Date().toISOString();
+    this.stats.totalFeedbacks++
+    this.stats.lastUsedAt = new Date().toISOString()
 
     if (!correct && correction) {
       // If correction is provided, try to learn from the mistake
       if (this.config.enableMistakeLearning) {
-        this.learnFromMistake('(last prediction)', correction, 'user feedback');
+        this.learnFromMistake('(last prediction)', correction, 'user feedback')
       }
     }
   }
 
   /** Get a readonly snapshot of the current statistics. */
   getStats(): Readonly<AdaptiveLearnerStats> {
-    return { ...this.stats };
+    return { ...this.stats }
   }
 
   /** Get the current configuration. */
   getConfig(): Readonly<AdaptiveLearnerConfig> {
-    return { ...this.config };
+    return { ...this.config }
   }
 
   /**
@@ -1582,8 +1689,8 @@ export class AdaptiveLearner {
       domainMappings: this.nestedMapToRecord(this.domainMappings),
       mistakeFrequency: this.simpleMapToRecord(this.mistakeFrequency),
       calibrationAdjustments: this.simpleMapToRecord(this.calibrationAdjustments),
-    };
-    return JSON.stringify(state);
+    }
+    return JSON.stringify(state)
   }
 
   /**
@@ -1593,88 +1700,90 @@ export class AdaptiveLearner {
    * @returns A new AdaptiveLearner with the restored state.
    */
   static deserialize(json: string): AdaptiveLearner {
-    const state = JSON.parse(json) as AdaptiveLearnerState;
-    const learner = new AdaptiveLearner(state.config);
+    const state = JSON.parse(json) as AdaptiveLearnerState
+    const learner = new AdaptiveLearner(state.config)
 
     // Restore stats
-    learner.stats = { ...state.stats };
+    learner.stats = { ...state.stats }
 
     // Restore data arrays
-    learner.facts = state.facts ?? [];
-    learner.rules = state.rules ?? [];
-    learner.mistakes = state.mistakes ?? [];
-    learner.predictions = state.predictions ?? [];
+    learner.facts = state.facts ?? []
+    learner.rules = state.rules ?? []
+    learner.mistakes = state.mistakes ?? []
+    learner.predictions = state.predictions ?? []
 
     // Restore concept graph
     if (state.conceptGraph) {
       for (const [key, val] of Object.entries(state.conceptGraph)) {
-        learner.conceptGraph.set(key, val);
+        learner.conceptGraph.set(key, val)
       }
     }
 
     // Restore mastered concepts
     if (state.masteredConcepts) {
       for (const concept of state.masteredConcepts) {
-        learner.masteredConcepts.add(concept);
+        learner.masteredConcepts.add(concept)
       }
     }
 
     // Restore domain mappings
     if (state.domainMappings) {
       for (const [key, val] of Object.entries(state.domainMappings)) {
-        const inner = new Map<string, string>();
+        const inner = new Map<string, string>()
         for (const [k, v] of Object.entries(val)) {
-          inner.set(k, v);
+          inner.set(k, v)
         }
-        learner.domainMappings.set(key, inner);
+        learner.domainMappings.set(key, inner)
       }
     }
 
     // Restore mistake frequency
     if (state.mistakeFrequency) {
       for (const [key, val] of Object.entries(state.mistakeFrequency)) {
-        learner.mistakeFrequency.set(key, val);
+        learner.mistakeFrequency.set(key, val)
       }
     }
 
     // Restore calibration adjustments
     if (state.calibrationAdjustments) {
       for (const [key, val] of Object.entries(state.calibrationAdjustments)) {
-        learner.calibrationAdjustments.set(key, val);
+        learner.calibrationAdjustments.set(key, val)
       }
     }
 
-    return learner;
+    return learner
   }
 
   /** Convert a Map<string, string[]> to a plain Record for serialization. */
   private mapToRecord(map: Map<string, string[]>): Record<string, string[]> {
-    const record: Record<string, string[]> = {};
+    const record: Record<string, string[]> = {}
     for (const [key, val] of map) {
-      record[key] = val;
+      record[key] = val
     }
-    return record;
+    return record
   }
 
   /** Convert a Map<string, Map<string, string>> to nested Record for serialization. */
-  private nestedMapToRecord(map: Map<string, Map<string, string>>): Record<string, Record<string, string>> {
-    const record: Record<string, Record<string, string>> = {};
+  private nestedMapToRecord(
+    map: Map<string, Map<string, string>>,
+  ): Record<string, Record<string, string>> {
+    const record: Record<string, Record<string, string>> = {}
     for (const [outerKey, innerMap] of map) {
-      const inner: Record<string, string> = {};
+      const inner: Record<string, string> = {}
       for (const [key, val] of innerMap) {
-        inner[key] = val;
+        inner[key] = val
       }
-      record[outerKey] = inner;
+      record[outerKey] = inner
     }
-    return record;
+    return record
   }
 
   /** Convert a Map<string, number> to a plain Record for serialization. */
   private simpleMapToRecord(map: Map<string, number>): Record<string, number> {
-    const record: Record<string, number> = {};
+    const record: Record<string, number> = {}
     for (const [key, val] of map) {
-      record[key] = val;
+      record[key] = val
     }
-    return record;
+    return record
   }
 }

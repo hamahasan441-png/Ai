@@ -59,9 +59,7 @@ const outputSchema = lazySchema(() =>
     results: z
       .array(z.union([searchResultSchema(), z.string()]))
       .describe('Search results and/or text commentary from the model'),
-    durationSeconds: z
-      .number()
-      .describe('Time taken to complete the search operation'),
+    durationSeconds: z.number().describe('Time taken to complete the search operation'),
   }),
 )
 type OutputSchema = ReturnType<typeof outputSchema>
@@ -259,20 +257,13 @@ export const WebSearchTool = buildTool({
     })
     const toolSchema = makeToolSchema(input)
 
-    const useHaiku = getFeatureValue_CACHED_MAY_BE_STALE(
-      'tengu_plum_vx3',
-      false,
-    )
+    const useHaiku = getFeatureValue_CACHED_MAY_BE_STALE('tengu_plum_vx3', false)
 
     const appState = context.getAppState()
     const queryStream = queryModelWithStreaming({
       messages: [userMessage],
-      systemPrompt: asSystemPrompt([
-        'You are an assistant for performing a web search tool use',
-      ]),
-      thinkingConfig: useHaiku
-        ? { type: 'disabled' as const }
-        : context.options.thinkingConfig,
+      systemPrompt: asSystemPrompt(['You are an assistant for performing a web search tool use']),
+      thinkingConfig: useHaiku ? { type: 'disabled' as const } : context.options.thinkingConfig,
       tools: [],
       signal: context.abortController.signal,
       options: {
@@ -303,10 +294,7 @@ export const WebSearchTool = buildTool({
       }
 
       // Track tool use ID when server_tool_use starts
-      if (
-        event.type === 'stream_event' &&
-        event.event?.type === 'content_block_start'
-      ) {
+      if (event.type === 'stream_event' && event.event?.type === 'content_block_start') {
         const contentBlock = event.event.content_block
         if (contentBlock && contentBlock.type === 'server_tool_use') {
           currentToolUseId = contentBlock.id
@@ -330,9 +318,7 @@ export const WebSearchTool = buildTool({
           // Try to extract query from partial JSON for progress updates
           try {
             // Look for a complete query field
-            const queryMatch = currentToolUseJson.match(
-              /"query"\s*:\s*"((?:[^"\\]|\\.)*)"/,
-            )
+            const queryMatch = currentToolUseJson.match(/"query"\s*:\s*"((?:[^"\\]|\\.)*)"/)
             if (queryMatch && queryMatch[1]) {
               // The regex properly handles escaped characters
               const query = jsonParse('"' + queryMatch[1] + '"')
@@ -361,10 +347,7 @@ export const WebSearchTool = buildTool({
       }
 
       // Yield progress when search results come in
-      if (
-        event.type === 'stream_event' &&
-        event.event?.type === 'content_block_start'
-      ) {
+      if (event.type === 'stream_event' && event.event?.type === 'content_block_start') {
         const contentBlock = event.event.content_block
         if (contentBlock && contentBlock.type === 'web_search_tool_result') {
           // Get the actual query that was used for this search
@@ -391,11 +374,7 @@ export const WebSearchTool = buildTool({
     const endTime = performance.now()
     const durationSeconds = (endTime - startTime) / 1000
 
-    const data = makeOutputFromSearchResponse(
-      allContentBlocks,
-      query,
-      durationSeconds,
-    )
+    const data = makeOutputFromSearchResponse(allContentBlocks, query, durationSeconds)
     return { data }
   },
   mapToolResultToToolResultBlockParam(output, toolUseID) {

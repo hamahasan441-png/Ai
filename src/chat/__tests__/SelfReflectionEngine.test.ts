@@ -34,8 +34,7 @@ const LONG_OUTPUT =
   'and cache behavior. Furthermore, compacting collectors move objects to reduce ' +
   'fragmentation, which covers edge cases comprehensively.'
 
-const TECHNICAL_INPUT =
-  'Write a function to implement binary search in Python with error handling.'
+const TECHNICAL_INPUT = 'Write a function to implement binary search in Python with error handling.'
 
 const TECHNICAL_OUTPUT =
   'Here is a step-by-step implementation:\n' +
@@ -75,46 +74,62 @@ const TRADING_OUTPUT =
 
 /** Generate a text with error-category signals embedded. */
 function makeOverConfidentOutput(): string {
-  return 'This is certainly the best approach. It is absolutely correct and definitely ' +
+  return (
+    'This is certainly the best approach. It is absolutely correct and definitely ' +
     'the only way. Without doubt, this method is guaranteed to work 100% of the time.'
+  )
 }
 
 function makeUnderConfidentOutput(): string {
-  return 'Maybe this is correct. Perhaps it could work, but I am not sure. ' +
+  return (
+    'Maybe this is correct. Perhaps it could work, but I am not sure. ' +
     'It might be the right answer. Possibly this is valid, but I am uncertain. ' +
     'I think this could be okay.'
+  )
 }
 
 function makeHallucinatingOutput(): string {
-  return 'The fabricated framework XYZ doesn\'t exist in reality. This invented concept ' +
+  return (
+    "The fabricated framework XYZ doesn't exist in reality. This invented concept " +
     'is fictional and there is no such library called AbcDef. It was made up by the community.'
+  )
 }
 
 function makeRepetitiveOutput(): string {
-  return 'As I said before, the answer is X. As mentioned earlier, X is correct. ' +
+  return (
+    'As I said before, the answer is X. As mentioned earlier, X is correct. ' +
     'Again, X is the answer. I already stated that X is the solution. ' +
     'This is redundant but repeated for emphasis.'
+  )
 }
 
 function makeOverGeneralizedOutput(): string {
-  return 'This always works. It never fails. All systems use this approach. ' +
+  return (
+    'This always works. It never fails. All systems use this approach. ' +
     'Every developer knows this. None of the alternatives are valid. ' +
     'Universally, this is the accepted standard without exception.'
+  )
 }
 
 function makeTangentialOutput(): string {
-  return 'By the way, here is something unrelated. Off topic, but interesting. ' +
+  return (
+    'By the way, here is something unrelated. Off topic, but interesting. ' +
     'As a side note, this is a tangent. This digression is unrelated to the question.'
+  )
 }
 
 function makeIncompleteOutput(): string {
-  return 'Also consider the edge cases. Additionally, there are missing pieces. ' +
+  return (
+    'Also consider the edge cases. Additionally, there are missing pieces. ' +
     'I forgot to mention the key detail. The explanation is incomplete and left out important facts.'
+  )
 }
 
 function makeLogicallyInconsistentOutput(): string {
-  return 'The answer is A. But earlier I said B, which contradicts this. ' +
+  return (
+    'The answer is A. But earlier I said B, which contradicts this. ' +
     'However, this is inconsistent with the first claim. This conflicts with the initial statement.'
+  )
 }
 
 function populateEngine(engine: SelfReflectionEngine, count: number): void {
@@ -129,7 +144,13 @@ function populateEngine(engine: SelfReflectionEngine, count: number): void {
 }
 
 const ALL_DIMENSIONS: QualityDimension[] = [
-  'coherence', 'relevance', 'completeness', 'accuracy', 'clarity', 'depth', 'actionability',
+  'coherence',
+  'relevance',
+  'completeness',
+  'accuracy',
+  'clarity',
+  'depth',
+  'actionability',
 ]
 
 // ── Constructor Tests ────────────────────────────────────────────────────────
@@ -364,8 +385,13 @@ describe('evaluate', () => {
   it('limits selfCorrectionSuggestions to at most 10', () => {
     const result = engine.evaluate(
       SHORT_INPUT,
-      makeOverConfidentOutput() + ' ' + makeUnderConfidentOutput() + ' ' +
-        makeHallucinatingOutput() + ' ' + makeRepetitiveOutput(),
+      makeOverConfidentOutput() +
+        ' ' +
+        makeUnderConfidentOutput() +
+        ' ' +
+        makeHallucinatingOutput() +
+        ' ' +
+        makeRepetitiveOutput(),
     )
     expect(result.selfCorrectionSuggestions.length).toBeLessThanOrEqual(10)
   })

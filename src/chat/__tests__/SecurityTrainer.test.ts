@@ -287,7 +287,9 @@ describe('SecurityTrainer', () => {
 
   describe('performAudit', () => {
     it('performs audit on a target', () => {
-      const audit = trainer.performAudit('e-commerce web application with SQL injection payment processing authentication')
+      const audit = trainer.performAudit(
+        'e-commerce web application with SQL injection payment processing authentication',
+      )
       expect(audit.target).toBeTruthy()
       expect(audit.findings.length).toBeGreaterThanOrEqual(0)
     })

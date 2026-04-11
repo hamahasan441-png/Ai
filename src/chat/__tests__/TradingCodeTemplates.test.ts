@@ -16,12 +16,16 @@ describe('Trading Code Templates Knowledge', () => {
 
   it('provides MQL4 indicator template code', async () => {
     const r = await brain.chat('Give me an MQL4 custom indicator template with arrow signals')
-    expect(r.text.toLowerCase()).toMatch(/oncalculate|setindexbuffer|indicator|draw_arrow|setindexarrow|template/)
+    expect(r.text.toLowerCase()).toMatch(
+      /oncalculate|setindexbuffer|indicator|draw_arrow|setindexarrow|template/,
+    )
   })
 
   it('provides MQL5 EA template code', async () => {
     const r = await brain.chat('Give me an MQL5 expert advisor template boilerplate with CTrade')
-    expect(r.text.toLowerCase()).toMatch(/ctrade|oninit|ontick|mql5|trade\.buy|copybuffer|template|indicatorrelease/)
+    expect(r.text.toLowerCase()).toMatch(
+      /ctrade|oninit|ontick|mql5|trade\.buy|copybuffer|template|indicatorrelease/,
+    )
   })
 
   describe('Semantic Memory', () => {

@@ -16,21 +16,33 @@ describe('VersionControlAdvanced', () => {
 
   describe('KB entry tests', () => {
     it('should match Git internals and branching strategies keywords', async () => {
-      const r = await brain.chat('explain git internals objects refs packfiles reflog dag branching strategies git flow github flow trunk based development release branches')
+      const r = await brain.chat(
+        'explain git internals objects refs packfiles reflog dag branching strategies git flow github flow trunk based development release branches',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/git\s+internal|objects?|refs?|packfile|reflog|dag|branching|git\s+flow|github\s+flow|trunk/)
+      expect(r.text.toLowerCase()).toMatch(
+        /git\s+internal|objects?|refs?|packfile|reflog|dag|branching|git\s+flow|github\s+flow|trunk/,
+      )
     })
 
     it('should match rebase vs merge and git hooks keywords', async () => {
-      const r = await brain.chat('explain rebase vs merge interactive rebase squash fixup autosquash git hooks automation pre-commit commit-msg pre-push husky lint-staged')
+      const r = await brain.chat(
+        'explain rebase vs merge interactive rebase squash fixup autosquash git hooks automation pre-commit commit-msg pre-push husky lint-staged',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/rebase|merge|interactive|squash|fixup|git\s+hook|pre.commit|husky|lint.staged/)
+      expect(r.text.toLowerCase()).toMatch(
+        /rebase|merge|interactive|squash|fixup|git\s+hook|pre.commit|husky|lint.staged/,
+      )
     })
 
     it('should match monorepo management and conflict resolution keywords', async () => {
-      const r = await brain.chat('explain monorepo management nx turborepo lerna workspace affected conflict resolution merge strategies ours theirs rerere octopus three way merge')
+      const r = await brain.chat(
+        'explain monorepo management nx turborepo lerna workspace affected conflict resolution merge strategies ours theirs rerere octopus three way merge',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/monorepo|nx|turborepo|lerna|workspace|conflict|merge|ours|theirs|rerere|three.way/)
+      expect(r.text.toLowerCase()).toMatch(
+        /monorepo|nx|turborepo|lerna|workspace|conflict|merge|ours|theirs|rerere|three.way/,
+      )
     })
   })
 

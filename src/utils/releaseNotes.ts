@@ -25,8 +25,7 @@ const MAX_RELEASE_NOTES_SHOWN = 5
  * 2. We fetch the changelog in the background and store it in config
  * 3. Next time the user starts Claude, the cached changelog is available immediately
  */
-export const CHANGELOG_URL =
-  'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md'
+export const CHANGELOG_URL = 'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md'
 const RAW_CHANGELOG_URL =
   'https://raw.githubusercontent.com/anthropics/claude-code/refs/heads/main/CHANGELOG.md'
 
@@ -218,15 +217,11 @@ export function getRecentReleaseNotes(
 
     if (
       !basePreviousVersion ||
-      (baseCurrentVersion &&
-        gt(baseCurrentVersion.version, basePreviousVersion.version))
+      (baseCurrentVersion && gt(baseCurrentVersion.version, basePreviousVersion.version))
     ) {
       // Get all versions that are newer than the last seen version
       return Object.entries(releaseNotes)
-        .filter(
-          ([version]) =>
-            !basePreviousVersion || gt(version, basePreviousVersion.version),
-        )
+        .filter(([version]) => !basePreviousVersion || gt(version, basePreviousVersion.version))
         .sort(([versionA], [versionB]) => (gt(versionA, versionB) ? -1 : 1)) // Sort newest first
         .flatMap(([_, notes]) => notes)
         .filter(Boolean)
@@ -253,9 +248,7 @@ export function getAllReleaseNotes(
     const releaseNotes = parseChangelog(changelogContent)
 
     // Sort versions with oldest first
-    const sortedVersions = Object.keys(releaseNotes).sort((a, b) =>
-      gt(a, b) ? 1 : -1,
-    )
+    const sortedVersions = Object.keys(releaseNotes).sort((a, b) => (gt(a, b) ? 1 : -1))
 
     // Return array of [version, notes] arrays
     return sortedVersions
@@ -313,11 +306,7 @@ export async function checkForReleaseNotes(
     fetchAndStoreChangelog().catch(error => logError(toError(error)))
   }
 
-  const releaseNotes = getRecentReleaseNotes(
-    currentVersion,
-    lastSeenVersion,
-    cachedChangelog,
-  )
+  const releaseNotes = getRecentReleaseNotes(currentVersion, lastSeenVersion, cachedChangelog)
   const hasReleaseNotes = releaseNotes.length > 0
 
   return {

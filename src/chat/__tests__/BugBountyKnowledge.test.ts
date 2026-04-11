@@ -184,7 +184,9 @@ describe('BugBountyKnowledge', () => {
     it('all returned have high payouts', () => {
       const results = kb.getHighPayoutVulns()
       for (let i = 1; i < results.length; i++) {
-        expect(results[i - 1].typicalPayout.max).toBeGreaterThanOrEqual(results[i].typicalPayout.max)
+        expect(results[i - 1].typicalPayout.max).toBeGreaterThanOrEqual(
+          results[i].typicalPayout.max,
+        )
       }
     })
   })

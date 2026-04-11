@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  SemanticTrainer,
-  type FeedbackSignal,
-} from '../SemanticTrainer'
+import { SemanticTrainer, type FeedbackSignal } from '../SemanticTrainer'
 
 describe('SemanticTrainer', () => {
   let trainer: SemanticTrainer
@@ -151,8 +148,8 @@ describe('SemanticTrainer', () => {
 
     it('moves vectors closer when target similarity is high', () => {
       const vocabBefore = trainer.getVocabulary()
-      const entryA = vocabBefore.find((e) => e.word === 'react')!
-      const entryB = vocabBefore.find((e) => e.word === 'component')!
+      const entryA = vocabBefore.find(e => e.word === 'react')!
+      const entryB = vocabBefore.find(e => e.word === 'component')!
       const vecABefore = [...entryA.vector]
       const _vecBBefore = [...entryB.vector]
 
@@ -160,7 +157,7 @@ describe('SemanticTrainer', () => {
       expect(result).toBe(true)
 
       const vocabAfter = trainer.getVocabulary()
-      const entryAAfter = vocabAfter.find((e) => e.word === 'react')!
+      const entryAAfter = vocabAfter.find(e => e.word === 'react')!
       // Vectors should have changed
       const changed = entryAAfter.vector.some((v, i) => v !== vecABefore[i])
       expect(changed).toBe(true)
@@ -324,7 +321,7 @@ describe('SemanticTrainer', () => {
 
     it('detects backend domain from API/server text', () => {
       expect(trainer.detectDomain('express api rest middleware route controller server')).toBe(
-        'backend'
+        'backend',
       )
     })
 
@@ -337,9 +334,9 @@ describe('SemanticTrainer', () => {
     })
 
     it('detects ai_ml domain', () => {
-      expect(trainer.detectDomain('neural model training dataset tensor gradient transformer')).toBe(
-        'ai_ml'
-      )
+      expect(
+        trainer.detectDomain('neural model training dataset tensor gradient transformer'),
+      ).toBe('ai_ml')
     })
 
     it('returns general for ambiguous text', () => {
@@ -370,7 +367,7 @@ describe('SemanticTrainer', () => {
     it('returns all domain profiles', () => {
       const profiles = trainer.getDomainProfiles()
       expect(profiles.length).toBe(9) // All DomainType values
-      const domains = profiles.map((p) => p.domain)
+      const domains = profiles.map(p => p.domain)
       expect(domains).toContain('frontend')
       expect(domains).toContain('backend')
       expect(domains).toContain('general')

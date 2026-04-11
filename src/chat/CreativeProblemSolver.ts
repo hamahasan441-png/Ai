@@ -27,10 +27,10 @@ export interface ProblemDefinition {
 export interface CreativeSolution {
   idea: string
   method: CreativityMethod
-  feasibility: number      // 0-1
-  novelty: number          // 0-1
-  applicability: number    // 0-1
-  overallScore: number     // 0-1
+  feasibility: number // 0-1
+  novelty: number // 0-1
+  applicability: number // 0-1
+  overallScore: number // 0-1
   explanation: string
 }
 
@@ -57,7 +57,7 @@ export interface AnalogySuggestion {
   targetDomain: string
   analogy: string
   explanation: string
-  strength: number    // 0-1
+  strength: number // 0-1
 }
 
 export interface FirstPrinciplesAnalysis {
@@ -70,29 +70,29 @@ export interface FirstPrinciplesAnalysis {
 // ── Domain Analogies ─────────────────────────────────────────────────────────
 
 const DOMAIN_ANALOGIES: Record<string, string[]> = {
-  'software': [
+  software: [
     'Architecture: Software is like building a house — foundation (infrastructure), walls (services), rooms (modules)',
     'Biology: Code is like DNA — replication (deployment), mutation (bugs), evolution (refactoring)',
     'Traffic: Data flow is like city traffic — bottlenecks (performance), lanes (threads), traffic lights (semaphores)',
     'Kitchen: APIs are like recipes — ingredients (inputs), steps (processes), dish (output)',
     'Music: Code rhythm — composition (architecture), harmony (integration), tempo (performance)',
   ],
-  'management': [
+  management: [
     'Garden: Team management is like gardening — nurturing (mentoring), pruning (removing waste), growth (development)',
     'Orchestra: Project coordination like conducting — each section (team) plays a part, timing is everything',
     'Sports: Strategy like coaching — game plan (roadmap), plays (sprints), practice (training)',
   ],
-  'design': [
+  design: [
     'Nature: Design like evolution — survival of the fittest (user testing), adaptation (iteration)',
     'Fashion: UI design like fashion — trends, accessibility, personal expression',
     'Architecture: Information architecture like building blueprints — flow, structure, purpose',
   ],
-  'data': [
+  data: [
     'Mining: Data mining like gold mining — raw material (data), processing (ETL), valuable output (insights)',
     'Water: Data pipeline like plumbing — flow, pressure (throughput), leaks (data loss)',
     'Library: Database like a library — catalog (index), shelves (tables), librarian (query optimizer)',
   ],
-  'security': [
+  security: [
     'Castle: Security like castle defense — walls (firewall), moat (DMZ), guards (IDS)',
     'Immune System: Security like immune system — detection (monitoring), response (incident response)',
     'Banking: Auth like banking — vault (encryption), keys (credentials), guards (access control)',
@@ -193,7 +193,15 @@ export class CreativeProblemSolver {
    * Apply SCAMPER creativity technique
    */
   applySCAMPER(problem: ProblemDefinition): CreativeSolution[] {
-    const actions: ScamperAction[] = ['substitute', 'combine', 'adapt', 'modify', 'put_to_other_use', 'eliminate', 'reverse']
+    const actions: ScamperAction[] = [
+      'substitute',
+      'combine',
+      'adapt',
+      'modify',
+      'put_to_other_use',
+      'eliminate',
+      'reverse',
+    ]
     const solutions: CreativeSolution[] = []
 
     for (const action of actions) {
@@ -306,7 +314,10 @@ export class CreativeProblemSolver {
    * Break down problem to first principles
    */
   analyzeFirstPrinciples(problem: ProblemDefinition): FirstPrinciplesAnalysis {
-    const keywords = problem.description.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+    const keywords = problem.description
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(w => w.length > 3)
 
     const fundamentalTruths = [
       `The core need: "${problem.desiredOutcome}"`,
@@ -393,10 +404,21 @@ export class CreativeProblemSolver {
   /**
    * Score a solution for creativity and feasibility
    */
-  scoreSolution(solution: string, problem: ProblemDefinition): { feasibility: number; novelty: number; applicability: number; overall: number } {
+  scoreSolution(
+    solution: string,
+    problem: ProblemDefinition,
+  ): { feasibility: number; novelty: number; applicability: number; overall: number } {
     // Feasibility: does it address the problem?
-    const problemWords = new Set(problem.description.toLowerCase().split(/\s+/).filter(w => w.length > 3))
-    const solutionWords = solution.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+    const problemWords = new Set(
+      problem.description
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 3),
+    )
+    const solutionWords = solution
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(w => w.length > 3)
     const overlap = solutionWords.filter(w => problemWords.has(w)).length
     const feasibility = Math.min(1, overlap / Math.max(problemWords.size, 1) + 0.3)
 
@@ -405,7 +427,12 @@ export class CreativeProblemSolver {
     const novelty = Math.min(1, uniqueWords / Math.max(solutionWords.length, 1))
 
     // Applicability: does it address the desired outcome?
-    const outcomeWords = new Set(problem.desiredOutcome.toLowerCase().split(/\s+/).filter(w => w.length > 3))
+    const outcomeWords = new Set(
+      problem.desiredOutcome
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 3),
+    )
     const outcomeOverlap = solutionWords.filter(w => outcomeWords.has(w)).length
     const applicability = Math.min(1, outcomeOverlap / Math.max(outcomeWords.size, 1) + 0.3)
 

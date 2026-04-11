@@ -31,10 +31,7 @@ import {
   readCronTasks,
   removeCronTasks,
 } from './cronTasks.js'
-import {
-  releaseSchedulerLock,
-  tryAcquireSchedulerLock,
-} from './cronTasksLock.js'
+import { releaseSchedulerLock, tryAcquireSchedulerLock } from './cronTasksLock.js'
 import { logForDebugging } from './debug.js'
 
 const CHECK_INTERVAL_MS = 1000
@@ -50,11 +47,7 @@ const LOCK_PROBE_INTERVAL_MS = 5000
  * Extracted for testability — the scheduler's check() is buried under
  * setInterval/chokidar/lock machinery.
  */
-export function isRecurringTaskAged(
-  t: CronTask,
-  nowMs: number,
-  maxAgeMs: number,
-): boolean {
+export function isRecurringTaskAged(t: CronTask, nowMs: number, maxAgeMs: number): boolean {
   if (maxAgeMs === 0) return false
   return Boolean(t.recurring && !t.permanent && nowMs - t.createdAt >= maxAgeMs)
 }
@@ -139,9 +132,7 @@ export type CronScheduler = {
   getNextFireTime: () => number | null
 }
 
-export function createCronScheduler(
-  options: CronSchedulerOptions,
-): CronScheduler {
+export function createCronScheduler(options: CronSchedulerOptions): CronScheduler {
   const {
     onFire,
     isLoading,
@@ -206,9 +197,7 @@ export function createCronScheduler(
         count: missed.length,
         taskIds: missed
           .map(t => t.id)
-          .join(
-            ',',
-          ) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          .join(',') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       })
       if (onMissed) {
         onMissed(missed)
@@ -218,12 +207,8 @@ export function createCronScheduler(
       void removeCronTasks(
         missed.map(t => t.id),
         dir,
-      ).catch(e =>
-        logForDebugging(`[ScheduledTasks] failed to remove missed tasks: ${e}`),
-      )
-      logForDebugging(
-        `[ScheduledTasks] surfaced ${missed.length} missed one-shot task(s)`,
-      )
+      ).catch(e => logForDebugging(`[ScheduledTasks] failed to remove missed tasks: ${e}`))
+      logForDebugging(`[ScheduledTasks] surfaced ${missed.length} missed one-shot task(s)`)
     }
   }
 
@@ -262,18 +247,9 @@ export function createCronScheduler(
         // idle loses nextFireAt and the next spawn re-anchors from 10-day-
         // old createdAt → fires every task every cycle.
         next = t.recurring
-          ? (jitteredNextCronRunMs(
-              t.cron,
-              t.lastFiredAt ?? t.createdAt,
-              t.id,
-              jitterCfg,
-            ) ?? Infinity)
-          : (oneShotJitteredNextCronRunMs(
-              t.cron,
-              t.createdAt,
-              t.id,
-              jitterCfg,
-            ) ?? Infinity)
+          ? (jitteredNextCronRunMs(t.cron, t.lastFiredAt ?? t.createdAt, t.id, jitterCfg) ??
+            Infinity)
+          : (oneShotJitteredNextCronRunMs(t.cron, t.createdAt, t.id, jitterCfg) ?? Infinity)
         nextFireAt.set(t.id, next)
         logForDebugging(
           `[ScheduledTasks] scheduled ${t.id} for ${next === Infinity ? 'never' : new Date(next).toISOString()}`,
@@ -282,13 +258,10 @@ export function createCronScheduler(
 
       if (now < next) return
 
-      logForDebugging(
-        `[ScheduledTasks] firing ${t.id}${t.recurring ? ' (recurring)' : ''}`,
-      )
+      logForDebugging(`[ScheduledTasks] firing ${t.id}${t.recurring ? ' (recurring)' : ''}`)
       logEvent('tengu_scheduled_task_fire', {
         recurring: t.recurring ?? false,
-        taskId:
-          t.id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        taskId: t.id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
       })
       if (onFireTask) {
         onFireTask(t)
@@ -306,8 +279,7 @@ export function createCronScheduler(
           `[ScheduledTasks] recurring task ${t.id} aged out (${ageHours}h since creation), deleting after final fire`,
         )
         logEvent('tengu_scheduled_task_expired', {
-          taskId:
-            t.id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          taskId: t.id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           ageHours,
         })
       }
@@ -316,8 +288,7 @@ export function createCronScheduler(
         // Recurring: reschedule from now (not from next) to avoid rapid
         // catch-up if the session was blocked. Jitter keeps us off the
         // exact :00 wall-clock boundary every cycle.
-        const newNext =
-          jitteredNextCronRunMs(t.cron, now, t.id, jitterCfg) ?? Infinity
+        const newNext = jitteredNextCronRunMs(t.cron, now, t.id, jitterCfg) ?? Infinity
         nextFireAt.set(t.id, newNext)
         // Persist lastFiredAt=now so next process spawn reconstructs this
         // same newNext on first-sight. Session tasks skip — process-local.
@@ -334,11 +305,7 @@ export function createCronScheduler(
         // removeCronTasks + chokidar reload.
         inFlight.add(t.id)
         void removeCronTasks([t.id], dir)
-          .catch(e =>
-            logForDebugging(
-              `[ScheduledTasks] failed to remove task ${t.id}: ${e}`,
-            ),
-          )
+          .catch(e => logForDebugging(`[ScheduledTasks] failed to remove task ${t.id}: ${e}`))
           .finally(() => inFlight.delete(t.id))
         nextFireAt.delete(t.id)
       }
@@ -358,11 +325,7 @@ export function createCronScheduler(
       if (firedFileRecurring.length > 0) {
         for (const id of firedFileRecurring) inFlight.add(id)
         void markCronTasksFired(firedFileRecurring, now, dir)
-          .catch(e =>
-            logForDebugging(
-              `[ScheduledTasks] failed to persist lastFiredAt: ${e}`,
-            ),
-          )
+          .catch(e => logForDebugging(`[ScheduledTasks] failed to persist lastFiredAt: ${e}`))
           .finally(() => {
             for (const id of firedFileRecurring) inFlight.delete(id)
           })
@@ -477,10 +440,7 @@ export function createCronScheduler(
       )
       // Auto-enable when scheduled_tasks.json has entries. CronCreateTool
       // also sets this when a task is created mid-session.
-      if (
-        !getScheduledTasksEnabled() &&
-        (assistantMode || hasCronTasksSync())
-      ) {
+      if (!getScheduledTasksEnabled() && (assistantMode || hasCronTasksSync())) {
         setScheduledTasksEnabled(true)
       }
       if (getScheduledTasksEnabled()) {

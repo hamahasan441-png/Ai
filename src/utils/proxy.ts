@@ -11,12 +11,7 @@ import type * as undici from 'undici'
 import { getCACertificates } from './caCerts.js'
 import { logForDebugging } from './debug.js'
 import { isEnvTruthy } from './envUtils.js'
-import {
-  getMTLSAgent,
-  getMTLSConfig,
-  getTLSFetchOptions,
-  type TLSConfig,
-} from './mtls.js'
+import { getMTLSAgent, getMTLSConfig, getTLSFetchOptions, type TLSConfig } from './mtls.js'
 
 // Disable fetch keep-alive after a stale-pool ECONNRESET so retries open a
 // fresh TCP connection instead of reusing the dead pooled socket. Sticky for
@@ -165,9 +160,7 @@ function createHttpsProxyAgent(
  * resolution as the global interceptor, but agent options stay
  * scoped to this instance.
  */
-export function createAxiosInstance(
-  extra: HttpsProxyAgentOptions<string> = {},
-): AxiosInstance {
+export function createAxiosInstance(extra: HttpsProxyAgentOptions<string> = {}): AxiosInstance {
   const proxyUrl = getProxyUrl()
   const mtlsAgent = getMTLSAgent()
   const instance = axios.create({ proxy: false })
@@ -369,9 +362,7 @@ export function configureGlobalAgents(): void {
 
     // Set global dispatcher that now respects NO_PROXY via EnvHttpProxyAgent
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    ;(require('undici') as typeof undici).setGlobalDispatcher(
-      getProxyAgent(proxyUrl),
-    )
+    ;(require('undici') as typeof undici).setGlobalDispatcher(getProxyAgent(proxyUrl))
   } else if (mtlsAgent) {
     // No proxy but mTLS is configured
     axios.defaults.httpsAgent = mtlsAgent
@@ -380,9 +371,7 @@ export function configureGlobalAgents(): void {
     const mtlsOptions = getTLSFetchOptions()
     if (mtlsOptions.dispatcher) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      ;(require('undici') as typeof undici).setGlobalDispatcher(
-        mtlsOptions.dispatcher,
-      )
+      ;(require('undici') as typeof undici).setGlobalDispatcher(mtlsOptions.dispatcher)
     }
   }
 }

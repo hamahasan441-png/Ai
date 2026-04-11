@@ -68,10 +68,7 @@ export function fireRawRead(): Promise<RawReadResult> {
           if (!existsSync(path)) {
             return { stdout: '', label, ok: false }
           }
-          const { stdout, code } = await execFilePromise(PLUTIL_PATH, [
-            ...PLUTIL_ARGS_PREFIX,
-            path,
-          ])
+          const { stdout, code } = await execFilePromise(PLUTIL_PATH, [...PLUTIL_ARGS_PREFIX, path])
           return { stdout, label, ok: code === 0 && !!stdout }
         }),
       )
@@ -79,9 +76,7 @@ export function fireRawRead(): Promise<RawReadResult> {
       // First source wins (array is in priority order)
       const winner = allResults.find(r => r.ok)
       return {
-        plistStdouts: winner
-          ? [{ stdout: winner.stdout, label: winner.label }]
-          : [],
+        plistStdouts: winner ? [{ stdout: winner.stdout, label: winner.label }] : [],
         hklmStdout: null,
         hkcuStdout: null,
       }

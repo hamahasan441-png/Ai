@@ -46,10 +46,7 @@ async function withFixture<T>(
   }
 
   // Create hash of input for fixture filename
-  const hash = createHash('sha1')
-    .update(jsonStringify(input))
-    .digest('hex')
-    .slice(0, 12)
+  const hash = createHash('sha1').update(jsonStringify(input)).digest('hex').slice(0, 12)
   const filename = join(
     process.env.CLAUDE_CODE_TEST_FIXTURES_ROOT ?? getCwd(),
     `fixtures/${fixtureName}-${hash}.json`,
@@ -57,9 +54,7 @@ async function withFixture<T>(
 
   // Fetch cached fixture
   try {
-    const cached = jsonParse(
-      await readFile(filename, { encoding: 'utf8' }),
-    ) as T
+    const cached = jsonParse(await readFile(filename, { encoding: 'utf8' })) as T
     return cached
   } catch (e: unknown) {
     const code = getErrnoCode(e)
@@ -116,9 +111,9 @@ export async function withVCR(
 
   // Fetch cached fixture
   try {
-    const cached = jsonParse(
-      await readFile(filename, { encoding: 'utf8' }),
-    ) as { output: (AssistantMessage | StreamEvent)[] }
+    const cached = jsonParse(await readFile(filename, { encoding: 'utf8' })) as {
+      output: (AssistantMessage | StreamEvent)[]
+    }
     cached.output.forEach(addCachedCostToTotalSessionCost)
     return cached.output.map((message, index) =>
       mapMessage(message, hydrateValue, index, randomUUID()),
@@ -148,9 +143,7 @@ export async function withVCR(
     jsonStringify(
       {
         input: dehydratedInput,
-        output: results.map((message, index) =>
-          mapMessage(message, dehydrateValue, index),
-        ),
+        output: results.map((message, index) => mapMessage(message, dehydrateValue, index)),
       },
       null,
       2,
@@ -160,9 +153,7 @@ export async function withVCR(
   return results
 }
 
-function addCachedCostToTotalSessionCost(
-  message: AssistantMessage | StreamEvent,
-): void {
+function addCachedCostToTotalSessionCost(message: AssistantMessage | StreamEvent): void {
   if (message.type === 'stream_event') {
     return
   }
@@ -323,9 +314,7 @@ function dehydrateValue(s: unknown): unknown {
   // hashes match across platforms (e.g., [CWD]\foo\bar -> [CWD]/foo/bar)
   // Handle both single backslashes and JSON-escaped double backslashes (\\)
   s1 = s1
-    .replace(/\[CWD\][^\s"'<>]*/g, match =>
-      match.replaceAll('\\\\', '/').replaceAll('\\', '/'),
-    )
+    .replace(/\[CWD\][^\s"'<>]*/g, match => match.replaceAll('\\\\', '/').replaceAll('\\', '/'))
     .replace(/\[CONFIG_HOME\][^\s"'<>]*/g, match =>
       match.replaceAll('\\\\', '/').replaceAll('\\', '/'),
     )
@@ -348,14 +337,8 @@ function hydrateValue(s: unknown): unknown {
 
 export async function* withStreamingVCR(
   messages: Message[],
-  f: () => AsyncGenerator<
-    StreamEvent | AssistantMessage | SystemAPIErrorMessage,
-    void
-  >,
-): AsyncGenerator<
-  StreamEvent | AssistantMessage | SystemAPIErrorMessage,
-  void
-> {
+  f: () => AsyncGenerator<StreamEvent | AssistantMessage | SystemAPIErrorMessage, void>,
+): AsyncGenerator<StreamEvent | AssistantMessage | SystemAPIErrorMessage, void> {
   if (!shouldUseVCR()) {
     return yield* f()
   }
@@ -390,14 +373,9 @@ export async function withTokenCountVCR(
   // auto-memory path) and messages carry fresh UUIDs per run; without this,
   // every test run produces a new hash and fixtures never hit in CI.
   const cwdSlug = getCwd().replace(/[^a-zA-Z0-9]/g, '-')
-  const dehydrated = (
-    dehydrateValue(jsonStringify({ messages, tools })) as string
-  )
+  const dehydrated = (dehydrateValue(jsonStringify({ messages, tools })) as string)
     .replaceAll(cwdSlug, '[CWD_SLUG]')
-    .replace(
-      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
-      '[UUID]',
-    )
+    .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '[UUID]')
     .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z?/g, '[TIMESTAMP]')
   const result = await withFixture(dehydrated, 'token-count', async () => ({
     tokenCount: await f(),

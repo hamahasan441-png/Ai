@@ -96,7 +96,10 @@ describe('error classes', () => {
     })
 
     it('uses separate messages when two args', () => {
-      const err = new TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS('full msg', 'telemetry msg')
+      const err = new TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS(
+        'full msg',
+        'telemetry msg',
+      )
       expect(err.message).toBe('full msg')
       expect(err.telemetryMessage).toBe('telemetry msg')
     })
@@ -216,13 +219,10 @@ describe('isENOENT', () => {
 })
 
 describe('isFsInaccessible', () => {
-  it.each(['ENOENT', 'EACCES', 'EPERM', 'ENOTDIR', 'ELOOP'])(
-    'returns true for %s',
-    (code) => {
-      const e = Object.assign(new Error(), { code })
-      expect(isFsInaccessible(e)).toBe(true)
-    },
-  )
+  it.each(['ENOENT', 'EACCES', 'EPERM', 'ENOTDIR', 'ELOOP'])('returns true for %s', code => {
+    const e = Object.assign(new Error(), { code })
+    expect(isFsInaccessible(e)).toBe(true)
+  })
 
   it('returns false for other codes', () => {
     const e = Object.assign(new Error(), { code: 'EMFILE' })
@@ -378,7 +378,9 @@ describe('ToolError', () => {
   })
 
   it('includes tool name in context', () => {
-    const err = new ToolError('database', 'Query failed', AiErrorCode.TOOL_EXECUTION_FAILED, { sql: 'SELECT 1' })
+    const err = new ToolError('database', 'Query failed', AiErrorCode.TOOL_EXECUTION_FAILED, {
+      sql: 'SELECT 1',
+    })
     expect(err.context).toEqual({ sql: 'SELECT 1', toolName: 'database' })
   })
 })
@@ -413,7 +415,9 @@ describe('ServiceError', () => {
   })
 
   it('includes service name in context', () => {
-    const err = new ServiceError('mcp', 'Connection failed', AiErrorCode.MCP_ERROR, { url: 'ws://localhost' })
+    const err = new ServiceError('mcp', 'Connection failed', AiErrorCode.MCP_ERROR, {
+      url: 'ws://localhost',
+    })
     expect(err.context).toEqual({ url: 'ws://localhost', serviceName: 'mcp' })
   })
 })

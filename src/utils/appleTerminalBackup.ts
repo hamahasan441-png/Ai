@@ -55,11 +55,7 @@ export async function backupTerminalPreferences(): Promise<string | null> {
       return null
     }
 
-    await execFileNoThrow('defaults', [
-      'export',
-      'com.apple.Terminal',
-      backupPath,
-    ])
+    await execFileNoThrow('defaults', ['export', 'com.apple.Terminal', backupPath])
 
     markTerminalSetupInProgress(backupPath)
 
@@ -98,11 +94,7 @@ export async function checkAndRestoreTerminalBackup(): Promise<RestoreResult> {
   }
 
   try {
-    const { code } = await execFileNoThrow('defaults', [
-      'import',
-      'com.apple.Terminal',
-      backupPath,
-    ])
+    const { code } = await execFileNoThrow('defaults', ['import', 'com.apple.Terminal', backupPath])
 
     if (code !== 0) {
       return { status: 'failed', backupPath }
@@ -113,11 +105,7 @@ export async function checkAndRestoreTerminalBackup(): Promise<RestoreResult> {
     markTerminalSetupComplete()
     return { status: 'restored' }
   } catch (restoreError) {
-    logError(
-      new Error(
-        `Failed to restore Terminal.app settings with: ${restoreError}`,
-      ),
-    )
+    logError(new Error(`Failed to restore Terminal.app settings with: ${restoreError}`))
     markTerminalSetupComplete()
     return { status: 'failed', backupPath }
   }

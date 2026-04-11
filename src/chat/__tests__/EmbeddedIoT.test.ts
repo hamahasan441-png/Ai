@@ -12,13 +12,17 @@ describe('Embedded Systems & IoT Knowledge', () => {
   // ── Microcontroller Programming ─────────────────────────────────────────
   describe('Microcontroller Programming', () => {
     it('explains Arduino and ESP32 programming', async () => {
-      const r = await brain.chat('How do I program Arduino ESP32 microcontrollers with embedded systems firmware?')
+      const r = await brain.chat(
+        'How do I program Arduino ESP32 microcontrollers with embedded systems firmware?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/arduino|esp32|stm32|microcontroller|firmware|embedded/)
     })
 
     it('covers RTOS concepts', async () => {
-      const r = await brain.chat('What is RTOS real-time operating system for embedded programming?')
+      const r = await brain.chat(
+        'What is RTOS real-time operating system for embedded programming?',
+      )
       expect(r.text.toLowerCase()).toMatch(/rtos|freertos|task|queue|real.?time|embedded/)
     })
   })
@@ -26,7 +30,9 @@ describe('Embedded Systems & IoT Knowledge', () => {
   // ── IoT Protocols ──────────────────────────────────────────────────────
   describe('IoT Protocols', () => {
     it('explains MQTT and CoAP IoT protocols', async () => {
-      const r = await brain.chat('How do IoT internet of things MQTT CoAP protocols work for smart devices?')
+      const r = await brain.chat(
+        'How do IoT internet of things MQTT CoAP protocols work for smart devices?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/mqtt|coap|iot|sensor|protocol|gateway/)
     })
@@ -40,7 +46,9 @@ describe('Embedded Systems & IoT Knowledge', () => {
   // ── Embedded Peripherals ───────────────────────────────────────────────
   describe('Embedded Peripherals', () => {
     it('explains GPIO SPI I2C UART interfaces', async () => {
-      const r = await brain.chat('How do GPIO SPI I2C UART peripheral interfaces work in embedded systems?')
+      const r = await brain.chat(
+        'How do GPIO SPI I2C UART peripheral interfaces work in embedded systems?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/gpio|spi|i2c|uart|serial|bus|peripheral/)
     })
@@ -54,7 +62,9 @@ describe('Embedded Systems & IoT Knowledge', () => {
   // ── Embedded Linux ─────────────────────────────────────────────────────
   describe('Embedded Linux', () => {
     it('explains Yocto and Buildroot', async () => {
-      const r = await brain.chat('How do I build embedded Linux with Yocto Buildroot kernel for ARM?')
+      const r = await brain.chat(
+        'How do I build embedded Linux with Yocto Buildroot kernel for ARM?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/yocto|buildroot|embedded|linux|kernel|arm|device/)
     })
@@ -63,7 +73,9 @@ describe('Embedded Systems & IoT Knowledge', () => {
   // ── Power Management & Hardware ────────────────────────────────────────
   describe('Embedded Power & Hardware', () => {
     it('explains power management and PCB design', async () => {
-      const r = await brain.chat('What is power management battery optimization for embedded hardware PCB design?')
+      const r = await brain.chat(
+        'What is power management battery optimization for embedded hardware PCB design?',
+      )
       expect(r.text.toLowerCase()).toMatch(/power|battery|sleep|pcb|design|embedded|hardware/)
     })
   })
@@ -71,7 +83,9 @@ describe('Embedded Systems & IoT Knowledge', () => {
   // ── TinyML & Edge AI ──────────────────────────────────────────────────
   describe('TinyML & Edge AI', () => {
     it('explains TinyML on microcontrollers', async () => {
-      const r = await brain.chat('How does TinyML machine learning work on microcontroller inference with TensorFlow Lite?')
+      const r = await brain.chat(
+        'How does TinyML machine learning work on microcontroller inference with TensorFlow Lite?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/tinyml|tensorflow|microcontroller|edge|inference|model/)
     })

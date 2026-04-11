@@ -120,8 +120,19 @@ interface IntentDef {
 const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   code_write: {
     triggers: [
-      'write', 'create', 'generate', 'implement', 'build', 'code', 'scaffold',
-      'make', 'develop', 'program', 'construct', 'craft', 'author',
+      'write',
+      'create',
+      'generate',
+      'implement',
+      'build',
+      'code',
+      'scaffold',
+      'make',
+      'develop',
+      'program',
+      'construct',
+      'craft',
+      'author',
     ],
     phrases: [
       /write (?:me )?(?:a |an |the )?(?:function|class|module|script|program|component)/i,
@@ -147,18 +158,22 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   },
   code_explain: {
     triggers: [
-      'explain', 'describe', 'clarify', 'elaborate', 'walk through', 'breakdown',
-      'what does', 'how does', 'understand',
+      'explain',
+      'describe',
+      'clarify',
+      'elaborate',
+      'walk through',
+      'breakdown',
+      'what does',
+      'how does',
+      'understand',
     ],
     phrases: [
       /explain (?:this |the )?(?:code|function|class|snippet|logic|algorithm)/i,
       /what does (?:this |the )?(?:code|function|line|block) do/i,
       /how does (?:this |the )?(?:code|function|algorithm|logic) work/i,
     ],
-    syntactic: [
-      /^(?:can you |please )?explain\b/i,
-      /\bwalk (?:me )?through\b/i,
-    ],
+    syntactic: [/^(?:can you |please )?explain\b/i, /\bwalk (?:me )?through\b/i],
   },
   code_fix: {
     triggers: ['fix', 'repair', 'patch', 'resolve', 'correct', 'solve', 'bug', 'error', 'issue'],
@@ -174,18 +189,21 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   },
   code_refactor: {
     triggers: [
-      'refactor', 'restructure', 'reorganize', 'simplify', 'optimize', 'clean up',
-      'improve', 'modernize',
+      'refactor',
+      'restructure',
+      'reorganize',
+      'simplify',
+      'optimize',
+      'clean up',
+      'improve',
+      'modernize',
     ],
     phrases: [
       /refactor (?:this |the |my )?(?:code|function|class|module|component)/i,
       /clean (?:up|this) (?:code|implementation)/i,
       /make (?:this |the )?(?:code|implementation) (?:cleaner|simpler|better|faster)/i,
     ],
-    syntactic: [
-      /^(?:can you |please )?refactor\b/i,
-      /\bsimplify (?:this|the|my)\b/i,
-    ],
+    syntactic: [/^(?:can you |please )?refactor\b/i, /\bsimplify (?:this|the|my)\b/i],
   },
   search: {
     triggers: ['search', 'find', 'look up', 'lookup', 'locate', 'where', 'grep', 'query'],
@@ -193,15 +211,19 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
       /(?:search|find|look up|locate) (?:for )?(?:a |the )?(?:\w+ )+(?:in|from|within)/i,
       /where (?:is|are|can i find)\b/i,
     ],
-    syntactic: [
-      /^(?:can you |please )?(?:search|find|locate)\b/i,
-      /\bgrep\b/i,
-    ],
+    syntactic: [/^(?:can you |please )?(?:search|find|locate)\b/i, /\bgrep\b/i],
   },
   learn: {
     triggers: [
-      'learn', 'study', 'tutorial', 'course', 'guide', 'introduction', 'getting started',
-      'beginner', 'basics',
+      'learn',
+      'study',
+      'tutorial',
+      'course',
+      'guide',
+      'introduction',
+      'getting started',
+      'beginner',
+      'basics',
     ],
     phrases: [
       /(?:i want to |help me )?learn (?:about |how to )?/i,
@@ -214,10 +236,7 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   },
   teach: {
     triggers: ['teach', 'show', 'demonstrate', 'instruct', 'lesson', 'example', 'illustrate'],
-    phrases: [
-      /(?:teach|show) me (?:how to |about |the )?/i,
-      /give (?:me )?(?:an? )?example/i,
-    ],
+    phrases: [/(?:teach|show) me (?:how to |about |the )?/i, /give (?:me )?(?:an? )?example/i],
     syntactic: [
       /^(?:can you |please )?(?:teach|show|demonstrate)\b/i,
       /\bdemonstrate (?:how|what|the)\b/i,
@@ -225,22 +244,34 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   },
   reason: {
     triggers: [
-      'reason', 'think', 'analyze', 'logic', 'deduce', 'infer', 'consider', 'argue',
-      'justify', 'prove',
+      'reason',
+      'think',
+      'analyze',
+      'logic',
+      'deduce',
+      'infer',
+      'consider',
+      'argue',
+      'justify',
+      'prove',
     ],
     phrases: [
       /(?:think|reason) (?:about|through|step by step)/i,
       /what (?:are|would be) the (?:pros|cons|trade-?offs|implications)/i,
     ],
-    syntactic: [
-      /^(?:let's |can you )(?:think|reason|analyze)\b/i,
-      /\bstep by step\b/i,
-    ],
+    syntactic: [/^(?:let's |can you )(?:think|reason|analyze)\b/i, /\bstep by step\b/i],
   },
   compare: {
     triggers: [
-      'compare', 'versus', 'vs', 'difference', 'differ', 'contrast', 'better',
-      'which', 'pros and cons',
+      'compare',
+      'versus',
+      'vs',
+      'difference',
+      'differ',
+      'contrast',
+      'better',
+      'which',
+      'pros and cons',
     ],
     phrases: [
       /compare (?:\w+ )+(?:with|to|vs|versus|and)\b/i,
@@ -254,22 +285,35 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   },
   debug: {
     triggers: [
-      'debug', 'trace', 'diagnose', 'troubleshoot', 'investigate', 'stack trace',
-      'breakpoint', 'step through', 'log',
+      'debug',
+      'trace',
+      'diagnose',
+      'troubleshoot',
+      'investigate',
+      'stack trace',
+      'breakpoint',
+      'step through',
+      'log',
     ],
     phrases: [
       /debug (?:this |the |my )?(?:code|issue|error|problem)/i,
       /(?:help me )?(?:troubleshoot|diagnose|investigate)\b/i,
     ],
-    syntactic: [
-      /^(?:can you |please )?debug\b/i,
-      /\bwhy (?:am i|do i) (?:getting|seeing)\b/i,
-    ],
+    syntactic: [/^(?:can you |please )?debug\b/i, /\bwhy (?:am i|do i) (?:getting|seeing)\b/i],
   },
   deploy: {
     triggers: [
-      'deploy', 'publish', 'release', 'ship', 'launch', 'ci/cd', 'pipeline',
-      'docker', 'kubernetes', 'k8s', 'hosting',
+      'deploy',
+      'publish',
+      'release',
+      'ship',
+      'launch',
+      'ci/cd',
+      'pipeline',
+      'docker',
+      'kubernetes',
+      'k8s',
+      'hosting',
     ],
     phrases: [
       /deploy (?:this |the |my )?(?:app|application|service|project|code)/i,
@@ -282,8 +326,17 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   },
   design: {
     triggers: [
-      'design', 'architect', 'architecture', 'pattern', 'structure', 'schema',
-      'model', 'plan', 'blueprint', 'diagram', 'uml',
+      'design',
+      'architect',
+      'architecture',
+      'pattern',
+      'structure',
+      'schema',
+      'model',
+      'plan',
+      'blueprint',
+      'diagram',
+      'uml',
     ],
     phrases: [
       /design (?:a |an |the )?(?:system|api|schema|database|architecture)/i,
@@ -296,8 +349,16 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   },
   test: {
     triggers: [
-      'test', 'spec', 'assert', 'expect', 'mock', 'stub', 'coverage', 'unit test',
-      'integration test', 'e2e',
+      'test',
+      'spec',
+      'assert',
+      'expect',
+      'mock',
+      'stub',
+      'coverage',
+      'unit test',
+      'integration test',
+      'e2e',
     ],
     phrases: [
       /write (?:a |an |the )?(?:test|spec|unit test|integration test)/i,
@@ -310,8 +371,15 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   },
   document: {
     triggers: [
-      'document', 'documentation', 'docs', 'jsdoc', 'readme', 'comment', 'annotate',
-      'docstring', 'typedoc',
+      'document',
+      'documentation',
+      'docs',
+      'jsdoc',
+      'readme',
+      'comment',
+      'annotate',
+      'docstring',
+      'typedoc',
     ],
     phrases: [
       /(?:write|add|generate) (?:the )?(?:docs?|documentation|comments?|jsdoc|readme)/i,
@@ -324,10 +392,7 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
   },
   general_chat: {
     triggers: ['hello', 'hi', 'hey', 'thanks', 'thank', 'bye', 'chat', 'talk', 'sup'],
-    phrases: [
-      /^(?:hi|hello|hey|howdy|greetings)\b/i,
-      /^(?:thanks?|thank you|ty|thx)\b/i,
-    ],
+    phrases: [/^(?:hi|hello|hey|howdy|greetings)\b/i, /^(?:thanks?|thank you|ty|thx)\b/i],
     syntactic: [
       /^(?:how are you|what's up|how's it going)/i,
       /^(?:good (?:morning|afternoon|evening|night))/i,
@@ -339,15 +404,20 @@ const INTENT_DEFS: Record<IntentLabel, IntentDef> = {
       /^(?:what|why|how|when|who|which) (?:is|are|was|were|do|does|did|can|could|would|should)\b/i,
       /^(?:is|are|can|could|would|should|does|do|did) /i,
     ],
-    syntactic: [
-      /\?$/,
-      /^(?:i have a question|quick question|wondering)\b/i,
-    ],
+    syntactic: [/\?$/, /^(?:i have a question|quick question|wondering)\b/i],
   },
   task_decompose: {
     triggers: [
-      'break down', 'decompose', 'split', 'steps', 'plan', 'outline', 'roadmap',
-      'subtasks', 'milestones', 'phases',
+      'break down',
+      'decompose',
+      'split',
+      'steps',
+      'plan',
+      'outline',
+      'roadmap',
+      'subtasks',
+      'milestones',
+      'phases',
     ],
     phrases: [
       /break (?:this |it )?(?:down|into|apart)/i,
@@ -369,30 +439,170 @@ const SYNTACTIC_WEIGHT = 2.0
 // ── Entity Dictionaries ──────────────────────────────────────────────────────
 
 const PROGRAMMING_LANGUAGES: ReadonlySet<string> = new Set([
-  'javascript', 'typescript', 'python', 'java', 'c', 'cpp', 'c++', 'csharp', 'c#',
-  'go', 'golang', 'rust', 'ruby', 'php', 'swift', 'kotlin', 'scala', 'perl',
-  'r', 'matlab', 'lua', 'haskell', 'elixir', 'erlang', 'clojure', 'dart', 'julia',
-  'objective-c', 'objc', 'fortran', 'cobol', 'pascal', 'assembly', 'asm',
-  'bash', 'shell', 'powershell', 'sql', 'plsql', 'tsql', 'graphql', 'html', 'css',
-  'sass', 'scss', 'less', 'xml', 'json', 'yaml', 'yml', 'toml', 'markdown',
-  'latex', 'tex', 'vhdl', 'verilog', 'systemverilog', 'prolog', 'lisp',
-  'scheme', 'racket', 'ocaml', 'fsharp', 'f#', 'elm', 'purescript', 'nim',
-  'zig', 'crystal', 'v', 'vlang', 'groovy', 'coffeescript', 'reason', 'rescript',
-  'solidity', 'vyper', 'move', 'cairo', 'wasm', 'webassembly', 'abap', 'apex',
-  'ada', 'algol', 'apl', 'awk', 'basic', 'brainfuck', 'd', 'delphi',
-  'smalltalk', 'tcl', 'forth', 'io', 'j', 'k', 'q',
+  'javascript',
+  'typescript',
+  'python',
+  'java',
+  'c',
+  'cpp',
+  'c++',
+  'csharp',
+  'c#',
+  'go',
+  'golang',
+  'rust',
+  'ruby',
+  'php',
+  'swift',
+  'kotlin',
+  'scala',
+  'perl',
+  'r',
+  'matlab',
+  'lua',
+  'haskell',
+  'elixir',
+  'erlang',
+  'clojure',
+  'dart',
+  'julia',
+  'objective-c',
+  'objc',
+  'fortran',
+  'cobol',
+  'pascal',
+  'assembly',
+  'asm',
+  'bash',
+  'shell',
+  'powershell',
+  'sql',
+  'plsql',
+  'tsql',
+  'graphql',
+  'html',
+  'css',
+  'sass',
+  'scss',
+  'less',
+  'xml',
+  'json',
+  'yaml',
+  'yml',
+  'toml',
+  'markdown',
+  'latex',
+  'tex',
+  'vhdl',
+  'verilog',
+  'systemverilog',
+  'prolog',
+  'lisp',
+  'scheme',
+  'racket',
+  'ocaml',
+  'fsharp',
+  'f#',
+  'elm',
+  'purescript',
+  'nim',
+  'zig',
+  'crystal',
+  'v',
+  'vlang',
+  'groovy',
+  'coffeescript',
+  'reason',
+  'rescript',
+  'solidity',
+  'vyper',
+  'move',
+  'cairo',
+  'wasm',
+  'webassembly',
+  'abap',
+  'apex',
+  'ada',
+  'algol',
+  'apl',
+  'awk',
+  'basic',
+  'brainfuck',
+  'd',
+  'delphi',
+  'smalltalk',
+  'tcl',
+  'forth',
+  'io',
+  'j',
+  'k',
+  'q',
 ])
 
 const FRAMEWORKS: ReadonlySet<string> = new Set([
-  'react', 'angular', 'vue', 'svelte', 'next', 'nextjs', 'next.js', 'nuxt', 'nuxtjs',
-  'express', 'fastify', 'koa', 'hapi', 'nest', 'nestjs', 'django', 'flask', 'fastapi',
-  'spring', 'spring boot', 'rails', 'ruby on rails', 'laravel', 'symfony',
-  'gin', 'echo', 'fiber', 'actix', 'rocket', 'axum', 'warp',
-  'pytorch', 'tensorflow', 'keras', 'scikit-learn', 'pandas', 'numpy',
-  'electron', 'tauri', 'react native', 'flutter', 'ionic', 'capacitor',
-  'tailwind', 'tailwindcss', 'bootstrap', 'material-ui', 'mui', 'chakra',
-  'remix', 'gatsby', 'astro', 'solid', 'solidjs', 'qwik', 'htmx', 'alpine',
-  'jquery', 'backbone', 'ember', 'lit', 'stencil', 'preact',
+  'react',
+  'angular',
+  'vue',
+  'svelte',
+  'next',
+  'nextjs',
+  'next.js',
+  'nuxt',
+  'nuxtjs',
+  'express',
+  'fastify',
+  'koa',
+  'hapi',
+  'nest',
+  'nestjs',
+  'django',
+  'flask',
+  'fastapi',
+  'spring',
+  'spring boot',
+  'rails',
+  'ruby on rails',
+  'laravel',
+  'symfony',
+  'gin',
+  'echo',
+  'fiber',
+  'actix',
+  'rocket',
+  'axum',
+  'warp',
+  'pytorch',
+  'tensorflow',
+  'keras',
+  'scikit-learn',
+  'pandas',
+  'numpy',
+  'electron',
+  'tauri',
+  'react native',
+  'flutter',
+  'ionic',
+  'capacitor',
+  'tailwind',
+  'tailwindcss',
+  'bootstrap',
+  'material-ui',
+  'mui',
+  'chakra',
+  'remix',
+  'gatsby',
+  'astro',
+  'solid',
+  'solidjs',
+  'qwik',
+  'htmx',
+  'alpine',
+  'jquery',
+  'backbone',
+  'ember',
+  'lit',
+  'stencil',
+  'preact',
 ])
 
 // ── Entity Patterns ──────────────────────────────────────────────────────────
@@ -445,9 +655,7 @@ export class IntentEngine {
 
   /** Classify input text and return ranked intents with optional entities. */
   classify(input: string, context?: ConversationTurn[]): IntentResult {
-    const resolved = context && context.length > 0
-      ? this.resolveReferences(input, context)
-      : input
+    const resolved = context && context.length > 0 ? this.resolveReferences(input, context) : input
 
     const lower = resolved.toLowerCase()
     const scored: { label: IntentLabel; score: number; triggers: string[] }[] = []
@@ -497,20 +705,15 @@ export class IntentEngine {
     }))
 
     // Apply threshold and cap
-    const filtered = normalised.filter(
-      s => s.confidence >= this.config.confidenceThreshold,
-    )
+    const filtered = normalised.filter(s => s.confidence >= this.config.confidenceThreshold)
     const capped = filtered.slice(0, this.config.maxIntents)
 
-    const primary: DetectedIntent = capped.length > 0
-      ? capped[0]
-      : { label: 'general_chat', confidence: 0.5, triggers: [] }
+    const primary: DetectedIntent =
+      capped.length > 0 ? capped[0] : { label: 'general_chat', confidence: 0.5, triggers: [] }
 
     const secondary = capped.slice(1)
 
-    const entities = this.config.enableEntityExtraction
-      ? this.extractEntities(resolved)
-      : []
+    const entities = this.config.enableEntityExtraction ? this.extractEntities(resolved) : []
 
     const isCompound = COMPOUND_SEPARATORS.test(input)
 
@@ -629,8 +832,7 @@ export class IntentEngine {
         {
           type: 'comparison_target',
           value: betweenMatch[2],
-          position:
-            (betweenMatch.index ?? 0) + betweenMatch[0].indexOf(betweenMatch[2]),
+          position: (betweenMatch.index ?? 0) + betweenMatch[0].indexOf(betweenMatch[2]),
           confidence: 0.85,
         },
       )
@@ -650,15 +852,20 @@ export class IntentEngine {
 
   /** Split compound requests into individual resolved intents. */
   resolveCompound(input: string): ResolvedIntent[] {
-    const segments = input.split(COMPOUND_SEPARATORS).map(s => s.trim()).filter(Boolean)
+    const segments = input
+      .split(COMPOUND_SEPARATORS)
+      .map(s => s.trim())
+      .filter(Boolean)
 
     if (segments.length <= 1) {
       const result = this.classify(input)
-      return [{
-        intent: result.primary,
-        entities: result.entities,
-        originalSegment: input,
-      }]
+      return [
+        {
+          intent: result.primary,
+          entities: result.entities,
+          originalSegment: input,
+        },
+      ]
     }
 
     return segments.map(segment => {

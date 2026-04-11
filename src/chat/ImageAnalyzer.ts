@@ -253,11 +253,20 @@ export class ImageAnalyzer {
     const structure = this.analyzeStructure(imageData, format, pixelAnalysis)
 
     // 4. Content classification
-    const classification = this.classifyContent(imageData, format, pixelAnalysis, structure, question)
-    this.classCounts[classification.primaryType] = (this.classCounts[classification.primaryType] ?? 0) + 1
+    const classification = this.classifyContent(
+      imageData,
+      format,
+      pixelAnalysis,
+      structure,
+      question,
+    )
+    this.classCounts[classification.primaryType] =
+      (this.classCounts[classification.primaryType] ?? 0) + 1
 
     // 5. Text detection
-    const textRegions = this.config.detectText ? this.detectTextRegions(imageData, format, structure) : []
+    const textRegions = this.config.detectText
+      ? this.detectTextRegions(imageData, format, structure)
+      : []
 
     // 6. Scene understanding
     const scene = this.analyzeScene(pixelAnalysis, structure, classification, textRegions)
@@ -266,7 +275,16 @@ export class ImageAnalyzer {
     const quality = this.assessQuality(imageData, format, pixelAnalysis, structure)
 
     // 8. Build description
-    const description = this.buildDescription(format, pixelAnalysis, structure, classification, textRegions, scene, quality, question)
+    const description = this.buildDescription(
+      format,
+      pixelAnalysis,
+      structure,
+      classification,
+      textRegions,
+      scene,
+      quality,
+      question,
+    )
 
     const processingMs = Date.now() - start
     this.totalProcessingMs += processingMs
@@ -299,12 +317,17 @@ export class ImageAnalyzer {
     const detectedFormat = this.detectFormatFromSignature(cleanData)
 
     // Try to parse exact dimensions from image headers; fall back to heuristic
-    const parsedDims = this.parseHeaderDimensions(cleanData, detectedFormat ?? formatName.toLowerCase())
-    const dims = parsedDims ?? this.estimateDimensions(sizeBytes, detectedFormat || formatName.toLowerCase())
+    const parsedDims = this.parseHeaderDimensions(
+      cleanData,
+      detectedFormat ?? formatName.toLowerCase(),
+    )
+    const dims =
+      parsedDims ?? this.estimateDimensions(sizeBytes, detectedFormat || formatName.toLowerCase())
 
     // Detect features
     const hasAlpha = mediaType === 'image/png' || mediaType === 'image/webp'
-    const isAnimated = mediaType === 'image/gif' || (mediaType === 'image/webp' && sizeBytes > 100_000)
+    const isAnimated =
+      mediaType === 'image/gif' || (mediaType === 'image/webp' && sizeBytes > 100_000)
     const bitDepth = hasAlpha ? 32 : 24
 
     return {
@@ -333,7 +356,10 @@ export class ImageAnalyzer {
    * Supports PNG (IHDR chunk), JPEG (SOF0/SOF2 markers), GIF (logical screen descriptor),
    * and WebP (VP8/VP8L/VP8X chunks). Returns null if parsing fails.
    */
-  private parseHeaderDimensions(b64Data: string, format: string): { width: number; height: number } | null {
+  private parseHeaderDimensions(
+    b64Data: string,
+    format: string,
+  ): { width: number; height: number } | null {
     try {
       // Decode enough bytes to cover any format header (~128 bytes is sufficient)
       const headerB64 = b64Data.slice(0, 172) // 172 chars ≈ 129 bytes decoded
@@ -370,7 +396,8 @@ export class ImageAnalyzer {
     // Need at least 24 bytes
     if (bytes.length < 24) return null
     // Verify PNG signature: 89 50 4E 47 0D 0A 1A 0A
-    if (bytes[0] !== 0x89 || bytes[1] !== 0x50 || bytes[2] !== 0x4E || bytes[3] !== 0x47) return null
+    if (bytes[0] !== 0x89 || bytes[1] !== 0x50 || bytes[2] !== 0x4e || bytes[3] !== 0x47)
+      return null
     const width = bytes.readUInt32BE(16)
     const height = bytes.readUInt32BE(20)
     if (width <= 0 || height <= 0 || width > 65535 || height > 65535) return null
@@ -389,18 +416,18 @@ export class ImageAnalyzer {
   private parseJpegDimensions(b64Data: string): { width: number; height: number } | null {
     // Decode up to ~8 KB to find the SOF marker
     const maxBytes = 8192
-    const headerB64 = b64Data.slice(0, Math.ceil(maxBytes * 4 / 3))
+    const headerB64 = b64Data.slice(0, Math.ceil((maxBytes * 4) / 3))
     const bytes = Buffer.from(headerB64, 'base64')
 
     // JPEG starts with FF D8
-    if (bytes[0] !== 0xFF || bytes[1] !== 0xD8) return null
+    if (bytes[0] !== 0xff || bytes[1] !== 0xd8) return null
 
     let i = 2
     while (i + 3 < bytes.length) {
-      if (bytes[i] !== 0xFF) break
+      if (bytes[i] !== 0xff) break
       const marker = bytes[i + 1]
       // SOF0 (0xC0) or SOF2 (0xC2) — progressive JPEG
-      if (marker === 0xC0 || marker === 0xC2) {
+      if (marker === 0xc0 || marker === 0xc2) {
         if (i + 8 >= bytes.length) break
         const height = bytes.readUInt16BE(i + 5)
         const width = bytes.readUInt16BE(i + 7)
@@ -462,30 +489,32 @@ export class ImageAnalyzer {
   private parseWebpDimensions(bytes: Buffer): { width: number; height: number } | null {
     if (bytes.length < 30) return null
     // Verify RIFF....WEBP
-    if (bytes[0] !== 0x52 || bytes[1] !== 0x49 || bytes[2] !== 0x46 || bytes[3] !== 0x46) return null
-    if (bytes[8] !== 0x57 || bytes[9] !== 0x45 || bytes[10] !== 0x42 || bytes[11] !== 0x50) return null
+    if (bytes[0] !== 0x52 || bytes[1] !== 0x49 || bytes[2] !== 0x46 || bytes[3] !== 0x46)
+      return null
+    if (bytes[8] !== 0x57 || bytes[9] !== 0x45 || bytes[10] !== 0x42 || bytes[11] !== 0x50)
+      return null
 
     const chunk = bytes.slice(12, 16).toString('ascii')
 
     if (chunk === 'VP8 ') {
       // Lossy: skip 3-byte frame tag + start code check
       if (bytes.length < 30) return null
-      if (bytes[23] !== 0x9D || bytes[24] !== 0x01 || bytes[25] !== 0x2A) return null
-      const width = bytes.readUInt16LE(26) & 0x3FFF
-      const height = bytes.readUInt16LE(28) & 0x3FFF
+      if (bytes[23] !== 0x9d || bytes[24] !== 0x01 || bytes[25] !== 0x2a) return null
+      const width = bytes.readUInt16LE(26) & 0x3fff
+      const height = bytes.readUInt16LE(28) & 0x3fff
       if (width > 0 && height > 0) return { width, height }
     } else if (chunk === 'VP8L') {
       // Lossless
       if (bytes.length < 25) return null
-      if (bytes[20] !== 0x2F) return null
+      if (bytes[20] !== 0x2f) return null
       // Read 28 bits starting at byte 21
       const b0 = bytes[21] ?? 0
       const b1 = bytes[22] ?? 0
       const b2 = bytes[23] ?? 0
       const b3 = bytes[24] ?? 0
       const bits = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24)
-      const width = (bits & 0x3FFF) + 1
-      const height = ((bits >>> 14) & 0x3FFF) + 1
+      const width = (bits & 0x3fff) + 1
+      const height = ((bits >>> 14) & 0x3fff) + 1
       if (width > 0 && height > 0) return { width, height }
     } else if (chunk === 'VP8X') {
       // Extended: canvas dimensions start at byte 24
@@ -501,10 +530,10 @@ export class ImageAnalyzer {
   private estimateDimensions(sizeBytes: number, format: string): { width: number; height: number } {
     // Compression ratio varies by format
     const compressionRatio: Record<string, number> = {
-      png: 3,    // PNG: ~3:1 lossless
-      jpeg: 10,  // JPEG: ~10:1 lossy
-      gif: 5,    // GIF: ~5:1 limited palette
-      webp: 12,  // WebP: ~12:1 modern
+      png: 3, // PNG: ~3:1 lossless
+      jpeg: 10, // JPEG: ~10:1 lossy
+      gif: 5, // GIF: ~5:1 limited palette
+      webp: 12, // WebP: ~12:1 modern
     }
     const ratio = compressionRatio[format] ?? 8
     const rawPixelBytes = sizeBytes * ratio
@@ -512,8 +541,8 @@ export class ImageAnalyzer {
     const totalPixels = rawPixelBytes / bytesPerPixel
 
     // Assume roughly 4:3 aspect ratio
-    const height = Math.round(Math.sqrt(totalPixels * 3 / 4))
-    const width = Math.round(height * 4 / 3)
+    const height = Math.round(Math.sqrt((totalPixels * 3) / 4))
+    const width = Math.round((height * 4) / 3)
 
     return { width: Math.max(1, width), height: Math.max(1, height) }
   }
@@ -542,10 +571,15 @@ export class ImageAnalyzer {
     // Determine color space richness
     const uniqueBytes = new Set(byteValues).size
     const colorSpace: PixelAnalysis['colorSpace'] =
-      uniqueBytes < 10 ? 'grayscale' :
-      uniqueBytes < 30 ? 'limited' :
-      uniqueBytes < 80 ? 'standard' :
-      uniqueBytes < 150 ? 'rich' : 'vibrant'
+      uniqueBytes < 10
+        ? 'grayscale'
+        : uniqueBytes < 30
+          ? 'limited'
+          : uniqueBytes < 80
+            ? 'standard'
+            : uniqueBytes < 150
+              ? 'rich'
+              : 'vibrant'
 
     return {
       dominantColors,
@@ -596,7 +630,7 @@ export class ImageAnalyzer {
 
       values.push((a << 2) | (b >> 4))
       if (values.length >= maxBytes) break
-      if (b64[i - 2] !== '=') values.push(((b & 0x0F) << 4) | (c >> 2))
+      if (b64[i - 2] !== '=') values.push(((b & 0x0f) << 4) | (c >> 2))
       if (values.length >= maxBytes) break
       if (b64[i - 1] !== '=') values.push(((c & 0x03) << 6) | d)
     }
@@ -667,14 +701,19 @@ export class ImageAnalyzer {
       const colorIdx = Math.floor((avg / 255) * (colorNames.length - 1))
       const name = colorNames[Math.max(0, Math.min(colorIdx, colorNames.length - 1))]!
       if (!colors.find(c => c.name === name)) {
-        colors.push({ ...this.colorInfo(name), percentage: Math.round((1 / (colors.length + 2)) * 100) / 100 })
+        colors.push({
+          ...this.colorInfo(name),
+          percentage: Math.round((1 / (colors.length + 2)) * 100) / 100,
+        })
       }
     }
 
     // Add contrast-informed colors
     if (contrast > 0.6) {
-      if (!colors.find(c => c.name === 'black')) colors.push({ ...this.colorInfo('black'), percentage: 0.15 })
-      if (!colors.find(c => c.name === 'white')) colors.push({ ...this.colorInfo('white'), percentage: 0.15 })
+      if (!colors.find(c => c.name === 'black'))
+        colors.push({ ...this.colorInfo('black'), percentage: 0.15 })
+      if (!colors.find(c => c.name === 'white'))
+        colors.push({ ...this.colorInfo('white'), percentage: 0.15 })
     }
 
     // Add format-specific color hints
@@ -707,7 +746,11 @@ export class ImageAnalyzer {
 
   // ── Structure Analysis ─────────────────────────────────────────────────────
 
-  private analyzeStructure(imageData: string, format: ImageFormatInfo, pixels: PixelAnalysis): StructureAnalysis {
+  private analyzeStructure(
+    imageData: string,
+    format: ImageFormatInfo,
+    pixels: PixelAnalysis,
+  ): StructureAnalysis {
     const cleanData = imageData.replace(/\s/g, '')
 
     // Edge density: high byte transitions indicate edges
@@ -734,12 +777,26 @@ export class ImageAnalyzer {
     // Complexity
     const complexityScore = edgeDensity * 30 + regionCount * 2 + pixels.colorCount * 3
     const complexity: StructureAnalysis['complexity'] =
-      complexityScore < 10 ? 'minimal' :
-      complexityScore < 25 ? 'simple' :
-      complexityScore < 50 ? 'moderate' :
-      complexityScore < 80 ? 'complex' : 'very_complex'
+      complexityScore < 10
+        ? 'minimal'
+        : complexityScore < 25
+          ? 'simple'
+          : complexityScore < 50
+            ? 'moderate'
+            : complexityScore < 80
+              ? 'complex'
+              : 'very_complex'
 
-    return { edgeDensity, symmetryScore, regionCount, composition, hasGrid, hasText, hasFaces, complexity }
+    return {
+      edgeDensity,
+      symmetryScore,
+      regionCount,
+      composition,
+      hasGrid,
+      hasText,
+      hasFaces,
+      complexity,
+    }
   }
 
   private computeEdgeDensity(b64Data: string): number {
@@ -778,7 +835,11 @@ export class ImageAnalyzer {
     return Math.round((matches / half) * 100) / 100
   }
 
-  private detectComposition(edgeDensity: number, symmetry: number, pixels: PixelAnalysis): CompositionType {
+  private detectComposition(
+    edgeDensity: number,
+    symmetry: number,
+    pixels: PixelAnalysis,
+  ): CompositionType {
     if (symmetry > 0.5) return 'symmetrical'
     if (edgeDensity < 0.1 && pixels.contrast < 0.3) return 'uniform'
     if (edgeDensity > 0.5) return 'scattered'
@@ -814,27 +875,44 @@ export class ImageAnalyzer {
 
     // Format hints
     if (format.mimeType === 'image/jpeg') scores.photograph += 3
-    if (format.mimeType === 'image/png') { scores.screenshot += 2; scores.diagram += 1 }
+    if (format.mimeType === 'image/png') {
+      scores.screenshot += 2
+      scores.diagram += 1
+    }
     if (format.mimeType === 'image/gif') scores.illustration += 2
 
     // Size hints
     if (format.estimatedSizeBytes > 500_000) scores.photograph += 2
-    if (format.estimatedSizeBytes < 50_000) { scores.icon += 2; scores.diagram += 1 }
+    if (format.estimatedSizeBytes < 50_000) {
+      scores.icon += 2
+      scores.diagram += 1
+    }
 
     // Pixel analysis hints
     if (pixels.colorSpace === 'vibrant' || pixels.colorSpace === 'rich') scores.photograph += 2
     if (pixels.colorSpace === 'limited' || pixels.colorSpace === 'grayscale') {
-      scores.text_document += 2; scores.diagram += 1
+      scores.text_document += 2
+      scores.diagram += 1
     }
     if (pixels.averageBrightness > 0.7 && pixels.contrast > 0.5) scores.text_document += 2
     if (pixels.contrast < 0.2) scores.icon += 1
 
     // Structure hints
-    if (structure.hasGrid) { scores.screenshot += 2; scores.ui_mockup += 2; scores.chart += 1 }
-    if (structure.hasText) { scores.text_document += 2; scores.screenshot += 1 }
+    if (structure.hasGrid) {
+      scores.screenshot += 2
+      scores.ui_mockup += 2
+      scores.chart += 1
+    }
+    if (structure.hasText) {
+      scores.text_document += 2
+      scores.screenshot += 1
+    }
     if (structure.complexity === 'minimal') scores.icon += 2
     if (structure.complexity === 'very_complex') scores.photograph += 1
-    if (structure.edgeDensity > 0.5) { scores.diagram += 1; scores.code_snippet += 1 }
+    if (structure.edgeDensity > 0.5) {
+      scores.diagram += 1
+      scores.code_snippet += 1
+    }
 
     // Question-based hints
     if (question) {
@@ -855,7 +933,8 @@ export class ImageAnalyzer {
     const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1])
     const primaryType = sorted[0]![0] as ImageContentType
     const maxScore = sorted[0]![1]
-    const secondaryTypes = sorted.slice(1, 4)
+    const secondaryTypes = sorted
+      .slice(1, 4)
       .filter(([_, score]) => score > 0)
       .map(([type]) => type as ImageContentType)
 
@@ -899,7 +978,11 @@ export class ImageAnalyzer {
 
   // ── Text Detection ─────────────────────────────────────────────────────────
 
-  private detectTextRegions(imageData: string, format: ImageFormatInfo, structure: StructureAnalysis): TextRegion[] {
+  private detectTextRegions(
+    imageData: string,
+    format: ImageFormatInfo,
+    structure: StructureAnalysis,
+  ): TextRegion[] {
     const regions: TextRegion[] = []
 
     if (!structure.hasText && structure.edgeDensity < 0.2) return regions
@@ -958,29 +1041,47 @@ export class ImageAnalyzer {
     textRegions: readonly TextRegion[],
   ): SceneAnalysis {
     // Environment detection
-    const isDigital = ['screenshot', 'diagram', 'chart', 'code_snippet', 'ui_mockup', 'icon'].includes(classification.primaryType)
-    const isAbstract = ['illustration', 'infographic'].includes(classification.primaryType) && pixels.colorSpace === 'limited'
+    const isDigital = [
+      'screenshot',
+      'diagram',
+      'chart',
+      'code_snippet',
+      'ui_mockup',
+      'icon',
+    ].includes(classification.primaryType)
+    const isAbstract =
+      ['illustration', 'infographic'].includes(classification.primaryType) &&
+      pixels.colorSpace === 'limited'
 
-    const environment: SceneAnalysis['environment'] =
-      isDigital ? 'digital' :
-      isAbstract ? 'abstract' :
-      pixels.colorSpace === 'vibrant' || pixels.colorSpace === 'rich' ? 'outdoor' :
-      'indoor'
+    const environment: SceneAnalysis['environment'] = isDigital
+      ? 'digital'
+      : isAbstract
+        ? 'abstract'
+        : pixels.colorSpace === 'vibrant' || pixels.colorSpace === 'rich'
+          ? 'outdoor'
+          : 'indoor'
 
     // Mood
     const mood = this.detectMood(pixels, structure)
 
     // Lighting
     const lighting: SceneAnalysis['lighting'] =
-      pixels.averageBrightness > 0.7 ? 'bright' :
-      pixels.averageBrightness < 0.3 ? 'dark' :
-      pixels.contrast > 0.5 ? 'natural' :
-      environment === 'digital' ? 'artificial' : 'mixed'
+      pixels.averageBrightness > 0.7
+        ? 'bright'
+        : pixels.averageBrightness < 0.3
+          ? 'dark'
+          : pixels.contrast > 0.5
+            ? 'natural'
+            : environment === 'digital'
+              ? 'artificial'
+              : 'mixed'
 
     // Depth
-    const depth: SceneAnalysis['depth'] =
-      isDigital ? 'flat' :
-      pixels.contrast > 0.5 && structure.regionCount > 5 ? 'deep' : 'shallow'
+    const depth: SceneAnalysis['depth'] = isDigital
+      ? 'flat'
+      : pixels.contrast > 0.5 && structure.regionCount > 5
+        ? 'deep'
+        : 'shallow'
 
     // Activity
     const activity = this.detectActivity(classification, textRegions)
@@ -1008,17 +1109,29 @@ export class ImageAnalyzer {
     return 'neutral'
   }
 
-  private detectActivity(classification: ContentClassification, textRegions: readonly TextRegion[]): string {
+  private detectActivity(
+    classification: ContentClassification,
+    textRegions: readonly TextRegion[],
+  ): string {
     switch (classification.primaryType) {
-      case 'code_snippet': return 'programming'
-      case 'chart': return 'data analysis'
-      case 'diagram': return 'planning or documentation'
-      case 'screenshot': return 'software use'
-      case 'ui_mockup': return 'design work'
-      case 'text_document': return 'reading or writing'
-      case 'photograph': return 'scene capture'
-      case 'map': return 'navigation or geography'
-      default: return textRegions.length > 0 ? 'content review' : 'viewing'
+      case 'code_snippet':
+        return 'programming'
+      case 'chart':
+        return 'data analysis'
+      case 'diagram':
+        return 'planning or documentation'
+      case 'screenshot':
+        return 'software use'
+      case 'ui_mockup':
+        return 'design work'
+      case 'text_document':
+        return 'reading or writing'
+      case 'photograph':
+        return 'scene capture'
+      case 'map':
+        return 'navigation or geography'
+      default:
+        return textRegions.length > 0 ? 'content review' : 'viewing'
     }
   }
 
@@ -1035,9 +1148,13 @@ export class ImageAnalyzer {
     // Resolution assessment
     const totalPixels = format.estimatedWidth * format.estimatedHeight
     const resolution: QualityAssessment['resolution'] =
-      totalPixels > 2_000_000 ? 'very_high' :
-      totalPixels > 500_000 ? 'high' :
-      totalPixels > 100_000 ? 'medium' : 'low'
+      totalPixels > 2_000_000
+        ? 'very_high'
+        : totalPixels > 500_000
+          ? 'high'
+          : totalPixels > 100_000
+            ? 'medium'
+            : 'low'
 
     if (resolution === 'low') issues.push('Low resolution image')
 
@@ -1059,12 +1176,21 @@ export class ImageAnalyzer {
     }
 
     // Overall score
-    const overallScore = Math.round((
-      (resolution === 'very_high' ? 1 : resolution === 'high' ? 0.8 : resolution === 'medium' ? 0.5 : 0.2) * 0.3 +
-      sharpness * 0.3 +
-      (1 - noiseLevel) * 0.2 +
-      dynamicRange * 0.2
-    ) * 100) / 100
+    const overallScore =
+      Math.round(
+        ((resolution === 'very_high'
+          ? 1
+          : resolution === 'high'
+            ? 0.8
+            : resolution === 'medium'
+              ? 0.5
+              : 0.2) *
+          0.3 +
+          sharpness * 0.3 +
+          (1 - noiseLevel) * 0.2 +
+          dynamicRange * 0.2) *
+          100,
+      ) / 100
 
     return { resolution, sharpness, noiseLevel, dynamicRange, overallScore, issues }
   }
@@ -1084,13 +1210,20 @@ export class ImageAnalyzer {
     const parts: string[] = []
 
     // Opening
-    parts.push(`${classification.primaryType.replace(/_/g, ' ')} (${format.formatName}, ~${format.estimatedSizeKB}KB).`)
+    parts.push(
+      `${classification.primaryType.replace(/_/g, ' ')} (${format.formatName}, ~${format.estimatedSizeKB}KB).`,
+    )
 
     // Scene description
-    parts.push(`${scene.environment.charAt(0).toUpperCase() + scene.environment.slice(1)} scene with ${scene.lighting} lighting and ${scene.mood} mood.`)
+    parts.push(
+      `${scene.environment.charAt(0).toUpperCase() + scene.environment.slice(1)} scene with ${scene.lighting} lighting and ${scene.mood} mood.`,
+    )
 
     // Color description
-    const colorNames = pixels.dominantColors.slice(0, 3).map(c => c.name).join(', ')
+    const colorNames = pixels.dominantColors
+      .slice(0, 3)
+      .map(c => c.name)
+      .join(', ')
     parts.push(`Dominant colors: ${colorNames}. Color palette: ${pixels.colorSpace}.`)
 
     // Structure
@@ -1103,7 +1236,9 @@ export class ImageAnalyzer {
     }
 
     // Quality
-    parts.push(`Quality: ${quality.resolution} resolution, sharpness ${(quality.sharpness * 100).toFixed(0)}%.`)
+    parts.push(
+      `Quality: ${quality.resolution} resolution, sharpness ${(quality.sharpness * 100).toFixed(0)}%.`,
+    )
     if (quality.issues.length > 0) {
       parts.push(`Issues: ${quality.issues.join('; ')}.`)
     }
@@ -1119,7 +1254,9 @@ export class ImageAnalyzer {
     // Answer user question if provided
     if (question) {
       parts.push(`User question: "${question}".`)
-      parts.push(this.answerImageQuestion(question, classification, pixels, structure, scene, textRegions))
+      parts.push(
+        this.answerImageQuestion(question, classification, pixels, structure, scene, textRegions),
+      )
     }
 
     return parts.join(' ')
@@ -1135,7 +1272,10 @@ export class ImageAnalyzer {
   ): string {
     const q = question.toLowerCase()
 
-    if (q.includes('what') && (q.includes('this') || q.includes('image') || q.includes('picture'))) {
+    if (
+      q.includes('what') &&
+      (q.includes('this') || q.includes('image') || q.includes('picture'))
+    ) {
       return `This appears to be a ${classification.primaryType.replace(/_/g, ' ')} with ${structure.complexity} complexity.`
     }
     if (q.includes('color')) {
@@ -1185,7 +1325,8 @@ export class ImageAnalyzer {
   getStats(): ImageAnalyzerStats {
     return {
       totalAnalyses: this.analysisCount,
-      averageProcessingMs: this.analysisCount > 0 ? Math.round(this.totalProcessingMs / this.analysisCount) : 0,
+      averageProcessingMs:
+        this.analysisCount > 0 ? Math.round(this.totalProcessingMs / this.analysisCount) : 0,
       formatDistribution: { ...this.formatCounts },
       classificationDistribution: { ...this.classCounts },
     }

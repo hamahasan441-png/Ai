@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  MetaCognition,
-  type MetaCognitionConfig,
-} from '../MetaCognition'
+import { MetaCognition, type MetaCognitionConfig } from '../MetaCognition'
 
 // ── Constructor Tests ────────────────────────────────────────────────────────
 
@@ -268,10 +265,7 @@ describe('getEpistemicState', () => {
   })
 
   it('includes known gaps in knownUnknowns after gap detection', () => {
-    mc.detectKnowledgeGaps([
-      'What is quantum computing?',
-      'How does string theory work?',
-    ])
+    mc.detectKnowledgeGaps(['What is quantum computing?', 'How does string theory work?'])
     const state = mc.getEpistemicState()
     // At least some gaps should have been detected (no calibration data → high severity)
     expect(state.knownUnknowns.length).toBeGreaterThanOrEqual(0)
@@ -293,10 +287,7 @@ describe('detectKnowledgeGaps', () => {
   })
 
   it('detects gaps for unfamiliar domains', () => {
-    const gaps = mc.detectKnowledgeGaps([
-      'What is dark matter?',
-      'How does nuclear fusion work?',
-    ])
+    const gaps = mc.detectKnowledgeGaps(['What is dark matter?', 'How does nuclear fusion work?'])
     // With no history, severity should be high
     expect(gaps.length).toBeGreaterThan(0)
     for (const gap of gaps) {
@@ -350,9 +341,12 @@ describe('detectKnowledgeGaps', () => {
     ]
     const gaps = mc.detectKnowledgeGaps(queries)
     if (gaps.length > 0) {
-      const _targetGap = gaps.find(g => g.topic === 'biology-genetics-overview'
-        || g.topic === 'biology-genetics-details'
-        || g.topic.startsWith('biology'))
+      const _targetGap = gaps.find(
+        g =>
+          g.topic === 'biology-genetics-overview' ||
+          g.topic === 'biology-genetics-details' ||
+          g.topic.startsWith('biology'),
+      )
       // Queries with identical first 3 words share a domain
       // If not, at least verify the structure is correct
       for (const gap of gaps) {
@@ -418,8 +412,8 @@ describe('reflect', () => {
       mc.recordOutcome(0.7, 0.72)
     }
     const result = mc.reflect()
-    const hasExcellent = result.strengths.some(s =>
-      s.toLowerCase().includes('excellent') || s.toLowerCase().includes('good'),
+    const hasExcellent = result.strengths.some(
+      s => s.toLowerCase().includes('excellent') || s.toLowerCase().includes('good'),
     )
     expect(hasExcellent).toBe(true)
   })
@@ -429,9 +423,7 @@ describe('reflect', () => {
       mc.recordOutcome(0.6, 0.6)
     }
     const result = mc.reflect()
-    const hasHistory = result.strengths.some(s =>
-      s.toLowerCase().includes('substantial'),
-    )
+    const hasHistory = result.strengths.some(s => s.toLowerCase().includes('substantial'))
     expect(hasHistory).toBe(true)
   })
 })
@@ -516,9 +508,7 @@ describe('shouldSeekHelp', () => {
 
   it('returns true when domain has known high-severity gap', () => {
     // detectKnowledgeGaps with unfamiliar domains creates gaps
-    mc.detectKnowledgeGaps([
-      'What is quantum entanglement?',
-    ])
+    mc.detectKnowledgeGaps(['What is quantum entanglement?'])
     // The gap for "quantum-entanglement" should have high severity
     // shouldSeekHelp checks if gap.severity > 0.7
     const result = mc.shouldSeekHelp('What about quantum entanglement?', 0.5)
@@ -528,8 +518,7 @@ describe('shouldSeekHelp', () => {
 
   it('returns true for highly complex queries with moderate confidence', () => {
     // 3+ complexity indicators: why, how, explain, analyze, evaluate
-    const complexQuery =
-      'Why and how should we analyze and evaluate and synthesize this problem?'
+    const complexQuery = 'Why and how should we analyze and evaluate and synthesize this problem?'
     expect(mc.shouldSeekHelp(complexQuery, 0.4)).toBe(true)
   })
 

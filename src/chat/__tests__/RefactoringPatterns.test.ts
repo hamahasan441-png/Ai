@@ -16,21 +16,33 @@ describe('RefactoringPatterns', () => {
 
   describe('KB entry tests', () => {
     it('should match code smells and refactoring techniques keywords', async () => {
-      const r = await brain.chat('explain code smell long method god class feature envy refactoring technique extract method extract class move method')
+      const r = await brain.chat(
+        'explain code smell long method god class feature envy refactoring technique extract method extract class move method',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/code\s+smell|long\s+method|god\s+class|extract\s+(method|class)|refactoring/)
+      expect(r.text.toLowerCase()).toMatch(
+        /code\s+smell|long\s+method|god\s+class|extract\s+(method|class)|refactoring/,
+      )
     })
 
     it('should match legacy code and technical debt keywords', async () => {
-      const r = await brain.chat('explain legacy code characterization test strangler fig branch by abstraction technical debt management debt quadrant impact effort')
+      const r = await brain.chat(
+        'explain legacy code characterization test strangler fig branch by abstraction technical debt management debt quadrant impact effort',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/legacy\s+code|strangler\s+fig|characterization|technical\s+debt|debt\s+quadrant/)
+      expect(r.text.toLowerCase()).toMatch(
+        /legacy\s+code|strangler\s+fig|characterization|technical\s+debt|debt\s+quadrant/,
+      )
     })
 
     it('should match SOLID principles and anti-patterns keywords', async () => {
-      const r = await brain.chat('explain solid principle srp ocp lsp isp dip anti pattern spaghetti code golden hammer premature optimization cargo cult')
+      const r = await brain.chat(
+        'explain solid principle srp ocp lsp isp dip anti pattern spaghetti code golden hammer premature optimization cargo cult',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/solid|srp|ocp|spaghetti|golden\s+hammer|premature\s+optimization|cargo\s+cult/)
+      expect(r.text.toLowerCase()).toMatch(
+        /solid|srp|ocp|spaghetti|golden\s+hammer|premature\s+optimization|cargo\s+cult/,
+      )
     })
   })
 

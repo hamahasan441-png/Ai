@@ -11,33 +11,45 @@ describe('Bioinformatics & Computational Biology Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about DNA/RNA sequence alignment', async () => {
-      const r = await brain.chat('Explain dna rna sequence alignment bioinformatics and blast sequence search')
+      const r = await brain.chat(
+        'Explain dna rna sequence alignment bioinformatics and blast sequence search',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/dna|rna|sequence|alignment|blast|genome/)
     })
 
     it('answers about protein structure and AlphaFold', async () => {
-      const r = await brain.chat('How does protein structure folding prediction alphafold and molecular dynamics work?')
+      const r = await brain.chat(
+        'How does protein structure folding prediction alphafold and molecular dynamics work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/protein|structure|alphafold|fold|molecular/)
     })
 
     it('answers about RNA-seq and gene expression', async () => {
-      const r = await brain.chat('Explain genomics transcriptomics rna seq gene expression and single cell sequencing analysis')
+      const r = await brain.chat(
+        'Explain genomics transcriptomics rna seq gene expression and single cell sequencing analysis',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/rna.?seq|gene|expression|single\s*cell|transcriptom/)
     })
 
     it('answers about bioinformatics tools and phylogenetics', async () => {
-      const r = await brain.chat('What are biopython bioconductor bioinformatics library and phylogenetic tree analysis?')
+      const r = await brain.chat(
+        'What are biopython bioconductor bioinformatics library and phylogenetic tree analysis?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/biopython|bioconductor|phylogene|metagenom/)
     })
 
     it('answers about ML in biology', async () => {
-      const r = await brain.chat('How does machine learning genomics deep learning biology and protein language model work?')
+      const r = await brain.chat(
+        'How does machine learning genomics deep learning biology and protein language model work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/machine\s*learn|deep\s*learn|protein|genomic|language\s*model/)
+      expect(r.text.toLowerCase()).toMatch(
+        /machine\s*learn|deep\s*learn|protein|genomic|language\s*model/,
+      )
     })
   })
 

@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  EconomicAnalyzer,
-  type EconomicSnapshot,
-} from '../EconomicAnalyzer'
+import { EconomicAnalyzer, type EconomicSnapshot } from '../EconomicAnalyzer'
 
 // ── Helpers ──
 
@@ -19,23 +16,27 @@ function makeSnapshot(overrides: Partial<EconomicSnapshot> = {}): EconomicSnapsh
 }
 
 function makeExpansionSnapshots(n = 5): EconomicSnapshot[] {
-  return Array.from({ length: n }, (_, i) => makeSnapshot({
-    gdpGrowth: 2.5 + i * 0.3,
-    inflation: 2.0 + i * 0.1,
-    unemployment: 4.5 - i * 0.2,
-    interestRate: 3.0 + i * 0.15,
-    timestamp: Date.now() - (n - i) * 86_400_000 * 90,
-  }))
+  return Array.from({ length: n }, (_, i) =>
+    makeSnapshot({
+      gdpGrowth: 2.5 + i * 0.3,
+      inflation: 2.0 + i * 0.1,
+      unemployment: 4.5 - i * 0.2,
+      interestRate: 3.0 + i * 0.15,
+      timestamp: Date.now() - (n - i) * 86_400_000 * 90,
+    }),
+  )
 }
 
 function makeRecessionSnapshots(n = 5): EconomicSnapshot[] {
-  return Array.from({ length: n }, (_, i) => makeSnapshot({
-    gdpGrowth: 1.0 - i * 0.6,
-    inflation: 3.0 - i * 0.2,
-    unemployment: 5.0 + i * 0.5,
-    interestRate: 4.0 - i * 0.3,
-    timestamp: Date.now() - (n - i) * 86_400_000 * 90,
-  }))
+  return Array.from({ length: n }, (_, i) =>
+    makeSnapshot({
+      gdpGrowth: 1.0 - i * 0.6,
+      inflation: 3.0 - i * 0.2,
+      unemployment: 5.0 + i * 0.5,
+      interestRate: 4.0 - i * 0.3,
+      timestamp: Date.now() - (n - i) * 86_400_000 * 90,
+    }),
+  )
 }
 
 describe('EconomicAnalyzer', () => {
@@ -198,7 +199,7 @@ describe('EconomicAnalyzer', () => {
 
   describe('analyzeCurrency', () => {
     it('returns currency pair analysis', () => {
-      const result = analyzer.analyzeCurrency('USD/EUR', 1.10, 5.0, 3.0, 3.0, 2.0)
+      const result = analyzer.analyzeCurrency('USD/EUR', 1.1, 5.0, 3.0, 3.0, 2.0)
       expect(result.pair).toBe('USD/EUR')
       expect(typeof result.rate).toBe('number')
     })

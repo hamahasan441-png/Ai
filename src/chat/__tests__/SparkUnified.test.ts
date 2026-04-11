@@ -35,14 +35,48 @@ import {
 
 function createMockBrain(): BrainCapabilities {
   const knowledgeBase = [
-    { content: 'TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.', score: 0.95, category: 'programming' },
-    { content: 'Python supports multiple paradigms: procedural, object-oriented, and functional.', score: 0.9, category: 'programming' },
-    { content: 'SQL injection is a code injection technique used to attack data-driven applications.', score: 0.88, category: 'security' },
-    { content: 'Binary search has O(log n) time complexity and requires a sorted array.', score: 0.85, category: 'algorithms' },
-    { content: 'REST APIs use HTTP methods: GET, POST, PUT, DELETE for CRUD operations.', score: 0.82, category: 'concepts' },
-    { content: 'Buffer overflow occurs when data exceeds the buffer boundary in memory.', score: 0.87, category: 'security' },
-    { content: 'Git is a distributed version control system for tracking code changes.', score: 0.8, category: 'tools' },
-    { content: 'Docker containers package applications with their dependencies for consistent deployment.', score: 0.78, category: 'devops' },
+    {
+      content: 'TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.',
+      score: 0.95,
+      category: 'programming',
+    },
+    {
+      content: 'Python supports multiple paradigms: procedural, object-oriented, and functional.',
+      score: 0.9,
+      category: 'programming',
+    },
+    {
+      content:
+        'SQL injection is a code injection technique used to attack data-driven applications.',
+      score: 0.88,
+      category: 'security',
+    },
+    {
+      content: 'Binary search has O(log n) time complexity and requires a sorted array.',
+      score: 0.85,
+      category: 'algorithms',
+    },
+    {
+      content: 'REST APIs use HTTP methods: GET, POST, PUT, DELETE for CRUD operations.',
+      score: 0.82,
+      category: 'concepts',
+    },
+    {
+      content: 'Buffer overflow occurs when data exceeds the buffer boundary in memory.',
+      score: 0.87,
+      category: 'security',
+    },
+    {
+      content: 'Git is a distributed version control system for tracking code changes.',
+      score: 0.8,
+      category: 'tools',
+    },
+    {
+      content:
+        'Docker containers package applications with their dependencies for consistent deployment.',
+      score: 0.78,
+      category: 'devops',
+    },
   ]
 
   const learned: Array<{ input: string; response: string; category: string }> = []
@@ -62,11 +96,11 @@ function createMockBrain(): BrainCapabilities {
         .sort((a, b) => b.score - a.score)
         .slice(0, limit)
     },
-    writeCode: async (request) => ({
+    writeCode: async request => ({
       code: `// Generated ${request.language} code\nfunction solution() {\n  // ${request.description}\n  return 'implemented'\n}`,
       explanation: `Generated ${request.language} implementation for: ${request.description}`,
     }),
-    reviewCode: async (request) => ({
+    reviewCode: async request => ({
       issues: [
         'Consider adding input validation',
         'Missing error handling for edge cases',
@@ -74,7 +108,7 @@ function createMockBrain(): BrainCapabilities {
       ],
       score: 7,
     }),
-    reason: async (question) => ({
+    reason: async question => ({
       answer: `Reasoning result for: ${question.slice(0, 80)}`,
       confidence: 0.85,
       reasoning: `Step 1: Analyze the question. Step 2: Apply logic. Step 3: Synthesize answer.`,
@@ -82,7 +116,11 @@ function createMockBrain(): BrainCapabilities {
     learn: (input, response, category) => {
       learned.push({ input, response, category: category ?? 'learned' })
     },
-    getStats: () => ({ totalChats: 10, knowledgeSize: knowledgeBase.length, learned: learned.length }),
+    getStats: () => ({
+      totalChats: 10,
+      knowledgeSize: knowledgeBase.length,
+      learned: learned.length,
+    }),
     getKnowledgeBaseSize: () => knowledgeBase.length,
   }
 }
@@ -91,21 +129,21 @@ function createMockBrain(): BrainCapabilities {
 
 function createMockBridge(): LLMBridgeCapabilities {
   return {
-    processQuery: async (query) => ({
+    processQuery: async query => ({
       text: `Bridge response: ${query.slice(0, 80)}`,
       confidence: 0.75,
       source: 'llm',
     }),
-    classifyIntent: (query) => ({
+    classifyIntent: query => ({
       intent: 'general_question',
       confidence: 0.8,
       target: 'hybrid',
     }),
-    searchExploits: async (query) => ({
+    searchExploits: async query => ({
       text: `Exploit search results for: ${query.slice(0, 50)}`,
       confidence: 0.7,
     }),
-    debugOverflow: async (crashData) => ({
+    debugOverflow: async crashData => ({
       text: `Overflow debug: ${crashData.slice(0, 50)}`,
       confidence: 0.7,
     }),
@@ -185,7 +223,10 @@ describe('SparkBrainConnector', () => {
 
     it('should not enrich when no relevant knowledge found', () => {
       connector.connectBrain(mockBrain)
-      const result = connector.enrichPromptWithKnowledge('xyzzy nonexistent thing 12345', 'general_reasoning')
+      const result = connector.enrichPromptWithKnowledge(
+        'xyzzy nonexistent thing 12345',
+        'general_reasoning',
+      )
       expect(result).toBe('xyzzy nonexistent thing 12345')
     })
 
@@ -260,12 +301,18 @@ describe('SparkBrainConnector', () => {
   describe('Enriched Inference', () => {
     it('should infer with brain knowledge enrichment', async () => {
       connector.connectBrain(mockBrain)
-      const response = await connector.enrichedInfer({ prompt: 'Explain TypeScript', domain: 'general_reasoning' })
+      const response = await connector.enrichedInfer({
+        prompt: 'Explain TypeScript',
+        domain: 'general_reasoning',
+      })
       expect(response.text.length).toBeGreaterThan(0)
     })
 
     it('should infer without brain (plain Spark)', async () => {
-      const response = await connector.enrichedInfer({ prompt: 'Hello world', domain: 'conversation' })
+      const response = await connector.enrichedInfer({
+        prompt: 'Hello world',
+        domain: 'conversation',
+      })
       expect(response.text.length).toBeGreaterThan(0)
     })
   })
@@ -286,11 +333,20 @@ describe('SparkBrainConnector', () => {
     it('should not teach from low-quality responses', () => {
       connector.connectBrain(mockBrain)
       const fakeResponse = {
-        text: 'bad', qualityScore: 0.3, strategy: 'route' as const,
-        domain: 'code_generation' as TaskDomain, primaryModel: 'qwen2.5' as const,
-        secondaryModel: null, primaryResponse: {} as any, secondaryResponse: null,
-        fusedResponse: null, totalTokensGenerated: 1, totalDurationMs: 1,
-        effectiveTokensPerSecond: 1, cached: false, routingReason: '',
+        text: 'bad',
+        qualityScore: 0.3,
+        strategy: 'route' as const,
+        domain: 'code_generation' as TaskDomain,
+        primaryModel: 'qwen2.5' as const,
+        secondaryModel: null,
+        primaryResponse: {} as any,
+        secondaryResponse: null,
+        fusedResponse: null,
+        totalTokensGenerated: 1,
+        totalDurationMs: 1,
+        effectiveTokensPerSecond: 1,
+        cached: false,
+        routingReason: '',
       }
       connector.teachBrainFromSpark('test', fakeResponse)
       // Should silently skip (qualityScore < 0.7)
@@ -378,7 +434,7 @@ describe('SparkAgent', () => {
         description: 'Calculate math expressions',
         category: 'reasoning',
         inputSchema: 'string: math expression',
-        handler: (input) => ({
+        handler: input => ({
           success: true,
           output: `Result: ${input}`,
           confidence: 0.9,
@@ -427,13 +483,17 @@ describe('SparkAgent', () => {
     })
 
     it('should execute a reasoning task', async () => {
-      const task = await agent.executeTask('Explain why algorithms are important in computer science')
+      const task = await agent.executeTask(
+        'Explain why algorithms are important in computer science',
+      )
       expect(task.status).toBe('complete')
       expect(task.finalAnswer.length).toBeGreaterThan(0)
     })
 
     it('should execute a security analysis task', async () => {
-      const task = await agent.executeTask('Analyze SQL injection vulnerability in web applications')
+      const task = await agent.executeTask(
+        'Analyze SQL injection vulnerability in web applications',
+      )
       expect(task.status).toBe('complete')
       expect(task.finalAnswer.length).toBeGreaterThan(0)
     })
@@ -456,7 +516,9 @@ describe('SparkAgent', () => {
     })
 
     it('should handle debugging tasks', async () => {
-      const task = await agent.executeTask('Debug this error: TypeError: undefined is not a function')
+      const task = await agent.executeTask(
+        'Debug this error: TypeError: undefined is not a function',
+      )
       expect(task.status).toBe('complete')
       expect(task.domain).toBe('debugging')
     })
@@ -613,7 +675,13 @@ describe('UnifiedOrchestrator', () => {
         description: 'Test',
         category: 'system',
         inputSchema: 'string',
-        handler: (input) => ({ success: true, output: input, confidence: 1, source: 'test', durationMs: 0 }),
+        handler: input => ({
+          success: true,
+          output: input,
+          confidence: 1,
+          source: 'test',
+          durationMs: 0,
+        }),
       }
       orchestrator.registerTool(tool)
       expect(orchestrator.getAgent().getTool('test_tool')).not.toBeNull()
@@ -630,14 +698,18 @@ describe('UnifiedOrchestrator', () => {
     })
 
     it('should route complex tasks to agent', () => {
-      const decision = orchestrator.routeQuery('Step by step, analyze this codebase and create tests for it')
+      const decision = orchestrator.routeQuery(
+        'Step by step, analyze this codebase and create tests for it',
+      )
       expect(decision.primary).toBe('agent')
       expect(decision.reason).toContain('multi-step')
     })
 
     it('should route security tasks', () => {
       const decision = orchestrator.routeQuery('Analyze SQL injection vulnerability attacks')
-      expect(['security_analysis', 'exploit_research', 'general_reasoning']).toContain(decision.domain)
+      expect(['security_analysis', 'exploit_research', 'general_reasoning']).toContain(
+        decision.domain,
+      )
     })
 
     it('should route reasoning tasks to spark', () => {
@@ -699,7 +771,9 @@ describe('UnifiedOrchestrator', () => {
     })
 
     it('should execute agent query for complex tasks', async () => {
-      const result = await orchestrator.query('Step by step, analyze and improve this sorting algorithm')
+      const result = await orchestrator.query(
+        'Step by step, analyze and improve this sorting algorithm',
+      )
       expect(result.source).toBe('agent')
       expect(result.agentTask).toBeTruthy()
       expect(result.agentTask!.status).toBe('complete')
@@ -846,16 +920,18 @@ describe('UnifiedOrchestrator', () => {
     })
 
     it('should handle special characters in query', async () => {
-      const result = await orchestrator.query('Test <script>alert("xss")</script> & special © chars')
+      const result = await orchestrator.query(
+        'Test <script>alert("xss")</script> & special © chars',
+      )
       expect(result).toBeTruthy()
     })
 
     it('should handle multiple system types in sequence', async () => {
       orchestrator.connectBrain(createMockBrain())
 
-      const r1 = await orchestrator.query('What is TypeScript?')     // brain
-      const r2 = await orchestrator.query('Write a function')        // hybrid
-      const r3 = await orchestrator.query('Step by step analyze')    // agent
+      const r1 = await orchestrator.query('What is TypeScript?') // brain
+      const r2 = await orchestrator.query('Write a function') // hybrid
+      const r3 = await orchestrator.query('Step by step analyze') // agent
 
       expect(r1.source).toBe('brain_knowledge')
       expect(r2.source).toBe('hybrid')

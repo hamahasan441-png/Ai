@@ -13,19 +13,29 @@ describe('Compiler & Language Design Knowledge', () => {
 
   describe('Lexical Analysis', () => {
     it('explains lexer and tokenizer implementation', async () => {
-      const r = await brain.chat('How does a lexer tokenizer implementation work for lexical analysis?')
+      const r = await brain.chat(
+        'How does a lexer tokenizer implementation work for lexical analysis?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/lexer|token|scan|character|keyword|identifier|literal/)
     })
 
     it('describes finite automata for scanning', async () => {
-      const r = await brain.chat('How do finite automata and regular expressions help scanner implementation?')
-      expect(r.text.toLowerCase()).toMatch(/scanner|finite\s*automat|dfa|regex|token|lexer|implement/)
+      const r = await brain.chat(
+        'How do finite automata and regular expressions help scanner implementation?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /scanner|finite\s*automat|dfa|regex|token|lexer|implement/,
+      )
     })
 
     it('covers token types and error recovery', async () => {
-      const r = await brain.chat('What token types does a lexer scanner handle during lexical analysis?')
-      expect(r.text.toLowerCase()).toMatch(/token|keyword|identifier|literal|operator|delimit|lexer/)
+      const r = await brain.chat(
+        'What token types does a lexer scanner handle during lexical analysis?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /token|keyword|identifier|literal|operator|delimit|lexer/,
+      )
     })
   })
 
@@ -33,14 +43,20 @@ describe('Compiler & Language Design Knowledge', () => {
 
   describe('Parsing & AST', () => {
     it('explains recursive descent parser implementation', async () => {
-      const r = await brain.chat('How does a recursive descent parser implementation work for syntax analysis?')
+      const r = await brain.chat(
+        'How does a recursive descent parser implementation work for syntax analysis?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/parser|recursive\s*descent|grammar|ast|production|rule/)
     })
 
     it('describes abstract syntax tree generation', async () => {
-      const r = await brain.chat('How does abstract syntax tree AST generation work from parsed tokens?')
-      expect(r.text.toLowerCase()).toMatch(/ast|abstract\s*syntax|tree|node|expression|statement|declar/)
+      const r = await brain.chat(
+        'How does abstract syntax tree AST generation work from parsed tokens?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /ast|abstract\s*syntax|tree|node|expression|statement|declar/,
+      )
     })
 
     it('covers parser generator tools', async () => {
@@ -49,8 +65,12 @@ describe('Compiler & Language Design Knowledge', () => {
     })
 
     it('describes context-free grammar', async () => {
-      const r = await brain.chat('What is a context-free grammar CFG and how do production rules work?')
-      expect(r.text.toLowerCase()).toMatch(/context-?free|grammar|cfg|bnf|production|rule|non-?terminal/)
+      const r = await brain.chat(
+        'What is a context-free grammar CFG and how do production rules work?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /context-?free|grammar|cfg|bnf|production|rule|non-?terminal/,
+      )
     })
   })
 
@@ -58,18 +78,24 @@ describe('Compiler & Language Design Knowledge', () => {
 
   describe('Type Systems', () => {
     it('explains static type checking and Hindley-Milner', async () => {
-      const r = await brain.chat('How does a type system with static type checking and Hindley-Milner inference work?')
+      const r = await brain.chat(
+        'How does a type system with static type checking and Hindley-Milner inference work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/type|check|infer|hindley|milner|static|algorithm/)
     })
 
     it('describes generics and polymorphism', async () => {
-      const r = await brain.chat('How do generic types and polymorphism work in type system design?')
+      const r = await brain.chat(
+        'How do generic types and polymorphism work in type system design?',
+      )
       expect(r.text.toLowerCase()).toMatch(/generic|polymorph|type\s*class|trait|parametric|subtyp/)
     })
 
     it('covers algebraic data types', async () => {
-      const r = await brain.chat('What are algebraic data types in type system design: sum and product types?')
+      const r = await brain.chat(
+        'What are algebraic data types in type system design: sum and product types?',
+      )
       expect(r.text.toLowerCase()).toMatch(/algebraic|sum|product|type|variant|pattern|dependent/)
     })
   })
@@ -78,18 +104,26 @@ describe('Compiler & Language Design Knowledge', () => {
 
   describe('Code Generation & Optimization', () => {
     it('explains LLVM IR and code generation', async () => {
-      const r = await brain.chat('How does LLVM IR code generation backend work for compiler optimization?')
+      const r = await brain.chat(
+        'How does LLVM IR code generation backend work for compiler optimization?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/llvm|ir|code\s*gen|optim|backend|pass|ssa/)
     })
 
     it('describes compiler optimization passes', async () => {
-      const r = await brain.chat('What compiler optimization passes exist like constant folding and dead code elimination?')
-      expect(r.text.toLowerCase()).toMatch(/optim|constant\s*fold|dead\s*code|inline|loop|register|pass/)
+      const r = await brain.chat(
+        'What compiler optimization passes exist like constant folding and dead code elimination?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /optim|constant\s*fold|dead\s*code|inline|loop|register|pass/,
+      )
     })
 
     it('covers JIT vs AOT compilation', async () => {
-      const r = await brain.chat('What are the tradeoffs between JIT and AOT compilation in code generation?')
+      const r = await brain.chat(
+        'What are the tradeoffs between JIT and AOT compilation in code generation?',
+      )
       expect(r.text.toLowerCase()).toMatch(/jit|aot|compil|runtime|code\s*gen|v8|performance/)
     })
   })
@@ -100,17 +134,27 @@ describe('Compiler & Language Design Knowledge', () => {
     it('explains mark-and-sweep garbage collection', async () => {
       const r = await brain.chat('How does mark-and-sweep garbage collection algorithm work?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/garbage\s*collect|mark|sweep|reachable|root|free|reclaim/)
+      expect(r.text.toLowerCase()).toMatch(
+        /garbage\s*collect|mark|sweep|reachable|root|free|reclaim/,
+      )
     })
 
     it('describes generational GC and reference counting', async () => {
-      const r = await brain.chat('How do generational garbage collection and reference counting work?')
-      expect(r.text.toLowerCase()).toMatch(/generat|reference\s*count|young|old|minor|major|gc|collect/)
+      const r = await brain.chat(
+        'How do generational garbage collection and reference counting work?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /generat|reference\s*count|young|old|minor|major|gc|collect/,
+      )
     })
 
     it('covers Rust ownership vs GC approaches', async () => {
-      const r = await brain.chat('How does Rust ownership compare to garbage collection for memory management?')
-      expect(r.text.toLowerCase()).toMatch(/rust|ownership|borrow|gc|garbage|memory|compile-?time|zero-?cost/)
+      const r = await brain.chat(
+        'How does Rust ownership compare to garbage collection for memory management?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /rust|ownership|borrow|gc|garbage|memory|compile-?time|zero-?cost/,
+      )
     })
   })
 
@@ -120,12 +164,18 @@ describe('Compiler & Language Design Knowledge', () => {
     it('explains bytecode VM design', async () => {
       const r = await brain.chat('How does a bytecode compiler and virtual machine design work?')
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/bytecode|virtual\s*machine|vm|compil|instruction|stack|register/)
+      expect(r.text.toLowerCase()).toMatch(
+        /bytecode|virtual\s*machine|vm|compil|instruction|stack|register/,
+      )
     })
 
     it('describes stack-based vs register-based VMs', async () => {
-      const r = await brain.chat('What is the difference between stack-based and register-based virtual machines?')
-      expect(r.text.toLowerCase()).toMatch(/stack|register|vm|virtual\s*machine|push|pop|operand|instruction/)
+      const r = await brain.chat(
+        'What is the difference between stack-based and register-based virtual machines?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /stack|register|vm|virtual\s*machine|push|pop|operand|instruction/,
+      )
     })
 
     it('covers tree-walking interpretation', async () => {
@@ -134,7 +184,9 @@ describe('Compiler & Language Design Knowledge', () => {
     })
 
     it('describes VM optimization techniques', async () => {
-      const r = await brain.chat('What bytecode VM optimization techniques exist like inline caching?')
+      const r = await brain.chat(
+        'What bytecode VM optimization techniques exist like inline caching?',
+      )
       expect(r.text.toLowerCase()).toMatch(/vm|optim|inline\s*cach|bytecode|nan\s*box|goto|intern/)
     })
   })

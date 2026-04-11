@@ -5,13 +5,7 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '../../services/analytics/index.js'
-import {
-  buildTool,
-  findToolByName,
-  type Tool,
-  type ToolDef,
-  type Tools,
-} from '../../Tool.js'
+import { buildTool, findToolByName, type Tool, type ToolDef, type Tools } from '../../Tool.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { lazySchema } from '../../utils/lazySchema.js'
 import { escapeRegExp } from '../../utils/stringUtils.js'
@@ -91,9 +85,7 @@ const getToolDescriptionMemoized = memoize(
 function maybeInvalidateCache(deferredTools: Tools): void {
   const currentKey = getDeferredToolsCacheKey(deferredTools)
   if (cachedDeferredToolNames !== currentKey) {
-    logForDebugging(
-      `ToolSearchTool: cache invalidated - deferred tools changed`,
-    )
+    logForDebugging(`ToolSearchTool: cache invalidated - deferred tools changed`)
     getToolDescriptionMemoized.cache.clear?.()
     cachedDeferredToolNames = currentKey
   }
@@ -339,15 +331,10 @@ export const ToolSearchTool = buildTool({
     }
 
     // Helper to log search outcome
-    function logSearchOutcome(
-      matches: string[],
-      queryType: 'select' | 'keyword',
-    ): void {
+    function logSearchOutcome(matches: string[], queryType: 'select' | 'keyword'): void {
       logEvent('tengu_tool_search_outcome', {
-        query:
-          query as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-        queryType:
-          queryType as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        query: query as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        queryType: queryType as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         matchCount: matches.length,
         totalDeferredTools: deferredTools.length,
         maxResults: max_results,
@@ -370,9 +357,7 @@ export const ToolSearchTool = buildTool({
       const found: string[] = []
       const missing: string[] = []
       for (const toolName of requested) {
-        const tool =
-          findToolByName(deferredTools, toolName) ??
-          findToolByName(tools, toolName)
+        const tool = findToolByName(deferredTools, toolName) ?? findToolByName(tools, toolName)
         if (tool) {
           if (!found.includes(tool.name)) found.push(tool.name)
         } else {
@@ -381,17 +366,10 @@ export const ToolSearchTool = buildTool({
       }
 
       if (found.length === 0) {
-        logForDebugging(
-          `ToolSearchTool: select failed — none found: ${missing.join(', ')}`,
-        )
+        logForDebugging(`ToolSearchTool: select failed — none found: ${missing.join(', ')}`)
         logSearchOutcome([], 'select')
         const pendingServers = getPendingServerNames()
-        return buildSearchResult(
-          [],
-          query,
-          deferredTools.length,
-          pendingServers,
-        )
+        return buildSearchResult([], query, deferredTools.length, pendingServers)
       }
 
       if (missing.length > 0) {
@@ -406,12 +384,7 @@ export const ToolSearchTool = buildTool({
     }
 
     // Keyword search
-    const matches = await searchToolsWithKeywords(
-      query,
-      deferredTools,
-      tools,
-      max_results,
-    )
+    const matches = await searchToolsWithKeywords(query, deferredTools, tools, max_results)
 
     logForDebugging(
       `ToolSearchTool: keyword search for "${query}", found ${matches.length} matches`,
@@ -422,12 +395,7 @@ export const ToolSearchTool = buildTool({
     // Include pending server info when search finds no matches
     if (matches.length === 0) {
       const pendingServers = getPendingServerNames()
-      return buildSearchResult(
-        matches,
-        query,
-        deferredTools.length,
-        pendingServers,
-      )
+      return buildSearchResult(matches, query, deferredTools.length, pendingServers)
     }
 
     return buildSearchResult(matches, query, deferredTools.length)
@@ -441,16 +409,10 @@ export const ToolSearchTool = buildTool({
    * This format works on 1P/Foundry. Bedrock/Vertex may not support
    * client-side tool_reference expansion yet.
    */
-  mapToolResultToToolResultBlockParam(
-    content: Output,
-    toolUseID: string,
-  ): ToolResultBlockParam {
+  mapToolResultToToolResultBlockParam(content: Output, toolUseID: string): ToolResultBlockParam {
     if (content.matches.length === 0) {
       let text = 'No matching deferred tools found'
-      if (
-        content.pending_mcp_servers &&
-        content.pending_mcp_servers.length > 0
-      ) {
+      if (content.pending_mcp_servers && content.pending_mcp_servers.length > 0) {
         text += `. Some MCP servers are still connecting: ${content.pending_mcp_servers.join(', ')}. Their tools will become available shortly — try searching again.`
       }
       return {

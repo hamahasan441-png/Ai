@@ -219,9 +219,7 @@ function hasDangerousEnvVars(settings: SettingsJson | null): boolean {
   if (!settings?.env) {
     return false
   }
-  return Object.keys(settings.env).some(
-    key => !SAFE_ENV_VARS.has(key.toUpperCase()),
-  )
+  return Object.keys(settings.env).some(key => !SAFE_ENV_VARS.has(key.toUpperCase()))
 }
 
 /**

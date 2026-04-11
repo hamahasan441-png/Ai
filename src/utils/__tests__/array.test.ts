@@ -11,17 +11,11 @@ describe('intersperse', () => {
   })
 
   it('inserts separator between multiple elements', () => {
-    expect(intersperse(['a', 'b', 'c'], () => ',')).toEqual([
-      'a',
-      ',',
-      'b',
-      ',',
-      'c',
-    ])
+    expect(intersperse(['a', 'b', 'c'], () => ',')).toEqual(['a', ',', 'b', ',', 'c'])
   })
 
   it('passes the element index to the separator factory', () => {
-    const result = intersperse([10, 20, 30], (i) => i * 100)
+    const result = intersperse([10, 20, 30], i => i * 100)
     // indices for the non-first elements are 1 and 2
     expect(result).toEqual([10, 100, 20, 200, 30])
   })
@@ -46,24 +40,24 @@ describe('count', () => {
   })
 
   it('returns 0 when no elements match', () => {
-    expect(count([1, 2, 3], (x) => x > 10)).toBe(0)
+    expect(count([1, 2, 3], x => x > 10)).toBe(0)
   })
 
   it('counts matching elements', () => {
-    expect(count([1, 2, 3, 4, 5], (x) => x % 2 === 0)).toBe(2)
+    expect(count([1, 2, 3, 4, 5], x => x % 2 === 0)).toBe(2)
   })
 
   it('counts all elements when all match', () => {
-    expect(count([2, 4, 6], (x) => x % 2 === 0)).toBe(3)
+    expect(count([2, 4, 6], x => x % 2 === 0)).toBe(3)
   })
 
   it('treats truthy non-boolean return values as matches', () => {
-    expect(count(['a', '', 'b', ''], (x) => x)).toBe(2)
+    expect(count(['a', '', 'b', ''], x => x)).toBe(2)
   })
 
   it('works with readonly array', () => {
     const arr: readonly number[] = [1, 2, 3]
-    expect(count(arr, (x) => x > 1)).toBe(2)
+    expect(count(arr, x => x > 1)).toBe(2)
   })
 })
 

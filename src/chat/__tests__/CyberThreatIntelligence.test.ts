@@ -227,7 +227,9 @@ describe('CyberThreatIntelligence', () => {
     })
 
     it('maps discovery behavior', () => {
-      const results = cti.mapToMitreAttack('file and directory discovery system information enumeration')
+      const results = cti.mapToMitreAttack(
+        'file and directory discovery system information enumeration',
+      )
       expect(results.some(t => t.tactic === 'discovery')).toBe(true)
     })
 
@@ -242,12 +244,16 @@ describe('CyberThreatIntelligence', () => {
     })
 
     it('maps resource development', () => {
-      const results = cti.mapToMitreAttack('acquire infrastructure domain registration resource development')
+      const results = cti.mapToMitreAttack(
+        'acquire infrastructure domain registration resource development',
+      )
       expect(results.some(t => t.tactic === 'resource-development')).toBe(true)
     })
 
     it('maps reconnaissance techniques', () => {
-      const results = cti.mapToMitreAttack('active scanning port scan vulnerability scanning reconnaissance')
+      const results = cti.mapToMitreAttack(
+        'active scanning port scan vulnerability scanning reconnaissance',
+      )
       expect(results.some(t => t.tactic === 'reconnaissance')).toBe(true)
     })
 
@@ -540,43 +546,82 @@ describe('CyberThreatIntelligence', () => {
     })
 
     it('classifies RAT traits (Cobalt Strike)', () => {
-      const results = cti.classifyMalware(['beacon', 'lateral movement', 'command execution', 'keylogging'])
+      const results = cti.classifyMalware([
+        'beacon',
+        'lateral movement',
+        'command execution',
+        'keylogging',
+      ])
       expect(results.length).toBeGreaterThan(0)
       expect(results.some(f => f.name === 'Cobalt Strike')).toBe(true)
     })
 
     it('classifies backdoor traits', () => {
-      const results = cti.classifyMalware(['remote command execution', 'DLL side-loading', 'keylogging', 'backdoor'])
+      const results = cti.classifyMalware([
+        'remote command execution',
+        'DLL side-loading',
+        'keylogging',
+        'backdoor',
+      ])
       expect(results.some(f => f.type === 'backdoor')).toBe(true)
     })
 
     it('classifies trojan traits (TrickBot)', () => {
-      const results = cti.classifyMalware(['credential theft', 'browser injection', 'lateral movement'])
+      const results = cti.classifyMalware([
+        'credential theft',
+        'browser injection',
+        'lateral movement',
+      ])
       expect(results.some(f => f.name === 'TrickBot')).toBe(true)
     })
 
     it('classifies loader traits (Emotet)', () => {
-      const results = cti.classifyMalware(['payload delivery', 'credential theft', 'email harvesting', 'process injection'])
+      const results = cti.classifyMalware([
+        'payload delivery',
+        'credential theft',
+        'email harvesting',
+        'process injection',
+      ])
       expect(results.some(f => f.name === 'Emotet')).toBe(true)
     })
 
     it('classifies wiper traits (NotPetya)', () => {
-      const results = cti.classifyMalware(['disk encryption', 'MBR overwrite', 'wiper', 'destructive'])
+      const results = cti.classifyMalware([
+        'disk encryption',
+        'MBR overwrite',
+        'wiper',
+        'destructive',
+      ])
       expect(results.some(f => f.name === 'NotPetya')).toBe(true)
     })
 
     it('classifies rootkit traits (Snake)', () => {
-      const results = cti.classifyMalware(['covert communication', 'kernel driver', 'rootkit', 'bootkit'])
+      const results = cti.classifyMalware([
+        'covert communication',
+        'kernel driver',
+        'rootkit',
+        'bootkit',
+      ])
       expect(results.some(f => f.name === 'Snake')).toBe(true)
     })
 
     it('classifies infostealer traits (Mimikatz)', () => {
-      const results = cti.classifyMalware(['credential dumping', 'pass-the-hash', 'Kerberos', 'DCSync'])
+      const results = cti.classifyMalware([
+        'credential dumping',
+        'pass-the-hash',
+        'Kerberos',
+        'DCSync',
+      ])
       expect(results.some(f => f.name === 'Mimikatz')).toBe(true)
     })
 
     it('returns multiple matches for broad traits', () => {
-      const results = cti.classifyMalware(['ransomware', 'file encryption', 'backup deletion', 'double extortion'])
+      const results = cti.classifyMalware([
+        'ransomware',
+        'file encryption',
+        'backup deletion',
+        'double extortion',
+      ])
       expect(results.length).toBeGreaterThan(1)
     })
 
@@ -618,36 +663,24 @@ describe('CyberThreatIntelligence', () => {
 
   describe('correlateThreats', () => {
     it('correlates SolarWinds campaign from IOCs and techniques', () => {
-      const campaigns = cti.correlateThreats(
-        ['solarwinds', 'sunburst'],
-        ['T1195', 'T1071'],
-      )
+      const campaigns = cti.correlateThreats(['solarwinds', 'sunburst'], ['T1195', 'T1071'])
       expect(campaigns.length).toBeGreaterThan(0)
       expect(campaigns[0].name).toContain('SolarWinds')
     })
 
     it('correlates Colonial Pipeline campaign', () => {
-      const campaigns = cti.correlateThreats(
-        ['colonial', 'pipeline'],
-        ['T1486'],
-      )
+      const campaigns = cti.correlateThreats(['colonial', 'pipeline'], ['T1486'])
       expect(campaigns.length).toBeGreaterThan(0)
       expect(campaigns[0].name).toContain('Colonial Pipeline')
     })
 
     it('correlates WannaCry campaign', () => {
-      const campaigns = cti.correlateThreats(
-        ['wannacry', 'eternalblue'],
-        ['T1486'],
-      )
+      const campaigns = cti.correlateThreats(['wannacry', 'eternalblue'], ['T1486'])
       expect(campaigns.some(c => c.name.includes('WannaCry'))).toBe(true)
     })
 
     it('generates ad-hoc campaign when no template matches', () => {
-      const campaigns = cti.correlateThreats(
-        ['APT28'],
-        ['T1566'],
-      )
+      const campaigns = cti.correlateThreats(['APT28'], ['T1566'])
       expect(campaigns.length).toBeGreaterThan(0)
     })
 
@@ -680,10 +713,7 @@ describe('CyberThreatIntelligence', () => {
     })
 
     it('deduplicates techniques in campaigns', () => {
-      const campaigns = cti.correlateThreats(
-        ['solarwinds', 'sunburst'],
-        ['T1195', 'T1195'],
-      )
+      const campaigns = cti.correlateThreats(['solarwinds', 'sunburst'], ['T1195', 'T1195'])
       if (campaigns.length > 0) {
         const techs = campaigns[0].techniques
         const unique = [...new Set(techs)]
@@ -698,10 +728,7 @@ describe('CyberThreatIntelligence', () => {
     })
 
     it('correlates LockBit campaign', () => {
-      const campaigns = cti.correlateThreats(
-        ['lockbit', 'ransomware'],
-        ['T1486'],
-      )
+      const campaigns = cti.correlateThreats(['lockbit', 'ransomware'], ['T1486'])
       expect(campaigns.some(c => c.name.includes('LockBit'))).toBe(true)
     })
   })
@@ -739,7 +766,9 @@ describe('CyberThreatIntelligence', () => {
     })
 
     it('includes recommendations in the report', () => {
-      const report = cti.generateThreatReport('phishing email with malicious attachment credential harvesting')
+      const report = cti.generateThreatReport(
+        'phishing email with malicious attachment credential harvesting',
+      )
       expect(report.recommendations.length).toBeGreaterThan(0)
       // Should always include baseline recommendations
       expect(report.recommendations.some(r => r.includes('patch'))).toBe(true)
@@ -780,13 +809,23 @@ describe('CyberThreatIntelligence', () => {
     })
 
     it('adds nation-state specific recommendations', () => {
-      const report = cti.generateThreatReport('APT29 Russia nation-state espionage supply chain attack SolarWinds')
-      expect(report.recommendations.some(r => r.toLowerCase().includes('threat hunting') || r.toLowerCase().includes('soc'))).toBe(true)
+      const report = cti.generateThreatReport(
+        'APT29 Russia nation-state espionage supply chain attack SolarWinds',
+      )
+      expect(
+        report.recommendations.some(
+          r => r.toLowerCase().includes('threat hunting') || r.toLowerCase().includes('soc'),
+        ),
+      ).toBe(true)
     })
 
     it('adds financial gain recommendations for ransomware groups', () => {
       const report = cti.generateThreatReport('LockBit ransomware double extortion financial gain')
-      expect(report.recommendations.some(r => r.toLowerCase().includes('backup') || r.toLowerCase().includes('ransomware'))).toBe(true)
+      expect(
+        report.recommendations.some(
+          r => r.toLowerCase().includes('backup') || r.toLowerCase().includes('ransomware'),
+        ),
+      ).toBe(true)
     })
   })
 
@@ -960,7 +999,9 @@ describe('CyberThreatIntelligence', () => {
       // Confidence threshold should increase
       // Verify by checking that some IOCs that previously passed are now filtered
       const serialized = JSON.parse(cti.serialize())
-      expect(serialized.config.confidenceThreshold).toBeGreaterThan(DEFAULT_CYBER_THREAT_INTEL_CONFIG.confidenceThreshold)
+      expect(serialized.config.confidenceThreshold).toBeGreaterThan(
+        DEFAULT_CYBER_THREAT_INTEL_CONFIG.confidenceThreshold,
+      )
     })
 
     it('adjusts confidence threshold after consistently high feedback', () => {
@@ -968,14 +1009,18 @@ describe('CyberThreatIntelligence', () => {
       cti.provideFeedback(5)
       cti.provideFeedback(5)
       const serialized = JSON.parse(cti.serialize())
-      expect(serialized.config.confidenceThreshold).toBeLessThan(DEFAULT_CYBER_THREAT_INTEL_CONFIG.confidenceThreshold)
+      expect(serialized.config.confidenceThreshold).toBeLessThan(
+        DEFAULT_CYBER_THREAT_INTEL_CONFIG.confidenceThreshold,
+      )
     })
 
     it('does not adjust threshold before 3 feedbacks', () => {
       cti.provideFeedback(1)
       cti.provideFeedback(1)
       const serialized = JSON.parse(cti.serialize())
-      expect(serialized.config.confidenceThreshold).toBe(DEFAULT_CYBER_THREAT_INTEL_CONFIG.confidenceThreshold)
+      expect(serialized.config.confidenceThreshold).toBe(
+        DEFAULT_CYBER_THREAT_INTEL_CONFIG.confidenceThreshold,
+      )
     })
   })
 

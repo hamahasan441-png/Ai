@@ -146,7 +146,7 @@ describe('DiskCache', () => {
     it('tracks hits and misses', async () => {
       const cache = new DiskCache()
       await cache.set('k', 'v')
-      await cache.get('k')    // hit
+      await cache.get('k') // hit
       await cache.get('miss') // miss
 
       const stats = cache.getStats()

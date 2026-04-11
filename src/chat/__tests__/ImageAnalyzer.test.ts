@@ -7,9 +7,11 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { ImageAnalyzer } from '../ImageAnalyzer.js'
 
 // Small valid base64 PNG signature (1x1 pixel PNG)
-const TINY_PNG_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+const TINY_PNG_B64 =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
 // Small valid base64 JPEG signature
-const TINY_JPEG_B64 = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsM'
+const TINY_JPEG_B64 =
+  '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsM'
 
 describe('ImageAnalyzer', () => {
   let analyzer: ImageAnalyzer
@@ -108,7 +110,9 @@ describe('ImageAnalyzer', () => {
 
     it('classifies color space', () => {
       const result = analyzer.analyze(TINY_PNG_B64, 'image/png')
-      expect(['grayscale', 'limited', 'standard', 'rich', 'vibrant']).toContain(result.pixelAnalysis.colorSpace)
+      expect(['grayscale', 'limited', 'standard', 'rich', 'vibrant']).toContain(
+        result.pixelAnalysis.colorSpace,
+      )
     })
   })
 
@@ -129,13 +133,23 @@ describe('ImageAnalyzer', () => {
 
     it('detects composition type', () => {
       const result = analyzer.analyze(TINY_PNG_B64, 'image/png')
-      const validTypes = ['centered', 'rule_of_thirds', 'symmetrical', 'diagonal', 'scattered', 'layered', 'uniform']
+      const validTypes = [
+        'centered',
+        'rule_of_thirds',
+        'symmetrical',
+        'diagonal',
+        'scattered',
+        'layered',
+        'uniform',
+      ]
       expect(validTypes).toContain(result.structure.composition)
     })
 
     it('assesses complexity', () => {
       const result = analyzer.analyze(TINY_PNG_B64, 'image/png')
-      expect(['minimal', 'simple', 'moderate', 'complex', 'very_complex']).toContain(result.structure.complexity)
+      expect(['minimal', 'simple', 'moderate', 'complex', 'very_complex']).toContain(
+        result.structure.complexity,
+      )
     })
   })
 
@@ -144,8 +158,21 @@ describe('ImageAnalyzer', () => {
   describe('content classification', () => {
     it('classifies image content type', () => {
       const result = analyzer.analyze(TINY_PNG_B64, 'image/png')
-      const validTypes = ['photograph', 'screenshot', 'diagram', 'chart', 'illustration',
-        'icon', 'text_document', 'map', 'code_snippet', 'ui_mockup', 'meme', 'infographic', 'unknown']
+      const validTypes = [
+        'photograph',
+        'screenshot',
+        'diagram',
+        'chart',
+        'illustration',
+        'icon',
+        'text_document',
+        'map',
+        'code_snippet',
+        'ui_mockup',
+        'meme',
+        'infographic',
+        'unknown',
+      ]
       expect(validTypes).toContain(result.classification.primaryType)
     })
 
@@ -162,10 +189,20 @@ describe('ImageAnalyzer', () => {
 
     it('uses question hints for classification', () => {
       const chartResult = analyzer.analyze(TINY_PNG_B64, 'image/png', 'What does this chart show?')
-      expect(chartResult.classification.primaryType === 'chart' || chartResult.classification.secondaryTypes.includes('chart')).toBe(true)
+      expect(
+        chartResult.classification.primaryType === 'chart' ||
+          chartResult.classification.secondaryTypes.includes('chart'),
+      ).toBe(true)
 
-      const codeResult = analyzer.analyze(TINY_PNG_B64, 'image/png', 'What code is in this snippet?')
-      expect(codeResult.classification.primaryType === 'code_snippet' || codeResult.classification.secondaryTypes.includes('code_snippet')).toBe(true)
+      const codeResult = analyzer.analyze(
+        TINY_PNG_B64,
+        'image/png',
+        'What code is in this snippet?',
+      )
+      expect(
+        codeResult.classification.primaryType === 'code_snippet' ||
+          codeResult.classification.secondaryTypes.includes('code_snippet'),
+      ).toBe(true)
     })
   })
 
@@ -189,7 +226,9 @@ describe('ImageAnalyzer', () => {
   describe('scene analysis', () => {
     it('detects environment', () => {
       const result = analyzer.analyze(TINY_PNG_B64, 'image/png')
-      expect(['indoor', 'outdoor', 'abstract', 'digital', 'mixed']).toContain(result.scene.environment)
+      expect(['indoor', 'outdoor', 'abstract', 'digital', 'mixed']).toContain(
+        result.scene.environment,
+      )
     })
 
     it('detects mood', () => {
@@ -199,7 +238,9 @@ describe('ImageAnalyzer', () => {
 
     it('detects lighting', () => {
       const result = analyzer.analyze(TINY_PNG_B64, 'image/png')
-      expect(['bright', 'dim', 'natural', 'artificial', 'mixed', 'dark']).toContain(result.scene.lighting)
+      expect(['bright', 'dim', 'natural', 'artificial', 'mixed', 'dark']).toContain(
+        result.scene.lighting,
+      )
     })
 
     it('detects depth', () => {

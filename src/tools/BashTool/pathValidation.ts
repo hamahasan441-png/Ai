@@ -3,10 +3,7 @@ import { isAbsolute, resolve } from 'path'
 import type { z } from 'zod/v4'
 import type { ToolPermissionContext } from '../../Tool.js'
 import type { Redirect, SimpleCommand } from '../../utils/bash/ast.js'
-import {
-  extractOutputRedirections,
-  splitCommand_DEPRECATED,
-} from '../../utils/bash/commands.js'
+import { extractOutputRedirections, splitCommand_DEPRECATED } from '../../utils/bash/commands.js'
 import { tryParseShellCommand } from '../../utils/bash/shellQuote.js'
 import { getDirectoryForPath } from '../../utils/path.js'
 import { allWorkingDirectories } from '../../utils/permissions/filesystem.js'
@@ -81,9 +78,7 @@ function checkDangerousRemovalPaths(
     // NOTE: We check the path WITHOUT resolving symlinks, because dangerous paths
     // like /tmp should be caught even though /tmp is a symlink to /private/tmp on macOS
     const cleanPath = expandTilde(path.replace(/^['"]|['"]$/g, ''))
-    const absolutePath = isAbsolute(cleanPath)
-      ? cleanPath
-      : resolve(cwd, cleanPath)
+    const absolutePath = isAbsolute(cleanPath) ? cleanPath : resolve(cwd, cleanPath)
 
     // Check if this is a dangerous path (using the non-symlink-resolved path)
     if (isDangerousRemovalPath(absolutePath)) {
@@ -187,10 +182,7 @@ function parsePatternCommand(
  * Extracts paths from command arguments for different path commands.
  * Each command has specific logic for how it handles paths and flags.
  */
-export const PATH_EXTRACTORS: Record<
-  PathCommand,
-  (args: string[]) => string[]
-> = {
+export const PATH_EXTRACTORS: Record<PathCommand, (args: string[]) => string[]> = {
   // cd: special case - all args form one path
   cd: args => (args.length === 0 ? [homedir()] : [args.join(' ')]),
 
@@ -300,10 +292,7 @@ export const PATH_EXTRACTORS: Record<
   // tr: special case - skip character sets
   tr: args => {
     const hasDelete = args.some(
-      a =>
-        a === '-d' ||
-        a === '--delete' ||
-        (a.startsWith('-') && a.includes('d')),
+      a => a === '-d' || a === '--delete' || (a.startsWith('-') && a.includes('d')),
     )
     const nonFlags = filterOutFlags(args)
     return nonFlags.slice(hasDelete ? 1 : 2) // Skip SET1 or SET1+SET2
@@ -331,10 +320,7 @@ export const PATH_EXTRACTORS: Record<
     ])
     const paths = parsePatternCommand(args, flags)
     // Special: if -r/-R flag present and no paths, use current dir
-    if (
-      paths.length === 0 &&
-      args.some(a => ['-r', '-R', '--recursive'].includes(a))
-    ) {
+    if (paths.length === 0 && args.some(a => ['-r', '-R', '--recursive'].includes(a))) {
       return ['.']
     }
     return paths
@@ -593,9 +579,7 @@ export const COMMAND_OPERATION_TYPE: Record<PathCommand, FileOperationType> = {
  * Returns true if the command is valid, false if it should be rejected.
  * Used to block commands with flags that could bypass path validation.
  */
-const COMMAND_VALIDATOR: Partial<
-  Record<PathCommand, (args: string[]) => boolean>
-> = {
+const COMMAND_VALIDATOR: Partial<Record<PathCommand, (args: string[]) => boolean>> = {
   mv: (args: string[]) => !args.some(arg => arg?.startsWith('-')),
   cp: (args: string[]) => !args.some(arg => arg?.startsWith('-')),
 }
@@ -663,16 +647,13 @@ function validateCommandPaths(
     )
 
     if (!allowed) {
-      const workingDirs = Array.from(
-        allWorkingDirectories(toolPermissionContext),
-      )
+      const workingDirs = Array.from(allWorkingDirectories(toolPermissionContext))
       const dirListStr = formatDirectoryList(workingDirs)
 
       // Use security check's custom reason if available (type: 'other' or 'safetyCheck')
       // Otherwise use the standard "was blocked" message
       const message =
-        decisionReason?.type === 'other' ||
-        decisionReason?.type === 'safetyCheck'
+        decisionReason?.type === 'other' || decisionReason?.type === 'safetyCheck'
           ? decisionReason.reason
           : `${command} in '${resolvedPath}' was blocked. For security, Claude Code may only ${ACTION_VERBS[command]} the allowed working directories for this session: ${dirListStr}.`
 
@@ -700,10 +681,7 @@ function validateCommandPaths(
   }
 }
 
-export function createPathChecker(
-  command: PathCommand,
-  operationTypeOverride?: FileOperationType,
-) {
+export function createPathChecker(command: PathCommand, operationTypeOverride?: FileOperationType) {
   return (
     args: string[],
     cwd: string,
@@ -743,8 +721,7 @@ export function createPathChecker(
 
     // If it's an ask decision, add suggestions based on the operation type
     if (result.behavior === 'ask') {
-      const operationType =
-        operationTypeOverride ?? COMMAND_OPERATION_TYPE[command]
+      const operationType = operationTypeOverride ?? COMMAND_OPERATION_TYPE[command]
       const suggestions: PermissionUpdate[] = []
 
       // Only suggest adding directory/rules if we have a blocked path
@@ -872,10 +849,7 @@ function validateSinglePathCommand(
       : undefined
 
   // Validate all paths are within allowed directories
-  const pathChecker = createPathChecker(
-    baseCmd as PathCommand,
-    operationTypeOverride,
-  )
+  const pathChecker = createPathChecker(baseCmd as PathCommand, operationTypeOverride)
   return pathChecker(args, cwd, toolPermissionContext, compoundCommandHasCd)
 }
 
@@ -910,14 +884,10 @@ function validateSinglePathCommandArgv(
   // wrapper-stripped but .text is raw tree-sitter span (includes
   // `timeout 5 ` prefix), so strip here too.
   const operationTypeOverride =
-    baseCmd === 'sed' &&
-    sedCommandIsAllowedByAllowlist(stripSafeWrappers(cmd.text))
+    baseCmd === 'sed' && sedCommandIsAllowedByAllowlist(stripSafeWrappers(cmd.text))
       ? ('read' as FileOperationType)
       : undefined
-  const pathChecker = createPathChecker(
-    baseCmd as PathCommand,
-    operationTypeOverride,
-  )
+  const pathChecker = createPathChecker(baseCmd as PathCommand, operationTypeOverride)
   return pathChecker(args, cwd, toolPermissionContext, compoundCommandHasCd)
 }
 
@@ -956,16 +926,13 @@ function validateOutputRedirections(
     )
 
     if (!allowed) {
-      const workingDirs = Array.from(
-        allWorkingDirectories(toolPermissionContext),
-      )
+      const workingDirs = Array.from(allWorkingDirectories(toolPermissionContext))
       const dirListStr = formatDirectoryList(workingDirs)
 
       // Use security check's custom reason if available (type: 'other' or 'safetyCheck')
       // Otherwise use the standard message for deny rules or working directory restrictions
       const message =
-        decisionReason?.type === 'other' ||
-        decisionReason?.type === 'safetyCheck'
+        decisionReason?.type === 'other' || decisionReason?.type === 'safetyCheck'
           ? decisionReason.reason
           : decisionReason?.type === 'rule'
             ? `Output redirection to '${resolvedPath}' was blocked by a deny rule.`
@@ -1185,12 +1152,7 @@ function skipTimeoutFlags(a: readonly string[]): number {
   while (i < a.length) {
     const arg = a[i]!
     const next = a[i + 1]
-    if (
-      arg === '--foreground' ||
-      arg === '--preserve-status' ||
-      arg === '--verbose'
-    )
-      i++
+    if (arg === '--foreground' || arg === '--preserve-status' || arg === '--verbose') i++
     else if (/^--(?:kill-after|signal)=[A-Za-z0-9_.+-]+$/.test(arg)) i++
     else if (
       (arg === '--kill-after' || arg === '--signal') &&
@@ -1204,12 +1166,7 @@ function skipTimeoutFlags(a: readonly string[]): number {
     } // end-of-options marker
     else if (arg.startsWith('--')) return -1
     else if (arg === '-v') i++
-    else if (
-      (arg === '-k' || arg === '-s') &&
-      next &&
-      TIMEOUT_FLAG_VALUE_RE.test(next)
-    )
-      i += 2
+    else if ((arg === '-k' || arg === '-s') && next && TIMEOUT_FLAG_VALUE_RE.test(next)) i += 2
     else if (/^-[ks][A-Za-z0-9_.+-]+$/.test(arg)) i++
     else if (arg.startsWith('-')) return -1
     else break
@@ -1278,8 +1235,7 @@ export function stripWrappersFromArgv(argv: string[]): string[] {
       // `nice cmd` and legacy `nice -N cmd`, not just `nice -n N cmd`.
       // Previously only `-n N` was stripped: `nice rm /outside` →
       // baseCmd='nice' → passthrough → /outside never path-validated.
-      if (a[1] === '-n' && a[2] && /^-?\d+$/.test(a[2]))
-        a = a.slice(a[3] === '--' ? 4 : 3)
+      if (a[1] === '-n' && a[2] && /^-?\d+$/.test(a[2])) a = a.slice(a[3] === '--' ? 4 : 3)
       else if (a[1] && /^-\d+$/.test(a[1])) a = a.slice(a[2] === '--' ? 3 : 2)
       else a = a.slice(a[1] === '--' ? 2 : 1)
     } else if (a[0] === 'stdbuf') {

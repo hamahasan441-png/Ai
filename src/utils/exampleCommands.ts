@@ -53,10 +53,7 @@ export function countAndSortItems(items: string[], topN: number = 20): string {
  * skipping non-core files and spreading across different directories.
  * Returns empty array if fewer than `want` core files are available.
  */
-export function pickDiverseCoreFiles(
-  sortedPaths: string[],
-  want: number,
-): string[] {
+export function pickDiverseCoreFiles(sortedPaths: string[], want: number): string[] {
   const picked: string[] = []
   const seenBasenames = new Set<string>()
   const dirTally = new Map<string, number>()
@@ -92,14 +89,7 @@ async function getFrequentlyModifiedFiles(): Promise<string[]> {
     // Collect frequently-modified files, preferring the user's own commits.
     const userEmail = await getGitEmail()
 
-    const logArgs = [
-      'log',
-      '-n',
-      '1000',
-      '--pretty=format:',
-      '--name-only',
-      '--diff-filter=M',
-    ]
+    const logArgs = ['log', '-n', '1000', '--pretty=format:', '--name-only', '--diff-filter=M']
 
     const counts = new Map<string, number>()
     const tallyInto = (stdout: string) => {

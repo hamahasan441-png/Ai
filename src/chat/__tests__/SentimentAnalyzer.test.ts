@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  SentimentAnalyzer,
-} from '../SentimentAnalyzer'
+import { SentimentAnalyzer } from '../SentimentAnalyzer'
 
 // ── Constructor Tests ──
 
@@ -144,7 +142,9 @@ describe('SentimentAnalyzer getOverallSentiment', () => {
   })
 
   it('scores a very positive statement above 0.5', () => {
-    const score = analyzer.getOverallSentiment('This is an amazing, excellent, outstanding achievement.')
+    const score = analyzer.getOverallSentiment(
+      'This is an amazing, excellent, outstanding achievement.',
+    )
     expect(score.score).toBeGreaterThan(0.5)
   })
 })
@@ -261,9 +261,7 @@ describe('SentimentAnalyzer extractOpinions', () => {
   })
 
   it('deduplicates opinions with the same target and expression', () => {
-    const opinions = analyzer.extractOpinions(
-      'The food is amazing. The food is amazing.',
-    )
+    const opinions = analyzer.extractOpinions('The food is amazing. The food is amazing.')
     const keys = opinions.map(o => `${o.target}:${o.expression}`)
     const unique = new Set(keys)
     expect(keys.length).toBe(unique.size)

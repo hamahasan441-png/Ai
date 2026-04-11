@@ -20,11 +20,11 @@ export interface ContextMemory {
   id: string
   content: string
   context: MemoryContext
-  importance: number      // 0-1
+  importance: number // 0-1
   accessCount: number
   createdAt: number
   lastAccessedAt: number
-  links: string[]         // IDs of related memories
+  links: string[] // IDs of related memories
   tags: string[]
 }
 
@@ -32,7 +32,7 @@ export interface MemoryContext {
   topic: string
   domain: string
   entities: string[]
-  sentiment: number       // -1 to 1
+  sentiment: number // -1 to 1
   keywords: string[]
 }
 
@@ -69,7 +69,12 @@ export class ContextualMemoryEngine {
   /**
    * Store a new memory with context
    */
-  store(content: string, context: Partial<MemoryContext> = {}, importance: number = 0.5, tags: string[] = []): string {
+  store(
+    content: string,
+    context: Partial<MemoryContext> = {},
+    importance: number = 0.5,
+    tags: string[] = [],
+  ): string {
     const id = `mem_${this.nextId++}`
     const now = Date.now()
 
@@ -298,7 +303,7 @@ export class ContextualMemoryEngine {
     memory: ContextMemory,
     queryKeywords: string[],
     queryEntities: string[],
-    now: number
+    now: number,
   ): { score: number; reasons: string[] } {
     let score = 0
     const reasons: string[] = []
@@ -306,7 +311,7 @@ export class ContextualMemoryEngine {
     // Keyword overlap
     const keywordOverlap = this.setOverlap(
       new Set(memory.context.keywords.map(k => k.toLowerCase())),
-      new Set(queryKeywords.map(k => k.toLowerCase()))
+      new Set(queryKeywords.map(k => k.toLowerCase())),
     )
     if (keywordOverlap > 0) {
       score += keywordOverlap * 0.4
@@ -316,7 +321,7 @@ export class ContextualMemoryEngine {
     // Entity overlap
     const entityOverlap = this.setOverlap(
       new Set(memory.context.entities.map(e => e.toLowerCase())),
-      new Set(queryEntities.map(e => e.toLowerCase()))
+      new Set(queryEntities.map(e => e.toLowerCase())),
     )
     if (entityOverlap > 0) {
       score += entityOverlap * 0.3
@@ -330,7 +335,7 @@ export class ContextualMemoryEngine {
     // Decay factor (more recent = more relevant)
     const ageHours = (now - memory.lastAccessedAt) / (1000 * 60 * 60)
     const decayFactor = Math.exp(-this.decayRate * ageHours)
-    score *= (0.5 + 0.5 * decayFactor)
+    score *= 0.5 + 0.5 * decayFactor
 
     // Access frequency boost
     if (memory.accessCount > 5) {
@@ -351,7 +356,7 @@ export class ContextualMemoryEngine {
     for (const existing of this.memories.values()) {
       const keywordOverlap = this.setOverlap(
         new Set(existing.context.keywords.map(k => k.toLowerCase())),
-        new Set(newMemory.context.keywords.map(k => k.toLowerCase()))
+        new Set(newMemory.context.keywords.map(k => k.toLowerCase())),
       )
 
       if (keywordOverlap > 0.5 || existing.context.topic === newMemory.context.topic) {
@@ -366,7 +371,9 @@ export class ContextualMemoryEngine {
     let minScore = Infinity
 
     for (const memory of this.memories.values()) {
-      const score = memory.importance * 0.5 + (memory.accessCount / 100) * 0.3 +
+      const score =
+        memory.importance * 0.5 +
+        (memory.accessCount / 100) * 0.3 +
         (memory.links.length / 10) * 0.2
       if (score < minScore) {
         minScore = score
@@ -380,7 +387,10 @@ export class ContextualMemoryEngine {
   }
 
   private extractTopic(text: string): string {
-    const words = text.toLowerCase().split(/\s+/).filter(w => w.length > 4)
+    const words = text
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(w => w.length > 4)
     return words.slice(0, 3).join(' ') || 'general'
   }
 
@@ -396,16 +406,91 @@ export class ContextualMemoryEngine {
   }
 
   private extractKeywords(text: string): string[] {
-    const stopWords = new Set(['the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been',
-      'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
-      'should', 'may', 'might', 'can', 'shall', 'to', 'of', 'in', 'for', 'on', 'with',
-      'at', 'by', 'from', 'as', 'into', 'through', 'during', 'before', 'after', 'it',
-      'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'we', 'they', 'me',
-      'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their', 'and',
-      'but', 'or', 'not', 'so', 'if', 'then', 'than', 'too', 'very', 'just', 'about',
-      'what', 'how', 'why', 'when', 'where', 'who', 'which'])
+    const stopWords = new Set([
+      'the',
+      'a',
+      'an',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'being',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+      'will',
+      'would',
+      'could',
+      'should',
+      'may',
+      'might',
+      'can',
+      'shall',
+      'to',
+      'of',
+      'in',
+      'for',
+      'on',
+      'with',
+      'at',
+      'by',
+      'from',
+      'as',
+      'into',
+      'through',
+      'during',
+      'before',
+      'after',
+      'it',
+      'this',
+      'that',
+      'these',
+      'those',
+      'i',
+      'you',
+      'he',
+      'she',
+      'we',
+      'they',
+      'me',
+      'him',
+      'her',
+      'us',
+      'them',
+      'my',
+      'your',
+      'his',
+      'its',
+      'our',
+      'their',
+      'and',
+      'but',
+      'or',
+      'not',
+      'so',
+      'if',
+      'then',
+      'than',
+      'too',
+      'very',
+      'just',
+      'about',
+      'what',
+      'how',
+      'why',
+      'when',
+      'where',
+      'who',
+      'which',
+    ])
 
-    return text.toLowerCase()
+    return text
+      .toLowerCase()
       .split(/\s+/)
       .map(w => w.replace(/[^a-z0-9]/g, ''))
       .filter(w => w.length > 2 && !stopWords.has(w))

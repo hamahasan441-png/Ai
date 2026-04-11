@@ -73,88 +73,227 @@ export const DEFAULT_ETHICAL_CONFIG: EthicalReasonerConfig = {
 }
 
 const ALL_FRAMEWORKS: EthicalFramework[] = [
-  'utilitarian', 'deontological', 'virtue', 'care', 'rights',
+  'utilitarian',
+  'deontological',
+  'virtue',
+  'care',
+  'rights',
 ]
 
 const BUILT_IN_PRINCIPLES: EthicalPrinciple[] = [
   // Utilitarian
-  { name: 'Maximize Happiness', description: 'Actions should produce the greatest overall happiness', framework: 'utilitarian', weight: 0.9 },
-  { name: 'Minimize Suffering', description: 'Reduce harm and suffering wherever possible', framework: 'utilitarian', weight: 0.9 },
-  { name: 'Greatest Good', description: 'Seek the greatest good for the greatest number', framework: 'utilitarian', weight: 0.85 },
-  { name: 'Cost-Benefit Analysis', description: 'Weigh positive outcomes against negative consequences', framework: 'utilitarian', weight: 0.7 },
-  { name: 'Long-Term Welfare', description: 'Consider long-term consequences alongside immediate results', framework: 'utilitarian', weight: 0.75 },
+  {
+    name: 'Maximize Happiness',
+    description: 'Actions should produce the greatest overall happiness',
+    framework: 'utilitarian',
+    weight: 0.9,
+  },
+  {
+    name: 'Minimize Suffering',
+    description: 'Reduce harm and suffering wherever possible',
+    framework: 'utilitarian',
+    weight: 0.9,
+  },
+  {
+    name: 'Greatest Good',
+    description: 'Seek the greatest good for the greatest number',
+    framework: 'utilitarian',
+    weight: 0.85,
+  },
+  {
+    name: 'Cost-Benefit Analysis',
+    description: 'Weigh positive outcomes against negative consequences',
+    framework: 'utilitarian',
+    weight: 0.7,
+  },
+  {
+    name: 'Long-Term Welfare',
+    description: 'Consider long-term consequences alongside immediate results',
+    framework: 'utilitarian',
+    weight: 0.75,
+  },
 
   // Deontological
-  { name: 'Universal Duty', description: 'Act only according to rules you could will to be universal laws', framework: 'deontological', weight: 0.9 },
-  { name: 'Treat as Ends', description: 'Treat people as ends in themselves, never merely as means', framework: 'deontological', weight: 0.9 },
-  { name: 'Categorical Imperative', description: 'Moral obligations are unconditional and universalizable', framework: 'deontological', weight: 0.85 },
-  { name: 'Follow Moral Rules', description: 'Adhere to established moral rules regardless of outcome', framework: 'deontological', weight: 0.8 },
-  { name: 'Keep Promises', description: 'Honour commitments and contracts faithfully', framework: 'deontological', weight: 0.75 },
+  {
+    name: 'Universal Duty',
+    description: 'Act only according to rules you could will to be universal laws',
+    framework: 'deontological',
+    weight: 0.9,
+  },
+  {
+    name: 'Treat as Ends',
+    description: 'Treat people as ends in themselves, never merely as means',
+    framework: 'deontological',
+    weight: 0.9,
+  },
+  {
+    name: 'Categorical Imperative',
+    description: 'Moral obligations are unconditional and universalizable',
+    framework: 'deontological',
+    weight: 0.85,
+  },
+  {
+    name: 'Follow Moral Rules',
+    description: 'Adhere to established moral rules regardless of outcome',
+    framework: 'deontological',
+    weight: 0.8,
+  },
+  {
+    name: 'Keep Promises',
+    description: 'Honour commitments and contracts faithfully',
+    framework: 'deontological',
+    weight: 0.75,
+  },
 
   // Virtue
-  { name: 'Courage', description: 'Act bravely in the face of fear or adversity', framework: 'virtue', weight: 0.75 },
-  { name: 'Temperance', description: 'Exercise moderation and self-control', framework: 'virtue', weight: 0.7 },
-  { name: 'Justice', description: 'Give each person their fair due', framework: 'virtue', weight: 0.9 },
-  { name: 'Prudence', description: 'Act with practical wisdom and foresight', framework: 'virtue', weight: 0.8 },
-  { name: 'Honesty', description: 'Be truthful and transparent in dealings', framework: 'virtue', weight: 0.85 },
-  { name: 'Compassion', description: 'Show empathy and kindness toward others', framework: 'virtue', weight: 0.8 },
-  { name: 'Integrity', description: 'Maintain consistency between values and actions', framework: 'virtue', weight: 0.85 },
+  {
+    name: 'Courage',
+    description: 'Act bravely in the face of fear or adversity',
+    framework: 'virtue',
+    weight: 0.75,
+  },
+  {
+    name: 'Temperance',
+    description: 'Exercise moderation and self-control',
+    framework: 'virtue',
+    weight: 0.7,
+  },
+  {
+    name: 'Justice',
+    description: 'Give each person their fair due',
+    framework: 'virtue',
+    weight: 0.9,
+  },
+  {
+    name: 'Prudence',
+    description: 'Act with practical wisdom and foresight',
+    framework: 'virtue',
+    weight: 0.8,
+  },
+  {
+    name: 'Honesty',
+    description: 'Be truthful and transparent in dealings',
+    framework: 'virtue',
+    weight: 0.85,
+  },
+  {
+    name: 'Compassion',
+    description: 'Show empathy and kindness toward others',
+    framework: 'virtue',
+    weight: 0.8,
+  },
+  {
+    name: 'Integrity',
+    description: 'Maintain consistency between values and actions',
+    framework: 'virtue',
+    weight: 0.85,
+  },
 
   // Care
-  { name: 'Protect the Vulnerable', description: 'Prioritize the welfare of those least able to protect themselves', framework: 'care', weight: 0.9 },
-  { name: 'Maintain Relationships', description: 'Preserve and strengthen interpersonal bonds', framework: 'care', weight: 0.8 },
-  { name: 'Empathy', description: 'Understand and share the feelings of others', framework: 'care', weight: 0.85 },
-  { name: 'Responsiveness', description: 'Attend and respond to the needs of those in your care', framework: 'care', weight: 0.8 },
-  { name: 'Nurture Growth', description: 'Support the development and flourishing of others', framework: 'care', weight: 0.7 },
+  {
+    name: 'Protect the Vulnerable',
+    description: 'Prioritize the welfare of those least able to protect themselves',
+    framework: 'care',
+    weight: 0.9,
+  },
+  {
+    name: 'Maintain Relationships',
+    description: 'Preserve and strengthen interpersonal bonds',
+    framework: 'care',
+    weight: 0.8,
+  },
+  {
+    name: 'Empathy',
+    description: 'Understand and share the feelings of others',
+    framework: 'care',
+    weight: 0.85,
+  },
+  {
+    name: 'Responsiveness',
+    description: 'Attend and respond to the needs of those in your care',
+    framework: 'care',
+    weight: 0.8,
+  },
+  {
+    name: 'Nurture Growth',
+    description: 'Support the development and flourishing of others',
+    framework: 'care',
+    weight: 0.7,
+  },
 
   // Rights
-  { name: 'Right to Life', description: 'Every person has a fundamental right to live', framework: 'rights', weight: 0.95 },
-  { name: 'Right to Liberty', description: 'Individuals are entitled to personal freedom', framework: 'rights', weight: 0.9 },
-  { name: 'Right to Privacy', description: 'People have the right to control personal information', framework: 'rights', weight: 0.85 },
-  { name: 'Right to Free Speech', description: 'Individuals may express opinions without censorship', framework: 'rights', weight: 0.85 },
-  { name: 'Right to Due Process', description: 'Everyone deserves fair treatment under established rules', framework: 'rights', weight: 0.8 },
+  {
+    name: 'Right to Life',
+    description: 'Every person has a fundamental right to live',
+    framework: 'rights',
+    weight: 0.95,
+  },
+  {
+    name: 'Right to Liberty',
+    description: 'Individuals are entitled to personal freedom',
+    framework: 'rights',
+    weight: 0.9,
+  },
+  {
+    name: 'Right to Privacy',
+    description: 'People have the right to control personal information',
+    framework: 'rights',
+    weight: 0.85,
+  },
+  {
+    name: 'Right to Free Speech',
+    description: 'Individuals may express opinions without censorship',
+    framework: 'rights',
+    weight: 0.85,
+  },
+  {
+    name: 'Right to Due Process',
+    description: 'Everyone deserves fair treatment under established rules',
+    framework: 'rights',
+    weight: 0.8,
+  },
 ]
 
 /** Keywords that signal ethical concerns, mapped to relevant frameworks. */
 const ETHICAL_KEYWORDS: Record<string, EthicalFramework[]> = {
-  harm:        ['utilitarian', 'care'],
-  suffering:   ['utilitarian', 'care'],
-  happiness:   ['utilitarian'],
-  benefit:     ['utilitarian'],
-  welfare:     ['utilitarian', 'care'],
-  fairness:    ['virtue', 'rights'],
-  justice:     ['virtue', 'rights', 'deontological'],
-  rights:      ['rights'],
-  privacy:     ['rights'],
-  liberty:     ['rights'],
-  freedom:     ['rights'],
-  speech:      ['rights'],
-  duty:        ['deontological'],
-  obligation:  ['deontological'],
-  promise:     ['deontological'],
-  rule:        ['deontological'],
-  law:         ['deontological', 'rights'],
-  virtue:      ['virtue'],
-  honesty:     ['virtue'],
-  courage:     ['virtue'],
-  integrity:   ['virtue'],
-  compassion:  ['virtue', 'care'],
-  empathy:     ['care'],
-  vulnerable:  ['care'],
-  children:    ['care', 'rights'],
-  relationship:['care'],
-  trust:       ['virtue', 'care', 'deontological'],
-  consent:     ['rights', 'deontological'],
-  autonomy:    ['rights', 'deontological'],
-  dignity:     ['deontological', 'rights'],
-  equality:    ['rights', 'virtue'],
-  deception:   ['virtue', 'deontological'],
-  lie:         ['virtue', 'deontological'],
-  steal:       ['deontological', 'rights'],
-  kill:        ['rights', 'utilitarian', 'deontological'],
-  life:        ['rights', 'utilitarian'],
-  safety:      ['care', 'utilitarian'],
-  protect:     ['care', 'rights'],
+  harm: ['utilitarian', 'care'],
+  suffering: ['utilitarian', 'care'],
+  happiness: ['utilitarian'],
+  benefit: ['utilitarian'],
+  welfare: ['utilitarian', 'care'],
+  fairness: ['virtue', 'rights'],
+  justice: ['virtue', 'rights', 'deontological'],
+  rights: ['rights'],
+  privacy: ['rights'],
+  liberty: ['rights'],
+  freedom: ['rights'],
+  speech: ['rights'],
+  duty: ['deontological'],
+  obligation: ['deontological'],
+  promise: ['deontological'],
+  rule: ['deontological'],
+  law: ['deontological', 'rights'],
+  virtue: ['virtue'],
+  honesty: ['virtue'],
+  courage: ['virtue'],
+  integrity: ['virtue'],
+  compassion: ['virtue', 'care'],
+  empathy: ['care'],
+  vulnerable: ['care'],
+  children: ['care', 'rights'],
+  relationship: ['care'],
+  trust: ['virtue', 'care', 'deontological'],
+  consent: ['rights', 'deontological'],
+  autonomy: ['rights', 'deontological'],
+  dignity: ['deontological', 'rights'],
+  equality: ['rights', 'virtue'],
+  deception: ['virtue', 'deontological'],
+  lie: ['virtue', 'deontological'],
+  steal: ['deontological', 'rights'],
+  kill: ['rights', 'utilitarian', 'deontological'],
+  life: ['rights', 'utilitarian'],
+  safety: ['care', 'utilitarian'],
+  protect: ['care', 'rights'],
 }
 
 /** Common stakeholder labels detected via simple pattern matching. */
@@ -245,9 +384,10 @@ export class EthicalReasoner {
     const analysis = this.analyze(combined)
     const isEthical = analysis.ethicalScore > 0
 
-    const topFramework = analysis.frameworks.length > 0
-      ? analysis.frameworks.reduce((a, b) => Math.abs(b.score) > Math.abs(a.score) ? b : a)
-      : null
+    const topFramework =
+      analysis.frameworks.length > 0
+        ? analysis.frameworks.reduce((a, b) => (Math.abs(b.score) > Math.abs(a.score) ? b : a))
+        : null
 
     const reasoning = topFramework
       ? `From a ${topFramework.framework} perspective: ${topFramework.reasoning}`
@@ -307,7 +447,12 @@ export class EthicalReasoner {
 
     const relevant = this.principles.filter(p => p.framework === framework)
     if (relevant.length === 0) {
-      return { framework, assessment: 'No principles available.', score: 0, reasoning: 'Framework has no registered principles.' }
+      return {
+        framework,
+        assessment: 'No principles available.',
+        score: 0,
+        reasoning: 'Framework has no registered principles.',
+      }
     }
 
     let weightedScore = 0
@@ -324,15 +469,14 @@ export class EthicalReasoner {
       else if (signal < -0.2) violated.push(principle.name)
     }
 
-    const score = totalWeight > 0
-      ? Math.max(-1, Math.min(1, weightedScore / totalWeight))
-      : 0
+    const score = totalWeight > 0 ? Math.max(-1, Math.min(1, weightedScore / totalWeight)) : 0
 
     const assessment = this.frameworkAssessmentSummary(framework, score)
     const reasoningParts: string[] = []
     if (satisfied.length > 0) reasoningParts.push(`Upholds: ${satisfied.join(', ')}.`)
     if (violated.length > 0) reasoningParts.push(`Potentially violates: ${violated.join(', ')}.`)
-    if (reasoningParts.length === 0) reasoningParts.push('No strong alignment or violation detected.')
+    if (reasoningParts.length === 0)
+      reasoningParts.push('No strong alignment or violation detected.')
 
     return { framework, assessment, score, reasoning: reasoningParts.join(' ') }
   }
@@ -391,7 +535,7 @@ export class EthicalReasoner {
       score: this.quickFrameworkScore(lower, fw),
     }))
 
-    const best = frameworkScores.reduce((a, b) => Math.abs(b.score) > Math.abs(a.score) ? b : a)
+    const best = frameworkScores.reduce((a, b) => (Math.abs(b.score) > Math.abs(a.score) ? b : a))
     const avgScore = frameworkScores.reduce((sum, f) => sum + f.score, 0) / frameworkScores.length
 
     if (avgScore > 0.3) {
@@ -428,9 +572,7 @@ export class EthicalReasoner {
   } {
     return {
       totalAnalyses: this.analysisCount,
-      averageConfidence: this.analysisCount > 0
-        ? this.confidenceSum / this.analysisCount
-        : 0,
+      averageConfidence: this.analysisCount > 0 ? this.confidenceSum / this.analysisCount : 0,
       frameworkUsage: { ...this.frameworkUsage },
     }
   }
@@ -504,66 +646,71 @@ export class EthicalReasoner {
 
   private positiveKeywordsFor(principle: EthicalPrinciple): string[] {
     const map: Record<string, string[]> = {
-      'Maximize Happiness':     ['happiness', 'joy', 'wellbeing', 'benefit', 'prosper'],
-      'Minimize Suffering':     ['reduce harm', 'alleviate', 'prevent suffering', 'protect'],
-      'Greatest Good':          ['greatest good', 'majority', 'most people', 'collective'],
-      'Cost-Benefit Analysis':  ['cost-benefit', 'efficient', 'trade-off', 'optimise', 'optimize'],
-      'Long-Term Welfare':      ['long-term', 'sustainable', 'future generations', 'lasting'],
-      'Universal Duty':         ['duty', 'obligation', 'universally', 'categorical'],
-      'Treat as Ends':          ['dignity', 'respect', 'autonomy', 'consent'],
+      'Maximize Happiness': ['happiness', 'joy', 'wellbeing', 'benefit', 'prosper'],
+      'Minimize Suffering': ['reduce harm', 'alleviate', 'prevent suffering', 'protect'],
+      'Greatest Good': ['greatest good', 'majority', 'most people', 'collective'],
+      'Cost-Benefit Analysis': ['cost-benefit', 'efficient', 'trade-off', 'optimise', 'optimize'],
+      'Long-Term Welfare': ['long-term', 'sustainable', 'future generations', 'lasting'],
+      'Universal Duty': ['duty', 'obligation', 'universally', 'categorical'],
+      'Treat as Ends': ['dignity', 'respect', 'autonomy', 'consent'],
       'Categorical Imperative': ['universal law', 'categorical', 'unconditional', 'moral law'],
-      'Follow Moral Rules':     ['rule', 'principle', 'standard', 'guideline'],
-      'Keep Promises':          ['promise', 'commitment', 'honour', 'honor', 'contract'],
-      'Courage':                ['courage', 'brave', 'stand up', 'confront'],
-      'Temperance':             ['moderation', 'restraint', 'self-control', 'balance'],
-      'Justice':                ['justice', 'fair', 'equitable', 'impartial'],
-      'Prudence':               ['prudent', 'wise', 'careful', 'foresight'],
-      'Honesty':                ['honest', 'truthful', 'transparent', 'candid'],
-      'Compassion':             ['compassion', 'empathy', 'kindness', 'caring'],
-      'Integrity':              ['integrity', 'consistent', 'principled', 'upright'],
+      'Follow Moral Rules': ['rule', 'principle', 'standard', 'guideline'],
+      'Keep Promises': ['promise', 'commitment', 'honour', 'honor', 'contract'],
+      Courage: ['courage', 'brave', 'stand up', 'confront'],
+      Temperance: ['moderation', 'restraint', 'self-control', 'balance'],
+      Justice: ['justice', 'fair', 'equitable', 'impartial'],
+      Prudence: ['prudent', 'wise', 'careful', 'foresight'],
+      Honesty: ['honest', 'truthful', 'transparent', 'candid'],
+      Compassion: ['compassion', 'empathy', 'kindness', 'caring'],
+      Integrity: ['integrity', 'consistent', 'principled', 'upright'],
       'Protect the Vulnerable': ['protect', 'vulnerable', 'children', 'safety', 'shield'],
       'Maintain Relationships': ['relationship', 'bond', 'connection', 'community'],
-      'Empathy':                ['empathy', 'understand feelings', 'perspective', 'listen'],
-      'Responsiveness':         ['responsive', 'attentive', 'address needs', 'support'],
-      'Nurture Growth':         ['growth', 'develop', 'flourish', 'nurture', 'mentor'],
-      'Right to Life':          ['right to life', 'life', 'survival', 'existence'],
-      'Right to Liberty':       ['liberty', 'freedom', 'autonomy', 'self-determination'],
-      'Right to Privacy':       ['privacy', 'confidential', 'personal data', 'surveillance'],
-      'Right to Free Speech':   ['free speech', 'expression', 'opinion', 'press'],
-      'Right to Due Process':   ['due process', 'fair trial', 'presumption of innocence', 'legal rights'],
+      Empathy: ['empathy', 'understand feelings', 'perspective', 'listen'],
+      Responsiveness: ['responsive', 'attentive', 'address needs', 'support'],
+      'Nurture Growth': ['growth', 'develop', 'flourish', 'nurture', 'mentor'],
+      'Right to Life': ['right to life', 'life', 'survival', 'existence'],
+      'Right to Liberty': ['liberty', 'freedom', 'autonomy', 'self-determination'],
+      'Right to Privacy': ['privacy', 'confidential', 'personal data', 'surveillance'],
+      'Right to Free Speech': ['free speech', 'expression', 'opinion', 'press'],
+      'Right to Due Process': [
+        'due process',
+        'fair trial',
+        'presumption of innocence',
+        'legal rights',
+      ],
     }
     return map[principle.name] ?? []
   }
 
   private negativeKeywordsFor(principle: EthicalPrinciple): string[] {
     const map: Record<string, string[]> = {
-      'Maximize Happiness':     ['suffering', 'misery', 'pain', 'despair'],
-      'Minimize Suffering':     ['inflict', 'torture', 'abuse', 'cruelty'],
-      'Greatest Good':          ['selfish', 'few benefit', 'exclusive'],
-      'Cost-Benefit Analysis':  ['wasteful', 'reckless', 'ignore consequences'],
-      'Long-Term Welfare':      ['short-sighted', 'unsustainable', 'exploit'],
-      'Universal Duty':         ['exception for myself', 'special treatment', 'double standard'],
-      'Treat as Ends':          ['exploit', 'manipulate', 'use people', 'objectify'],
+      'Maximize Happiness': ['suffering', 'misery', 'pain', 'despair'],
+      'Minimize Suffering': ['inflict', 'torture', 'abuse', 'cruelty'],
+      'Greatest Good': ['selfish', 'few benefit', 'exclusive'],
+      'Cost-Benefit Analysis': ['wasteful', 'reckless', 'ignore consequences'],
+      'Long-Term Welfare': ['short-sighted', 'unsustainable', 'exploit'],
+      'Universal Duty': ['exception for myself', 'special treatment', 'double standard'],
+      'Treat as Ends': ['exploit', 'manipulate', 'use people', 'objectify'],
       'Categorical Imperative': ['exception', 'convenient', 'situational ethics'],
-      'Follow Moral Rules':     ['break rules', 'cheat', 'circumvent'],
-      'Keep Promises':          ['betray', 'break promise', 'renege', 'deceive'],
-      'Courage':                ['cowardice', 'avoid', 'flee responsibility'],
-      'Temperance':             ['excess', 'indulgence', 'gluttony', 'extreme'],
-      'Justice':                ['unfair', 'bias', 'discriminat', 'unjust'],
-      'Prudence':               ['reckless', 'impulsive', 'short-sighted', 'foolish'],
-      'Honesty':                ['lie', 'deceive', 'fraud', 'dishonest', 'mislead'],
-      'Compassion':             ['cruel', 'callous', 'indifferent', 'heartless'],
-      'Integrity':              ['hypocrit', 'corrupt', 'inconsistent', 'two-faced'],
+      'Follow Moral Rules': ['break rules', 'cheat', 'circumvent'],
+      'Keep Promises': ['betray', 'break promise', 'renege', 'deceive'],
+      Courage: ['cowardice', 'avoid', 'flee responsibility'],
+      Temperance: ['excess', 'indulgence', 'gluttony', 'extreme'],
+      Justice: ['unfair', 'bias', 'discriminat', 'unjust'],
+      Prudence: ['reckless', 'impulsive', 'short-sighted', 'foolish'],
+      Honesty: ['lie', 'deceive', 'fraud', 'dishonest', 'mislead'],
+      Compassion: ['cruel', 'callous', 'indifferent', 'heartless'],
+      Integrity: ['hypocrit', 'corrupt', 'inconsistent', 'two-faced'],
       'Protect the Vulnerable': ['exploit vulnerable', 'endanger children', 'neglect'],
       'Maintain Relationships': ['betray', 'abandon', 'isolate', 'sever ties'],
-      'Empathy':                ['ignore feelings', 'dismiss', 'apathetic'],
-      'Responsiveness':         ['neglect', 'ignore', 'unresponsive', 'abandon'],
-      'Nurture Growth':         ['stifle', 'suppress', 'hinder', 'oppress'],
-      'Right to Life':          ['kill', 'murder', 'endanger life', 'lethal'],
-      'Right to Liberty':       ['imprison', 'enslave', 'coerce', 'restrict freedom'],
-      'Right to Privacy':       ['surveillance', 'spy', 'expose private', 'data breach'],
-      'Right to Free Speech':   ['censor', 'silence', 'suppress speech', 'ban expression'],
-      'Right to Due Process':   ['unfair trial', 'no hearing', 'arbitrary punishment', 'deny rights'],
+      Empathy: ['ignore feelings', 'dismiss', 'apathetic'],
+      Responsiveness: ['neglect', 'ignore', 'unresponsive', 'abandon'],
+      'Nurture Growth': ['stifle', 'suppress', 'hinder', 'oppress'],
+      'Right to Life': ['kill', 'murder', 'endanger life', 'lethal'],
+      'Right to Liberty': ['imprison', 'enslave', 'coerce', 'restrict freedom'],
+      'Right to Privacy': ['surveillance', 'spy', 'expose private', 'data breach'],
+      'Right to Free Speech': ['censor', 'silence', 'suppress speech', 'ban expression'],
+      'Right to Due Process': ['unfair trial', 'no hearing', 'arbitrary punishment', 'deny rights'],
     }
     return map[principle.name] ?? []
   }
@@ -571,7 +718,11 @@ export class EthicalReasoner {
   /** Detect which framework is most relevant based on keyword frequency. */
   private detectDominantFramework(lower: string): EthicalFramework {
     const counts: Record<EthicalFramework, number> = {
-      utilitarian: 0, deontological: 0, virtue: 0, care: 0, rights: 0,
+      utilitarian: 0,
+      deontological: 0,
+      virtue: 0,
+      care: 0,
+      rights: 0,
     }
     for (const [kw, frameworks] of Object.entries(ETHICAL_KEYWORDS)) {
       if (lower.includes(kw)) {
@@ -581,7 +732,10 @@ export class EthicalReasoner {
     let best: EthicalFramework = 'utilitarian'
     let bestCount = 0
     for (const fw of ALL_FRAMEWORKS) {
-      if (counts[fw] > bestCount) { best = fw; bestCount = counts[fw] }
+      if (counts[fw] > bestCount) {
+        best = fw
+        bestCount = counts[fw]
+      }
     }
     return best
   }
@@ -603,7 +757,11 @@ export class EthicalReasoner {
   private aggregateScores(assessments: FrameworkAssessment[]): number {
     if (assessments.length === 0) return 0
     const frameworkWeights: Record<EthicalFramework, number> = {
-      utilitarian: 1.0, deontological: 1.0, virtue: 0.9, care: 0.85, rights: 1.0,
+      utilitarian: 1.0,
+      deontological: 1.0,
+      virtue: 0.9,
+      care: 0.85,
+      rights: 1.0,
     }
     let weighted = 0
     let total = 0
@@ -630,14 +788,14 @@ export class EthicalReasoner {
     const variance = scores.reduce((s, v) => s + (v - mean) ** 2, 0) / scores.length
     const agreementConfidence = Math.max(0, 1 - Math.sqrt(variance))
 
-    return Math.min(1, (keywordConfidence * 0.4 + agreementConfidence * 0.6))
+    return Math.min(1, keywordConfidence * 0.4 + agreementConfidence * 0.6)
   }
 
   /** Human-readable summary for a given framework score. */
   private frameworkAssessmentSummary(framework: EthicalFramework, score: number): string {
     const label = framework.charAt(0).toUpperCase() + framework.slice(1)
-    if (score > 0.5)  return `${label} analysis: strongly ethically supported.`
-    if (score > 0.1)  return `${label} analysis: generally ethically acceptable.`
+    if (score > 0.5) return `${label} analysis: strongly ethically supported.`
+    if (score > 0.1) return `${label} analysis: generally ethically acceptable.`
     if (score > -0.1) return `${label} analysis: ethically ambiguous.`
     if (score > -0.5) return `${label} analysis: raises ethical concerns.`
     return `${label} analysis: significant ethical violations detected.`
@@ -662,16 +820,44 @@ export class EthicalReasoner {
   }
 
   /** Infer whether a stakeholder is positively or negatively affected. */
-  private inferImpact(scenario: string, stakeholder: string): { kind: 'positive' | 'negative' | 'neutral'; severity: number } {
+  private inferImpact(
+    scenario: string,
+    stakeholder: string,
+  ): { kind: 'positive' | 'negative' | 'neutral'; severity: number } {
     const lower = scenario.toLowerCase()
     const stakeholderLower = stakeholder.toLowerCase()
-    const negWords = ['harm', 'hurt', 'damage', 'endanger', 'exploit', 'risk', 'threaten', 'suffer', 'lose', 'violate']
-    const posWords = ['benefit', 'help', 'protect', 'support', 'improve', 'empower', 'save', 'serve', 'gain']
+    const negWords = [
+      'harm',
+      'hurt',
+      'damage',
+      'endanger',
+      'exploit',
+      'risk',
+      'threaten',
+      'suffer',
+      'lose',
+      'violate',
+    ]
+    const posWords = [
+      'benefit',
+      'help',
+      'protect',
+      'support',
+      'improve',
+      'empower',
+      'save',
+      'serve',
+      'gain',
+    ]
 
     let negHits = 0
     let posHits = 0
-    for (const w of negWords) { if (lower.includes(w)) negHits++ }
-    for (const w of posWords) { if (lower.includes(w)) posHits++ }
+    for (const w of negWords) {
+      if (lower.includes(w)) negHits++
+    }
+    for (const w of posWords) {
+      if (lower.includes(w)) posHits++
+    }
 
     // Boost if stakeholder name appears near ethical keywords
     if (lower.includes(stakeholderLower)) {
@@ -679,19 +865,21 @@ export class EthicalReasoner {
       posHits *= 1.2
     }
 
-    if (negHits > posHits && negHits > 0) return { kind: 'negative', severity: Math.min(1, negHits * 0.25) }
-    if (posHits > negHits && posHits > 0) return { kind: 'positive', severity: Math.min(1, posHits * 0.25) }
+    if (negHits > posHits && negHits > 0)
+      return { kind: 'negative', severity: Math.min(1, negHits * 0.25) }
+    if (posHits > negHits && posHits > 0)
+      return { kind: 'positive', severity: Math.min(1, posHits * 0.25) }
     return { kind: 'neutral', severity: 0.3 }
   }
 
   /** Map a framework to its core value for recommendation text. */
   private frameworkCoreValue(framework: EthicalFramework): string {
     const map: Record<EthicalFramework, string> = {
-      utilitarian:    'overall welfare and harm reduction',
-      deontological:  'moral duty and universal principles',
-      virtue:         'character, honesty, and justice',
-      care:           'relationships and protection of the vulnerable',
-      rights:         'fundamental human rights and freedoms',
+      utilitarian: 'overall welfare and harm reduction',
+      deontological: 'moral duty and universal principles',
+      virtue: 'character, honesty, and justice',
+      care: 'relationships and protection of the vulnerable',
+      rights: 'fundamental human rights and freedoms',
     }
     return map[framework]
   }

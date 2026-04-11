@@ -4,9 +4,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  KurdishSentimentAnalyzer,
-} from '../KurdishSentimentAnalyzer.js'
+import { KurdishSentimentAnalyzer } from '../KurdishSentimentAnalyzer.js'
 import { KurdishMorphologicalAnalyzer } from '../KurdishMorphologicalAnalyzer.js'
 import { SemanticMemory, createProgrammingKnowledgeGraph } from '../SemanticMemory.js'
 import { LocalBrain } from '../LocalBrain.js'

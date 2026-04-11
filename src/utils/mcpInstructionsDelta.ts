@@ -1,9 +1,6 @@
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/analytics/growthbook.js'
 import { logEvent } from '../services/analytics/index.js'
-import type {
-  ConnectedMCPServer,
-  MCPServerConnection,
-} from '../services/mcp/types.js'
+import type { ConnectedMCPServer, MCPServerConnection } from '../services/mcp/types.js'
 import type { Message } from '../types/message.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from './envUtils.js'
 
@@ -69,9 +66,7 @@ export function getMcpInstructionsDelta(
     for (const n of msg.attachment.removedNames) announced.delete(n)
   }
 
-  const connected = mcpClients.filter(
-    (c): c is ConnectedMCPServer => c.type === 'connected',
-  )
+  const connected = mcpClients.filter((c): c is ConnectedMCPServer => c.type === 'connected')
   const connectedNames = new Set(connected.map(c => c.name))
 
   // Servers with instructions to announce (either channel). A server can
@@ -85,9 +80,7 @@ export function getMcpInstructionsDelta(
     const existing = blocks.get(ci.serverName)
     blocks.set(
       ci.serverName,
-      existing
-        ? `${existing}\n\n${ci.block}`
-        : `## ${ci.serverName}\n${ci.block}`,
+      existing ? `${existing}\n\n${ci.block}` : `## ${ci.serverName}\n${ci.block}`,
     )
   }
 

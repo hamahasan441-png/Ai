@@ -56,9 +56,7 @@ function logEventImpl(eventName: string, metadata: LogEventMetadata): void {
 
   // If sample result is a positive number, add it to metadata
   const metadataWithSampleRate =
-    sampleResult !== null
-      ? { ...metadata, sample_rate: sampleResult }
-      : metadata
+    sampleResult !== null ? { ...metadata, sample_rate: sampleResult } : metadata
 
   if (shouldTrackDatadog()) {
     // Datadog is a general-access backend — strip _PROTO_* keys
@@ -77,10 +75,7 @@ function logEventImpl(eventName: string, metadata: LogEventMetadata): void {
  * With Segment removed the two remaining sinks are fire-and-forget, so this
  * just wraps the sync impl — kept to preserve the sink interface contract.
  */
-function logEventAsyncImpl(
-  eventName: string,
-  metadata: LogEventMetadata,
-): Promise<void> {
+function logEventAsyncImpl(eventName: string, metadata: LogEventMetadata): Promise<void> {
   logEventImpl(eventName, metadata)
   return Promise.resolve()
 }
@@ -94,8 +89,7 @@ function logEventAsyncImpl(
  * Called from main.tsx during setupBackend().
  */
 export function initializeAnalyticsGates(): void {
-  isDatadogGateEnabled =
-    checkStatsigFeatureGate_CACHED_MAY_BE_STALE(DATADOG_GATE_NAME)
+  isDatadogGateEnabled = checkStatsigFeatureGate_CACHED_MAY_BE_STALE(DATADOG_GATE_NAME)
 }
 
 /**

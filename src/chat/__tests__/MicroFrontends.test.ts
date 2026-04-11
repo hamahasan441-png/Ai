@@ -16,21 +16,33 @@ describe('MicroFrontends', () => {
 
   describe('KB entry tests', () => {
     it('should match module federation and composition keywords', async () => {
-      const r = await brain.chat('explain module federation webpack module federation import map dynamic remote micro frontend composition server side edge side client side')
+      const r = await brain.chat(
+        'explain module federation webpack module federation import map dynamic remote micro frontend composition server side edge side client side',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/module\s+federation|import\s+map|micro\s+frontend|composition/)
+      expect(r.text.toLowerCase()).toMatch(
+        /module\s+federation|import\s+map|micro\s+frontend|composition/,
+      )
     })
 
     it('should match single-spa and web components keywords', async () => {
-      const r = await brain.chat('explain single spa framework parcel application root config lifecycle web component micro frontend shadow dom custom element slot')
+      const r = await brain.chat(
+        'explain single spa framework parcel application root config lifecycle web component micro frontend shadow dom custom element slot',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/single.spa|parcel|shadow\s+dom|custom\s+element|web\s+component/)
+      expect(r.text.toLowerCase()).toMatch(
+        /single.spa|parcel|shadow\s+dom|custom\s+element|web\s+component/,
+      )
     })
 
     it('should match shared state and deployment keywords', async () => {
-      const r = await brain.chat('explain shared state management custom event pub sub micro frontend deployment independent deploy canary blue green versioning')
+      const r = await brain.chat(
+        'explain shared state management custom event pub sub micro frontend deployment independent deploy canary blue green versioning',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/shared\s+state|custom\s+event|pub.sub|independent\s+deploy|canary/)
+      expect(r.text.toLowerCase()).toMatch(
+        /shared\s+state|custom\s+event|pub.sub|independent\s+deploy|canary/,
+      )
     })
   })
 

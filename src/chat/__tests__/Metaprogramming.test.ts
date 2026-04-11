@@ -16,19 +16,27 @@ describe('Metaprogramming', () => {
 
   describe('KB entry tests', () => {
     it('should match reflection and compile-time metaprogramming keywords', async () => {
-      const r = await brain.chat('explain runtime reflection java reflect python inspect compile time metaprogramming rust macro c++ template lisp macro')
+      const r = await brain.chat(
+        'explain runtime reflection java reflect python inspect compile time metaprogramming rust macro c++ template lisp macro',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/reflection|inspect|rust\s+macro|template|metaprogramming/)
+      expect(r.text.toLowerCase()).toMatch(
+        /reflection|inspect|rust\s+macro|template|metaprogramming/,
+      )
     })
 
     it('should match AST manipulation and code generation keywords', async () => {
-      const r = await brain.chat('explain ast manipulation babel plugin typescript compiler api roslyn code generation scaffolding yeoman plop template engine')
+      const r = await brain.chat(
+        'explain ast manipulation babel plugin typescript compiler api roslyn code generation scaffolding yeoman plop template engine',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/ast|babel|typescript\s+compiler|roslyn|scaffold|yeoman/)
     })
 
     it('should match AOP and decorators keywords', async () => {
-      const r = await brain.chat('explain aspect oriented programming aop cross cutting concern spring aop decorator annotation python decorator java annotation typescript decorator')
+      const r = await brain.chat(
+        'explain aspect oriented programming aop cross cutting concern spring aop decorator annotation python decorator java annotation typescript decorator',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/aspect.oriented|aop|cross.cutting|decorator|annotation/)
     })

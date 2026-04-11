@@ -4,20 +4,14 @@
 // Plan mode is set via set_permission_mode control_request in
 // teleportToRemote's CreateSession events array.
 
-import type {
-  ToolResultBlockParam,
-  ToolUseBlock,
-} from '@anthropic-ai/sdk/resources'
+import type { ToolResultBlockParam, ToolUseBlock } from '@anthropic-ai/sdk/resources'
 import type { SDKMessage } from '../../entrypoints/agentSdkTypes.js'
 import { EXIT_PLAN_MODE_V2_TOOL_NAME } from '../../tools/ExitPlanModeTool/constants.js'
 import { checkAndRefreshOAuthTokenIfNeeded } from '../auth.js'
 import { logForDebugging } from '../debug.js'
 import { sleep } from '../sleep.js'
 import { isTransientNetworkError } from '../teleport/api.js'
-import {
-  type PollRemoteSessionResponse,
-  pollRemoteSessionEvents,
-} from '../teleport.js'
+import { type PollRemoteSessionResponse, pollRemoteSessionEvents } from '../teleport.js'
 
 const POLL_INTERVAL_MS = 3000
 // pollRemoteSessionEvents doesn't retry. A 30min poll makes ~600 calls;
@@ -226,11 +220,7 @@ export async function pollForApprovedExitPlanMode(
       }
     }
     if (shouldStop?.()) {
-      throw new UltraplanPollError(
-        'poll stopped by caller',
-        'stopped',
-        scanner.rejectCount,
-      )
+      throw new UltraplanPollError('poll stopped by caller', 'stopped', scanner.rejectCount)
     }
     let newEvents: SDKMessage[]
     let sessionStatus: PollRemoteSessionResponse['sessionStatus']
@@ -298,8 +288,7 @@ export async function pollForApprovedExitPlanMode(
     // snapshot. This also makes needs_input → running snap back on the first
     // poll that sees the user's reply event, even if session_status lags.
     const quietIdle =
-      (sessionStatus === 'idle' || sessionStatus === 'requires_action') &&
-      newEvents.length === 0
+      (sessionStatus === 'idle' || sessionStatus === 'requires_action') && newEvents.length === 0
     const phase: UltraplanPhase = scanner.hasPendingPlan
       ? 'plan_ready'
       : quietIdle
@@ -335,9 +324,7 @@ function contentToText(content: ToolResultBlockParam['content']): string {
 // Extracts the plan text after the ULTRAPLAN_TELEPORT_SENTINEL marker.
 // Returns null when the sentinel is absent — callers treat null as a normal
 // user rejection (scanner falls through to { kind: 'rejected' }).
-function extractTeleportPlan(
-  content: ToolResultBlockParam['content'],
-): string | null {
+function extractTeleportPlan(content: ToolResultBlockParam['content']): string | null {
   const text = contentToText(content)
   const marker = `${ULTRAPLAN_TELEPORT_SENTINEL}\n`
   const idx = text.indexOf(marker)
@@ -350,10 +337,7 @@ function extractTeleportPlan(
 function extractApprovedPlan(content: ToolResultBlockParam['content']): string {
   const text = contentToText(content)
   // Try both markers — edited plans use a different label.
-  const markers = [
-    '## Approved Plan (edited by user):\n',
-    '## Approved Plan:\n',
-  ]
+  const markers = ['## Approved Plan (edited by user):\n', '## Approved Plan:\n']
   for (const marker of markers) {
     const idx = text.indexOf(marker)
     if (idx !== -1) {

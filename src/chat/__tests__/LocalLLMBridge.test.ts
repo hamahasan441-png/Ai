@@ -24,7 +24,9 @@ describe('LocalLLMBridge', () => {
     })
 
     it('should classify debugging intent', () => {
-      const result = bridge.classifyIntent('Debug this error: TypeError cannot read property of null')
+      const result = bridge.classifyIntent(
+        'Debug this error: TypeError cannot read property of null',
+      )
       expect(result.intent).toBe('debugging')
       expect(result.confidence).toBeGreaterThan(0.5)
     })
@@ -48,7 +50,9 @@ describe('LocalLLMBridge', () => {
     })
 
     it('should classify heap overflow intent', () => {
-      const result = bridge.classifyIntent('Analyze this heap buffer overflow with tcache poisoning')
+      const result = bridge.classifyIntent(
+        'Analyze this heap buffer overflow with tcache poisoning',
+      )
       expect(result.intent).toBe('overflow_debug')
     })
 
@@ -158,7 +162,10 @@ describe('LocalLLMBridge', () => {
 
   describe('Context Enrichment', () => {
     it('should add and retrieve knowledge context', () => {
-      bridge.addKnowledgeContext('security', ['CVE-2021-44228: Log4Shell', 'CVE-2014-0160: Heartbleed'])
+      bridge.addKnowledgeContext('security', [
+        'CVE-2021-44228: Log4Shell',
+        'CVE-2014-0160: Heartbleed',
+      ])
       const ctx = bridge.getContextForIntent('vulnerability_search')
       expect(ctx).toContain('CVE-2021-44228: Log4Shell')
     })
@@ -242,7 +249,9 @@ describe('LocalLLMBridge', () => {
     })
 
     it('should generate code with context', async () => {
-      const result = await bridge.generateCode('sort function', 'Python', ['Use quicksort algorithm'])
+      const result = await bridge.generateCode('sort function', 'Python', [
+        'Use quicksort algorithm',
+      ])
       expect(result.intent).toBe('code_generation')
       expect(result.contextSources).toContain('code_templates')
     })

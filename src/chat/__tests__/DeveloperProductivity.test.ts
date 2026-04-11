@@ -16,21 +16,33 @@ describe('DeveloperProductivity', () => {
 
   describe('KB entry tests', () => {
     it('should match IDE mastery and debugging techniques keywords', async () => {
-      const r = await brain.chat('explain ide editor mastery vs code extensions jetbrains plugins vim neovim lsp debugging techniques conditional breakpoints watchpoints remote debugging')
+      const r = await brain.chat(
+        'explain ide editor mastery vs code extensions jetbrains plugins vim neovim lsp debugging techniques conditional breakpoints watchpoints remote debugging',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/ide|vs\s+code|jetbrains|vim|neovim|lsp|debugging|breakpoint|watchpoint/)
+      expect(r.text.toLowerCase()).toMatch(
+        /ide|vs\s+code|jetbrains|vim|neovim|lsp|debugging|breakpoint|watchpoint/,
+      )
     })
 
     it('should match profiling tools and code navigation keywords', async () => {
-      const r = await brain.chat('explain profiling tools cpu profilers memory profilers flame graphs async profiling ebpf code navigation code intelligence symbol search call hierarchies')
+      const r = await brain.chat(
+        'explain profiling tools cpu profilers memory profilers flame graphs async profiling ebpf code navigation code intelligence symbol search call hierarchies',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/profil|cpu|memory|flame\s+graph|ebpf|code\s+navigation|intelligence|symbol|call\s+hierarch/)
+      expect(r.text.toLowerCase()).toMatch(
+        /profil|cpu|memory|flame\s+graph|ebpf|code\s+navigation|intelligence|symbol|call\s+hierarch/,
+      )
     })
 
     it('should match CLI tools and development environments keywords', async () => {
-      const r = await brain.chat('explain cli tools developers ripgrep fd jq fzf tmux zoxide bat development environments devcontainers nix dotfiles codespaces')
+      const r = await brain.chat(
+        'explain cli tools developers ripgrep fd jq fzf tmux zoxide bat development environments devcontainers nix dotfiles codespaces',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/ide|vs\s+code|jetbrains|vim|neovim|lsp|debugging|profil|flame\s+graph|ripgrep|devcontainer/)
+      expect(r.text.toLowerCase()).toMatch(
+        /ide|vs\s+code|jetbrains|vim|neovim|lsp|debugging|profil|flame\s+graph|ripgrep|devcontainer/,
+      )
     })
   })
 

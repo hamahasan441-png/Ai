@@ -106,7 +106,9 @@ describe('ConversationEngine', () => {
     })
 
     it('should detect documentation intent', () => {
-      expect(engine.detectIntent('document the API and explain how it works in the readme')).toBe('documentation')
+      expect(engine.detectIntent('document the API and explain how it works in the readme')).toBe(
+        'documentation',
+      )
     })
 
     it('should detect security intent', () => {

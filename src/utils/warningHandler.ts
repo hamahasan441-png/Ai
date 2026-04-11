@@ -68,8 +68,7 @@ export function initializeWarningHandler(): void {
   // For internal users, only keep default warnings for development builds
   // Check development mode directly to avoid async call in init
   // This preserves the same logic as getCurrentInstallationType() without async
-  const isDevelopment =
-    process.env.NODE_ENV === 'development' || isRunningFromBuildDirectory()
+  const isDevelopment = process.env.NODE_ENV === 'development' || isRunningFromBuildDirectory()
   if (!isDevelopment) {
     process.removeAllListeners('warning')
   }
@@ -83,10 +82,7 @@ export function initializeWarningHandler(): void {
       // Bound the map to prevent unbounded memory growth from unique warning keys.
       // Once the cap is reached, new unique keys are not tracked — their
       // occurrence_count will always be reported as 1 in analytics.
-      if (
-        warningCounts.has(warningKey) ||
-        warningCounts.size < MAX_WARNING_KEYS
-      ) {
+      if (warningCounts.has(warningKey) || warningCounts.size < MAX_WARNING_KEYS) {
         warningCounts.set(warningKey, count + 1)
       }
 
@@ -97,11 +93,9 @@ export function initializeWarningHandler(): void {
       logEvent('tengu_node_warning', {
         is_internal: isInternal ? 1 : 0,
         occurrence_count: count + 1,
-        classname:
-          warning.name as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        classname: warning.name as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         ...(process.env.USER_TYPE === 'ant' && {
-          message:
-            warning.message as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          message: warning.message as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
         }),
       })
 

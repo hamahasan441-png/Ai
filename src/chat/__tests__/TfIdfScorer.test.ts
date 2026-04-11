@@ -85,8 +85,8 @@ describe('getNgrams', () => {
 describe('computeTf', () => {
   it('computes normalized term frequency', () => {
     const tf = computeTf(['hello', 'world', 'hello'])
-    expect(tf.get('hello')).toBeCloseTo(2/3, 5)
-    expect(tf.get('world')).toBeCloseTo(1/3, 5)
+    expect(tf.get('hello')).toBeCloseTo(2 / 3, 5)
+    expect(tf.get('world')).toBeCloseTo(1 / 3, 5)
   })
 
   it('handles empty tokens', () => {
@@ -104,7 +104,10 @@ describe('computeTf', () => {
 
 describe('cosineSimilarity', () => {
   it('returns 1 for identical vectors', () => {
-    const v = new Map([['a', 1], ['b', 2]])
+    const v = new Map([
+      ['a', 1],
+      ['b', 2],
+    ])
     expect(cosineSimilarity(v, v)).toBeCloseTo(1, 5)
   })
 
@@ -115,8 +118,14 @@ describe('cosineSimilarity', () => {
   })
 
   it('returns between 0 and 1 for partial overlap', () => {
-    const a = new Map([['x', 1], ['y', 1]])
-    const b = new Map([['y', 1], ['z', 1]])
+    const a = new Map([
+      ['x', 1],
+      ['y', 1],
+    ])
+    const b = new Map([
+      ['y', 1],
+      ['z', 1],
+    ])
     const sim = cosineSimilarity(a, b)
     expect(sim).toBeGreaterThan(0)
     expect(sim).toBeLessThan(1)

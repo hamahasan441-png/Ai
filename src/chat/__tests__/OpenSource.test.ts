@@ -5,7 +5,9 @@ import { createProgrammingKnowledgeGraph } from '../SemanticMemory'
 describe('Open Source / Community Knowledge', () => {
   let brain: LocalBrain
 
-  beforeAll(() => { brain = new LocalBrain({ enableIntelligence: true }) })
+  beforeAll(() => {
+    brain = new LocalBrain({ enableIntelligence: true })
+  })
 
   // ── KB entry tests ──────────────────────────────────────
   it('knows about open source licensing', async () => {
@@ -15,27 +17,39 @@ describe('Open Source / Community Knowledge', () => {
   })
 
   it('knows about semantic versioning', async () => {
-    const r = await brain.chat('explain semantic versioning semver major minor patch conventional commits changelog')
+    const r = await brain.chat(
+      'explain semantic versioning semver major minor patch conventional commits changelog',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/semver|semantic\s+version|major|minor|patch|changelog/)
   })
 
   it('knows about community management', async () => {
-    const r = await brain.chat('explain contributing guide code of conduct community guidelines pr template issue')
+    const r = await brain.chat(
+      'explain contributing guide code of conduct community guidelines pr template issue',
+    )
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/contribut|code\s+of\s+conduct|community|template|governance/)
+    expect(r.text.toLowerCase()).toMatch(
+      /contribut|code\s+of\s+conduct|community|template|governance/,
+    )
   })
 
   it('knows about OSS operations', async () => {
-    const r = await brain.chat('explain github actions ci cd open source workflow automation package publishing npm pypi crates rubygems registry')
+    const r = await brain.chat(
+      'explain github actions ci cd open source workflow automation package publishing npm pypi crates rubygems registry',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/open\s+source|licens|publish|registry|ci|workflow/)
   })
 
   it('knows about OSS sustainability', async () => {
-    const r = await brain.chat('explain open source funding sponsorship sustainability model contribution forking inner source')
+    const r = await brain.chat(
+      'explain open source funding sponsorship sustainability model contribution forking inner source',
+    )
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/fund|sponsor|sustain|contribut|fork|inner.?source|open\s+source/)
+    expect(r.text.toLowerCase()).toMatch(
+      /fund|sponsor|sustain|contribut|fork|inner.?source|open\s+source/,
+    )
   })
 
   // ── Semantic concept tests ──────────────────────────────

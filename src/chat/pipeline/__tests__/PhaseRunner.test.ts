@@ -1,15 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  PhaseRunner,
-  type HealthReport,
-  type PhaseResult,
-} from '../PhaseRunner'
-import {
-  PipelinePhase,
-  MODULE_REGISTRY,
-  PHASE_LABELS,
-  getPhaseOrder,
-} from '../PipelineContract'
+import { PhaseRunner, type HealthReport, type PhaseResult } from '../PhaseRunner'
+import { PipelinePhase, MODULE_REGISTRY, PHASE_LABELS, getPhaseOrder } from '../PipelineContract'
 
 // ── Helpers ──
 
@@ -29,7 +20,9 @@ function richFactory(id = 'mod') {
     id,
     getStats: () => ({ calls: 42 }),
     serialize: () => ({ state: id }),
-    deserialize: (_d: unknown) => { /* noop */ },
+    deserialize: (_d: unknown) => {
+      /* noop */
+    },
   })
 }
 
@@ -113,9 +106,7 @@ describe('PhaseRunner', () => {
 
       const report = runner.initializeAll()
       expect(report.failed).toBe(1)
-      const failedMod = report.phaseResults
-        .flatMap(pr => pr.modules)
-        .find(m => m.name === name)
+      const failedMod = report.phaseResults.flatMap(pr => pr.modules).find(m => m.name === name)
       expect(failedMod?.error).toBe('init boom')
     })
 
@@ -285,7 +276,9 @@ describe('PhaseRunner', () => {
     it('returns module names that fail deserialization', () => {
       const name = firstModuleInPhase(PipelinePhase.PHASE_1_CORE)
       runner.registerFactory(name, () => ({
-        deserialize: () => { throw new Error('bad data') },
+        deserialize: () => {
+          throw new Error('bad data')
+        },
       }))
       runner.initializeAll()
 

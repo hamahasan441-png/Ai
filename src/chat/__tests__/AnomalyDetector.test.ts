@@ -82,7 +82,9 @@ describe('AnomalyDetector', () => {
       for (let i = 0; i < 10; i++) {
         detector.detectQueryAnomaly('Normal question about technology')
       }
-      const result = detector.detectQueryAnomaly('spam spam spam spam spam spam spam spam spam spam spam')
+      const result = detector.detectQueryAnomaly(
+        'spam spam spam spam spam spam spam spam spam spam spam',
+      )
       expect(result.score).toBeGreaterThan(0)
     })
   })

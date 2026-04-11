@@ -131,7 +131,18 @@ describe('KurdishLanguageUtils — Numbers', () => {
   })
 
   it('numberToKurdish(11) through (20) returns correct words', () => {
-    const expected = ['یانزە', 'دوانزە', 'سیانزە', 'چواردە', 'پانزە', 'شانزە', 'حەڤدە', 'هەژدە', 'نۆزدە', 'بیست']
+    const expected = [
+      'یانزە',
+      'دوانزە',
+      'سیانزە',
+      'چواردە',
+      'پانزە',
+      'شانزە',
+      'حەڤدە',
+      'هەژدە',
+      'نۆزدە',
+      'بیست',
+    ]
     for (let i = 11; i <= 20; i++) {
       expect(utils.numberToKurdish(i)).toBe(expected[i - 11])
     }
@@ -272,7 +283,15 @@ describe('KurdishLanguageUtils — Days', () => {
   })
 
   it('getDay() finds all seven days', () => {
-    const englishDays = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+    const englishDays = [
+      'Saturday',
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+    ]
     for (const eng of englishDays) {
       expect(utils.getDay(eng)).toBeDefined()
     }

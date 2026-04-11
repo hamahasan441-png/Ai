@@ -79,10 +79,7 @@ function aliasesOf(targets: ReadonlySet<string>): string[] {
  * Network cmdlets — wildcard rules for these enable exfil/download without
  * prompt. No legitimate narrow prefix exists.
  */
-export const NETWORK_CMDLETS = new Set([
-  'invoke-webrequest',
-  'invoke-restmethod',
-])
+export const NETWORK_CMDLETS = new Set(['invoke-webrequest', 'invoke-restmethod'])
 
 /**
  * Alias/variable mutation cmdlets — Set-Alias rebinds command resolution,

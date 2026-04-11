@@ -27,8 +27,8 @@ export interface ToolDescriptor {
   readonly capabilities: string[]
   readonly inputTypes: string[]
   readonly outputTypes: string[]
-  readonly cost: number          // 0-1, relative cost (time, resources)
-  readonly reliability: number   // 0-1, how often it succeeds
+  readonly cost: number // 0-1, relative cost (time, resources)
+  readonly reliability: number // 0-1, how often it succeeds
   readonly sideEffects: boolean
   readonly requiresConfirmation: boolean
 }
@@ -45,7 +45,12 @@ export interface TaskRequirement {
 
 /** Constraint on tool selection. */
 export interface TaskConstraint {
-  readonly type: 'max_cost' | 'no_side_effects' | 'no_confirmation' | 'preferred_tool' | 'excluded_tool'
+  readonly type:
+    | 'max_cost'
+    | 'no_side_effects'
+    | 'no_confirmation'
+    | 'preferred_tool'
+    | 'excluded_tool'
   readonly value: string | number
 }
 
@@ -246,12 +251,18 @@ export class ToolReasoningEngine {
       if (!this.passesConstraints(tool, requirement.constraints || [])) continue
 
       // Compute relevance
-      const capabilityOverlap = computeCapabilityOverlap(requirement.requiredCapabilities, tool.capabilities)
+      const capabilityOverlap = computeCapabilityOverlap(
+        requirement.requiredCapabilities,
+        tool.capabilities,
+      )
       const inputMatch = computeCapabilityOverlap(requirement.inputAvailable, tool.inputTypes)
-      const outputMatch = tool.outputTypes.some(o =>
-        o.toLowerCase().includes(requirement.expectedOutputType.toLowerCase()) ||
-        requirement.expectedOutputType.toLowerCase().includes(o.toLowerCase())
-      ) ? 1.0 : 0.3
+      const outputMatch = tool.outputTypes.some(
+        o =>
+          o.toLowerCase().includes(requirement.expectedOutputType.toLowerCase()) ||
+          requirement.expectedOutputType.toLowerCase().includes(o.toLowerCase()),
+      )
+        ? 1.0
+        : 0.3
 
       // Historical success rate for this task type
       const historicalSuccess = this.getHistoricalSuccessRate(tool.name, taskType)
@@ -259,11 +270,12 @@ export class ToolReasoningEngine {
       // Compute scores
       const relevanceScore = clamp(
         capabilityOverlap * 0.4 +
-        inputMatch * 0.15 +
-        outputMatch * 0.15 +
-        tool.reliability * 0.1 +
-        historicalSuccess * this.config.historyWeight,
-        0, 1,
+          inputMatch * 0.15 +
+          outputMatch * 0.15 +
+          tool.reliability * 0.1 +
+          historicalSuccess * this.config.historyWeight,
+        0,
+        1,
       )
 
       const costBenefit = relevanceScore / Math.max(tool.cost, 0.01)
@@ -274,7 +286,8 @@ export class ToolReasoningEngine {
           relevanceScore,
           capabilityOverlap,
           costBenefit,
-          reasoning: `${tool.name}: capability overlap ${(capabilityOverlap * 100).toFixed(0)}%, ` +
+          reasoning:
+            `${tool.name}: capability overlap ${(capabilityOverlap * 100).toFixed(0)}%, ` +
             `historical success ${(historicalSuccess * 100).toFixed(0)}%, ` +
             `cost-benefit ratio ${costBenefit.toFixed(2)}`,
         })
@@ -310,7 +323,9 @@ export class ToolReasoningEngine {
   }
 
   private getHistoricalSuccessRate(toolName: string, taskType: string): number {
-    const relevant = this.usageHistory.filter(r => r.toolName === toolName && r.taskType === taskType)
+    const relevant = this.usageHistory.filter(
+      r => r.toolName === toolName && r.taskType === taskType,
+    )
     if (relevant.length === 0) return 0.5 // No history — assume neutral
     return relevant.filter(r => r.success).length / relevant.length
   }
@@ -364,7 +379,8 @@ export class ToolReasoningEngine {
       totalEstimatedCost: totalCost,
       expectedReliability: reliabilityProduct,
       executionOrder,
-      reasoning: `Pipeline with ${steps.length} steps. ` +
+      reasoning:
+        `Pipeline with ${steps.length} steps. ` +
         `Total cost: ${totalCost.toFixed(2)}, ` +
         `Expected reliability: ${(reliabilityProduct * 100).toFixed(0)}%`,
     }
@@ -436,7 +452,13 @@ export class ToolReasoningEngine {
   /** Perform a cost-benefit analysis between tool alternatives. */
   analyzeCostBenefit(requirement: TaskRequirement): {
     recommended: ToolDescriptor | null
-    analysis: Array<{ tool: string; benefit: number; cost: number; ratio: number; reasoning: string }>
+    analysis: Array<{
+      tool: string
+      benefit: number
+      cost: number
+      ratio: number
+      reasoning: string
+    }>
   } {
     const matches = this.selectTools(requirement)
     const analysis = matches.map(m => ({
@@ -486,14 +508,14 @@ export class ToolReasoningEngine {
     return {
       totalSelectionsPerformed: this.stats.totalSelections,
       totalPipelinesCreated: this.stats.totalPipelines,
-      avgToolsPerPipeline: this.stats.totalPipelines > 0
-        ? this.stats.totalToolSteps / this.stats.totalPipelines
-        : 0,
+      avgToolsPerPipeline:
+        this.stats.totalPipelines > 0 ? this.stats.totalToolSteps / this.stats.totalPipelines : 0,
       toolSuccessRates,
       mostUsedTools,
-      fallbackUsageRate: this.stats.totalStepsExecuted > 0
-        ? this.stats.fallbacksUsed / this.stats.totalStepsExecuted
-        : 0,
+      fallbackUsageRate:
+        this.stats.totalStepsExecuted > 0
+          ? this.stats.fallbacksUsed / this.stats.totalStepsExecuted
+          : 0,
     }
   }
 
@@ -509,7 +531,10 @@ export class ToolReasoningEngine {
   }
 
   /** Restore engine state from serialized data. */
-  static deserialize(json: string, config?: Partial<ToolReasoningEngineConfig>): ToolReasoningEngine {
+  static deserialize(
+    json: string,
+    config?: Partial<ToolReasoningEngineConfig>,
+  ): ToolReasoningEngine {
     const engine = new ToolReasoningEngine(config)
     try {
       const data = JSON.parse(json)

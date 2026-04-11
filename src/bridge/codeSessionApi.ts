@@ -46,9 +46,7 @@ export async function createCodeSession(
       },
     )
   } catch (err: unknown) {
-    logForDebugging(
-      `[code-session] Session create request failed: ${errorMessage(err)}`,
-    )
+    logForDebugging(`[code-session] Session create request failed: ${errorMessage(err)}`)
     return null
   }
 
@@ -114,9 +112,7 @@ export async function fetchRemoteCredentials(
       },
     )
   } catch (err: unknown) {
-    logForDebugging(
-      `[code-session] /bridge request failed: ${errorMessage(err)}`,
-    )
+    logForDebugging(`[code-session] /bridge request failed: ${errorMessage(err)}`)
     return null
   }
 
@@ -149,14 +145,8 @@ export async function fetchRemoteCredentials(
   // Go may also return a number depending on encoder settings.
   const rawEpoch = data.worker_epoch
   const epoch = typeof rawEpoch === 'string' ? Number(rawEpoch) : rawEpoch
-  if (
-    typeof epoch !== 'number' ||
-    !Number.isFinite(epoch) ||
-    !Number.isSafeInteger(epoch)
-  ) {
-    logForDebugging(
-      `[code-session] /bridge worker_epoch invalid: ${jsonStringify(rawEpoch)}`,
-    )
+  if (typeof epoch !== 'number' || !Number.isFinite(epoch) || !Number.isSafeInteger(epoch)) {
+    logForDebugging(`[code-session] /bridge worker_epoch invalid: ${jsonStringify(rawEpoch)}`)
     return null
   }
   return {

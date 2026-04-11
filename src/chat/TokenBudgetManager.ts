@@ -228,7 +228,7 @@ export class TokenBudgetManager {
     this.pendingChunks = chunks.slice(1)
     const firstChunk = chunks[0] ?? text
     if (this.pendingChunks.length > 0) {
-      return firstChunk + '\n\n... [response truncated, type \'continue\' for more]'
+      return firstChunk + "\n\n... [response truncated, type 'continue' for more]"
     }
     return firstChunk
   }
@@ -247,7 +247,7 @@ export class TokenBudgetManager {
     if (this.pendingChunks.length === 0) return null
     const chunk = this.pendingChunks.shift()!
     if (this.pendingChunks.length > 0) {
-      return chunk + '\n\n... [response truncated, type \'continue\' for more]'
+      return chunk + "\n\n... [response truncated, type 'continue' for more]"
     }
     return chunk
   }

@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  ThreatModeler,
-  type Asset,
-  type DataFlow,
-  type Threat,
-} from '../ThreatModeler'
+import { ThreatModeler, type Asset, type DataFlow, type Threat } from '../ThreatModeler'
 
 // ── Constructor Tests ──
 
@@ -251,7 +246,14 @@ describe('ThreatModeler analyzeStride', () => {
       description: 'Main database',
     }
     const flows: DataFlow[] = [
-      { id: 'f1', source: 'a2', destination: 'x', data: 'PII', encrypted: false, authentication: true },
+      {
+        id: 'f1',
+        source: 'a2',
+        destination: 'x',
+        data: 'PII',
+        encrypted: false,
+        authentication: true,
+      },
     ]
     const results = modeler.analyzeStride(asset, flows)
     const interception = results.find(r => r.threat === 'Data Interception')
@@ -555,7 +557,9 @@ describe('ThreatModeler compareMitigationStrategies', () => {
     }
     // Verify sorted descending by costEffectiveness
     for (let i = 1; i < strategies.length; i++) {
-      expect(strategies[i - 1].costEffectiveness).toBeGreaterThanOrEqual(strategies[i].costEffectiveness)
+      expect(strategies[i - 1].costEffectiveness).toBeGreaterThanOrEqual(
+        strategies[i].costEffectiveness,
+      )
     }
   })
 

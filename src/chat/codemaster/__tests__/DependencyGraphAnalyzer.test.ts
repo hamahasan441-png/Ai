@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  DependencyGraphAnalyzer,
-  type FileContent,
-} from '../DependencyGraphAnalyzer.js'
+import { DependencyGraphAnalyzer, type FileContent } from '../DependencyGraphAnalyzer.js'
 
 describe('DependencyGraphAnalyzer', () => {
   let analyzer: DependencyGraphAnalyzer
@@ -126,7 +123,10 @@ describe('DependencyGraphAnalyzer', () => {
     })
 
     it('handles aliased python imports', () => {
-      const node = analyzer.addFile('a.py', `from collections import OrderedDict as OD, defaultdict as dd`)
+      const node = analyzer.addFile(
+        'a.py',
+        `from collections import OrderedDict as OD, defaultdict as dd`,
+      )
       expect(node.imports).toHaveLength(1)
       expect(node.imports[0].names).toEqual(['OrderedDict', 'defaultdict'])
     })
@@ -172,7 +172,11 @@ describe('DependencyGraphAnalyzer', () => {
       const node = analyzer.addFile('a.ts', content)
       expect(node.exports).toHaveLength(5)
       expect(node.exports.map(e => e.name)).toEqual([
-        'VALUE', 'doStuff', 'MyClass', 'MyInterface', 'Status',
+        'VALUE',
+        'doStuff',
+        'MyClass',
+        'MyInterface',
+        'Status',
       ])
     })
 
@@ -285,9 +289,7 @@ describe('DependencyGraphAnalyzer', () => {
     })
 
     it('is 0 when both fan-in and fan-out are 0', () => {
-      const files: FileContent[] = [
-        { path: 'isolated.ts', content: `const x = 1` },
-      ]
+      const files: FileContent[] = [{ path: 'isolated.ts', content: `const x = 1` }]
       const result = analyzer.analyzeFiles(files)
       expect(result.nodes[0].instability).toBe(0)
     })
@@ -385,12 +387,10 @@ describe('DependencyGraphAnalyzer', () => {
 
   describe('high coupling detection', () => {
     it('flags a module with more than 10 imports', () => {
-      const imports = Array.from({ length: 12 }, (_, i) =>
-        `import { x${i} } from './m${i}'`,
-      ).join('\n')
-      const files: FileContent[] = [
-        { path: 'big.ts', content: imports },
-      ]
+      const imports = Array.from({ length: 12 }, (_, i) => `import { x${i} } from './m${i}'`).join(
+        '\n',
+      )
+      const files: FileContent[] = [{ path: 'big.ts', content: imports }]
       const result = analyzer.analyzeFiles(files)
       const highCoupling = result.issues.filter(i => i.type === 'high-coupling')
       expect(highCoupling.length).toBeGreaterThanOrEqual(1)
@@ -398,12 +398,10 @@ describe('DependencyGraphAnalyzer', () => {
     })
 
     it('does not flag a module with 10 or fewer imports', () => {
-      const imports = Array.from({ length: 10 }, (_, i) =>
-        `import { x${i} } from './m${i}'`,
-      ).join('\n')
-      const files: FileContent[] = [
-        { path: 'ok.ts', content: imports },
-      ]
+      const imports = Array.from({ length: 10 }, (_, i) => `import { x${i} } from './m${i}'`).join(
+        '\n',
+      )
+      const files: FileContent[] = [{ path: 'ok.ts', content: imports }]
       const result = analyzer.analyzeFiles(files)
       const fanOutIssues = result.issues.filter(
         i => i.type === 'high-coupling' && i.title.includes('fan-out'),
@@ -484,9 +482,7 @@ describe('DependencyGraphAnalyzer', () => {
 
   describe('coupling score', () => {
     it('is 100 for a clean codebase with no issues', () => {
-      const files: FileContent[] = [
-        { path: 'a.ts', content: `export const a = 1` },
-      ]
+      const files: FileContent[] = [{ path: 'a.ts', content: `export const a = 1` }]
       const result = analyzer.analyzeFiles(files)
       expect(result.couplingScore).toBe(100)
     })
@@ -542,9 +538,7 @@ describe('DependencyGraphAnalyzer', () => {
     })
 
     it('includes coupling score', () => {
-      const result = analyzer.analyzeFiles([
-        { path: 'a.ts', content: `export const a = 1` },
-      ])
+      const result = analyzer.analyzeFiles([{ path: 'a.ts', content: `export const a = 1` }])
       expect(result.summary).toMatch(/Coupling score: \d+\/100/)
     })
   })

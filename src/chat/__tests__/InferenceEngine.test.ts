@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  InferenceEngine,
-} from '../InferenceEngine'
+import { InferenceEngine } from '../InferenceEngine'
 
 // ── Constructor Tests ──
 
@@ -116,7 +114,7 @@ describe('InferenceEngine fact management', () => {
     const facts = engine.getAllFacts()
     expect(facts.length).toBeGreaterThan(0)
     // Built-in rules create assumption propositions
-    const assumptions = facts.filter((f) => f.source === 'assumption')
+    const assumptions = facts.filter(f => f.source === 'assumption')
     expect(assumptions.length).toBeGreaterThan(0)
   })
 })
@@ -430,7 +428,7 @@ describe('InferenceEngine explain', () => {
   it('explains an unresolved assumption', () => {
     // Built-in rules create assumption props with null value
     const allFacts = engine.getAllFacts()
-    const assumption = allFacts.find((f) => f.source === 'assumption' && f.value === null)
+    const assumption = allFacts.find(f => f.source === 'assumption' && f.value === null)
     expect(assumption).toBeDefined()
     const explanation = engine.explain(assumption!.id)
     expect(explanation).toContain('unresolved assumption')

@@ -157,11 +157,7 @@ type SpawnInput = {
  * Checks if a tmux session exists
  */
 async function hasSession(sessionName: string): Promise<boolean> {
-  const result = await execFileNoThrow(TMUX_COMMAND, [
-    'has-session',
-    '-t',
-    sessionName,
-  ])
+  const result = await execFileNoThrow(TMUX_COMMAND, ['has-session', '-t', sessionName])
   return result.code === 0
 }
 
@@ -171,12 +167,7 @@ async function hasSession(sessionName: string): Promise<boolean> {
 async function ensureSession(sessionName: string): Promise<void> {
   const exists = await hasSession(sessionName)
   if (!exists) {
-    const result = await execFileNoThrow(TMUX_COMMAND, [
-      'new-session',
-      '-d',
-      '-s',
-      sessionName,
-    ])
+    const result = await execFileNoThrow(TMUX_COMMAND, ['new-session', '-d', '-s', sessionName])
     if (result.code !== 0) {
       throw new Error(
         `Failed to create tmux session '${sessionName}': ${result.stderr || 'Unknown error'}`,
@@ -216,10 +207,7 @@ function buildInheritedCliFlags(options?: {
   // Plan mode takes precedence over bypass permissions for safety
   if (planModeRequired) {
     // Don't inherit bypass permissions when plan mode is required
-  } else if (
-    permissionMode === 'bypassPermissions' ||
-    getSessionBypassPermissionsMode()
-  ) {
+  } else if (permissionMode === 'bypassPermissions' || getSessionBypassPermissionsMode()) {
     flags.push('--dangerously-skip-permissions')
   } else if (permissionMode === 'acceptEdits') {
     flags.push('--permission-mode acceptEdits')
@@ -344,9 +332,7 @@ async function handleSpawnSplitPane(
     const tmuxAvailable = await isTmuxAvailable()
 
     // Show the setup prompt and wait for user decision
-    const setupResult = await new Promise<
-      'installed' | 'use-tmux' | 'cancelled'
-    >(resolve => {
+    const setupResult = await new Promise<'installed' | 'use-tmux' | 'cancelled'>(resolve => {
       context.setToolJSX!({
         jsx: React.createElement(It2SetupPrompt, {
           onDone: resolve,
@@ -488,9 +474,7 @@ async function handleSpawnSplitPane(
   // Register agent in the team file
   const teamFile = await readTeamFileAsync(teamName)
   if (!teamFile) {
-    throw new Error(
-      `Team "${teamName}" does not exist. Call spawnTeam first to create the team.`,
-    )
+    throw new Error(`Team "${teamName}" does not exist. Call spawnTeam first to create the team.`)
   }
   teamFile.members.push({
     agentId: teammateId,
@@ -596,9 +580,7 @@ async function handleSpawnSeparateWindow(
   ])
 
   if (createWindowResult.code !== 0) {
-    throw new Error(
-      `Failed to create tmux window: ${createWindowResult.stderr}`,
-    )
+    throw new Error(`Failed to create tmux window: ${createWindowResult.stderr}`)
   }
 
   const paneId = createWindowResult.stdout.trim()
@@ -656,9 +638,7 @@ async function handleSpawnSeparateWindow(
   ])
 
   if (sendKeysResult.code !== 0) {
-    throw new Error(
-      `Failed to send command to tmux window: ${sendKeysResult.stderr}`,
-    )
+    throw new Error(`Failed to send command to tmux window: ${sendKeysResult.stderr}`)
   }
 
   // Track the teammate in AppState's teamContext
@@ -702,9 +682,7 @@ async function handleSpawnSeparateWindow(
   // Register agent in the team file
   const teamFile = await readTeamFileAsync(teamName)
   if (!teamFile) {
-    throw new Error(
-      `Team "${teamName}" does not exist. Call spawnTeam first to create the team.`,
-    )
+    throw new Error(`Team "${teamName}" does not exist. Call spawnTeam first to create the team.`)
   }
   teamFile.members.push({
     agentId: teammateId,
@@ -789,12 +767,7 @@ function registerOutOfProcessTeammateTask(
   const abortController = new AbortController()
 
   const taskState: InProcessTeammateTaskState = {
-    ...createTaskStateBase(
-      taskId,
-      'in_process_teammate',
-      description,
-      toolUseId,
-    ),
+    ...createTaskStateBase(taskId, 'in_process_teammate', description, toolUseId),
     type: 'in_process_teammate',
     status: 'running',
     identity: {
@@ -881,9 +854,7 @@ async function handleSpawnInProcess(
     if (foundAgent && isCustomAgent(foundAgent)) {
       agentDefinition = foundAgent
     }
-    logForDebugging(
-      `[handleSpawnInProcess] agent_type=${agent_type}, found=${!!agentDefinition}`,
-    )
+    logForDebugging(`[handleSpawnInProcess] agent_type=${agent_type}, found=${!!agentDefinition}`)
   }
 
   // Spawn in-process teammate
@@ -932,9 +903,7 @@ async function handleSpawnInProcess(
       abortController: result.abortController,
       invokingRequestId: input.invokingRequestId,
     })
-    logForDebugging(
-      `[handleSpawnInProcess] Started agent execution for ${teammateId}`,
-    )
+    logForDebugging(`[handleSpawnInProcess] Started agent execution for ${teammateId}`)
   }
 
   // Track the teammate in AppState's teamContext
@@ -988,9 +957,7 @@ async function handleSpawnInProcess(
   // Register agent in the team file
   const teamFile = await readTeamFileAsync(teamName)
   if (!teamFile) {
-    throw new Error(
-      `Team "${teamName}" does not exist. Call spawnTeam first to create the team.`,
-    )
+    throw new Error(`Team "${teamName}" does not exist. Call spawnTeam first to create the team.`)
   }
   teamFile.members.push({
     agentId: teammateId,

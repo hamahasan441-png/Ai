@@ -11,15 +11,21 @@ describe('ScientificComputing', () => {
 
   describe('KB entry tests', () => {
     it('should respond to HPC parallel and GPU computing queries', async () => {
-      const response = await brain.chat('explain high performance computing hpc supercomputer parallel computing openmp gpu computing cuda opencl nvidia tensor core')
+      const response = await brain.chat(
+        'explain high performance computing hpc supercomputer parallel computing openmp gpu computing cuda opencl nvidia tensor core',
+      )
       expect(response.text.length).toBeGreaterThan(50)
       expect(response.text.toLowerCase()).toMatch(/hpc|parallel|openmp|cuda|gpu|supercomputer/)
     })
 
     it('should respond to MPI and numerical methods queries', async () => {
-      const response = await brain.chat('explain mpi message passing interface distributed numerical methods finite element method simulation hpc storage lustre')
+      const response = await brain.chat(
+        'explain mpi message passing interface distributed numerical methods finite element method simulation hpc storage lustre',
+      )
       expect(response.text.length).toBeGreaterThan(50)
-      expect(response.text.toLowerCase()).toMatch(/mpi|message\s+passing|finite\s+element|numerical|lustre|storage/)
+      expect(response.text.toLowerCase()).toMatch(
+        /mpi|message\s+passing|finite\s+element|numerical|lustre|storage/,
+      )
     })
   })
 

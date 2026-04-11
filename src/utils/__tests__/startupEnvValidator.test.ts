@@ -30,8 +30,8 @@ describe('validateStartupEnv', () => {
 
     it('warns about missing AI provider', () => {
       const result = validateStartupEnv({})
-      const providerWarning = result.warnings.find(
-        (w) => w.message.includes('No AI provider configured'),
+      const providerWarning = result.warnings.find(w =>
+        w.message.includes('No AI provider configured'),
       )
       expect(providerWarning).toBeDefined()
     })
@@ -46,8 +46,8 @@ describe('validateStartupEnv', () => {
   describe('with ANTHROPIC_API_KEY set', () => {
     it('does not warn about missing AI provider', () => {
       const result = validateStartupEnv(makeEnv({ ANTHROPIC_API_KEY: 'sk-test-key' }))
-      const providerWarning = result.warnings.find(
-        (w) => w.message.includes('No AI provider configured'),
+      const providerWarning = result.warnings.find(w =>
+        w.message.includes('No AI provider configured'),
       )
       expect(providerWarning).toBeUndefined()
     })
@@ -56,8 +56,8 @@ describe('validateStartupEnv', () => {
   describe('with CLAUDE_CODE_USE_BEDROCK=1', () => {
     it('does not warn about missing AI provider', () => {
       const result = validateStartupEnv(makeEnv({ CLAUDE_CODE_USE_BEDROCK: '1' }))
-      const providerWarning = result.warnings.find(
-        (w) => w.message.includes('No AI provider configured'),
+      const providerWarning = result.warnings.find(w =>
+        w.message.includes('No AI provider configured'),
       )
       expect(providerWarning).toBeUndefined()
     })
@@ -66,8 +66,8 @@ describe('validateStartupEnv', () => {
   describe('with CLAUDE_CODE_USE_VERTEX=true', () => {
     it('does not warn about missing AI provider', () => {
       const result = validateStartupEnv(makeEnv({ CLAUDE_CODE_USE_VERTEX: 'true' }))
-      const providerWarning = result.warnings.find(
-        (w) => w.message.includes('No AI provider configured'),
+      const providerWarning = result.warnings.find(w =>
+        w.message.includes('No AI provider configured'),
       )
       expect(providerWarning).toBeUndefined()
     })
@@ -78,43 +78,43 @@ describe('validateStartupEnv', () => {
   describe('boolean type validation', () => {
     it('accepts "true"', () => {
       const result = validateStartupEnv(makeEnv({ AI_CACHE_DISK: 'true' }))
-      const err = result.errors.find((e) => e.variable === 'AI_CACHE_DISK')
+      const err = result.errors.find(e => e.variable === 'AI_CACHE_DISK')
       expect(err).toBeUndefined()
     })
 
     it('accepts "false"', () => {
       const result = validateStartupEnv(makeEnv({ AI_CACHE_DISK: 'false' }))
-      const err = result.errors.find((e) => e.variable === 'AI_CACHE_DISK')
+      const err = result.errors.find(e => e.variable === 'AI_CACHE_DISK')
       expect(err).toBeUndefined()
     })
 
     it('accepts "1"', () => {
       const result = validateStartupEnv(makeEnv({ AI_CACHE_DISK: '1' }))
-      const err = result.errors.find((e) => e.variable === 'AI_CACHE_DISK')
+      const err = result.errors.find(e => e.variable === 'AI_CACHE_DISK')
       expect(err).toBeUndefined()
     })
 
     it('accepts "0"', () => {
       const result = validateStartupEnv(makeEnv({ AI_CACHE_DISK: '0' }))
-      const err = result.errors.find((e) => e.variable === 'AI_CACHE_DISK')
+      const err = result.errors.find(e => e.variable === 'AI_CACHE_DISK')
       expect(err).toBeUndefined()
     })
 
     it('accepts "yes"', () => {
       const result = validateStartupEnv(makeEnv({ AI_CACHE_DISK: 'yes' }))
-      const err = result.errors.find((e) => e.variable === 'AI_CACHE_DISK')
+      const err = result.errors.find(e => e.variable === 'AI_CACHE_DISK')
       expect(err).toBeUndefined()
     })
 
     it('accepts "no"', () => {
       const result = validateStartupEnv(makeEnv({ AI_CACHE_DISK: 'no' }))
-      const err = result.errors.find((e) => e.variable === 'AI_CACHE_DISK')
+      const err = result.errors.find(e => e.variable === 'AI_CACHE_DISK')
       expect(err).toBeUndefined()
     })
 
     it('rejects "maybe" as invalid boolean', () => {
       const result = validateStartupEnv(makeEnv({ AI_CACHE_DISK: 'maybe' }))
-      const err = result.errors.find((e) => e.variable === 'AI_CACHE_DISK')
+      const err = result.errors.find(e => e.variable === 'AI_CACHE_DISK')
       expect(err).toBeDefined()
       expect(err!.message).toContain('invalid boolean')
     })
@@ -127,7 +127,7 @@ describe('validateStartupEnv', () => {
       const result = validateStartupEnv(
         makeEnv({ DATABASE_URL: 'postgresql://user:pass@localhost:5432/db' }),
       )
-      const err = result.errors.find((e) => e.variable === 'DATABASE_URL')
+      const err = result.errors.find(e => e.variable === 'DATABASE_URL')
       expect(err).toBeUndefined()
     })
 
@@ -135,7 +135,7 @@ describe('validateStartupEnv', () => {
       const result = validateStartupEnv(
         makeEnv({ DATABASE_URL: 'postgres://user:pass@localhost:5432/db' }),
       )
-      const err = result.errors.find((e) => e.variable === 'DATABASE_URL')
+      const err = result.errors.find(e => e.variable === 'DATABASE_URL')
       expect(err).toBeUndefined()
     })
 
@@ -143,25 +143,25 @@ describe('validateStartupEnv', () => {
       const result = validateStartupEnv(
         makeEnv({ MYSQL_URL: 'mysql://user:pass@localhost:3306/db' }),
       )
-      const err = result.errors.find((e) => e.variable === 'MYSQL_URL')
+      const err = result.errors.find(e => e.variable === 'MYSQL_URL')
       expect(err).toBeUndefined()
     })
 
     it('accepts http:// URL', () => {
       const result = validateStartupEnv(makeEnv({ DATABASE_URL: 'http://localhost:5432/db' }))
-      const err = result.errors.find((e) => e.variable === 'DATABASE_URL')
+      const err = result.errors.find(e => e.variable === 'DATABASE_URL')
       expect(err).toBeUndefined()
     })
 
     it('accepts sqlite:/// URL', () => {
       const result = validateStartupEnv(makeEnv({ DATABASE_URL: 'sqlite:///path/to/db' }))
-      const err = result.errors.find((e) => e.variable === 'DATABASE_URL')
+      const err = result.errors.find(e => e.variable === 'DATABASE_URL')
       expect(err).toBeUndefined()
     })
 
     it('rejects invalid URL format', () => {
       const result = validateStartupEnv(makeEnv({ DATABASE_URL: 'not-a-url' }))
-      const err = result.errors.find((e) => e.variable === 'DATABASE_URL')
+      const err = result.errors.find(e => e.variable === 'DATABASE_URL')
       expect(err).toBeDefined()
       expect(err!.message).toContain('invalid URL format')
     })
@@ -174,7 +174,7 @@ describe('validateStartupEnv', () => {
       for (const val of ['development', 'production', 'test']) {
         const result = validateStartupEnv(makeEnv({ NODE_ENV: val }))
         const warn = result.warnings.find(
-          (w) => w.variable === 'NODE_ENV' && w.message.includes('invalid value'),
+          w => w.variable === 'NODE_ENV' && w.message.includes('invalid value'),
         )
         expect(warn).toBeUndefined()
       }
@@ -183,7 +183,7 @@ describe('validateStartupEnv', () => {
     it('warns about invalid NODE_ENV value', () => {
       const result = validateStartupEnv(makeEnv({ NODE_ENV: 'staging' }))
       const warn = result.warnings.find(
-        (w) => w.variable === 'NODE_ENV' && w.message.includes('invalid value'),
+        w => w.variable === 'NODE_ENV' && w.message.includes('invalid value'),
       )
       expect(warn).toBeDefined()
     })
@@ -192,7 +192,7 @@ describe('validateStartupEnv', () => {
       for (const val of ['trace', 'debug', 'info', 'warn', 'error', 'fatal']) {
         const result = validateStartupEnv(makeEnv({ LOG_LEVEL: val }))
         const warn = result.warnings.find(
-          (w) => w.variable === 'LOG_LEVEL' && w.message.includes('invalid value'),
+          w => w.variable === 'LOG_LEVEL' && w.message.includes('invalid value'),
         )
         expect(warn).toBeUndefined()
       }
@@ -201,7 +201,7 @@ describe('validateStartupEnv', () => {
     it('warns about invalid LOG_LEVEL value', () => {
       const result = validateStartupEnv(makeEnv({ LOG_LEVEL: 'verbose' }))
       const warn = result.warnings.find(
-        (w) => w.variable === 'LOG_LEVEL' && w.message.includes('invalid value'),
+        w => w.variable === 'LOG_LEVEL' && w.message.includes('invalid value'),
       )
       expect(warn).toBeDefined()
       expect(warn!.message).toContain('Expected one of:')
@@ -248,32 +248,32 @@ describe('validateStartupEnv', () => {
 
     it('accepts valid number', () => {
       const result = validateStartupEnv({ MY_PORT: '3000' }, numSchema)
-      const err = result.errors.find((e) => e.variable === 'MY_PORT')
+      const err = result.errors.find(e => e.variable === 'MY_PORT')
       expect(err).toBeUndefined()
     })
 
     it('accepts negative number', () => {
       const result = validateStartupEnv({ MY_PORT: '-1' }, numSchema)
-      const err = result.errors.find((e) => e.variable === 'MY_PORT')
+      const err = result.errors.find(e => e.variable === 'MY_PORT')
       expect(err).toBeUndefined()
     })
 
     it('accepts floating point', () => {
       const result = validateStartupEnv({ MY_PORT: '3.14' }, numSchema)
-      const err = result.errors.find((e) => e.variable === 'MY_PORT')
+      const err = result.errors.find(e => e.variable === 'MY_PORT')
       expect(err).toBeUndefined()
     })
 
     it('rejects non-numeric string', () => {
       const result = validateStartupEnv({ MY_PORT: 'abc' }, numSchema)
-      const err = result.errors.find((e) => e.variable === 'MY_PORT')
+      const err = result.errors.find(e => e.variable === 'MY_PORT')
       expect(err).toBeDefined()
       expect(err!.message).toContain('invalid number')
     })
 
     it('rejects Infinity', () => {
       const result = validateStartupEnv({ MY_PORT: 'Infinity' }, numSchema)
-      const err = result.errors.find((e) => e.variable === 'MY_PORT')
+      const err = result.errors.find(e => e.variable === 'MY_PORT')
       expect(err).toBeDefined()
     })
   })
@@ -334,10 +334,7 @@ describe('maskSensitiveValue', () => {
 
 describe('getEnvSnapshot', () => {
   it('masks sensitive values', () => {
-    const snapshot = getEnvSnapshot(
-      { ANTHROPIC_API_KEY: 'sk-ant-api03-longkey' },
-      ENV_SCHEMA,
-    )
+    const snapshot = getEnvSnapshot({ ANTHROPIC_API_KEY: 'sk-ant-api03-longkey' }, ENV_SCHEMA)
     expect(snapshot['ANTHROPIC_API_KEY']).toBe('sk-a****')
     expect(snapshot['ANTHROPIC_API_KEY']).not.toContain('longkey')
   })
@@ -385,7 +382,7 @@ describe('ENV_SCHEMA', () => {
   })
 
   it('enum entries have enumValues', () => {
-    const enums = ENV_SCHEMA.filter((s) => s.type === 'enum')
+    const enums = ENV_SCHEMA.filter(s => s.type === 'enum')
     for (const entry of enums) {
       expect(entry.enumValues).toBeDefined()
       expect(entry.enumValues!.length).toBeGreaterThan(0)
@@ -393,12 +390,12 @@ describe('ENV_SCHEMA', () => {
   })
 
   it('sensitive entries are marked', () => {
-    const sensitiveVars = ENV_SCHEMA.filter((s) => s.sensitive)
+    const sensitiveVars = ENV_SCHEMA.filter(s => s.sensitive)
     expect(sensitiveVars.length).toBeGreaterThanOrEqual(3) // API keys + DB URLs
   })
 
   it('no duplicate variable names', () => {
-    const names = ENV_SCHEMA.map((s) => s.name)
+    const names = ENV_SCHEMA.map(s => s.name)
     const uniqueNames = new Set(names)
     expect(uniqueNames.size).toBe(names.length)
   })

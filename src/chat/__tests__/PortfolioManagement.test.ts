@@ -11,21 +11,33 @@ describe('Portfolio Management Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about asset allocation and MPT', async () => {
-      const r = await brain.chat('explain portfolio management asset allocation strategic tactical modern portfolio theory markowitz efficient frontier')
+      const r = await brain.chat(
+        'explain portfolio management asset allocation strategic tactical modern portfolio theory markowitz efficient frontier',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/portfolio|asset\s+alloc|strategic|markowitz|efficient\s+frontier|diversif/)
+      expect(r.text.toLowerCase()).toMatch(
+        /portfolio|asset\s+alloc|strategic|markowitz|efficient\s+frontier|diversif/,
+      )
     })
 
     it('answers about risk parity and factor investing', async () => {
-      const r = await brain.chat('explain risk parity all weather permanent portfolio factor investing smart beta momentum value etf index fund')
+      const r = await brain.chat(
+        'explain risk parity all weather permanent portfolio factor investing smart beta momentum value etf index fund',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/risk\s+parity|all\s+weather|factor|smart\s+beta|etf|momentum|value/)
+      expect(r.text.toLowerCase()).toMatch(
+        /risk\s+parity|all\s+weather|factor|smart\s+beta|etf|momentum|value/,
+      )
     })
 
     it('answers about hedge funds and wealth management', async () => {
-      const r = await brain.chat('explain hedge fund strategy long short equity global macro portfolio performance attribution benchmark alpha wealth management')
+      const r = await brain.chat(
+        'explain hedge fund strategy long short equity global macro portfolio performance attribution benchmark alpha wealth management',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/hedge\s+fund|long.short|global\s+macro|performance|attribution|alpha|wealth/)
+      expect(r.text.toLowerCase()).toMatch(
+        /hedge\s+fund|long.short|global\s+macro|performance|attribution|alpha|wealth/,
+      )
     })
   })
 

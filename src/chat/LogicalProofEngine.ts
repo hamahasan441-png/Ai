@@ -47,7 +47,7 @@ export interface DetectedFallacy {
   name: string
   description: string
   evidence: string
-  severity: number   // 0-1
+  severity: number // 0-1
 }
 
 export interface TruthTableRow {
@@ -91,7 +91,7 @@ const FALLACY_PATTERNS: Array<{
       /\bwhat\s+you('re|\s+are)\s+really\s+saying\b/i,
       /\bin\s+other\s+words,?\s+you\s+think\b/i,
     ],
-    description: 'Misrepresenting someone\'s argument to make it easier to attack',
+    description: "Misrepresenting someone's argument to make it easier to attack",
     severity: 0.6,
   },
   {
@@ -176,7 +176,6 @@ const FALLACY_PATTERNS: Array<{
 // ── Main Class ───────────────────────────────────────────────────────────────
 
 export class LogicalProofEngine {
-
   constructor() {}
 
   // ── Propositional Logic ──────────────────────────────────────────────────
@@ -247,22 +246,23 @@ export class LogicalProofEngine {
 
     // Check for valid form: middle term appears in both premises but not conclusion
     const allPremiseTerms = [...majorTerms, ...minorTerms]
-    const middleTerm = allPremiseTerms.find(t =>
-      majorTerms.includes(t) && minorTerms.includes(t) && !concTerms.includes(t)
+    const middleTerm = allPremiseTerms.find(
+      t => majorTerms.includes(t) && minorTerms.includes(t) && !concTerms.includes(t),
     )
 
     if (!middleTerm) {
       return {
         isValid: false,
         form: 'undetermined',
-        explanation: 'No valid middle term found — the middle term must appear in both premises but not the conclusion.',
+        explanation:
+          'No valid middle term found — the middle term must appear in both premises but not the conclusion.',
         confidence: 0.7,
       }
     }
 
     // Check if conclusion terms appear in premises
-    const conclusionInPremises = concTerms.every(t =>
-      majorTerms.includes(t) || minorTerms.includes(t)
+    const conclusionInPremises = concTerms.every(
+      t => majorTerms.includes(t) || minorTerms.includes(t),
     )
 
     if (!conclusionInPremises) {
@@ -275,10 +275,12 @@ export class LogicalProofEngine {
     }
 
     // Check quantifier consistency
-    const isUniversal = /\b(all|every|each|no|none)\b/i.test(majorPremise) ||
+    const isUniversal =
+      /\b(all|every|each|no|none)\b/i.test(majorPremise) ||
       /\b(all|every|each|no|none)\b/i.test(minorPremise)
     const conclusionUniversal = /\b(all|every|each|no|none)\b/i.test(conclusion)
-    const premisesParticular = /\b(some|few|most|many)\b/i.test(majorPremise) ||
+    const premisesParticular =
+      /\b(some|few|most|many)\b/i.test(majorPremise) ||
       /\b(some|few|most|many)\b/i.test(minorPremise)
 
     if (conclusionUniversal && premisesParticular) {
@@ -342,9 +344,15 @@ export class LogicalProofEngine {
 
     // Validate that premises logically support the conclusion
     const premiseKeywords = premises.flatMap(p =>
-      p.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+      p
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 3),
     )
-    const conclusionKeywords = conclusion.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+    const conclusionKeywords = conclusion
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(w => w.length > 3)
 
     const overlap = conclusionKeywords.filter(k => premiseKeywords.includes(k))
     const coverageRatio = overlap.length / Math.max(conclusionKeywords.length, 1)
@@ -382,7 +390,11 @@ export class LogicalProofEngine {
   /**
    * Detect contradictions in a set of statements
    */
-  detectContradictions(statements: string[]): { hasContradiction: boolean; pairs: [number, number][]; explanations: string[] } {
+  detectContradictions(statements: string[]): {
+    hasContradiction: boolean
+    pairs: [number, number][]
+    explanations: string[]
+  } {
     const pairs: [number, number][] = []
     const explanations: string[] = []
 
@@ -400,7 +412,9 @@ export class LogicalProofEngine {
         // Check for quantifier contradiction
         if (this.hasQuantifierContradiction(s1, s2)) {
           pairs.push([i, j])
-          explanations.push(`Statement ${i + 1} contradicts statement ${j + 1}: quantifier mismatch`)
+          explanations.push(
+            `Statement ${i + 1} contradicts statement ${j + 1}: quantifier mismatch`,
+          )
         }
       }
     }
@@ -439,7 +453,10 @@ export class LogicalProofEngine {
   /**
    * Apply modus tollens: if P→Q and ¬Q, then ¬P
    */
-  modusTollens(conditional: string, negatedConsequent: string): { valid: boolean; conclusion: string } {
+  modusTollens(
+    conditional: string,
+    negatedConsequent: string,
+  ): { valid: boolean; conclusion: string } {
     const match = conditional.match(/if\s+(.+?)\s+then\s+(.+)/i)
     if (!match) {
       return { valid: false, conclusion: '' }
@@ -449,7 +466,10 @@ export class LogicalProofEngine {
     const consequent = match[2]!.trim().toLowerCase()
 
     // Check if negated consequent matches (look for "not" + consequent)
-    const cleanNeg = negatedConsequent.toLowerCase().replace(/\bnot\b\s*/i, '').trim()
+    const cleanNeg = negatedConsequent
+      .toLowerCase()
+      .replace(/\bnot\b\s*/i, '')
+      .trim()
     const similarity = this.textSimilarity(consequent, cleanNeg)
 
     if (similarity > 0.5) {
@@ -507,7 +527,8 @@ export class LogicalProofEngine {
   }
 
   private extractSyllogismTerms(statement: string): string[] {
-    return statement.toLowerCase()
+    return statement
+      .toLowerCase()
       .replace(/\b(all|some|no|every|each|none|are|is|a|an|the|if|then)\b/g, '')
       .split(/\s+/)
       .filter(w => w.length > 2)
@@ -521,12 +542,11 @@ export class LogicalProofEngine {
     if (!p1 || !p2) return false
 
     const sameTopic = this.textSimilarity(p1[1]!, p2[1]!) > 0.7
-    const oneNegated = (s1.includes(' not ') && !s2.includes(' not ')) ||
+    const oneNegated =
+      (s1.includes(' not ') && !s2.includes(' not ')) ||
       (!s1.includes(' not ') && s2.includes(' not '))
-    const samePredicate = this.textSimilarity(
-      p1[2]!.replace(/\bnot\s+/g, ''),
-      p2[2]!.replace(/\bnot\s+/g, '')
-    ) > 0.7
+    const samePredicate =
+      this.textSimilarity(p1[2]!.replace(/\bnot\s+/g, ''), p2[2]!.replace(/\bnot\s+/g, '')) > 0.7
 
     return sameTopic && oneNegated && samePredicate
   }
@@ -537,11 +557,17 @@ export class LogicalProofEngine {
     const _somePattern = /\b(some|few|most)\b/
 
     // "All X are Y" vs "No X are Y"
-    if ((allPattern.test(s1) && nonePattern.test(s2)) ||
-      (nonePattern.test(s1) && allPattern.test(s2))) {
+    if (
+      (allPattern.test(s1) && nonePattern.test(s2)) ||
+      (nonePattern.test(s1) && allPattern.test(s2))
+    ) {
       // Check if they're about the same subject
-      const words1 = s1.replace(/\b(all|every|each|no|none|never|some|few|most|are|is)\b/g, '').trim()
-      const words2 = s2.replace(/\b(all|every|each|no|none|never|some|few|most|are|is)\b/g, '').trim()
+      const words1 = s1
+        .replace(/\b(all|every|each|no|none|never|some|few|most|are|is)\b/g, '')
+        .trim()
+      const words2 = s2
+        .replace(/\b(all|every|each|no|none|never|some|few|most|are|is)\b/g, '')
+        .trim()
       return this.textSimilarity(words1, words2) > 0.5
     }
 

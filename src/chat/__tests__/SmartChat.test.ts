@@ -36,7 +36,9 @@ describe('SmartChat — Intelligence Module Integration', () => {
 
   describe('ReasoningEngine', () => {
     it('augments complex queries with reasoning output', async () => {
-      const result = await brain.chat('Why is TypeScript better than JavaScript and how does it compare to other typed languages?')
+      const result = await brain.chat(
+        'Why is TypeScript better than JavaScript and how does it compare to other typed languages?',
+      )
       expect(result.text).toBeDefined()
       expect(result.text.length).toBeGreaterThan(0)
     })
@@ -118,7 +120,9 @@ describe('SmartChat — Intelligence Module Integration', () => {
 
   describe('KnowledgeSynthesizer', () => {
     it('combines knowledge for broad queries', async () => {
-      const result = await brain.chat('Tell me about sorting algorithms and their time complexities')
+      const result = await brain.chat(
+        'Tell me about sorting algorithms and their time complexities',
+      )
       expect(result.text).toBeDefined()
       expect(result.text.length).toBeGreaterThan(0)
     })

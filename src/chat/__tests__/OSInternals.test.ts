@@ -11,37 +11,49 @@ describe('Operating Systems & Internals Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about process management and scheduling', async () => {
-      const r = await brain.chat('Explain linux kernel process thread scheduling and cpu scheduling round robin')
+      const r = await brain.chat(
+        'Explain linux kernel process thread scheduling and cpu scheduling round robin',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/process|thread|scheduling|fork|kernel/)
     })
 
     it('answers about virtual memory and paging', async () => {
-      const r = await brain.chat('How does virtual memory paging page table mmu work in operating systems?')
+      const r = await brain.chat(
+        'How does virtual memory paging page table mmu work in operating systems?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/virtual|memory|paging|page|table|mmu|tlb/)
     })
 
     it('answers about file systems', async () => {
-      const r = await brain.chat('Explain file system ext4 ntfs btrfs inode and disk io block device')
+      const r = await brain.chat(
+        'Explain file system ext4 ntfs btrfs inode and disk io block device',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/file\s*system|ext4|inode|journal|btrfs/)
     })
 
     it('answers about system calls and kernel', async () => {
-      const r = await brain.chat('What are system call syscall linux kernel user space and interrupt handler irq?')
+      const r = await brain.chat(
+        'What are system call syscall linux kernel user space and interrupt handler irq?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/syscall|system\s*call|interrupt|kernel/)
     })
 
     it('answers about concurrency and synchronization', async () => {
-      const r = await brain.chat('How do concurrency synchronization mutex semaphore lock and deadlock work?')
+      const r = await brain.chat(
+        'How do concurrency synchronization mutex semaphore lock and deadlock work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/mutex|semaphore|lock|deadlock|synchroniz/)
     })
 
     it('answers about containers and virtualization', async () => {
-      const r = await brain.chat('Explain container virtualization docker namespace cgroup and hypervisor vm kvm')
+      const r = await brain.chat(
+        'Explain container virtualization docker namespace cgroup and hypervisor vm kvm',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/container|docker|namespace|cgroup|kvm|virtual/)
     })

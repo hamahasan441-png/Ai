@@ -98,7 +98,7 @@ describe('LogicalProofEngine', () => {
 
   describe('Fallacy Detection', () => {
     it('should detect ad hominem', () => {
-      const result = engine.detectFallacies("You are stupid, so your argument is invalid")
+      const result = engine.detectFallacies('You are stupid, so your argument is invalid')
       expect(result.hasFallacy).toBe(true)
       expect(result.fallacies.some(f => f.name === 'Ad Hominem')).toBe(true)
     })
@@ -110,29 +110,33 @@ describe('LogicalProofEngine', () => {
     })
 
     it('should detect false dilemma', () => {
-      const result = engine.detectFallacies("Either you use TypeScript or you write buggy code")
+      const result = engine.detectFallacies('Either you use TypeScript or you write buggy code')
       expect(result.hasFallacy).toBe(true)
       expect(result.fallacies.some(f => f.name === 'False Dilemma')).toBe(true)
     })
 
     it('should detect slippery slope', () => {
-      const result = engine.detectFallacies("If we allow one exception, soon everyone will want one")
+      const result = engine.detectFallacies(
+        'If we allow one exception, soon everyone will want one',
+      )
       expect(result.hasFallacy).toBe(true)
     })
 
     it('should detect hasty generalization', () => {
-      const result = engine.detectFallacies("All developers always write bugs")
+      const result = engine.detectFallacies('All developers always write bugs')
       expect(result.hasFallacy).toBe(true)
       expect(result.fallacies.some(f => f.name === 'Hasty Generalization')).toBe(true)
     })
 
     it('should not flag clean logical argument', () => {
-      const result = engine.detectFallacies("If the tests pass and the code review is approved, we should deploy")
+      const result = engine.detectFallacies(
+        'If the tests pass and the code review is approved, we should deploy',
+      )
       expect(result.hasFallacy).toBe(false)
     })
 
     it('should include evidence in fallacy results', () => {
-      const result = engine.detectFallacies("You are an idiot for thinking that")
+      const result = engine.detectFallacies('You are an idiot for thinking that')
       if (result.hasFallacy) {
         expect(result.fallacies[0]!.evidence.length).toBeGreaterThan(0)
       }
@@ -143,7 +147,7 @@ describe('LogicalProofEngine', () => {
     it('should construct valid argument', () => {
       const result = engine.constructArgument(
         ['All programmers write code', 'Alice is a programmer'],
-        'Alice writes code'
+        'Alice writes code',
       )
       expect(result.isValid).toBe(true)
       expect(result.logicalForm).toBe('deductive')
@@ -152,61 +156,43 @@ describe('LogicalProofEngine', () => {
     it('should detect inductive reasoning', () => {
       const result = engine.constructArgument(
         ['Most frameworks have bugs', 'React is a framework'],
-        'React probably has bugs'
+        'React probably has bugs',
       )
       expect(result.logicalForm).toBe('inductive')
     })
 
     it('should include intermediate steps', () => {
-      const result = engine.constructArgument(
-        ['Premise 1', 'Premise 2', 'Premise 3'],
-        'Conclusion'
-      )
+      const result = engine.constructArgument(['Premise 1', 'Premise 2', 'Premise 3'], 'Conclusion')
       expect(result.intermediateSteps.length).toBeGreaterThan(0)
     })
   })
 
   describe('Contradiction Detection', () => {
     it('should detect direct contradiction', () => {
-      const result = engine.detectContradictions([
-        'The sky is blue',
-        'The sky is not blue',
-      ])
+      const result = engine.detectContradictions(['The sky is blue', 'The sky is not blue'])
       expect(result.hasContradiction).toBe(true)
     })
 
     it('should detect quantifier contradiction', () => {
-      const result = engine.detectContradictions([
-        'All birds can fly',
-        'No birds can fly',
-      ])
+      const result = engine.detectContradictions(['All birds can fly', 'No birds can fly'])
       expect(result.hasContradiction).toBe(true)
     })
 
     it('should not flag non-contradictory statements', () => {
-      const result = engine.detectContradictions([
-        'React is fast',
-        'Vue is lightweight',
-      ])
+      const result = engine.detectContradictions(['React is fast', 'Vue is lightweight'])
       expect(result.hasContradiction).toBe(false)
     })
   })
 
   describe('Modus Ponens', () => {
     it('should apply modus ponens', () => {
-      const result = engine.modusPonens(
-        'If it rains then the ground gets wet',
-        'it rains'
-      )
+      const result = engine.modusPonens('If it rains then the ground gets wet', 'it rains')
       expect(result.valid).toBe(true)
       expect(result.conclusion).toContain('wet')
     })
 
-    it('should reject when antecedent doesn\'t match', () => {
-      const result = engine.modusPonens(
-        'If it rains then the ground gets wet',
-        'it is sunny'
-      )
+    it("should reject when antecedent doesn't match", () => {
+      const result = engine.modusPonens('If it rains then the ground gets wet', 'it is sunny')
       expect(result.valid).toBe(false)
     })
   })
@@ -215,17 +201,14 @@ describe('LogicalProofEngine', () => {
     it('should apply modus tollens', () => {
       const result = engine.modusTollens(
         'If it rains then the ground gets wet',
-        'The ground is not wet'
+        'The ground is not wet',
       )
       expect(result.valid).toBe(true)
       expect(result.conclusion.toLowerCase()).toContain('not')
     })
 
     it('should reject invalid modus tollens', () => {
-      const result = engine.modusTollens(
-        'If it rains then the ground gets wet',
-        'The sky is clear'
-      )
+      const result = engine.modusTollens('If it rains then the ground gets wet', 'The sky is clear')
       expect(result.valid).toBe(false)
     })
   })

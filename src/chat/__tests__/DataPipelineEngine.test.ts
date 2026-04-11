@@ -4,7 +4,9 @@ import { DataPipelineEngine, DEFAULT_DATA_PIPELINE_CONFIG } from '../DataPipelin
 describe('DataPipelineEngine', () => {
   let engine: DataPipelineEngine
 
-  beforeEach(() => { engine = new DataPipelineEngine() })
+  beforeEach(() => {
+    engine = new DataPipelineEngine()
+  })
 
   describe('constructor & config', () => {
     it('uses default config', () => {

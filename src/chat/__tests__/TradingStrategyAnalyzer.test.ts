@@ -594,8 +594,9 @@ describe('TradingStrategyAnalyzer performance analysis', () => {
   })
 
   it('detects excessive indicator calls', () => {
-    const code = Array.from({ length: 12 }, (_, i) =>
-      `double ma${i} = iMA(NULL, 0, ${10 + i}, 0, MODE_SMA, PRICE_CLOSE, 0);`,
+    const code = Array.from(
+      { length: 12 },
+      (_, i) => `double ma${i} = iMA(NULL, 0, ${10 + i}, 0, MODE_SMA, PRICE_CLOSE, 0);`,
     ).join('\n')
     const perf = analyzer.analyzePerformance(code, 'mql4')
     expect(perf.excessiveIndicatorCalls).toBe(true)
@@ -616,7 +617,8 @@ describe('TradingStrategyAnalyzer performance analysis', () => {
   })
 
   it('optimized loop with IndicatorCounted passes', () => {
-    const code = 'int counted = IndicatorCounted();\nfor (int i = Bars - counted; i >= 0; i--) { Buffer[i] = Close[i]; }'
+    const code =
+      'int counted = IndicatorCounted();\nfor (int i = Bars - counted; i >= 0; i--) { Buffer[i] = Close[i]; }'
     const perf = analyzer.analyzePerformance(code, 'mql4')
     const issue = perf.issues.find(i => i.message.includes('counted bars'))
     expect(issue).toBeUndefined()

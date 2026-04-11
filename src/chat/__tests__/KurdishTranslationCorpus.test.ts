@@ -193,9 +193,7 @@ describe('KurdishTranslationCorpus', () => {
     })
 
     it('equals the sum of pairs across all categories', () => {
-      const expected = corpus
-        .getCategories()
-        .reduce((s, c) => s + c.pairs.length, 0)
+      const expected = corpus.getCategories().reduce((s, c) => s + c.pairs.length, 0)
       expect(corpus.totalPairs).toBe(expected)
     })
   })

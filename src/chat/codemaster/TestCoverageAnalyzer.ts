@@ -133,8 +133,12 @@ export class TestCoverageAnalyzer {
     const testQualityScore = this.calculateTestQuality(testCases, gaps)
 
     const summary = this.generateSummary(
-      testableFunctions, testCases, gaps,
-      functionCoverage, branchCoverage, testQualityScore,
+      testableFunctions,
+      testCases,
+      gaps,
+      functionCoverage,
+      branchCoverage,
+      testQualityScore,
     )
 
     return {
@@ -149,7 +153,11 @@ export class TestCoverageAnalyzer {
   }
 
   /** Analyze test quality from test code only. */
-  analyzeTestQuality(testCode: string): { testCases: TestCase[]; qualityScore: number; summary: string } {
+  analyzeTestQuality(testCode: string): {
+    testCases: TestCase[]
+    qualityScore: number
+    summary: string
+  } {
     if (!testCode || !testCode.trim()) {
       return { testCases: [], qualityScore: 0, summary: 'No test code to analyze.' }
     }
@@ -244,14 +252,28 @@ export class TestCoverageAnalyzer {
     ]
 
     const assertionPatterns = [
-      /expect\s*\(/, /assert\s*[.(]/, /\.toBe\s*\(/, /\.toEqual\s*\(/,
-      /\.toThrow\s*\(/, /\.toHaveBeenCalled/, /\.toContain\s*\(/,
-      /\.toMatch\s*\(/, /\.toHaveLength\s*\(/, /\.toBeDefined\s*\(/,
-      /\.toBeTruthy\s*\(/, /\.toBeFalsy\s*\(/, /\.toBeNull\s*\(/,
-      /\.toBeGreaterThan\s*\(/, /\.toBeLessThan\s*\(/,
-      /assert\.strict/, /assertEqual/, /assertRaises/,
-      /\.resolves\s*\./, /\.rejects\s*\./,
-      /\.toMatchSnapshot\s*\(/, /\.toMatchInlineSnapshot\s*\(/,
+      /expect\s*\(/,
+      /assert\s*[.(]/,
+      /\.toBe\s*\(/,
+      /\.toEqual\s*\(/,
+      /\.toThrow\s*\(/,
+      /\.toHaveBeenCalled/,
+      /\.toContain\s*\(/,
+      /\.toMatch\s*\(/,
+      /\.toHaveLength\s*\(/,
+      /\.toBeDefined\s*\(/,
+      /\.toBeTruthy\s*\(/,
+      /\.toBeFalsy\s*\(/,
+      /\.toBeNull\s*\(/,
+      /\.toBeGreaterThan\s*\(/,
+      /\.toBeLessThan\s*\(/,
+      /assert\.strict/,
+      /assertEqual/,
+      /assertRaises/,
+      /\.resolves\s*\./,
+      /\.rejects\s*\./,
+      /\.toMatchSnapshot\s*\(/,
+      /\.toMatchInlineSnapshot\s*\(/,
     ]
 
     for (let i = 0; i < lines.length; i++) {
@@ -286,7 +308,9 @@ export class TestCoverageAnalyzer {
           const lowerName = name.toLowerCase()
           if (/\berror\b|\bfail\b|\bthrow\b|\breject\b|\binvalid\b/.test(lowerName)) {
             type = 'error-case'
-          } else if (/\bedge\b|\bboundary\b|\bempty\b|\bnull\b|\bundefined\b|\bzero\b/.test(lowerName)) {
+          } else if (
+            /\bedge\b|\bboundary\b|\bempty\b|\bnull\b|\bundefined\b|\bzero\b/.test(lowerName)
+          ) {
             type = 'edge-case'
           } else if (/\bintegrat\b|\bend.to.end\b|\be2e\b/.test(lowerName)) {
             type = 'integration'
@@ -452,11 +476,21 @@ export class TestCoverageAnalyzer {
     // Penalize for gaps
     for (const gap of gaps) {
       switch (gap.severity) {
-        case 'critical': score -= 15; break
-        case 'high': score -= 10; break
-        case 'medium': score -= 5; break
-        case 'low': score -= 2; break
-        default: score -= 1; break
+        case 'critical':
+          score -= 15
+          break
+        case 'high':
+          score -= 10
+          break
+        case 'medium':
+          score -= 5
+          break
+        case 'low':
+          score -= 2
+          break
+        default:
+          score -= 1
+          break
       }
     }
 

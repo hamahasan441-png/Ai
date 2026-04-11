@@ -16,21 +16,31 @@ describe('ReactiveProgramming', () => {
 
   describe('KB entry tests', () => {
     it('should match reactive streams and backpressure keywords', async () => {
-      const r = await brain.chat('explain reactive stream rxjs rxjava project reactor observable operator backpressure strategy buffer drop throttle')
+      const r = await brain.chat(
+        'explain reactive stream rxjs rxjava project reactor observable operator backpressure strategy buffer drop throttle',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/reactive|rxjs|rxjava|reactor|backpressure|observable/)
     })
 
     it('should match reactive systems and FRP keywords', async () => {
-      const r = await brain.chat('explain reactive system reactive manifesto resilient elastic message driven functional reactive programming signal behavior')
+      const r = await brain.chat(
+        'explain reactive system reactive manifesto resilient elastic message driven functional reactive programming signal behavior',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/reactive\s+(manifesto|system)|resilient|elastic|message.driven|signal/)
+      expect(r.text.toLowerCase()).toMatch(
+        /reactive\s+(manifesto|system)|resilient|elastic|message.driven|signal/,
+      )
     })
 
     it('should match reactive operators and error handling keywords', async () => {
-      const r = await brain.chat('explain reactive operator map flatmap switchmap merge combinlatest zip error handling reactive retry onerror circuit breaker')
+      const r = await brain.chat(
+        'explain reactive operator map flatmap switchmap merge combinlatest zip error handling reactive retry onerror circuit breaker',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/switchmap|merge|combinlatest|zip|retry|circuit\s+breaker/)
+      expect(r.text.toLowerCase()).toMatch(
+        /switchmap|merge|combinlatest|zip|retry|circuit\s+breaker/,
+      )
     })
   })
 
