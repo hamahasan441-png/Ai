@@ -258,7 +258,8 @@ async function main() {
   console.log(bold(blue('  ═══════════════════════════════════════════════')))
   console.log(bold(blue('    AI — Local AI Assistant  Setup')))
   console.log(bold(blue('  ═══════════════════════════════════════════════')))
-  console.log(dim('  Fully offline. No external APIs. No API keys.'))
+  console.log(dim('  Runs fully offline after models are downloaded.'))
+  console.log(dim('  No external APIs or API keys required.'))
   console.log()
 
   checkNode()

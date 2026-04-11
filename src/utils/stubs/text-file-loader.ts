@@ -29,7 +29,6 @@ export async function load(
     return {
       format: 'module',
       source: `export default ${escaped};\n`,
-      shortCircuit: true,
     }
   }
   return nextLoad(url, context)

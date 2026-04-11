@@ -52,7 +52,7 @@ const MODELS = {
     id: 'qwen2.5-coder-7b-instruct-q4_k_m',
     label: 'Qwen2.5-Coder 7B  Q4_K_M  ★ recommended',
     family: 'qwen',
-    sizeMb: 4680,
+    sizeInMb: 4680,
     url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf',
     description: 'Best balance of quality and speed for code tasks. Needs ~6 GB RAM.',
   },
@@ -60,7 +60,7 @@ const MODELS = {
     id: 'qwen2.5-coder-7b-instruct-q5_k_m',
     label: 'Qwen2.5-Coder 7B  Q5_K_M',
     family: 'qwen',
-    sizeMb: 5320,
+    sizeInMb: 5320,
     url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q5_k_m.gguf',
     description: 'Higher quality. Needs ~7 GB RAM.',
   },
@@ -68,7 +68,7 @@ const MODELS = {
     id: 'qwen2.5-coder-7b-instruct-q8_0',
     label: 'Qwen2.5-Coder 7B  Q8_0  (highest quality)',
     family: 'qwen',
-    sizeMb: 8080,
+    sizeInMb: 8080,
     url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q8_0.gguf',
     description: 'Near-full precision. Needs ~10 GB RAM.',
   },
@@ -76,7 +76,7 @@ const MODELS = {
     id: 'qwen2.5-coder-7b-instruct-q3_k_m',
     label: 'Qwen2.5-Coder 7B  Q3_K_M  (lower RAM)',
     family: 'qwen',
-    sizeMb: 3600,
+    sizeInMb: 3600,
     url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q3_k_m.gguf',
     description: 'Needs ~5 GB RAM. Some quality loss.',
   },
@@ -84,7 +84,7 @@ const MODELS = {
     id: 'qwen2.5-coder-7b-instruct-q2_k',
     label: 'Qwen2.5-Coder 7B  Q2_K  (minimal RAM)',
     family: 'qwen',
-    sizeMb: 2860,
+    sizeInMb: 2860,
     url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q2_k.gguf',
     description: 'Needs ~4 GB RAM. Significant quality loss.',
   },
@@ -93,7 +93,7 @@ const MODELS = {
     id: 'llama-3.2-3b-instruct-q4_k_m',
     label: 'LLaMA 3.2 3B  Q4_K_M  ★ recommended',
     family: 'llama',
-    sizeMb: 2020,
+    sizeInMb: 2020,
     url: 'https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf',
     description: 'Fast and lightweight. Needs ~3 GB RAM. Great for general use.',
   },
@@ -101,7 +101,7 @@ const MODELS = {
     id: 'llama-3.1-8b-instruct-q4_k_m',
     label: 'LLaMA 3.1 8B  Q4_K_M',
     family: 'llama',
-    sizeMb: 4920,
+    sizeInMb: 4920,
     url: 'https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf',
     description: 'More capable. Needs ~6 GB RAM.',
   },
@@ -109,7 +109,7 @@ const MODELS = {
     id: 'llama-3.1-8b-instruct-q8_0',
     label: 'LLaMA 3.1 8B  Q8_0  (highest quality)',
     family: 'llama',
-    sizeMb: 8540,
+    sizeInMb: 8540,
     url: 'https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q8_0.gguf',
     description: 'Near full precision. Needs ~10 GB RAM.',
   },
@@ -203,7 +203,7 @@ function listModels() {
     const exists = fs.existsSync(dest)
     const status = exists ? green('✓ downloaded') : dim('not downloaded')
     console.log(`    ${bold(key.padEnd(16))}  ${m.label}`)
-    console.log(`    ${''.padEnd(16)}  ${dim(m.description)}  [${m.sizeMb} MB]  ${status}`)
+    console.log(`    ${''.padEnd(16)}  ${dim(m.description)}  [${m.sizeInMb} MB]  ${status}`)
   }
 
   console.log()
@@ -237,7 +237,7 @@ async function downloadModel(key) {
   console.log(`  ${bold('Downloading')} ${cyan(m.label)}`)
   console.log(dim(`  URL  : ${m.url}`))
   console.log(dim(`  Dest : ${dest}`))
-  console.log(dim(`  Size : ~${m.sizeMb} MB`))
+  console.log(dim(`  Size : ~${m.sizeInMb} MB`))
   console.log()
 
   const start = Date.now()
@@ -282,7 +282,7 @@ async function interactiveMenu() {
     const status = exists ? green(' ✓') : '  '
     const sep = k.startsWith('llama') && keys[i - 1] && keys[i - 1].startsWith('qwen') ? '\n' : ''
     process.stdout.write(sep)
-    console.log(`  ${status} ${bold(String(i + 1).padStart(2))}) ${m.label}  ${dim('[' + m.sizeMb + ' MB]')}`)
+    console.log(`  ${status} ${bold(String(i + 1).padStart(2))}) ${m.label}  ${dim('[' + m.sizeInMb + ' MB]')}`)
     console.log(`        ${dim(m.description)}`)
   })
   console.log()
