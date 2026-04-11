@@ -9,9 +9,11 @@
  *  - An ESM loader hook for .md / .txt files
  */
 
-import { createRequire } from 'module'
+import Module from 'module'
 import { join } from 'path'
 import { readFileSync } from 'fs'
+
+const { createRequire } = Module
 
 // In CommonJS output (module: Node16 for .ts files) __filename and __dirname
 // are built-in globals.  We use them instead of import.meta.url so that
@@ -40,6 +42,31 @@ if (reqExts && !reqExts['.txt']) {
     const content = readFileSync(filename, 'utf-8')
     ;(m as unknown as { exports: string }).exports = content
   }
+}
+
+// ─── Redirect bun:* modules to Node.js stubs ─────────────────────────────────
+// tsx / Node.js doesn't resolve tsconfig "paths" for bare specifiers with
+// protocol-like prefixes (bun:*). Patch Module._resolveFilename so that
+// `require('bun:bundle')` and `require('bun:ffi')` transparently return the
+// corresponding stub files that already live in this directory.
+const _bunStubs: Record<string, string> = {
+  'bun:bundle': join(__dirname, 'bun-bundle.ts'),
+  'bun:ffi': join(__dirname, 'bun-ffi.ts'),
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const _origResolve = (Module as any)._resolveFilename
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(Module as any)._resolveFilename = function (
+  request: string,
+  parent: unknown,
+  isMain: boolean,
+  options: unknown,
+) {
+  if (request in _bunStubs) {
+    return _bunStubs[request]
+  }
+  return _origResolve.call(this, request, parent, isMain, options)
 }
 
 // ─── Version from package.json ────────────────────────────────────────────────
