@@ -408,7 +408,79 @@ An AI system that **uses every file in the repository**. Three files work togeth
 | `src/types/` | 10+ | TypeScript type definitions |
 | `src/constants/` | 5+ | App-wide constants |
 
-## Quick Start
+## 🎮 Run Commands & Usage
+
+### Essential Commands
+
+```bash
+npm start                                  # Start the AI CLI (interactive chat)
+npm run dashboard                          # Start web dashboard (localhost:3210)
+npm run setup                              # Full guided setup
+npm test                                   # Run all tests
+npm run ollama-models -- --recommended     # Pull recommended models
+npm run download-models -- --all           # Download GGUF model files
+```
+
+### Chat Usage (inside the AI)
+
+Once running with `npm start`, just type naturally:
+
+```
+You: Write a Python function to sort a list
+You: Now add type hints and error handling
+You: Can you write tests for it too?
+You: /model qwen2.5-coder:7b       ← switch models
+You: /help                          ← see all commands
+You: /compact                       ← manage context window
+You: /memory                        ← persistent memory
+You: /review                        ← code review
+You: /diff                          ← git diff
+You: /commit                        ← git commit
+```
+
+### Model Commands
+
+```bash
+# Ollama direct commands
+ollama pull qwen2.5-coder:7b              # Download code model (★ recommended)
+ollama pull llama3.2:3b                    # Download general model (★ recommended)
+ollama run qwen2.5-coder:7b "prompt"      # One-shot query
+ollama run qwen2.5-coder:7b               # Interactive chat
+ollama list                                # List downloaded models
+ollama ps                                  # Running models + GPU info
+ollama rm <model>                          # Remove a model
+ollama show <model>                        # Show model details
+```
+
+### Using in Code
+
+```ts
+import { ModelSpark, QwenLocalLLM, LocalLLMBridge, LocalBrain } from './chat/index.js'
+
+// Dual-model ensemble (best quality)
+const spark = new ModelSpark({
+  primaryModel: 'qwen2.5-coder:7b',
+  secondaryModel: 'llama3.2:3b',
+  strategy: 'ensemble',
+})
+const result = await spark.infer('Explain the Observer pattern')
+
+// Direct Qwen inference
+const qwen = new QwenLocalLLM({ backend: 'ollama', model: 'qwen2.5-coder:7b' })
+const response = await qwen.generate({ prompt: 'Write a binary search', maxTokens: 2048 })
+
+// Smart routing (auto-selects best method)
+const bridge = new LocalLLMBridge()
+const answer = await bridge.query('How do I implement REST APIs?')
+
+// Offline brain (no LLM needed)
+const brain = new LocalBrain({ enableIntelligence: true })
+const chat = brain.chat('What is a binary search tree?')
+```
+
+**📖 Full commands & usage guide:** [docs/COMMANDS_AND_USAGE.md](docs/COMMANDS_AND_USAGE.md) — all run commands, chat features, model commands, slash commands, tool reference, and API examples.
+
+## Quick Start (Code API)
 
 ```ts
 import { IntegratedAI, MODULE_DIRECTORY } from './chat/index.js'
@@ -416,22 +488,22 @@ import { IntegratedAI, MODULE_DIRECTORY } from './chat/index.js'
 // Create the integrated AI (uses ALL modules)
 const ai = new IntegratedAI({
   title: 'My Session',
-  model: 'claude-sonnet-4-20250514',
+  model: 'qwen2.5-coder:7b',
 })
 
-// 💬 Chat (uses AiChat.ts brain → Claude API)
+// 💬 Chat (uses local LLM — fully offline)
 await ai.chat_send('Explain this project')
 
 // 💻 Write code (uses Code Writer — 24 languages)
 await ai.writeCode({ description: 'REST API', language: 'typescript', style: 'production' })
 
-// 🖼 Analyze images (uses Image Analyzer — like Claude Opus vision)
+// 🖼 Analyze images (uses Image Analyzer)
 await ai.analyzeImage({ imageData: base64, mediaType: 'image/png' })
 
-// 🔧 See all 38 tools
-console.log(`Tools: ${ai.getToolCount()}`)  // 38
+// 🔧 See all 39 tools
+console.log(`Tools: ${ai.getToolCount()}`)  // 39
 
-// 📋 See all 50+ commands
+// 📋 See all 100+ commands
 const cmds = await ai.getAvailableCommands()
 
 // 🌍 Get project context
