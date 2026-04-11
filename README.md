@@ -56,6 +56,71 @@ npm install
 npm test
 ```
 
+## 🦙 Local LLM Setup (Ollama & Qwen)
+
+This AI runs **fully offline** using local LLMs via [Ollama](https://ollama.com). No API keys needed.
+
+### Quick Setup
+
+```bash
+# 1. Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# 2. Start the Ollama server
+ollama serve &
+
+# 3. Download recommended models
+ollama pull qwen2.5-coder:7b    # Primary — code specialist (4.7 GB)
+ollama pull llama3.2:3b          # Secondary — general purpose (2.0 GB)
+
+# 4. Start our AI (auto-connects to Ollama)
+npm start
+```
+
+Or use our management scripts:
+```bash
+npm run ollama-models -- --recommended    # Pull recommended models via script
+npm run download-models -- --all          # Download GGUF files from HuggingFace
+```
+
+### Available Qwen Models
+
+| Model | Command | Size | RAM | Best For |
+|-------|---------|------|-----|----------|
+| Qwen 2.5 Coder 0.5B | `ollama pull qwen2.5-coder:0.5b` | 400 MB | 1 GB | Ultra-light, low-resource |
+| Qwen 2.5 Coder 1.5B | `ollama pull qwen2.5-coder:1.5b` | 1 GB | 2 GB | Fast, mobile/embedded |
+| Qwen 2.5 Coder 3B | `ollama pull qwen2.5-coder:3b` | 2 GB | 4 GB | Good quality, moderate |
+| **Qwen 2.5 Coder 7B** ★ | `ollama pull qwen2.5-coder:7b` | **4.7 GB** | **6 GB** | **Recommended** |
+| Qwen 2.5 Coder 14B | `ollama pull qwen2.5-coder:14b` | 9 GB | 12 GB | High quality |
+| Qwen 2.5 Coder 32B | `ollama pull qwen2.5-coder:32b` | 20 GB | 24 GB | Very high quality |
+| Qwen 2.5 72B | `ollama pull qwen2.5:72b` | 44 GB | 48 GB | Maximum quality |
+
+### Other Supported Models
+
+```bash
+ollama pull llama3.1:8b          # LLaMA 3.1 — better general reasoning
+ollama pull mistral:7b           # Mistral — strong reasoning
+ollama pull codellama:7b         # CodeLlama — Meta code model
+ollama pull deepseek-coder:6.7b  # DeepSeek Coder
+ollama pull phi3:mini            # Phi-3 Mini — Microsoft efficient model
+ollama pull gemma2:9b            # Gemma 2 — Google model
+ollama pull starcoder2:7b        # StarCoder 2 — code completion
+```
+
+### How It Connects
+
+The AI auto-detects Ollama at `localhost:11434` and uses models through these components:
+
+| Component | What It Does |
+|-----------|-------------|
+| `QwenLocalLLM` | Direct Qwen inference — code generation, completions |
+| `LocalLLMBridge` | Smart routing — picks best model/method per query |
+| `ModelSpark` | Dual-model ensemble — Qwen + LLaMA for best quality |
+
+**📖 Full guide:** [docs/OLLAMA_QWEN_GUIDE.md](docs/OLLAMA_QWEN_GUIDE.md) — installation, configuration, troubleshooting, and advanced usage.
+
+---
+
 ## ✨ What's New in v2.2
 
 ### 📋 Structured Logging (NEW)
