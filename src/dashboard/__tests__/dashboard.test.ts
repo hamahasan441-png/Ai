@@ -14,13 +14,12 @@ describe('Dashboard Server', () => {
     let port: number
 
     beforeAll(async () => {
-      // Use a random high port to avoid conflicts
-      port = 40000 + Math.floor(Math.random() * 10000)
-      process.env.AI_DASHBOARD_PORT = String(port)
       const mod = await import('../server.js')
-      server = mod.startDashboard(port)
-      // Wait for server to be ready
+      // Use port 0 to let the OS assign an available port
+      server = mod.startDashboard(0)
       await new Promise(resolve => setTimeout(resolve, 500))
+      const addr = server.address()
+      port = typeof addr === 'object' && addr ? addr.port : 0
     })
 
     afterAll(() => {

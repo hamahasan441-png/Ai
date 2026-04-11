@@ -27,9 +27,9 @@ export function isFirstPartyAnthropicBaseUrl(): boolean {
     return true
   }
   try {
-    const host = new URL(baseUrl).host
-    const allowedHosts = ['localhost', '127.0.0.1', 'localhost:11434', 'localhost:8080']
-    return allowedHosts.some(h => host.includes(h))
+    const parsed = new URL(baseUrl)
+    const hostname = parsed.hostname
+    return hostname === 'localhost' || hostname === '127.0.0.1'
   } catch {
     return false
   }

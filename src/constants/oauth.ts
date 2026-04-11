@@ -105,7 +105,7 @@ const PROD_OAUTH_CONFIG = {
  */
 export const MCP_CLIENT_METADATA_URL = 'http://localhost:4000/oauth/client-metadata'
 
-// Staging OAuth configuration - local only, no external services
+// Staging OAuth configuration - local only; only active for internal (ant) builds with staging flag
 const STAGING_OAUTH_CONFIG =
   process.env.USER_TYPE === 'ant'
     ? ({

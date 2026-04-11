@@ -9,9 +9,9 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'http'
 import { resolve, extname } from 'path'
 import { readFile, readdir, stat } from 'fs/promises'
-import { execSync } from 'child_process'
 
 const DEFAULT_PORT = parseInt(process.env.AI_DASHBOARD_PORT ?? '3210', 10)
+const VERSION = '2.3.0'
 
 // ── MIME types ────────────────────────────────────────────────────────────────
 const MIME_TYPES: Record<string, string> = {
@@ -43,13 +43,6 @@ async function getOllamaModels(): Promise<object[]> {
 // ── Helper: get system info ───────────────────────────────────────────────────
 function getSystemInfo(): Record<string, unknown> {
   const mem = process.memoryUsage()
-  let ollamaRunning = false
-  try {
-    execSync('curl -sf http://localhost:11434/api/tags > /dev/null 2>&1', { timeout: 2000 })
-    ollamaRunning = true
-  } catch {
-    /* ignored */
-  }
   return {
     nodeVersion: process.version,
     platform: process.platform,
@@ -58,9 +51,22 @@ function getSystemInfo(): Record<string, unknown> {
     memoryMB: Math.round(mem.rss / 1024 / 1024),
     heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024),
     heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024),
-    ollamaRunning,
+    ollamaRunning: false, // updated asynchronously
     pid: process.pid,
     cwd: process.cwd(),
+  }
+}
+
+async function checkOllamaRunning(): Promise<boolean> {
+  try {
+    const ollamaUrl = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434'
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 2000)
+    const resp = await fetch(`${ollamaUrl}/api/tags`, { signal: controller.signal })
+    clearTimeout(timeout)
+    return resp.ok
+  } catch {
+    return false
   }
 }
 
@@ -83,6 +89,7 @@ async function handleAPI(path: string, _req: IncomingMessage, res: ServerRespons
   switch (path) {
     case '/api/status': {
       const info = getSystemInfo()
+      info.ollamaRunning = await checkOllamaRunning()
       res.end(JSON.stringify({ ok: true, ...info }))
       break
     }
@@ -102,7 +109,7 @@ async function handleAPI(path: string, _req: IncomingMessage, res: ServerRespons
         llamaCppUrl: process.env.LLAMACPP_BASE_URL ?? 'http://localhost:8080',
         defaultModel: process.env.AI_DEFAULT_MODEL ?? 'qwen2.5-coder:7b',
         dashboardPort: DEFAULT_PORT,
-        version: '2.3.0',
+        version: VERSION,
       }
       res.end(JSON.stringify({ ok: true, config }))
       break
@@ -182,7 +189,7 @@ function getDashboardHTML(): string {
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
@@ -565,12 +572,11 @@ function getDashboardHTML(): string {
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
       font-size: 13px;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       transition: all 0.15s;
     }
     .module-item:hover { border-color: var(--accent-purple); background: var(--bg-card-hover); }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="app" id="app">
