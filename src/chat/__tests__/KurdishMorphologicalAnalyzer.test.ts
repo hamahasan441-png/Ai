@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { KurdishMorphologicalAnalyzer, DEFAULT_ANALYZER_CONFIG } from '../KurdishMorphologicalAnalyzer.js'
+import {
+  KurdishMorphologicalAnalyzer,
+  DEFAULT_ANALYZER_CONFIG,
+} from '../KurdishMorphologicalAnalyzer.js'
 
 // ─── DEFAULT_ANALYZER_CONFIG ────────────────────────────────────────────────────
 

@@ -92,9 +92,7 @@ async function handleSwarmWorkerPermission(
 
           // Merge the updated input with the original input
           const finalInput =
-            allowedInput && Object.keys(allowedInput).length > 0
-              ? allowedInput
-              : ctx.input
+            allowedInput && Object.keys(allowedInput).length > 0 ? allowedInput : ctx.input
 
           resolveOnce(
             await ctx.handleUserAllow(

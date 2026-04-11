@@ -224,7 +224,7 @@ describe('StreamChannel', () => {
 
   it('should apply filter function', async () => {
     const handler = vi.fn()
-    channel.subscribe(handler, (e) => e.event === 'important')
+    channel.subscribe(handler, e => e.event === 'important')
     await channel.publish({ data: 'skip', event: 'trivial' })
     await channel.publish({ data: 'keep', event: 'important' })
     expect(handler).toHaveBeenCalledTimes(1)
@@ -307,7 +307,7 @@ describe('StreamManager', () => {
     manager.createChannel('b')
     const list = manager.listChannels()
     expect(list).toHaveLength(2)
-    expect(list.map((c) => c.topic).sort()).toEqual(['a', 'b'])
+    expect(list.map(c => c.topic).sort()).toEqual(['a', 'b'])
   })
 
   it('should broadcast to all channels', async () => {
@@ -363,7 +363,7 @@ describe('AIStreamProcessor', () => {
     const chunks = await collectChunks(proc.streamChatResponse('hello world'))
     expect(chunks[0].type).toBe('thinking')
     expect(chunks[chunks.length - 1].type).toBe('done')
-    const tokens = chunks.filter((c) => c.type === 'token')
+    const tokens = chunks.filter(c => c.type === 'token')
     expect(tokens).toHaveLength(2)
     expect(tokens[0].content).toBe('hello')
     expect(tokens[1].content).toBe(' world')
@@ -378,13 +378,13 @@ describe('AIStreamProcessor', () => {
     const chunks = await collectChunks(proc.streamCodeAnalysis('const a = 1\nconst b = 2', 'ts'))
     expect(chunks[0].type).toBe('thinking')
     expect(chunks[chunks.length - 1].type).toBe('done')
-    const tokens = chunks.filter((c) => c.type === 'token')
+    const tokens = chunks.filter(c => c.type === 'token')
     expect(tokens.length).toBeGreaterThanOrEqual(2)
   })
 
   it('should stream tool execution lifecycle', async () => {
     const chunks = await collectChunks(proc.streamToolExecution('search', { q: 'test' }))
-    const types = chunks.map((c) => c.type)
+    const types = chunks.map(c => c.type)
     expect(types).toContain('tool_call')
     expect(types).toContain('tool_result')
     expect(types[types.length - 1]).toBe('done')
@@ -411,7 +411,7 @@ describe('AIStreamProcessor', () => {
 describe('StreamTransformPipeline', () => {
   it('should add and apply a custom transform', () => {
     const pipe = new StreamTransformPipeline()
-    pipe.addTransform('upper', (c) => ({ ...c, content: c.content.toUpperCase() }))
+    pipe.addTransform('upper', c => ({ ...c, content: c.content.toUpperCase() }))
     const result = pipe.process({ type: 'text', content: 'hello' })
     expect(result?.content).toBe('HELLO')
   })
@@ -429,8 +429,8 @@ describe('StreamTransformPipeline', () => {
     pipe.removeTransform('latencyTracker')
     pipe.removeTransform('contentFilter')
 
-    pipe.addTransform('addA', (c) => ({ ...c, content: c.content + 'A' }))
-    pipe.addTransform('addB', (c) => ({ ...c, content: c.content + 'B' }))
+    pipe.addTransform('addA', c => ({ ...c, content: c.content + 'A' }))
+    pipe.addTransform('addB', c => ({ ...c, content: c.content + 'B' }))
     const result = pipe.process({ type: 'text', content: '' })
     expect(result?.content).toBe('AB')
   })
@@ -442,7 +442,7 @@ describe('StreamTransformPipeline', () => {
     pipe.removeTransform('contentFilter')
 
     pipe.addTransform('block', () => null)
-    pipe.addTransform('never', (c) => c)
+    pipe.addTransform('never', c => c)
     expect(pipe.process({ type: 'text', content: 'x' })).toBeNull()
   })
 

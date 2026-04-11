@@ -4,7 +4,9 @@ import { ScientificReasoner, DEFAULT_SCIENTIFIC_REASONER_CONFIG } from '../Scien
 describe('ScientificReasoner', () => {
   let sr: ScientificReasoner
 
-  beforeEach(() => { sr = new ScientificReasoner() })
+  beforeEach(() => {
+    sr = new ScientificReasoner()
+  })
 
   describe('constructor & config', () => {
     it('uses default config', () => {
@@ -23,8 +25,18 @@ describe('ScientificReasoner', () => {
   describe('hypothesis formulation', () => {
     it('creates a hypothesis with variables', () => {
       const h = sr.formulateHypothesis('Sleep affects productivity', [
-        { name: 'sleep_hours', type: 'independent', operationalization: 'Hours of sleep per night', measurementScale: 'ratio' },
-        { name: 'productivity_score', type: 'dependent', operationalization: 'Tasks completed per day', measurementScale: 'ratio' },
+        {
+          name: 'sleep_hours',
+          type: 'independent',
+          operationalization: 'Hours of sleep per night',
+          measurementScale: 'ratio',
+        },
+        {
+          name: 'productivity_score',
+          type: 'dependent',
+          operationalization: 'Tasks completed per day',
+          measurementScale: 'ratio',
+        },
       ])
       expect(h.id).toBeTruthy()
       expect(h.nullHypothesis).toContain('no significant')
@@ -48,8 +60,18 @@ describe('ScientificReasoner', () => {
   describe('experiment design', () => {
     it('designs an experiment for a hypothesis', () => {
       const h = sr.formulateHypothesis('Effect test', [
-        { name: 'iv', type: 'independent', operationalization: 'treatment', measurementScale: 'nominal' },
-        { name: 'dv', type: 'dependent', operationalization: 'outcome', measurementScale: 'interval' },
+        {
+          name: 'iv',
+          type: 'independent',
+          operationalization: 'treatment',
+          measurementScale: 'nominal',
+        },
+        {
+          name: 'dv',
+          type: 'dependent',
+          operationalization: 'outcome',
+          measurementScale: 'interval',
+        },
       ])
       const exp = sr.designExperiment(h.id, 'experimental', { sampleSize: 100, blinding: 'double' })
       expect(exp).toBeTruthy()
@@ -66,7 +88,11 @@ describe('ScientificReasoner', () => {
         { name: 'x', type: 'independent', operationalization: 'x', measurementScale: 'nominal' },
         { name: 'y', type: 'dependent', operationalization: 'y', measurementScale: 'ratio' },
       ])
-      const exp = sr.designExperiment(h.id, 'experimental', { sampleSize: 10, blinding: 'none', controlGroup: false })
+      const exp = sr.designExperiment(h.id, 'experimental', {
+        sampleSize: 10,
+        blinding: 'none',
+        controlGroup: false,
+      })
       expect(exp!.biases.length).toBeGreaterThan(0)
     })
     it('has higher reproducibility with better design', () => {
@@ -74,8 +100,16 @@ describe('ScientificReasoner', () => {
         { name: 'x', type: 'independent', operationalization: 'x', measurementScale: 'nominal' },
         { name: 'y', type: 'dependent', operationalization: 'y', measurementScale: 'ratio' },
       ])
-      const bad = sr.designExperiment(h.id, 'experimental', { sampleSize: 10, blinding: 'none', controlGroup: false })
-      const good = sr.designExperiment(h.id, 'experimental', { sampleSize: 200, blinding: 'double', controlGroup: true })
+      const bad = sr.designExperiment(h.id, 'experimental', {
+        sampleSize: 10,
+        blinding: 'none',
+        controlGroup: false,
+      })
+      const good = sr.designExperiment(h.id, 'experimental', {
+        sampleSize: 200,
+        blinding: 'double',
+        controlGroup: true,
+      })
       expect(good!.reproducibilityScore).toBeGreaterThan(bad!.reproducibilityScore)
     })
   })
@@ -149,7 +183,12 @@ describe('ScientificReasoner', () => {
   describe('research summary', () => {
     it('generates a summary', () => {
       const h = sr.formulateHypothesis('Test hypothesis', [
-        { name: 'x', type: 'independent', operationalization: 'treatment', measurementScale: 'nominal' },
+        {
+          name: 'x',
+          type: 'independent',
+          operationalization: 'treatment',
+          measurementScale: 'nominal',
+        },
         { name: 'y', type: 'dependent', operationalization: 'outcome', measurementScale: 'ratio' },
       ])
       sr.designExperiment(h.id, 'experimental', { sampleSize: 50 })
@@ -172,7 +211,9 @@ describe('ScientificReasoner', () => {
       expect(s.feedbackCount).toBe(1)
     })
     it('serializes and deserializes', () => {
-      sr.formulateHypothesis('H', [{ name: 'x', type: 'independent', operationalization: 'x', measurementScale: 'nominal' }])
+      sr.formulateHypothesis('H', [
+        { name: 'x', type: 'independent', operationalization: 'x', measurementScale: 'nominal' },
+      ])
       const json = sr.serialize()
       const restored = ScientificReasoner.deserialize(json)
       expect(restored.getHypothesis('hyp_1')).toBeTruthy()

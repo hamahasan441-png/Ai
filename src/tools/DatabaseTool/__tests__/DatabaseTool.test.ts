@@ -33,8 +33,7 @@ vi.mock('../../../Tool.js', () => ({
     isConcurrencySafe: () => false,
     isReadOnly: () => false,
     isDestructive: () => false,
-    checkPermissions: (input: any) =>
-      Promise.resolve({ behavior: 'allow', updatedInput: input }),
+    checkPermissions: (input: any) => Promise.resolve({ behavior: 'allow', updatedInput: input }),
     userFacingName: () => def.name,
     ...def,
   }),

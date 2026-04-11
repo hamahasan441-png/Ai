@@ -19,19 +19,27 @@ describe('AI Toolkit Image Generation Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about diffusion model image generation', async () => {
-      const r = await brain.chat('explain ai toolkit image generation diffusion model text to image flux stable diffusion')
+      const r = await brain.chat(
+        'explain ai toolkit image generation diffusion model text to image flux stable diffusion',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/diffusion|image|generation|flux|stable\s*diffusion|model/)
+      expect(r.text.toLowerCase()).toMatch(
+        /diffusion|image|generation|flux|stable\s*diffusion|model/,
+      )
     })
 
     it('answers about LoRA training and fine-tuning', async () => {
-      const r = await brain.chat('explain lora training fine tuning diffusion model custom rank adapter')
+      const r = await brain.chat(
+        'explain lora training fine tuning diffusion model custom rank adapter',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/lora|training|fine.tun|rank|adapter|model/)
     })
 
     it('answers about video generation and image editing', async () => {
-      const r = await brain.chat('explain video generation text to video image editing ai model wan ltx kontext')
+      const r = await brain.chat(
+        'explain video generation text to video image editing ai model wan ltx kontext',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/video|generation|editing|model|wan|ltx|kontext/)
     })

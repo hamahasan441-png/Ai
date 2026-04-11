@@ -19,7 +19,13 @@ function makeMockProvider(name: string, overrides?: Partial<LLMProvider>): LLMPr
     name,
     model: `${name}-model`,
     maxTokens: 1024,
-    capabilities: { streaming: true, tools: false, vision: false, embeddings: false, jsonMode: false },
+    capabilities: {
+      streaming: true,
+      tools: false,
+      vision: false,
+      embeddings: false,
+      jsonMode: false,
+    },
     async generate(req: LLMRequest): Promise<LLMResponse> {
       return {
         text: `[${name}] ${req.prompt}`,
@@ -206,9 +212,13 @@ describe('LLMRouter', () => {
     })
 
     it('should fallback when primary provider fails', async () => {
-      registry.register('bad', () => makeMockProvider('bad', {
-        async generate() { throw new Error('down') },
-      }))
+      registry.register('bad', () =>
+        makeMockProvider('bad', {
+          async generate() {
+            throw new Error('down')
+          },
+        }),
+      )
       registry.register('good', () => makeMockProvider('good'))
       const router = new LLMRouter(registry, { fallbackChain: ['bad', 'good'] })
 
@@ -217,12 +227,20 @@ describe('LLMRouter', () => {
     })
 
     it('should throw when all providers fail', async () => {
-      registry.register('a', () => makeMockProvider('a', {
-        async generate() { throw new Error('fail-a') },
-      }))
-      registry.register('b', () => makeMockProvider('b', {
-        async generate() { throw new Error('fail-b') },
-      }))
+      registry.register('a', () =>
+        makeMockProvider('a', {
+          async generate() {
+            throw new Error('fail-a')
+          },
+        }),
+      )
+      registry.register('b', () =>
+        makeMockProvider('b', {
+          async generate() {
+            throw new Error('fail-b')
+          },
+        }),
+      )
       const router = new LLMRouter(registry, { fallbackChain: ['a', 'b'] })
 
       await expect(router.route(makeRequest())).rejects.toThrow(/fail/)
@@ -230,7 +248,9 @@ describe('LLMRouter', () => {
 
     it('should throw when no providers are available', async () => {
       const router = new LLMRouter(registry)
-      await expect(router.route(makeRequest())).rejects.toThrow('No healthy LLM providers available')
+      await expect(router.route(makeRequest())).rejects.toThrow(
+        'No healthy LLM providers available',
+      )
     })
 
     it('should include default provider in routing candidates', async () => {
@@ -252,17 +272,19 @@ describe('LLMRouter', () => {
 
     it('should not duplicate default if already in fallback chain', async () => {
       let callCount = 0
-      registry.register('primary', () => makeMockProvider('primary', {
-        async generate(req) {
-          callCount++
-          return {
-            text: `[primary] ${req.prompt}`,
-            usage: { promptTokens: 5, completionTokens: 5 },
-            model: 'primary-model',
-            finishReason: 'stop',
-          }
-        },
-      }))
+      registry.register('primary', () =>
+        makeMockProvider('primary', {
+          async generate(req) {
+            callCount++
+            return {
+              text: `[primary] ${req.prompt}`,
+              usage: { promptTokens: 5, completionTokens: 5 },
+              model: 'primary-model',
+              finishReason: 'stop',
+            }
+          },
+        }),
+      )
       const router = new LLMRouter(registry, {
         defaultProvider: 'primary',
         fallbackChain: ['primary'],
@@ -295,17 +317,19 @@ describe('LLMRouter', () => {
     })
 
     it('should support least-latency strategy', async () => {
-      registry.register('slow', () => makeMockProvider('slow', {
-        async generate(req) {
-          await new Promise(r => setTimeout(r, 30))
-          return {
-            text: `[slow] ${req.prompt}`,
-            usage: { promptTokens: 5, completionTokens: 5 },
-            model: 'slow-model',
-            finishReason: 'stop',
-          }
-        },
-      }))
+      registry.register('slow', () =>
+        makeMockProvider('slow', {
+          async generate(req) {
+            await new Promise(r => setTimeout(r, 30))
+            return {
+              text: `[slow] ${req.prompt}`,
+              usage: { promptTokens: 5, completionTokens: 5 },
+              model: 'slow-model',
+              finishReason: 'stop',
+            }
+          },
+        }),
+      )
       registry.register('fast', () => makeMockProvider('fast'))
       const router = new LLMRouter(registry, {
         fallbackChain: ['slow', 'fast'],
@@ -361,18 +385,20 @@ describe('LLMRouter', () => {
 
     it('should track errors in provider stats', async () => {
       let callCount = 0
-      registry.register('flaky', () => makeMockProvider('flaky', {
-        async generate(req) {
-          callCount++
-          if (callCount === 1) throw new Error('transient')
-          return {
-            text: `[flaky] ${req.prompt}`,
-            usage: { promptTokens: 5, completionTokens: 5 },
-            model: 'flaky-model',
-            finishReason: 'stop',
-          }
-        },
-      }))
+      registry.register('flaky', () =>
+        makeMockProvider('flaky', {
+          async generate(req) {
+            callCount++
+            if (callCount === 1) throw new Error('transient')
+            return {
+              text: `[flaky] ${req.prompt}`,
+              usage: { promptTokens: 5, completionTokens: 5 },
+              model: 'flaky-model',
+              finishReason: 'stop',
+            }
+          },
+        }),
+      )
       const router = new LLMRouter(registry, { fallbackChain: ['flaky'] })
 
       // First call fails, since there's only one provider it rejects
@@ -383,9 +409,13 @@ describe('LLMRouter', () => {
     })
 
     it('should mark provider unhealthy after max consecutive failures', async () => {
-      registry.register('bad', () => makeMockProvider('bad', {
-        async generate() { throw new Error('fail') },
-      }))
+      registry.register('bad', () =>
+        makeMockProvider('bad', {
+          async generate() {
+            throw new Error('fail')
+          },
+        }),
+      )
       const router = new LLMRouter(registry, {
         fallbackChain: ['bad'],
         maxFailures: 2,
@@ -403,9 +433,13 @@ describe('LLMRouter', () => {
     })
 
     it('should recover provider health after cooldown', async () => {
-      registry.register('bad', () => makeMockProvider('bad', {
-        async generate() { throw new Error('fail') },
-      }))
+      registry.register('bad', () =>
+        makeMockProvider('bad', {
+          async generate() {
+            throw new Error('fail')
+          },
+        }),
+      )
       const router = new LLMRouter(registry, {
         fallbackChain: ['bad'],
         maxFailures: 1,
@@ -454,9 +488,18 @@ describe('LLMRouter', () => {
       const router = new LLMRouter(registry, { fallbackChain: ['test'] })
       const order: number[] = []
 
-      router.use(async (_r, _s, next) => { order.push(1); return next() })
-      router.use(async (_r, _s, next) => { order.push(2); return next() })
-      router.use(async (_r, _s, next) => { order.push(3); return next() })
+      router.use(async (_r, _s, next) => {
+        order.push(1)
+        return next()
+      })
+      router.use(async (_r, _s, next) => {
+        order.push(2)
+        return next()
+      })
+      router.use(async (_r, _s, next) => {
+        order.push(3)
+        return next()
+      })
 
       await router.route(makeRequest())
       expect(order).toEqual([1, 2, 3])
@@ -626,10 +669,7 @@ describe('Provider Factories', () => {
     })
 
     it('should cycle through configured responses', async () => {
-      const provider = createMockProvider([
-        { text: 'first' },
-        { text: 'second' },
-      ])
+      const provider = createMockProvider([{ text: 'first' }, { text: 'second' }])
       const r1 = await provider.generate(makeRequest())
       const r2 = await provider.generate(makeRequest())
       expect(r1.text).toBe('first')

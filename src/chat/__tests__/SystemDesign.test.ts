@@ -13,9 +13,13 @@ describe('System Design Knowledge', () => {
 
   describe('Load Balancing', () => {
     it('explains load balancer algorithms and design', async () => {
-      const r = await brain.chat('What load balancing algorithms are used in system design with Nginx?')
+      const r = await brain.chat(
+        'What load balancing algorithms are used in system design with Nginx?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/load\s*balanc|algorithm|round\s*robin|least\s*connect|nginx/)
+      expect(r.text.toLowerCase()).toMatch(
+        /load\s*balanc|algorithm|round\s*robin|least\s*connect|nginx/,
+      )
     })
 
     it('describes L4 vs L7 load balancing', async () => {
@@ -33,14 +37,20 @@ describe('System Design Knowledge', () => {
 
   describe('Caching Strategies', () => {
     it('explains Redis caching strategies', async () => {
-      const r = await brain.chat('What are the caching strategies with Redis and Memcached for system design?')
+      const r = await brain.chat(
+        'What are the caching strategies with Redis and Memcached for system design?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/cach|redis|memcached|strategy|latency|key-?value/)
     })
 
     it('describes cache-aside and write-through patterns', async () => {
-      const r = await brain.chat('How do cache invalidation patterns like cache-aside and write-through work?')
-      expect(r.text.toLowerCase()).toMatch(/cache-?aside|write-?through|write-?back|invalidat|miss|populat/)
+      const r = await brain.chat(
+        'How do cache invalidation patterns like cache-aside and write-through work?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /cache-?aside|write-?through|write-?back|invalidat|miss|populat/,
+      )
     })
 
     it('covers CDN edge caching', async () => {
@@ -60,12 +70,16 @@ describe('System Design Knowledge', () => {
 
     it('describes SQL vs NoSQL selection', async () => {
       const r = await brain.chat('How to choose between SQL and NoSQL databases in system design?')
-      expect(r.text.toLowerCase()).toMatch(/sql|nosql|relational|document|consistency|cap\s*theorem/)
+      expect(r.text.toLowerCase()).toMatch(
+        /sql|nosql|relational|document|consistency|cap\s*theorem/,
+      )
     })
 
     it('covers CAP theorem implications', async () => {
       const r = await brain.chat('What is the CAP theorem and how does it affect database design?')
-      expect(r.text.toLowerCase()).toMatch(/cap|consistency|availability|partition|theorem|trade-?off/)
+      expect(r.text.toLowerCase()).toMatch(
+        /cap|consistency|availability|partition|theorem|trade-?off/,
+      )
     })
   })
 
@@ -73,7 +87,9 @@ describe('System Design Knowledge', () => {
 
   describe('Message Queues & Streaming', () => {
     it('explains Apache Kafka for event streaming', async () => {
-      const r = await brain.chat('How does a message queue like Kafka work for event streaming in system design?')
+      const r = await brain.chat(
+        'How does a message queue like Kafka work for event streaming in system design?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/kafka|message|queue|topic|partition|stream|consumer/)
     })
@@ -84,8 +100,12 @@ describe('System Design Knowledge', () => {
     })
 
     it('covers delivery guarantees', async () => {
-      const r = await brain.chat('What message queue delivery guarantees exist: at-most-once vs exactly-once?')
-      expect(r.text.toLowerCase()).toMatch(/delivery|guarantee|at-?most|at-?least|exactly-?once|retry/)
+      const r = await brain.chat(
+        'What message queue delivery guarantees exist: at-most-once vs exactly-once?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /delivery|guarantee|at-?most|at-?least|exactly-?once|retry/,
+      )
     })
   })
 
@@ -93,13 +113,19 @@ describe('System Design Knowledge', () => {
 
   describe('Rate Limiting', () => {
     it('explains rate limiter algorithms', async () => {
-      const r = await brain.chat('What rate limiting algorithms like token bucket are used in system design?')
+      const r = await brain.chat(
+        'What rate limiting algorithms like token bucket are used in system design?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/rate\s*limit|token\s*bucket|leaky\s*bucket|sliding\s*window|algorithm/)
+      expect(r.text.toLowerCase()).toMatch(
+        /rate\s*limit|token\s*bucket|leaky\s*bucket|sliding\s*window|algorithm/,
+      )
     })
 
     it('describes distributed rate limiting with Redis', async () => {
-      const r = await brain.chat('How does distributed rate limiting with Redis work in API design?')
+      const r = await brain.chat(
+        'How does distributed rate limiting with Redis work in API design?',
+      )
       expect(r.text.toLowerCase()).toMatch(/rate\s*limit|redis|distribut|api|429|incr|expire/)
     })
   })
@@ -108,14 +134,20 @@ describe('System Design Knowledge', () => {
 
   describe('Distributed Systems', () => {
     it('explains Raft consensus algorithm', async () => {
-      const r = await brain.chat('How does the Raft consensus algorithm work in distributed systems?')
+      const r = await brain.chat(
+        'How does the Raft consensus algorithm work in distributed systems?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/raft|consensus|leader|election|log\s*replic|follower/)
     })
 
     it('describes distributed system fundamentals', async () => {
-      const r = await brain.chat('What are the fundamental challenges of distributed system design?')
-      expect(r.text.toLowerCase()).toMatch(/distribut|consensus|consistency|partition|failure|transaction/)
+      const r = await brain.chat(
+        'What are the fundamental challenges of distributed system design?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /distribut|consensus|consistency|partition|failure|transaction/,
+      )
     })
   })
 
@@ -123,14 +155,20 @@ describe('System Design Knowledge', () => {
 
   describe('System Design Interviews', () => {
     it('explains URL shortener design', async () => {
-      const r = await brain.chat('How would you design a URL shortener in a system design interview?')
+      const r = await brain.chat(
+        'How would you design a URL shortener in a system design interview?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/url|short|base62|encod|cache|database|key|generat/)
     })
 
     it('describes scalable system design patterns', async () => {
-      const r = await brain.chat('What are the common system design interview patterns for scalable architecture?')
-      expect(r.text.toLowerCase()).toMatch(/system\s*design|scal|load\s*balanc|cache|queue|database|cdn/)
+      const r = await brain.chat(
+        'What are the common system design interview patterns for scalable architecture?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /system\s*design|scal|load\s*balanc|cache|queue|database|cdn/,
+      )
     })
   })
 

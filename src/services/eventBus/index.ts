@@ -147,7 +147,7 @@ export class EventBus {
   off(subscriptionId: string): boolean {
     // Check regular subscriptions
     for (const [topic, subs] of this.subscriptions.entries()) {
-      const idx = subs.findIndex((s) => s.id === subscriptionId)
+      const idx = subs.findIndex(s => s.id === subscriptionId)
       if (idx !== -1) {
         subs.splice(idx, 1)
         if (subs.length === 0) this.subscriptions.delete(topic)
@@ -156,7 +156,7 @@ export class EventBus {
     }
 
     // Check wildcard subscriptions
-    const wIdx = this.wildcardSubs.findIndex((s) => s.id === subscriptionId)
+    const wIdx = this.wildcardSubs.findIndex(s => s.id === subscriptionId)
     if (wIdx !== -1) {
       this.wildcardSubs.splice(wIdx, 1)
       return true
@@ -205,10 +205,7 @@ export class EventBus {
   }
 
   /** Replay history for a handler (all events matching topic) */
-  replay<T extends EventPayload = EventPayload>(
-    topic: string,
-    handler: EventHandler<T>,
-  ): number {
+  replay<T extends EventPayload = EventPayload>(topic: string, handler: EventHandler<T>): number {
     let count = 0
     for (const event of this.history) {
       if (this.topicMatches(event.topic, topic)) {
@@ -226,7 +223,7 @@ export class EventBus {
   /** Get all events matching a topic from history */
   getHistory(topic?: string): EventEnvelope[] {
     if (!topic) return [...this.history]
-    return this.history.filter((e) => this.topicMatches(e.topic, topic))
+    return this.history.filter(e => this.topicMatches(e.topic, topic))
   }
 
   /** Get dead-letter entries */
@@ -257,7 +254,7 @@ export class EventBus {
   removeAllListeners(topic?: string): void {
     if (topic) {
       this.subscriptions.delete(topic)
-      this.wildcardSubs = this.wildcardSubs.filter((s) => s.topic !== topic)
+      this.wildcardSubs = this.wildcardSubs.filter(s => s.topic !== topic)
     } else {
       this.subscriptions.clear()
       this.wildcardSubs = []
@@ -339,7 +336,7 @@ export class EventBus {
   private removeSubscription(subId: string, topic: string): void {
     const subs = this.subscriptions.get(topic)
     if (subs) {
-      const idx = subs.findIndex((s) => s.id === subId)
+      const idx = subs.findIndex(s => s.id === subId)
       if (idx !== -1) {
         subs.splice(idx, 1)
         if (subs.length === 0) this.subscriptions.delete(topic)
@@ -347,13 +344,16 @@ export class EventBus {
       }
     }
 
-    const wIdx = this.wildcardSubs.findIndex((s) => s.id === subId)
+    const wIdx = this.wildcardSubs.findIndex(s => s.id === subId)
     if (wIdx !== -1) {
       this.wildcardSubs.splice(wIdx, 1)
     }
   }
 
-  private async runMiddleware(event: EventEnvelope, finalHandler: () => Promise<void>): Promise<void> {
+  private async runMiddleware(
+    event: EventEnvelope,
+    finalHandler: () => Promise<void>,
+  ): Promise<void> {
     if (this.middleware.length === 0) {
       await finalHandler()
       return
@@ -425,7 +425,10 @@ export class EventBus {
   private topicMatches(eventTopic: string, subscriptionTopic: string): boolean {
     if (eventTopic === subscriptionTopic) return true
 
-    if (this.opts.enableWildcards && (subscriptionTopic.includes('*') || subscriptionTopic.includes('#'))) {
+    if (
+      this.opts.enableWildcards &&
+      (subscriptionTopic.includes('*') || subscriptionTopic.includes('#'))
+    ) {
       const regex = this.wildcardToRegex(subscriptionTopic)
       return regex.test(eventTopic)
     }

@@ -114,14 +114,33 @@ export interface GatheredContext {
 // ══════════════════════════════════════════════════════════════════════════════
 
 const EXT_LANG: Record<string, AnalysisLanguage> = {
-  '.ts': 'typescript', '.tsx': 'typescript',
-  '.js': 'javascript', '.jsx': 'javascript', '.mjs': 'javascript',
-  '.py': 'python', '.rs': 'rust', '.go': 'go',
-  '.java': 'java', '.c': 'c', '.cpp': 'cpp', '.cs': 'csharp',
-  '.swift': 'swift', '.kt': 'kotlin', '.rb': 'ruby', '.php': 'php',
-  '.html': 'html', '.css': 'css', '.sql': 'sql',
-  '.sh': 'bash', '.ps1': 'powershell', '.r': 'r', '.dart': 'dart',
-  '.scala': 'scala', '.lua': 'lua', '.hs': 'haskell', '.ex': 'elixir',
+  '.ts': 'typescript',
+  '.tsx': 'typescript',
+  '.js': 'javascript',
+  '.jsx': 'javascript',
+  '.mjs': 'javascript',
+  '.py': 'python',
+  '.rs': 'rust',
+  '.go': 'go',
+  '.java': 'java',
+  '.c': 'c',
+  '.cpp': 'cpp',
+  '.cs': 'csharp',
+  '.swift': 'swift',
+  '.kt': 'kotlin',
+  '.rb': 'ruby',
+  '.php': 'php',
+  '.html': 'html',
+  '.css': 'css',
+  '.sql': 'sql',
+  '.sh': 'bash',
+  '.ps1': 'powershell',
+  '.r': 'r',
+  '.dart': 'dart',
+  '.scala': 'scala',
+  '.lua': 'lua',
+  '.hs': 'haskell',
+  '.ex': 'elixir',
 }
 
 function langFromPath(filePath: string): AnalysisLanguage {
@@ -140,7 +159,6 @@ function langFromPath(filePath: string): AnalysisLanguage {
  * are most relevant to a given task.
  */
 export class ContextGatherer {
-
   /**
    * Extract symbols from source code.
    */
@@ -159,7 +177,8 @@ export class ContextGatherer {
         // Walk backward to find /** start
         for (let j = i - 1; j >= 0; j--) {
           if (lines[j].trim().startsWith('/**')) {
-            description = lines.slice(j, i)
+            description = lines
+              .slice(j, i)
               .map(l => l.trim().replace(/^\/\*\*?\s?|\*\/\s?|\*\s?/g, ''))
               .filter(Boolean)
               .join(' ')
@@ -172,58 +191,118 @@ export class ContextGatherer {
       // TypeScript/JavaScript patterns
       if (lang === 'typescript' || lang === 'javascript') {
         // Export function
-        const exportFn = line.match(/export\s+(?:async\s+)?function\s+(\w+)\s*(\([^)]*\)(?:\s*:\s*[^{]+)?)/)
+        const exportFn = line.match(
+          /export\s+(?:async\s+)?function\s+(\w+)\s*(\([^)]*\)(?:\s*:\s*[^{]+)?)/,
+        )
         if (exportFn) {
-          symbols.push({ name: exportFn[1], kind: 'function', filePath, line: lineNum, isExported: true, signature: `function ${exportFn[1]}${exportFn[2]}`, description })
+          symbols.push({
+            name: exportFn[1],
+            kind: 'function',
+            filePath,
+            line: lineNum,
+            isExported: true,
+            signature: `function ${exportFn[1]}${exportFn[2]}`,
+            description,
+          })
           continue
         }
 
         // Export class
         const exportClass = line.match(/export\s+class\s+(\w+)/)
         if (exportClass) {
-          symbols.push({ name: exportClass[1], kind: 'class', filePath, line: lineNum, isExported: true, description })
+          symbols.push({
+            name: exportClass[1],
+            kind: 'class',
+            filePath,
+            line: lineNum,
+            isExported: true,
+            description,
+          })
           continue
         }
 
         // Export interface
         const exportIface = line.match(/export\s+interface\s+(\w+)/)
         if (exportIface) {
-          symbols.push({ name: exportIface[1], kind: 'interface', filePath, line: lineNum, isExported: true, description })
+          symbols.push({
+            name: exportIface[1],
+            kind: 'interface',
+            filePath,
+            line: lineNum,
+            isExported: true,
+            description,
+          })
           continue
         }
 
         // Export type
         const exportType = line.match(/export\s+type\s+(\w+)/)
         if (exportType) {
-          symbols.push({ name: exportType[1], kind: 'type', filePath, line: lineNum, isExported: true, description })
+          symbols.push({
+            name: exportType[1],
+            kind: 'type',
+            filePath,
+            line: lineNum,
+            isExported: true,
+            description,
+          })
           continue
         }
 
         // Export enum
         const exportEnum = line.match(/export\s+enum\s+(\w+)/)
         if (exportEnum) {
-          symbols.push({ name: exportEnum[1], kind: 'enum', filePath, line: lineNum, isExported: true, description })
+          symbols.push({
+            name: exportEnum[1],
+            kind: 'enum',
+            filePath,
+            line: lineNum,
+            isExported: true,
+            description,
+          })
           continue
         }
 
         // Export const/let
         const exportConst = line.match(/export\s+(?:const|let)\s+(\w+)/)
         if (exportConst) {
-          symbols.push({ name: exportConst[1], kind: 'constant', filePath, line: lineNum, isExported: true, description })
+          symbols.push({
+            name: exportConst[1],
+            kind: 'constant',
+            filePath,
+            line: lineNum,
+            isExported: true,
+            description,
+          })
           continue
         }
 
         // Non-exported function
         const fn = line.match(/^(?:async\s+)?function\s+(\w+)\s*(\([^)]*\))/)
         if (fn) {
-          symbols.push({ name: fn[1], kind: 'function', filePath, line: lineNum, isExported: false, signature: `function ${fn[1]}${fn[2]}`, description })
+          symbols.push({
+            name: fn[1],
+            kind: 'function',
+            filePath,
+            line: lineNum,
+            isExported: false,
+            signature: `function ${fn[1]}${fn[2]}`,
+            description,
+          })
           continue
         }
 
         // Non-exported class
         const cls = line.match(/^class\s+(\w+)/)
         if (cls) {
-          symbols.push({ name: cls[1], kind: 'class', filePath, line: lineNum, isExported: false, description })
+          symbols.push({
+            name: cls[1],
+            kind: 'class',
+            filePath,
+            line: lineNum,
+            isExported: false,
+            description,
+          })
           continue
         }
       }
@@ -232,13 +311,28 @@ export class ContextGatherer {
       if (lang === 'python') {
         const pyFn = line.match(/^(?:async\s+)?def\s+(\w+)\s*\(([^)]*)\)/)
         if (pyFn) {
-          symbols.push({ name: pyFn[1], kind: 'function', filePath, line: lineNum, isExported: !pyFn[1].startsWith('_'), signature: `def ${pyFn[1]}(${pyFn[2]})`, description })
+          symbols.push({
+            name: pyFn[1],
+            kind: 'function',
+            filePath,
+            line: lineNum,
+            isExported: !pyFn[1].startsWith('_'),
+            signature: `def ${pyFn[1]}(${pyFn[2]})`,
+            description,
+          })
           continue
         }
 
         const pyClass = line.match(/^class\s+(\w+)/)
         if (pyClass) {
-          symbols.push({ name: pyClass[1], kind: 'class', filePath, line: lineNum, isExported: !pyClass[1].startsWith('_'), description })
+          symbols.push({
+            name: pyClass[1],
+            kind: 'class',
+            filePath,
+            line: lineNum,
+            isExported: !pyClass[1].startsWith('_'),
+            description,
+          })
           continue
         }
       }
@@ -248,21 +342,43 @@ export class ContextGatherer {
         const goFn = line.match(/^func\s+(\w+)\s*\(([^)]*)\)/)
         if (goFn) {
           const isExported = /^[A-Z]/.test(goFn[1])
-          symbols.push({ name: goFn[1], kind: 'function', filePath, line: lineNum, isExported, signature: `func ${goFn[1]}(${goFn[2]})`, description })
+          symbols.push({
+            name: goFn[1],
+            kind: 'function',
+            filePath,
+            line: lineNum,
+            isExported,
+            signature: `func ${goFn[1]}(${goFn[2]})`,
+            description,
+          })
           continue
         }
 
         const goStruct = line.match(/^type\s+(\w+)\s+struct/)
         if (goStruct) {
           const isExported = /^[A-Z]/.test(goStruct[1])
-          symbols.push({ name: goStruct[1], kind: 'class', filePath, line: lineNum, isExported, description })
+          symbols.push({
+            name: goStruct[1],
+            kind: 'class',
+            filePath,
+            line: lineNum,
+            isExported,
+            description,
+          })
           continue
         }
 
         const goInterface = line.match(/^type\s+(\w+)\s+interface/)
         if (goInterface) {
           const isExported = /^[A-Z]/.test(goInterface[1])
-          symbols.push({ name: goInterface[1], kind: 'interface', filePath, line: lineNum, isExported, description })
+          symbols.push({
+            name: goInterface[1],
+            kind: 'interface',
+            filePath,
+            line: lineNum,
+            isExported,
+            description,
+          })
           continue
         }
       }
@@ -271,19 +387,41 @@ export class ContextGatherer {
       if (lang === 'rust') {
         const rustFn = line.match(/^pub\s+(?:async\s+)?fn\s+(\w+)\s*(\([^)]*\))/)
         if (rustFn) {
-          symbols.push({ name: rustFn[1], kind: 'function', filePath, line: lineNum, isExported: true, signature: `fn ${rustFn[1]}${rustFn[2]}`, description })
+          symbols.push({
+            name: rustFn[1],
+            kind: 'function',
+            filePath,
+            line: lineNum,
+            isExported: true,
+            signature: `fn ${rustFn[1]}${rustFn[2]}`,
+            description,
+          })
           continue
         }
 
         const rustStruct = line.match(/^pub\s+struct\s+(\w+)/)
         if (rustStruct) {
-          symbols.push({ name: rustStruct[1], kind: 'class', filePath, line: lineNum, isExported: true, description })
+          symbols.push({
+            name: rustStruct[1],
+            kind: 'class',
+            filePath,
+            line: lineNum,
+            isExported: true,
+            description,
+          })
           continue
         }
 
         const rustTrait = line.match(/^pub\s+trait\s+(\w+)/)
         if (rustTrait) {
-          symbols.push({ name: rustTrait[1], kind: 'interface', filePath, line: lineNum, isExported: true, description })
+          symbols.push({
+            name: rustTrait[1],
+            kind: 'interface',
+            filePath,
+            line: lineNum,
+            isExported: true,
+            description,
+          })
           continue
         }
       }
@@ -301,28 +439,53 @@ export class ContextGatherer {
 
     for (const line of lines) {
       // TypeScript/JavaScript: import { X } from './file'
-      const tsImport = line.match(/import\s+(type\s+)?(?:\{([^}]+)\}|(\w+))\s+from\s+['"]([^'"]+)['"]/)
+      const tsImport = line.match(
+        /import\s+(type\s+)?(?:\{([^}]+)\}|(\w+))\s+from\s+['"]([^'"]+)['"]/,
+      )
       if (tsImport) {
         const isTypeOnly = !!tsImport[1]
         const symbols = tsImport[2]
-          ? tsImport[2].split(',').map(s => s.trim().split(' as ')[0].trim()).filter(Boolean)
-          : tsImport[3] ? [tsImport[3]] : []
-        relations.push({ sourceFile: filePath, targetFile: tsImport[4], importedSymbols: symbols, isTypeOnly })
+          ? tsImport[2]
+              .split(',')
+              .map(s => s.trim().split(' as ')[0].trim())
+              .filter(Boolean)
+          : tsImport[3]
+            ? [tsImport[3]]
+            : []
+        relations.push({
+          sourceFile: filePath,
+          targetFile: tsImport[4],
+          importedSymbols: symbols,
+          isTypeOnly,
+        })
         continue
       }
 
       // Python: from module import X
       const pyImport = line.match(/from\s+([\w.]+)\s+import\s+(.+)/)
       if (pyImport) {
-        const symbols = pyImport[2].split(',').map(s => s.trim().split(' as ')[0].trim()).filter(Boolean)
-        relations.push({ sourceFile: filePath, targetFile: pyImport[1], importedSymbols: symbols, isTypeOnly: false })
+        const symbols = pyImport[2]
+          .split(',')
+          .map(s => s.trim().split(' as ')[0].trim())
+          .filter(Boolean)
+        relations.push({
+          sourceFile: filePath,
+          targetFile: pyImport[1],
+          importedSymbols: symbols,
+          isTypeOnly: false,
+        })
         continue
       }
 
       // Go: import "package"
       const goImport = line.match(/import\s+(?:\w+\s+)?["']([^"']+)["']/)
       if (goImport) {
-        relations.push({ sourceFile: filePath, targetFile: goImport[1], importedSymbols: [], isTypeOnly: false })
+        relations.push({
+          sourceFile: filePath,
+          targetFile: goImport[1],
+          importedSymbols: [],
+          isTypeOnly: false,
+        })
         continue
       }
     }
@@ -359,7 +522,10 @@ export class ContextGatherer {
     }
 
     // Type/interface files get a boost for type-related tasks
-    if ((lower.includes('type') || lower.includes('interface')) && (fileName.includes('type') || fileName.includes('interface'))) {
+    if (
+      (lower.includes('type') || lower.includes('interface')) &&
+      (fileName.includes('type') || fileName.includes('interface'))
+    ) {
       score += 0.2
     }
 
@@ -430,7 +596,10 @@ export class ContextGatherer {
       allSymbols.push(...symbols)
       allImports.push(...imports)
 
-      const keySymbols = symbols.filter(s => s.isExported).map(s => s.name).slice(0, 5)
+      const keySymbols = symbols
+        .filter(s => s.isExported)
+        .map(s => s.name)
+        .slice(0, 5)
       let reason = 'general context'
       if (relevance > 0.5) reason = 'high keyword match'
       else if (relevance > 0.2) reason = 'partial keyword match'
@@ -446,7 +615,9 @@ export class ContextGatherer {
     scored.sort((a, b) => b.relevance - a.relevance)
 
     const primaryFiles = scored.filter(f => f.relevance > 0.2).slice(0, maxPrimary)
-    const supportingFiles = scored.filter(f => f.relevance > 0.05 && f.relevance <= 0.2).slice(0, maxSupporting)
+    const supportingFiles = scored
+      .filter(f => f.relevance > 0.05 && f.relevance <= 0.2)
+      .slice(0, maxSupporting)
 
     const totalContextSize = allSummaries.reduce((sum, s) => sum + s.summaryText.length, 0)
 
@@ -473,15 +644,16 @@ export class ContextGatherer {
    * Find all files that a given file imports.
    */
   findDependencies(filePath: string, importGraph: ImportRelation[]): string[] {
-    return importGraph
-      .filter(r => r.sourceFile === filePath)
-      .map(r => r.targetFile)
+    return importGraph.filter(r => r.sourceFile === filePath).map(r => r.targetFile)
   }
 
   /**
    * Trace a symbol across the codebase — find where it's defined and used.
    */
-  traceSymbol(symbolName: string, files: Map<string, string>): {
+  traceSymbol(
+    symbolName: string,
+    files: Map<string, string>,
+  ): {
     definition: SymbolInfo | null
     usages: Array<{ filePath: string; line: number }>
   } {

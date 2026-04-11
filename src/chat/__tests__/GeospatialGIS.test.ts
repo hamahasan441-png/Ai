@@ -5,35 +5,47 @@ import { createProgrammingKnowledgeGraph } from '../SemanticMemory'
 describe('Geospatial & GIS Knowledge', () => {
   let brain: LocalBrain
 
-  beforeAll(() => { brain = new LocalBrain({ enableIntelligence: true }) })
+  beforeAll(() => {
+    brain = new LocalBrain({ enableIntelligence: true })
+  })
 
   // ── KB entry tests ──────────────────────────────────────────────────
   it('knows about web mapping libraries', async () => {
-    const r = await brain.chat('explain leaflet mapbox openlayers interactive web map tiles cesium deck gl')
+    const r = await brain.chat(
+      'explain leaflet mapbox openlayers interactive web map tiles cesium deck gl',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/leaflet|mapbox|openlayers|tiles|cesium|map/)
   })
 
   it('knows about PostGIS spatial databases', async () => {
-    const r = await brain.chat('explain postgis spatial database geography geometry geojson topojson shapefile')
+    const r = await brain.chat(
+      'explain postgis spatial database geography geometry geojson topojson shapefile',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/postgis|spatial|geojson|geometry|shapefile/)
   })
 
   it('knows about geocoding and routing', async () => {
-    const r = await brain.chat('explain geocoding reverse geocoding address coordinates routing directions geofencing')
+    const r = await brain.chat(
+      'explain geocoding reverse geocoding address coordinates routing directions geofencing',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/geocod|routing|direction|geofenc|address|coordinates/)
   })
 
   it('knows about QGIS and remote sensing', async () => {
-    const r = await brain.chat('explain gis qgis arcgis desktop analysis remote sensing satellite imagery raster dem')
+    const r = await brain.chat(
+      'explain gis qgis arcgis desktop analysis remote sensing satellite imagery raster dem',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/qgis|arcgis|raster|remote\s+sens|dem|satellite/)
   })
 
   it('knows about Turf.js and H3', async () => {
-    const r = await brain.chat('explain turf js geospatial analysis javascript h3 uber hexagonal grid openstreetmap')
+    const r = await brain.chat(
+      'explain turf js geospatial analysis javascript h3 uber hexagonal grid openstreetmap',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/turf|h3|hexagonal|openstreetmap|geospatial/)
   })

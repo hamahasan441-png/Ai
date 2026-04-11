@@ -10,18 +10,28 @@ describe('MT4→MT5 Migration Knowledge', () => {
   })
 
   it('explains MT4 to MT5 conversion guide', async () => {
-    const r = await brain.chat('How to convert an EA from MT4 to MT5? What are the migration steps?')
-    expect(r.text.toLowerCase()).toMatch(/ordersend|ctrade|copybuffer|copyrates|netting|hedging|migration|convert/)
+    const r = await brain.chat(
+      'How to convert an EA from MT4 to MT5? What are the migration steps?',
+    )
+    expect(r.text.toLowerCase()).toMatch(
+      /ordersend|ctrade|copybuffer|copyrates|netting|hedging|migration|convert/,
+    )
   })
 
   it('covers MQL4 to MQL5 API function mapping', async () => {
     const r = await brain.chat('What are the MQL4 to MQL5 function mapping and API differences?')
-    expect(r.text.toLowerCase()).toMatch(/accountbalance|accountinfodouble|marketinfo|symbolinfodouble|mapping|mql[45]/)
+    expect(r.text.toLowerCase()).toMatch(
+      /accountbalance|accountinfodouble|marketinfo|symbolinfodouble|mapping|mql[45]/,
+    )
   })
 
   it('explains cross-platform MQL code with preprocessor', async () => {
-    const r = await brain.chat('How to write cross platform MQL4 MQL5 compatible code with wrapper functions?')
-    expect(r.text.toLowerCase()).toMatch(/#ifdef|__mql[45]__|wrapper|cross.platform|getbid|universal/)
+    const r = await brain.chat(
+      'How to write cross platform MQL4 MQL5 compatible code with wrapper functions?',
+    )
+    expect(r.text.toLowerCase()).toMatch(
+      /#ifdef|__mql[45]__|wrapper|cross.platform|getbid|universal/,
+    )
   })
 
   describe('Semantic Memory', () => {

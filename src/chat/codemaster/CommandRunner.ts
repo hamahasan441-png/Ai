@@ -105,7 +105,17 @@ export interface ParsedWarning {
 /** Detected project configuration. */
 export interface ProjectConfig {
   /** Detected package manager. */
-  packageManager: 'npm' | 'yarn' | 'pnpm' | 'bun' | 'pip' | 'cargo' | 'go' | 'maven' | 'gradle' | 'unknown'
+  packageManager:
+    | 'npm'
+    | 'yarn'
+    | 'pnpm'
+    | 'bun'
+    | 'pip'
+    | 'cargo'
+    | 'go'
+    | 'maven'
+    | 'gradle'
+    | 'unknown'
   /** Detected build tool. */
   buildTool: string
   /** Detected test runner. */
@@ -169,39 +179,39 @@ export interface CommandHistoryEntry {
 // ══════════════════════════════════════════════════════════════════════════════
 
 const DESTRUCTIVE_PATTERNS: RegExp[] = [
-  /\brm\s+-rf\s+[/~]/,         // rm -rf with root/home paths
-  /\brm\s+-rf\s+\*/,           // rm -rf *
-  /\bdd\s+if=/,                 // dd (disk destroyer)
-  /\bmkfs\b/,                   // format filesystem
-  /\bfdisk\b/,                  // partition editing
-  /\bshutdown\b/,               // shutdown system
-  /\breboot\b/,                 // reboot system
-  /\bchmod\s+-R\s+777/,        // insecure permissions
-  />\s*\/dev\/sd[a-z]/,        // write to raw disk
-  /\bcurl\b.*\|\s*(?:ba)?sh/,  // pipe curl to shell
-  /\bwget\b.*\|\s*(?:ba)?sh/,  // pipe wget to shell
+  /\brm\s+-rf\s+[/~]/, // rm -rf with root/home paths
+  /\brm\s+-rf\s+\*/, // rm -rf *
+  /\bdd\s+if=/, // dd (disk destroyer)
+  /\bmkfs\b/, // format filesystem
+  /\bfdisk\b/, // partition editing
+  /\bshutdown\b/, // shutdown system
+  /\breboot\b/, // reboot system
+  /\bchmod\s+-R\s+777/, // insecure permissions
+  />\s*\/dev\/sd[a-z]/, // write to raw disk
+  /\bcurl\b.*\|\s*(?:ba)?sh/, // pipe curl to shell
+  /\bwget\b.*\|\s*(?:ba)?sh/, // pipe wget to shell
 ]
 
 const DANGEROUS_PATTERNS: RegExp[] = [
-  /\brm\s+-rf\b/,              // any rm -rf
+  /\brm\s+-rf\b/, // any rm -rf
   /\bgit\s+push\s+.*--force\b/, // force push
-  /\bgit\s+reset\s+--hard\b/,  // hard reset
-  /\bdrop\s+database\b/i,      // drop database
-  /\bdrop\s+table\b/i,         // drop table
-  /\btruncate\s+table\b/i,     // truncate table
-  /\bnpm\s+publish\b/,         // publish to npm
+  /\bgit\s+reset\s+--hard\b/, // hard reset
+  /\bdrop\s+database\b/i, // drop database
+  /\bdrop\s+table\b/i, // drop table
+  /\btruncate\s+table\b/i, // truncate table
+  /\bnpm\s+publish\b/, // publish to npm
   /\bdocker\s+system\s+prune\b/, // docker prune
-  /\bkubectl\s+delete\b/,      // k8s delete
+  /\bkubectl\s+delete\b/, // k8s delete
 ]
 
 const MODERATE_PATTERNS: RegExp[] = [
-  /\bgit\s+push\b/,            // push
-  /\bgit\s+merge\b/,           // merge
-  /\bgit\s+rebase\b/,          // rebase
-  /\bnpm\s+install\b/,         // install (modifies node_modules)
-  /\bpip\s+install\b/,         // pip install
-  /\bdocker\s+build\b/,        // docker build
-  /\bdocker\s+run\b/,          // docker run
+  /\bgit\s+push\b/, // push
+  /\bgit\s+merge\b/, // merge
+  /\bgit\s+rebase\b/, // rebase
+  /\bnpm\s+install\b/, // install (modifies node_modules)
+  /\bpip\s+install\b/, // pip install
+  /\bdocker\s+build\b/, // docker build
+  /\bdocker\s+run\b/, // docker run
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -217,13 +227,33 @@ interface ErrorPattern {
 
 const ERROR_PATTERNS: ErrorPattern[] = [
   // TypeScript errors: src/file.ts(10,5): error TS2322
-  { pattern: /(.+?)\((\d+),(\d+)\):\s*error\s+TS\d+:\s*(.+)/g, type: 'typescript', extractFile: true, extractLine: true },
+  {
+    pattern: /(.+?)\((\d+),(\d+)\):\s*error\s+TS\d+:\s*(.+)/g,
+    type: 'typescript',
+    extractFile: true,
+    extractLine: true,
+  },
   // ESLint: /path/file.ts:10:5 error ...
-  { pattern: /(.+?):(\d+):(\d+)\s+error\s+(.+)/g, type: 'eslint', extractFile: true, extractLine: true },
+  {
+    pattern: /(.+?):(\d+):(\d+)\s+error\s+(.+)/g,
+    type: 'eslint',
+    extractFile: true,
+    extractLine: true,
+  },
   // Node.js errors: Error: message
-  { pattern: /^(?:Error|TypeError|ReferenceError|SyntaxError):\s*(.+)/gm, type: 'runtime', extractFile: false, extractLine: false },
+  {
+    pattern: /^(?:Error|TypeError|ReferenceError|SyntaxError):\s*(.+)/gm,
+    type: 'runtime',
+    extractFile: false,
+    extractLine: false,
+  },
   // Python errors: File "path", line N
-  { pattern: /File "(.+?)", line (\d+).*\n\s+(.+)\n(\w+Error:\s*.+)/g, type: 'python', extractFile: true, extractLine: true },
+  {
+    pattern: /File "(.+?)", line (\d+).*\n\s+(.+)\n(\w+Error:\s*.+)/g,
+    type: 'python',
+    extractFile: true,
+    extractLine: true,
+  },
   // Rust errors: error[E0308]: ...
   { pattern: /error\[E\d+\]:\s*(.+)/g, type: 'rust', extractFile: false, extractLine: false },
   // Go errors: ./file.go:10:5: ...
@@ -234,15 +264,30 @@ const ERROR_PATTERNS: ErrorPattern[] = [
 
 const WARNING_PATTERNS: ErrorPattern[] = [
   // ESLint warnings
-  { pattern: /(.+?):(\d+):(\d+)\s+warning\s+(.+)/g, type: 'eslint', extractFile: true, extractLine: true },
+  {
+    pattern: /(.+?):(\d+):(\d+)\s+warning\s+(.+)/g,
+    type: 'eslint',
+    extractFile: true,
+    extractLine: true,
+  },
   // TypeScript warnings (rare but possible)
-  { pattern: /(.+?)\((\d+),(\d+)\):\s*warning\s+(.+)/g, type: 'typescript', extractFile: true, extractLine: true },
+  {
+    pattern: /(.+?)\((\d+),(\d+)\):\s*warning\s+(.+)/g,
+    type: 'typescript',
+    extractFile: true,
+    extractLine: true,
+  },
   // Generic "warning:" pattern
   { pattern: /^warning:\s*(.+)/gim, type: 'generic', extractFile: false, extractLine: false },
   // npm WARN
   { pattern: /^npm (?:WARN|warn)\s+(.+)/gm, type: 'npm', extractFile: false, extractLine: false },
   // Deprecation warnings
-  { pattern: /(?:DeprecationWarning|deprecated):\s*(.+)/gi, type: 'deprecation', extractFile: false, extractLine: false },
+  {
+    pattern: /(?:DeprecationWarning|deprecated):\s*(.+)/gi,
+    type: 'deprecation',
+    extractFile: false,
+    extractLine: false,
+  },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -252,7 +297,7 @@ const WARNING_PATTERNS: ErrorPattern[] = [
 interface CommandTemplate {
   task: string
   keywords: string[]
-  commands: Record<string, string>  // packageManager → command
+  commands: Record<string, string> // packageManager → command
   category: CommandCategory
   risk: CommandRisk
   duration: number
@@ -262,7 +307,15 @@ const COMMAND_TEMPLATES: CommandTemplate[] = [
   {
     task: 'install dependencies',
     keywords: ['install', 'dependencies', 'deps', 'packages', 'node_modules'],
-    commands: { npm: 'npm install', yarn: 'yarn install', pnpm: 'pnpm install', bun: 'bun install', pip: 'pip install -r requirements.txt', cargo: 'cargo build', go: 'go mod download' },
+    commands: {
+      npm: 'npm install',
+      yarn: 'yarn install',
+      pnpm: 'pnpm install',
+      bun: 'bun install',
+      pip: 'pip install -r requirements.txt',
+      cargo: 'cargo build',
+      go: 'go mod download',
+    },
     category: 'install',
     risk: 'moderate',
     duration: 30,
@@ -270,7 +323,14 @@ const COMMAND_TEMPLATES: CommandTemplate[] = [
   {
     task: 'build project',
     keywords: ['build', 'compile', 'transpile', 'tsc'],
-    commands: { npm: 'npm run build', yarn: 'yarn build', pnpm: 'pnpm build', bun: 'bun run build', cargo: 'cargo build --release', go: 'go build ./...' },
+    commands: {
+      npm: 'npm run build',
+      yarn: 'yarn build',
+      pnpm: 'pnpm build',
+      bun: 'bun run build',
+      cargo: 'cargo build --release',
+      go: 'go build ./...',
+    },
     category: 'build',
     risk: 'safe',
     duration: 30,
@@ -278,7 +338,14 @@ const COMMAND_TEMPLATES: CommandTemplate[] = [
   {
     task: 'run tests',
     keywords: ['test', 'tests', 'spec', 'specs', 'unit test', 'vitest', 'jest'],
-    commands: { npm: 'npm test', yarn: 'yarn test', pnpm: 'pnpm test', cargo: 'cargo test', go: 'go test ./...', pip: 'pytest' },
+    commands: {
+      npm: 'npm test',
+      yarn: 'yarn test',
+      pnpm: 'pnpm test',
+      cargo: 'cargo test',
+      go: 'go test ./...',
+      pip: 'pytest',
+    },
     category: 'test',
     risk: 'safe',
     duration: 60,
@@ -286,7 +353,13 @@ const COMMAND_TEMPLATES: CommandTemplate[] = [
   {
     task: 'lint code',
     keywords: ['lint', 'eslint', 'linter', 'check style', 'code quality'],
-    commands: { npm: 'npm run lint', yarn: 'yarn lint', pnpm: 'pnpm lint', cargo: 'cargo clippy', go: 'golangci-lint run' },
+    commands: {
+      npm: 'npm run lint',
+      yarn: 'yarn lint',
+      pnpm: 'pnpm lint',
+      cargo: 'cargo clippy',
+      go: 'golangci-lint run',
+    },
     category: 'lint',
     risk: 'safe',
     duration: 15,
@@ -294,7 +367,12 @@ const COMMAND_TEMPLATES: CommandTemplate[] = [
   {
     task: 'format code',
     keywords: ['format', 'prettier', 'fmt', 'beautify', 'autoformat'],
-    commands: { npm: 'npx prettier --write .', yarn: 'yarn prettier --write .', cargo: 'cargo fmt', go: 'gofmt -w .' },
+    commands: {
+      npm: 'npx prettier --write .',
+      yarn: 'yarn prettier --write .',
+      cargo: 'cargo fmt',
+      go: 'gofmt -w .',
+    },
     category: 'format',
     risk: 'moderate',
     duration: 10,
@@ -310,7 +388,12 @@ const COMMAND_TEMPLATES: CommandTemplate[] = [
   {
     task: 'clean build artifacts',
     keywords: ['clean', 'clear', 'artifacts', 'dist', 'build clean'],
-    commands: { npm: 'rm -rf dist node_modules/.cache', yarn: 'rm -rf dist node_modules/.cache', cargo: 'cargo clean', go: 'go clean' },
+    commands: {
+      npm: 'rm -rf dist node_modules/.cache',
+      yarn: 'rm -rf dist node_modules/.cache',
+      cargo: 'cargo clean',
+      go: 'go clean',
+    },
     category: 'clean',
     risk: 'moderate',
     duration: 5,
@@ -326,7 +409,11 @@ const COMMAND_TEMPLATES: CommandTemplate[] = [
   {
     task: 'run database migrations',
     keywords: ['migrate', 'migration', 'database', 'db', 'schema'],
-    commands: { npm: 'npx prisma migrate dev', yarn: 'yarn prisma migrate dev', pip: 'alembic upgrade head' },
+    commands: {
+      npm: 'npx prisma migrate dev',
+      yarn: 'yarn prisma migrate dev',
+      pip: 'alembic upgrade head',
+    },
     category: 'migrate',
     risk: 'dangerous',
     duration: 15,
@@ -334,7 +421,13 @@ const COMMAND_TEMPLATES: CommandTemplate[] = [
   {
     task: 'git status',
     keywords: ['status', 'git status', 'changes', 'modified'],
-    commands: { npm: 'git status', yarn: 'git status', cargo: 'git status', go: 'git status', pip: 'git status' },
+    commands: {
+      npm: 'git status',
+      yarn: 'git status',
+      cargo: 'git status',
+      go: 'git status',
+      pip: 'git status',
+    },
     category: 'git',
     risk: 'safe',
     duration: 1,
@@ -342,7 +435,10 @@ const COMMAND_TEMPLATES: CommandTemplate[] = [
   {
     task: 'git commit',
     keywords: ['commit', 'save', 'checkpoint'],
-    commands: { npm: 'git add -A && git commit -m "update"', yarn: 'git add -A && git commit -m "update"' },
+    commands: {
+      npm: 'git add -A && git commit -m "update"',
+      yarn: 'git add -A && git commit -m "update"',
+    },
     category: 'git',
     risk: 'moderate',
     duration: 2,
@@ -434,7 +530,9 @@ export class CommandRunner {
     // Check for multiple chained commands with &&/||
     const chainedCount = (trimmed.match(/&&|\|\|/g) ?? []).length
     if (chainedCount > 5) {
-      issues.push(`Complex command chain with ${chainedCount + 1} parts — consider breaking into steps`)
+      issues.push(
+        `Complex command chain with ${chainedCount + 1} parts — consider breaking into steps`,
+      )
     }
 
     return { safe: issues.length === 0, issues }
@@ -443,10 +541,7 @@ export class CommandRunner {
   /**
    * Suggest commands for a given task description.
    */
-  suggestCommands(
-    taskDescription: string,
-    config?: Partial<ProjectConfig>,
-  ): SuggestedCommand[] {
+  suggestCommands(taskDescription: string, config?: Partial<ProjectConfig>): SuggestedCommand[] {
     const lower = taskDescription.toLowerCase()
     const pm = config?.packageManager ?? 'npm'
     const suggestions: SuggestedCommand[] = []
@@ -466,17 +561,25 @@ export class CommandRunner {
         shell: 'bash',
         requiresConfirmation: template.risk !== 'safe',
         estimatedDuration: template.duration,
-        prerequisites: template.category === 'test' ? ['Dependencies installed'] :
-                       template.category === 'build' ? ['Dependencies installed'] : [],
+        prerequisites:
+          template.category === 'test'
+            ? ['Dependencies installed']
+            : template.category === 'build'
+              ? ['Dependencies installed']
+              : [],
       })
     }
 
     // Sort by match relevance (more keyword matches first)
     suggestions.sort((a, b) => {
-      const aScore = COMMAND_TEMPLATES.find(t => t.commands[pm] === a.command || t.commands['npm'] === a.command)
-        ?.keywords.filter(kw => lower.includes(kw)).length ?? 0
-      const bScore = COMMAND_TEMPLATES.find(t => t.commands[pm] === b.command || t.commands['npm'] === b.command)
-        ?.keywords.filter(kw => lower.includes(kw)).length ?? 0
+      const aScore =
+        COMMAND_TEMPLATES.find(
+          t => t.commands[pm] === a.command || t.commands['npm'] === a.command,
+        )?.keywords.filter(kw => lower.includes(kw)).length ?? 0
+      const bScore =
+        COMMAND_TEMPLATES.find(
+          t => t.commands[pm] === b.command || t.commands['npm'] === b.command,
+        )?.keywords.filter(kw => lower.includes(kw)).length ?? 0
       return bScore - aScore
     })
 
@@ -534,7 +637,10 @@ export class CommandRunner {
     // Suggest fixes for common errors
     const suggestedFixes: string[] = []
     for (const error of errors) {
-      if (error.message.includes('Cannot find module') || error.message.includes('cannot find module')) {
+      if (
+        error.message.includes('Cannot find module') ||
+        error.message.includes('cannot find module')
+      ) {
         suggestedFixes.push('npm install')
       }
       if (error.message.includes('ENOENT') || error.message.includes('not found')) {
@@ -571,17 +677,25 @@ export class CommandRunner {
     else if (fileSet.has('pnpm-lock.yaml') || fileSet.has('.pnpmfile.cjs')) packageManager = 'pnpm'
     else if (fileSet.has('yarn.lock')) packageManager = 'yarn'
     else if (fileSet.has('package-lock.json') || fileSet.has('package.json')) packageManager = 'npm'
-    else if (fileSet.has('requirements.txt') || fileSet.has('setup.py') || fileSet.has('pyproject.toml')) packageManager = 'pip'
+    else if (
+      fileSet.has('requirements.txt') ||
+      fileSet.has('setup.py') ||
+      fileSet.has('pyproject.toml')
+    )
+      packageManager = 'pip'
     else if (fileSet.has('cargo.toml')) packageManager = 'cargo'
     else if (fileSet.has('go.mod')) packageManager = 'go'
     else if (fileSet.has('pom.xml')) packageManager = 'maven'
-    else if (fileSet.has('build.gradle') || fileSet.has('build.gradle.kts')) packageManager = 'gradle'
+    else if (fileSet.has('build.gradle') || fileSet.has('build.gradle.kts'))
+      packageManager = 'gradle'
 
     // Build tool
     let buildTool = 'unknown'
     if (fileSet.has('vite.config.ts') || fileSet.has('vite.config.js')) buildTool = 'vite'
-    else if (fileSet.has('webpack.config.js') || fileSet.has('webpack.config.ts')) buildTool = 'webpack'
-    else if (fileSet.has('rollup.config.js') || fileSet.has('rollup.config.mjs')) buildTool = 'rollup'
+    else if (fileSet.has('webpack.config.js') || fileSet.has('webpack.config.ts'))
+      buildTool = 'webpack'
+    else if (fileSet.has('rollup.config.js') || fileSet.has('rollup.config.mjs'))
+      buildTool = 'rollup'
     else if (fileSet.has('tsconfig.json')) buildTool = 'tsc'
     else if (fileSet.has('cargo.toml')) buildTool = 'cargo'
     else if (fileSet.has('makefile')) buildTool = 'make'
@@ -595,13 +709,24 @@ export class CommandRunner {
 
     // Linter
     let linter = 'unknown'
-    if (fileSet.has('.eslintrc.js') || fileSet.has('.eslintrc.json') || fileSet.has('eslint.config.js') || fileSet.has('eslint.config.mjs')) linter = 'eslint'
+    if (
+      fileSet.has('.eslintrc.js') ||
+      fileSet.has('.eslintrc.json') ||
+      fileSet.has('eslint.config.js') ||
+      fileSet.has('eslint.config.mjs')
+    )
+      linter = 'eslint'
     else if (fileSet.has('.pylintrc') || fileSet.has('setup.cfg')) linter = 'pylint'
     else if (fileSet.has('.rubocop.yml')) linter = 'rubocop'
 
     // Formatter
     let formatter = 'unknown'
-    if (fileSet.has('.prettierrc') || fileSet.has('.prettierrc.json') || fileSet.has('prettier.config.js')) formatter = 'prettier'
+    if (
+      fileSet.has('.prettierrc') ||
+      fileSet.has('.prettierrc.json') ||
+      fileSet.has('prettier.config.js')
+    )
+      formatter = 'prettier'
     else if (fileSet.has('.editorconfig')) formatter = 'editorconfig'
 
     return {
@@ -612,18 +737,21 @@ export class CommandRunner {
       formatter,
       scripts,
       hasTypeScript: fileSet.has('tsconfig.json'),
-      hasDocker: fileSet.has('dockerfile') || fileSet.has('docker-compose.yml') || fileSet.has('docker-compose.yaml'),
-      hasCi: fileSet.has('.github/workflows') || fileSet.has('.gitlab-ci.yml') || fileSet.has('jenkinsfile'),
+      hasDocker:
+        fileSet.has('dockerfile') ||
+        fileSet.has('docker-compose.yml') ||
+        fileSet.has('docker-compose.yaml'),
+      hasCi:
+        fileSet.has('.github/workflows') ||
+        fileSet.has('.gitlab-ci.yml') ||
+        fileSet.has('jenkinsfile'),
     }
   }
 
   /**
    * Generate a multi-step command sequence for a complex task.
    */
-  generateSequence(
-    task: string,
-    config?: Partial<ProjectConfig>,
-  ): CommandSequence {
+  generateSequence(task: string, config?: Partial<ProjectConfig>): CommandSequence {
     const lower = task.toLowerCase()
     const pm = config?.packageManager ?? 'npm'
     const steps: SequenceStep[] = []
@@ -631,34 +759,109 @@ export class CommandRunner {
 
     // Full setup from scratch
     if (lower.includes('setup') || lower.includes('from scratch') || lower.includes('initialize')) {
-      steps.push({ step: ++stepNum, command: this.getInstallCmd(pm), description: 'Install dependencies', continueOnError: false })
+      steps.push({
+        step: ++stepNum,
+        command: this.getInstallCmd(pm),
+        description: 'Install dependencies',
+        continueOnError: false,
+      })
       if (config?.hasTypeScript) {
-        steps.push({ step: ++stepNum, command: this.getBuildCmd(pm), description: 'Build TypeScript', continueOnError: false })
+        steps.push({
+          step: ++stepNum,
+          command: this.getBuildCmd(pm),
+          description: 'Build TypeScript',
+          continueOnError: false,
+        })
       }
-      steps.push({ step: ++stepNum, command: this.getLintCmd(pm), description: 'Lint code', continueOnError: true })
-      steps.push({ step: ++stepNum, command: this.getTestCmd(pm), description: 'Run tests', continueOnError: false })
+      steps.push({
+        step: ++stepNum,
+        command: this.getLintCmd(pm),
+        description: 'Lint code',
+        continueOnError: true,
+      })
+      steps.push({
+        step: ++stepNum,
+        command: this.getTestCmd(pm),
+        description: 'Run tests',
+        continueOnError: false,
+      })
     }
     // Deploy sequence
     else if (lower.includes('deploy') || lower.includes('release') || lower.includes('publish')) {
-      steps.push({ step: ++stepNum, command: this.getInstallCmd(pm), description: 'Install dependencies', continueOnError: false })
-      steps.push({ step: ++stepNum, command: this.getLintCmd(pm), description: 'Lint code', continueOnError: false })
-      steps.push({ step: ++stepNum, command: this.getTestCmd(pm), description: 'Run tests', continueOnError: false })
-      steps.push({ step: ++stepNum, command: this.getBuildCmd(pm), description: 'Build for production', continueOnError: false })
+      steps.push({
+        step: ++stepNum,
+        command: this.getInstallCmd(pm),
+        description: 'Install dependencies',
+        continueOnError: false,
+      })
+      steps.push({
+        step: ++stepNum,
+        command: this.getLintCmd(pm),
+        description: 'Lint code',
+        continueOnError: false,
+      })
+      steps.push({
+        step: ++stepNum,
+        command: this.getTestCmd(pm),
+        description: 'Run tests',
+        continueOnError: false,
+      })
+      steps.push({
+        step: ++stepNum,
+        command: this.getBuildCmd(pm),
+        description: 'Build for production',
+        continueOnError: false,
+      })
     }
     // CI pipeline
     else if (lower.includes('ci') || lower.includes('pipeline') || lower.includes('continuous')) {
-      steps.push({ step: ++stepNum, command: this.getInstallCmd(pm), description: 'Install dependencies', continueOnError: false })
-      steps.push({ step: ++stepNum, command: this.getLintCmd(pm), description: 'Lint', continueOnError: false })
+      steps.push({
+        step: ++stepNum,
+        command: this.getInstallCmd(pm),
+        description: 'Install dependencies',
+        continueOnError: false,
+      })
+      steps.push({
+        step: ++stepNum,
+        command: this.getLintCmd(pm),
+        description: 'Lint',
+        continueOnError: false,
+      })
       if (config?.hasTypeScript) {
-        steps.push({ step: ++stepNum, command: `${pm === 'npm' ? 'npx' : pm} tsc --noEmit`, description: 'Type check', continueOnError: false })
+        steps.push({
+          step: ++stepNum,
+          command: `${pm === 'npm' ? 'npx' : pm} tsc --noEmit`,
+          description: 'Type check',
+          continueOnError: false,
+        })
       }
-      steps.push({ step: ++stepNum, command: this.getTestCmd(pm), description: 'Tests', continueOnError: false })
-      steps.push({ step: ++stepNum, command: this.getBuildCmd(pm), description: 'Build', continueOnError: false })
+      steps.push({
+        step: ++stepNum,
+        command: this.getTestCmd(pm),
+        description: 'Tests',
+        continueOnError: false,
+      })
+      steps.push({
+        step: ++stepNum,
+        command: this.getBuildCmd(pm),
+        description: 'Build',
+        continueOnError: false,
+      })
     }
     // Default: build and test
     else {
-      steps.push({ step: ++stepNum, command: this.getBuildCmd(pm), description: 'Build', continueOnError: false })
-      steps.push({ step: ++stepNum, command: this.getTestCmd(pm), description: 'Test', continueOnError: false })
+      steps.push({
+        step: ++stepNum,
+        command: this.getBuildCmd(pm),
+        description: 'Build',
+        continueOnError: false,
+      })
+      steps.push({
+        step: ++stepNum,
+        command: this.getTestCmd(pm),
+        description: 'Test',
+        continueOnError: false,
+      })
     }
 
     const risk = steps.some(s => !s.continueOnError) ? 'moderate' : 'safe'
@@ -700,7 +903,12 @@ export class CommandRunner {
   /**
    * Get history statistics.
    */
-  getHistoryStats(): { total: number; succeeded: number; failed: number; byCategory: Record<string, number> } {
+  getHistoryStats(): {
+    total: number
+    succeeded: number
+    failed: number
+    byCategory: Record<string, number>
+  } {
     const byCategory: Record<string, number> = {}
     let succeeded = 0
     let failed = 0
@@ -724,22 +932,50 @@ export class CommandRunner {
   // ── Private helpers ──
 
   private getInstallCmd(pm: string): string {
-    const cmds: Record<string, string> = { npm: 'npm install', yarn: 'yarn install', pnpm: 'pnpm install', bun: 'bun install', pip: 'pip install -r requirements.txt', cargo: 'cargo build', go: 'go mod download' }
+    const cmds: Record<string, string> = {
+      npm: 'npm install',
+      yarn: 'yarn install',
+      pnpm: 'pnpm install',
+      bun: 'bun install',
+      pip: 'pip install -r requirements.txt',
+      cargo: 'cargo build',
+      go: 'go mod download',
+    }
     return cmds[pm] ?? 'npm install'
   }
 
   private getBuildCmd(pm: string): string {
-    const cmds: Record<string, string> = { npm: 'npm run build', yarn: 'yarn build', pnpm: 'pnpm build', bun: 'bun run build', cargo: 'cargo build --release', go: 'go build ./...' }
+    const cmds: Record<string, string> = {
+      npm: 'npm run build',
+      yarn: 'yarn build',
+      pnpm: 'pnpm build',
+      bun: 'bun run build',
+      cargo: 'cargo build --release',
+      go: 'go build ./...',
+    }
     return cmds[pm] ?? 'npm run build'
   }
 
   private getTestCmd(pm: string): string {
-    const cmds: Record<string, string> = { npm: 'npm test', yarn: 'yarn test', pnpm: 'pnpm test', cargo: 'cargo test', go: 'go test ./...', pip: 'pytest' }
+    const cmds: Record<string, string> = {
+      npm: 'npm test',
+      yarn: 'yarn test',
+      pnpm: 'pnpm test',
+      cargo: 'cargo test',
+      go: 'go test ./...',
+      pip: 'pytest',
+    }
     return cmds[pm] ?? 'npm test'
   }
 
   private getLintCmd(pm: string): string {
-    const cmds: Record<string, string> = { npm: 'npm run lint', yarn: 'yarn lint', pnpm: 'pnpm lint', cargo: 'cargo clippy', go: 'golangci-lint run' }
+    const cmds: Record<string, string> = {
+      npm: 'npm run lint',
+      yarn: 'yarn lint',
+      pnpm: 'pnpm lint',
+      cargo: 'cargo clippy',
+      go: 'golangci-lint run',
+    }
     return cmds[pm] ?? 'npm run lint'
   }
 }

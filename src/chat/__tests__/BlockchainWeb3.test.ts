@@ -19,12 +19,16 @@ describe('Blockchain & Web3 Knowledge', () => {
     })
 
     it('describes ERC token standards', async () => {
-      const r = await brain.chat('What are the ERC-20 and ERC-721 token standards for Solidity contracts?')
+      const r = await brain.chat(
+        'What are the ERC-20 and ERC-721 token standards for Solidity contracts?',
+      )
       expect(r.text.toLowerCase()).toMatch(/erc-?20|erc-?721|token|openzeppelin|standard|fungible/)
     })
 
     it('covers Hardhat and Foundry development tools', async () => {
-      const r = await brain.chat('How to use Hardhat and Foundry forge for Solidity contract testing and deployment?')
+      const r = await brain.chat(
+        'How to use Hardhat and Foundry forge for Solidity contract testing and deployment?',
+      )
       expect(r.text.toLowerCase()).toMatch(/hardhat|foundry|forge|test|deploy|compil/)
     })
 
@@ -38,7 +42,9 @@ describe('Blockchain & Web3 Knowledge', () => {
 
   describe('DeFi Protocols', () => {
     it('explains decentralized exchange AMM mechanics', async () => {
-      const r = await brain.chat('How does a DeFi decentralized exchange AMM with liquidity pools work?')
+      const r = await brain.chat(
+        'How does a DeFi decentralized exchange AMM with liquidity pools work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/defi|dex|amm|liquidity|pool|swap|uniswap/)
     })
@@ -49,7 +55,9 @@ describe('Blockchain & Web3 Knowledge', () => {
     })
 
     it('covers yield farming and impermanent loss', async () => {
-      const r = await brain.chat('What is DeFi yield farming and impermanent loss in liquidity pools?')
+      const r = await brain.chat(
+        'What is DeFi yield farming and impermanent loss in liquidity pools?',
+      )
       expect(r.text.toLowerCase()).toMatch(/yield\s*farm|impermanent\s*loss|liquidity|pool|reward/)
     })
   })
@@ -58,18 +66,24 @@ describe('Blockchain & Web3 Knowledge', () => {
 
   describe('Web3 DApp Development', () => {
     it('explains ethers.js and wallet integration', async () => {
-      const r = await brain.chat('How does Web3 DApp development with ethers.js and MetaMask wallet connection work?')
+      const r = await brain.chat(
+        'How does Web3 DApp development with ethers.js and MetaMask wallet connection work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/web3|ethers|metamask|wallet|connect|signer|provider/)
     })
 
     it('describes IPFS and decentralized storage', async () => {
-      const r = await brain.chat('How does Web3 DApp development use IPFS for decentralized storage?')
+      const r = await brain.chat(
+        'How does Web3 DApp development use IPFS for decentralized storage?',
+      )
       expect(r.text.toLowerCase()).toMatch(/ipfs|decentral|storage|pin|metadata|cid/)
     })
 
     it('covers wagmi hooks for React Web3', async () => {
-      const r = await brain.chat('How do wagmi hooks work for React Web3 DApp frontend development?')
+      const r = await brain.chat(
+        'How do wagmi hooks work for React Web3 DApp frontend development?',
+      )
       expect(r.text.toLowerCase()).toMatch(/wagmi|hook|react|connect|contract|wallet|web3/)
     })
   })
@@ -78,19 +92,27 @@ describe('Blockchain & Web3 Knowledge', () => {
 
   describe('Smart Contract Security', () => {
     it('explains reentrancy vulnerability and prevention', async () => {
-      const r = await brain.chat('What is the smart contract security reentrancy vulnerability and how to prevent it?')
+      const r = await brain.chat(
+        'What is the smart contract security reentrancy vulnerability and how to prevent it?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/reentr|vulnerab|check|effect|interact|guard|dao/)
     })
 
     it('describes audit tools and formal verification', async () => {
-      const r = await brain.chat('What smart contract security audit tools exist like Slither and Mythril?')
+      const r = await brain.chat(
+        'What smart contract security audit tools exist like Slither and Mythril?',
+      )
       expect(r.text.toLowerCase()).toMatch(/audit|slither|mythril|echidna|security|vulnerab|formal/)
     })
 
     it('covers common smart contract vulnerabilities', async () => {
-      const r = await brain.chat('What are common Solidity smart contract security vulnerabilities?')
-      expect(r.text.toLowerCase()).toMatch(/vulnerab|reentr|overflow|access\s*control|front-?run|oracle/)
+      const r = await brain.chat(
+        'What are common Solidity smart contract security vulnerabilities?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /vulnerab|reentr|overflow|access\s*control|front-?run|oracle/,
+      )
     })
   })
 
@@ -98,7 +120,9 @@ describe('Blockchain & Web3 Knowledge', () => {
 
   describe('NFT Development', () => {
     it('explains NFT minting and token standards', async () => {
-      const r = await brain.chat('How does NFT smart contract minting with ERC-721 and ERC-1155 work?')
+      const r = await brain.chat(
+        'How does NFT smart contract minting with ERC-721 and ERC-1155 work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/nft|erc-?721|erc-?1155|mint|token|metadata/)
     })
@@ -113,13 +137,17 @@ describe('Blockchain & Web3 Knowledge', () => {
 
   describe('Layer 2 Scaling', () => {
     it('explains optimistic and zk rollups', async () => {
-      const r = await brain.chat('How do Layer 2 scaling solutions like optimistic rollups and zk-rollups work?')
+      const r = await brain.chat(
+        'How do Layer 2 scaling solutions like optimistic rollups and zk-rollups work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/layer\s*2|rollup|optimistic|zk|scaling|proof|l1/)
     })
 
     it('describes Arbitrum, Optimism, and zkSync', async () => {
-      const r = await brain.chat('How do Layer 2 scaling solutions Arbitrum, Optimism, and zkSync compare?')
+      const r = await brain.chat(
+        'How do Layer 2 scaling solutions Arbitrum, Optimism, and zkSync compare?',
+      )
       expect(r.text.toLowerCase()).toMatch(/arbitrum|optimism|zksync|layer\s*2|rollup|scaling/)
     })
   })

@@ -1,18 +1,12 @@
 import type { RenderableMessage } from '../types/message.js'
-import {
-  INTERRUPT_MESSAGE,
-  INTERRUPT_MESSAGE_FOR_TOOL_USE,
-} from './messages.js'
+import { INTERRUPT_MESSAGE, INTERRUPT_MESSAGE_FOR_TOOL_USE } from './messages.js'
 
 const SYSTEM_REMINDER_CLOSE = '</system-reminder>'
 
 // UserTextMessage.tsx:~84 replaces these with <InterruptedByUser />
 // (renders 'Interrupted · /issue...'). Raw text never appears on screen;
 // searching it yields phantom matches — /terr → in[terr]upted.
-const RENDERED_AS_SENTINEL = new Set([
-  INTERRUPT_MESSAGE,
-  INTERRUPT_MESSAGE_FOR_TOOL_USE,
-])
+const RENDERED_AS_SENTINEL = new Set([INTERRUPT_MESSAGE, INTERRUPT_MESSAGE_FOR_TOOL_USE])
 
 const searchTextCache = new WeakMap<RenderableMessage, string>()
 
@@ -95,9 +89,7 @@ function computeSearchText(msg: RenderableMessage): string {
       ) {
         const p = msg.attachment.prompt
         raw =
-          typeof p === 'string'
-            ? p
-            : p.flatMap(b => (b.type === 'text' ? [b.text] : [])).join('\n')
+          typeof p === 'string' ? p : p.flatMap(b => (b.type === 'text' ? [b.text] : [])).join('\n')
       }
       break
     }

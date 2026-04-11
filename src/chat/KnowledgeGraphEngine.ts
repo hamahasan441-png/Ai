@@ -22,12 +22,33 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type EntityType = 'concept' | 'person' | 'organization' | 'event' | 'location' | 'artifact' | 'process' | 'property' | 'custom'
+export type EntityType =
+  | 'concept'
+  | 'person'
+  | 'organization'
+  | 'event'
+  | 'location'
+  | 'artifact'
+  | 'process'
+  | 'property'
+  | 'custom'
 
 export type RelationType =
-  | 'is_a' | 'part_of' | 'has_property' | 'causes' | 'related_to'
-  | 'depends_on' | 'created_by' | 'used_for' | 'located_in' | 'preceded_by'
-  | 'followed_by' | 'similar_to' | 'opposite_of' | 'instance_of' | 'custom'
+  | 'is_a'
+  | 'part_of'
+  | 'has_property'
+  | 'causes'
+  | 'related_to'
+  | 'depends_on'
+  | 'created_by'
+  | 'used_for'
+  | 'located_in'
+  | 'preceded_by'
+  | 'followed_by'
+  | 'similar_to'
+  | 'opposite_of'
+  | 'instance_of'
+  | 'custom'
 
 export interface KGEntity {
   readonly id: string
@@ -64,9 +85,9 @@ export interface Subgraph {
 }
 
 export interface TripleQuery {
-  readonly subject?: string    // entity id or name
+  readonly subject?: string // entity id or name
   readonly predicate?: RelationType
-  readonly object?: string     // entity id or name
+  readonly object?: string // entity id or name
 }
 
 export interface TripleResult {
@@ -161,7 +182,12 @@ export class KnowledgeGraphEngine {
 
   // ── Entity operations ────────────────────────────────────────────────
 
-  addEntity(name: string, type: EntityType, properties: Record<string, string> = {}, aliases: string[] = []): KGEntity {
+  addEntity(
+    name: string,
+    type: EntityType,
+    properties: Record<string, string> = {},
+    aliases: string[] = [],
+  ): KGEntity {
     const entity: KGEntity = {
       id: kgId('ent'),
       name,
@@ -182,9 +208,10 @@ export class KnowledgeGraphEngine {
 
   findEntitiesByName(name: string): KGEntity[] {
     const lower = name.toLowerCase()
-    return [...this.entities.values()].filter(e =>
-      e.name.toLowerCase().includes(lower) ||
-      e.aliases.some(a => a.toLowerCase().includes(lower))
+    return [...this.entities.values()].filter(
+      e =>
+        e.name.toLowerCase().includes(lower) ||
+        e.aliases.some(a => a.toLowerCase().includes(lower)),
     )
   }
 
@@ -207,7 +234,15 @@ export class KnowledgeGraphEngine {
 
   // ── Relation operations ──────────────────────────────────────────────
 
-  addRelation(sourceId: string, targetId: string, type: RelationType, label: string = '', weight: number = 1, bidirectional: boolean = false, properties: Record<string, string> = {}): KGRelation | null {
+  addRelation(
+    sourceId: string,
+    targetId: string,
+    type: RelationType,
+    label: string = '',
+    weight: number = 1,
+    bidirectional: boolean = false,
+    properties: Record<string, string> = {},
+  ): KGRelation | null {
     if (!this.entities.has(sourceId) || !this.entities.has(targetId)) return null
     const relation: KGRelation = {
       id: kgId('rel'),
@@ -269,9 +304,19 @@ export class KnowledgeGraphEngine {
       const tgtEntity = this.entities.get(rel.targetId)
       if (!srcEntity || !tgtEntity) continue
 
-      if (query.subject && srcEntity.id !== query.subject && srcEntity.name.toLowerCase() !== query.subject.toLowerCase()) continue
+      if (
+        query.subject &&
+        srcEntity.id !== query.subject &&
+        srcEntity.name.toLowerCase() !== query.subject.toLowerCase()
+      )
+        continue
       if (query.predicate && rel.type !== query.predicate) continue
-      if (query.object && tgtEntity.id !== query.object && tgtEntity.name.toLowerCase() !== query.object.toLowerCase()) continue
+      if (
+        query.object &&
+        tgtEntity.id !== query.object &&
+        tgtEntity.name.toLowerCase() !== query.object.toLowerCase()
+      )
+        continue
 
       results.push({ subject: srcEntity, predicate: rel.type, object: tgtEntity, relation: rel })
     }
@@ -308,11 +353,12 @@ export class KnowledgeGraphEngine {
   shortestPath(startId: string, endId: string): GraphPath | null {
     this.stats.totalTraversals++
     if (!this.entities.has(startId) || !this.entities.has(endId)) return null
-    if (startId === endId) return { entityIds: [startId], relationIds: [], totalWeight: 0, length: 0 }
+    if (startId === endId)
+      return { entityIds: [startId], relationIds: [], totalWeight: 0, length: 0 }
 
     const visited = new Set<string>([startId])
     const queue: Array<{ id: string; path: string[]; relPath: string[]; weight: number }> = [
-      { id: startId, path: [startId], relPath: [], weight: 0 }
+      { id: startId, path: [startId], relPath: [], weight: 0 },
     ]
 
     while (queue.length > 0) {
@@ -330,7 +376,12 @@ export class KnowledgeGraphEngine {
         const newWeight = current.weight + rel.weight
 
         if (next === endId) {
-          return { entityIds: newPath, relationIds: newRelPath, totalWeight: newWeight, length: newPath.length - 1 }
+          return {
+            entityIds: newPath,
+            relationIds: newRelPath,
+            totalWeight: newWeight,
+            length: newPath.length - 1,
+          }
         }
 
         visited.add(next)
@@ -430,8 +481,8 @@ export class KnowledgeGraphEngine {
     const rels2 = this.getRelationsOf(entityId2)
 
     // Shared relation targets
-    const targets1 = new Set(rels1.map(r => r.sourceId === entityId1 ? r.targetId : r.sourceId))
-    const targets2 = new Set(rels2.map(r => r.sourceId === entityId2 ? r.targetId : r.sourceId))
+    const targets1 = new Set(rels1.map(r => (r.sourceId === entityId1 ? r.targetId : r.sourceId)))
+    const targets2 = new Set(rels2.map(r => (r.sourceId === entityId2 ? r.targetId : r.sourceId)))
     const sharedRelations: string[] = []
     for (const t of targets1) {
       if (targets2.has(t)) sharedRelations.push(t)
@@ -464,7 +515,8 @@ export class KnowledgeGraphEngine {
     }
     const degreeValues = [...degrees.values()]
     const maxDegree = degreeValues.length > 0 ? Math.max(...degreeValues) : 0
-    const avgDegree = degreeValues.length > 0 ? degreeValues.reduce((a, b) => a + b, 0) / degreeValues.length : 0
+    const avgDegree =
+      degreeValues.length > 0 ? degreeValues.reduce((a, b) => a + b, 0) / degreeValues.length : 0
 
     // Simple component count via BFS
     const visited = new Set<string>()
@@ -477,7 +529,10 @@ export class KnowledgeGraphEngine {
           const cur = q.pop()!
           if (visited.has(cur)) continue
           visited.add(cur)
-          for (const relId of [...(this.outEdges.get(cur) ?? []), ...(this.inEdges.get(cur) ?? [])]) {
+          for (const relId of [
+            ...(this.outEdges.get(cur) ?? []),
+            ...(this.inEdges.get(cur) ?? []),
+          ]) {
             const rel = this.relations.get(relId)
             if (rel) {
               const neighbor = rel.sourceId === cur ? rel.targetId : rel.sourceId
@@ -537,7 +592,10 @@ export class KnowledgeGraphEngine {
     })
   }
 
-  static deserialize(json: string, config?: Partial<KnowledgeGraphEngineConfig>): KnowledgeGraphEngine {
+  static deserialize(
+    json: string,
+    config?: Partial<KnowledgeGraphEngineConfig>,
+  ): KnowledgeGraphEngine {
     const engine = new KnowledgeGraphEngine(config)
     const data = JSON.parse(json)
     for (const e of data.entities ?? []) {

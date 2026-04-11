@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  IntelligentRefactorer,
-  type RefactoringSuggestion,
-} from '../IntelligentRefactorer.js'
+import { IntelligentRefactorer, type RefactoringSuggestion } from '../IntelligentRefactorer.js'
 
 describe('IntelligentRefactorer', () => {
   let refactorer: IntelligentRefactorer
@@ -58,7 +55,8 @@ describe('IntelligentRefactorer', () => {
     })
 
     it('should detect snake_case in camelCase codebase', () => {
-      const code = 'const user_name = "test"\nconst userName = "test2"\nconst userAge = 25\nconst userEmail = "a"'
+      const code =
+        'const user_name = "test"\nconst userName = "test2"\nconst userAge = 25\nconst userEmail = "a"'
       const renames = refactorer.suggestRenames(code)
       const snake = renames.find(r => r.oldName === 'user_name')
       expect(snake).toBeDefined()
@@ -127,8 +125,10 @@ describe('IntelligentRefactorer', () => {
 
   describe('findDuplicates', () => {
     it('should find duplicate code blocks', () => {
-      const block = Array.from({ length: 6 }, (_, i) =>
-        `  const result${i} = processData(input${i}, options${i}, config${i}, params${i})`
+      const block = Array.from(
+        { length: 6 },
+        (_, i) =>
+          `  const result${i} = processData(input${i}, options${i}, config${i}, params${i})`,
       ).join('\n')
       const code = `function a() {\n${block}\n}\n\nfunction b() {\n${block}\n}`
       const dups = refactorer.findDuplicates(code)
@@ -147,14 +147,18 @@ describe('IntelligentRefactorer', () => {
 
   describe('suggestDecomposition', () => {
     it('should detect deep nesting', () => {
-      const code = 'function f() {\n  if (a) {\n    if (b) {\n      if (c) {\n        if (d) {\n          doSomething()\n        }\n      }\n    }\n  }\n}'
+      const code =
+        'function f() {\n  if (a) {\n    if (b) {\n      if (c) {\n        if (d) {\n          doSomething()\n        }\n      }\n    }\n  }\n}'
       const suggestions = refactorer.suggestDecomposition(code)
       const deep = suggestions.find(s => s.description.includes('nesting'))
       expect(deep).toBeDefined()
     })
 
     it('should detect long if/else chains', () => {
-      const conditions = Array.from({ length: 6 }, (_, i) => `  if (x === ${i}) {\n    return ${i}\n  } else`).join('\n')
+      const conditions = Array.from(
+        { length: 6 },
+        (_, i) => `  if (x === ${i}) {\n    return ${i}\n  } else`,
+      ).join('\n')
       const code = `function f(x: number) {\n${conditions}\n  { return -1 }\n}`
       const suggestions = refactorer.suggestDecomposition(code)
       expect(suggestions.length).toBeGreaterThanOrEqual(0)
@@ -271,15 +275,35 @@ describe('IntelligentRefactorer', () => {
     })
 
     it('should weight by impact level', () => {
-      const lowSuggestions: RefactoringSuggestion[] = [{
-        type: 'rename_symbol', description: '', confidence: 1, impact: 'low',
-        startLine: 0, endLine: 0, originalCode: '', suggestedCode: '', rationale: '',
-      }]
-      const highSuggestions: RefactoringSuggestion[] = [{
-        type: 'extract_method', description: '', confidence: 1, impact: 'high',
-        startLine: 0, endLine: 0, originalCode: '', suggestedCode: '', rationale: '',
-      }]
-      expect(refactorer.estimateImpact(highSuggestions)).toBeGreaterThan(refactorer.estimateImpact(lowSuggestions))
+      const lowSuggestions: RefactoringSuggestion[] = [
+        {
+          type: 'rename_symbol',
+          description: '',
+          confidence: 1,
+          impact: 'low',
+          startLine: 0,
+          endLine: 0,
+          originalCode: '',
+          suggestedCode: '',
+          rationale: '',
+        },
+      ]
+      const highSuggestions: RefactoringSuggestion[] = [
+        {
+          type: 'extract_method',
+          description: '',
+          confidence: 1,
+          impact: 'high',
+          startLine: 0,
+          endLine: 0,
+          originalCode: '',
+          suggestedCode: '',
+          rationale: '',
+        },
+      ]
+      expect(refactorer.estimateImpact(highSuggestions)).toBeGreaterThan(
+        refactorer.estimateImpact(lowSuggestions),
+      )
     })
   })
 

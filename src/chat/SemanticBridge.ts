@@ -153,12 +153,15 @@ const NL_CODE_MAP: Array<{ nl: string; code: string; rel: ConceptMapping['relati
 
 // ── Language Templates ──────────────────────────────────────────────────────────
 
-const LANGUAGE_TEMPLATES: Record<string, {
-  function: string
-  class: string
-  interface: string
-  test: string
-}> = {
+const LANGUAGE_TEMPLATES: Record<
+  string,
+  {
+    function: string
+    class: string
+    interface: string
+    test: string
+  }
+> = {
   typescript: {
     function: 'export function {{name}}({{params}}): {{returnType}} {\n  {{body}}\n}',
     class: 'export class {{name}} {\n  constructor({{params}}) {\n    {{body}}\n  }\n}',
@@ -186,7 +189,10 @@ function round2(n: number): number {
 }
 
 function tokenize(text: string): string[] {
-  return text.toLowerCase().split(/[^a-z0-9]+/).filter(t => t.length > 1)
+  return text
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(t => t.length > 1)
 }
 
 // ── Main Class ──────────────────────────────────────────────────────────────────
@@ -222,7 +228,11 @@ export class SemanticBridge {
 
   // ── Bidirectional Translation ───────────────────────────────────────────────
 
-  translate(input: string, direction: 'nl_to_code' | 'code_to_nl', language?: string): BridgeAnalysis {
+  translate(
+    input: string,
+    direction: 'nl_to_code' | 'code_to_nl',
+    language?: string,
+  ): BridgeAnalysis {
     const start = Date.now()
     this.stats.lastUsedAt = new Date().toISOString()
     this.stats.totalTranslations++
@@ -268,7 +278,8 @@ export class SemanticBridge {
     // Detect structure type
     let structureType: 'function' | 'class' | 'interface' | 'test' = 'function'
     if (/\bclass\b|\bobject\b|\bentity\b|\bmodel\b/.test(lower)) structureType = 'class'
-    else if (/\binterface\b|\btype\b|\bschema\b|\bcontract\b/.test(lower)) structureType = 'interface'
+    else if (/\binterface\b|\btype\b|\bschema\b|\bcontract\b/.test(lower))
+      structureType = 'interface'
     else if (/\btest\b|\bspec\b|\bverify\b/.test(lower)) structureType = 'test'
 
     // Extract name (use original description to preserve casing)
@@ -298,7 +309,9 @@ export class SemanticBridge {
       description,
       language: lang,
       generatedCode,
-      confidence: round2(Math.min(0.85, 0.4 + mappedConcepts.length * 0.05 + (nameMatch ? 0.1 : 0))),
+      confidence: round2(
+        Math.min(0.85, 0.4 + mappedConcepts.length * 0.05 + (nameMatch ? 0.1 : 0)),
+      ),
       mappedConcepts,
       alternatives,
     }
@@ -326,10 +339,14 @@ export class SemanticBridge {
     }
 
     // Detect functions
-    const funcMatches = [...code.matchAll(/(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(([^)]*)\)/g)]
+    const funcMatches = [
+      ...code.matchAll(/(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(([^)]*)\)/g),
+    ]
     for (const fm of funcMatches) {
       const isAsync = /async/.test(fm[0])
-      parts.push(`${isAsync ? 'Async function' : 'Function'} '${fm[1]}' with ${fm[2] ? fm[2].split(',').length : 0} parameters`)
+      parts.push(
+        `${isAsync ? 'Async function' : 'Function'} '${fm[1]}' with ${fm[2] ? fm[2].split(',').length : 0} parameters`,
+      )
       concepts.push('function')
       if (isAsync) concepts.push('async/await')
     }
@@ -342,12 +359,25 @@ export class SemanticBridge {
     }
 
     // Detect patterns
-    if (/try\s*\{/.test(code)) { parts.push('Includes error handling'); concepts.push('error handling') }
-    if (/async|await|Promise/.test(code)) { concepts.push('asynchronous') }
-    if (/import\s+/.test(code)) { concepts.push('modules') }
-    if (/\.map\(|\.filter\(|\.reduce\(/.test(code)) { concepts.push('functional programming') }
-    if (/for\s*\(|while\s*\(|\.forEach\(/.test(code)) { concepts.push('iteration') }
-    if (/if\s*\(|switch\s*\(/.test(code)) { concepts.push('conditional logic') }
+    if (/try\s*\{/.test(code)) {
+      parts.push('Includes error handling')
+      concepts.push('error handling')
+    }
+    if (/async|await|Promise/.test(code)) {
+      concepts.push('asynchronous')
+    }
+    if (/import\s+/.test(code)) {
+      concepts.push('modules')
+    }
+    if (/\.map\(|\.filter\(|\.reduce\(/.test(code)) {
+      concepts.push('functional programming')
+    }
+    if (/for\s*\(|while\s*\(|\.forEach\(/.test(code)) {
+      concepts.push('iteration')
+    }
+    if (/if\s*\(|switch\s*\(/.test(code)) {
+      concepts.push('conditional logic')
+    }
 
     // Determine complexity
     const cc = (code.match(/\b(if|for|while|case|catch)\b/g) ?? []).length
@@ -356,13 +386,10 @@ export class SemanticBridge {
     else if (cc > 8) complexity = 'complex'
     else if (cc > 3) complexity = 'moderate'
 
-    const explanation = parts.length > 0
-      ? parts.join('. ') + '.'
-      : 'Code block with ' + lines.length + ' lines.'
+    const explanation =
+      parts.length > 0 ? parts.join('. ') + '.' : 'Code block with ' + lines.length + ' lines.'
 
-    const summary = parts.length > 0
-      ? parts[0]
-      : `${lines.length}-line code block`
+    const summary = parts.length > 0 ? parts[0] : `${lines.length}-line code block`
 
     return {
       code,
@@ -394,7 +421,9 @@ export class SemanticBridge {
             nlConcept: isCode ? mapTo : entry.nl,
             codeConcept: isCode ? entry.code : mapTo,
             relationship: entry.rel,
-            confidence: round2(entry.rel === 'equivalent' ? 0.9 : entry.rel === 'similar' ? 0.7 : 0.5),
+            confidence: round2(
+              entry.rel === 'equivalent' ? 0.9 : entry.rel === 'similar' ? 0.7 : 0.5,
+            ),
             examples: [`"${entry.nl}" maps to "${entry.code}"`],
           })
           break
@@ -404,12 +433,14 @@ export class SemanticBridge {
 
     // Deduplicate
     const seen = new Set<string>()
-    return mappings.filter(m => {
-      const key = `${m.nlConcept}:${m.codeConcept}`
-      if (seen.has(key)) return false
-      seen.add(key)
-      return true
-    }).slice(0, this.config.maxMappings)
+    return mappings
+      .filter(m => {
+        const key = `${m.nlConcept}:${m.codeConcept}`
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
+      .slice(0, this.config.maxMappings)
   }
 
   // ── Skeleton Generation ─────────────────────────────────────────────────────
@@ -548,8 +579,12 @@ export class SemanticBridge {
 
   // ── Accessors ───────────────────────────────────────────────────────────────
 
-  getStats(): Readonly<SemanticBridgeStats> { return { ...this.stats } }
-  getConfig(): Readonly<SemanticBridgeConfig> { return { ...this.config } }
+  getStats(): Readonly<SemanticBridgeStats> {
+    return { ...this.stats }
+  }
+  getConfig(): Readonly<SemanticBridgeConfig> {
+    return { ...this.config }
+  }
 
   // ── Persistence ─────────────────────────────────────────────────────────────
 
@@ -579,7 +614,9 @@ export class SemanticBridge {
   // ── Private Helpers ─────────────────────────────────────────────────────────
 
   private inferName(description: string, structureType: string): string {
-    const words = description.split(/\s+/).filter(w => w.length > 2 && !/^(the|that|this|with|from|and|for|a|an)$/i.test(w))
+    const words = description
+      .split(/\s+/)
+      .filter(w => w.length > 2 && !/^(the|that|this|with|from|and|for|a|an)$/i.test(w))
     if (words.length === 0) return structureType === 'class' ? 'MyClass' : 'myFunction'
 
     if (structureType === 'class' || structureType === 'interface') {
@@ -608,11 +645,24 @@ export class SemanticBridge {
   }
 
   private inferReturnType(description: string): string {
-    if (/\b(return|returns|gives|produces)\s+(?:a\s+)?(number|count|total|sum|average)/i.test(description)) return 'number'
-    if (/\b(return|returns|gives|produces)\s+(?:a\s+)?(string|text|name|label)/i.test(description)) return 'string'
-    if (/\b(return|returns|gives|produces)\s+(?:a\s+)?(boolean|true|false|flag)/i.test(description)) return 'boolean'
-    if (/\b(return|returns|gives|produces)\s+(?:a\s+)?(list|array|items|collection)/i.test(description)) return 'any[]'
-    if (/\b(return|returns|gives|produces)\s+(?:a\s+)?(object|data|result)/i.test(description)) return 'Record<string, unknown>'
+    if (
+      /\b(return|returns|gives|produces)\s+(?:a\s+)?(number|count|total|sum|average)/i.test(
+        description,
+      )
+    )
+      return 'number'
+    if (/\b(return|returns|gives|produces)\s+(?:a\s+)?(string|text|name|label)/i.test(description))
+      return 'string'
+    if (/\b(return|returns|gives|produces)\s+(?:a\s+)?(boolean|true|false|flag)/i.test(description))
+      return 'boolean'
+    if (
+      /\b(return|returns|gives|produces)\s+(?:a\s+)?(list|array|items|collection)/i.test(
+        description,
+      )
+    )
+      return 'any[]'
+    if (/\b(return|returns|gives|produces)\s+(?:a\s+)?(object|data|result)/i.test(description))
+      return 'Record<string, unknown>'
     if (/\bvoid\b|\bnothing\b|\bno return\b/i.test(description)) return 'void'
     return 'unknown'
   }
@@ -623,7 +673,9 @@ export class SemanticBridge {
     const setA = new Set(tokensA)
     const setB = new Set(tokensB)
     let intersection = 0
-    for (const t of setA) { if (setB.has(t)) intersection++ }
+    for (const t of setA) {
+      if (setB.has(t)) intersection++
+    }
     const union = new Set([...setA, ...setB]).size
     return union > 0 ? intersection / union : 0
   }

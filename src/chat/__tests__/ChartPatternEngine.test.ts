@@ -72,16 +72,18 @@ describe('ChartPatternEngine', () => {
   describe('candlestick patterns', () => {
     it('detects doji (open ≈ close)', () => {
       const candles: Candle[] = [
-        makeCandle(1.1000, 1.1050, 1.0950, 1.1005), // doji: body is tiny vs range
+        makeCandle(1.1, 1.105, 1.095, 1.1005), // doji: body is tiny vs range
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
-      const doji = patterns.find(p => p.type === 'doji' || p.type === 'dragonfly-doji' || p.type === 'gravestone-doji')
+      const doji = patterns.find(
+        p => p.type === 'doji' || p.type === 'dragonfly-doji' || p.type === 'gravestone-doji',
+      )
       expect(doji).toBeDefined()
     })
 
     it('detects hammer (long lower wick, bullish)', () => {
       const candles: Candle[] = [
-        makeCandle(1.1000, 1.1010, 1.0950, 1.1008), // lower wick >> body, upper wick tiny
+        makeCandle(1.1, 1.101, 1.095, 1.1008), // lower wick >> body, upper wick tiny
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       const hammer = patterns.find(p => p.type === 'hammer')
@@ -91,7 +93,7 @@ describe('ChartPatternEngine', () => {
 
     it('detects shooting star (long upper wick, bearish)', () => {
       const candles: Candle[] = [
-        makeCandle(1.1010, 1.1060, 1.1000, 1.1002), // bearish, long upper wick
+        makeCandle(1.101, 1.106, 1.1, 1.1002), // bearish, long upper wick
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       const star = patterns.find(p => p.type === 'shooting-star')
@@ -101,8 +103,8 @@ describe('ChartPatternEngine', () => {
 
     it('detects bullish engulfing (2 candles)', () => {
       const candles: Candle[] = [
-        makeCandle(1.1020, 1.1025, 1.0990, 1.1000), // bearish
-        makeCandle(1.0995, 1.1030, 1.0990, 1.1025), // bullish, engulfs previous
+        makeCandle(1.102, 1.1025, 1.099, 1.1), // bearish
+        makeCandle(1.0995, 1.103, 1.099, 1.1025), // bullish, engulfs previous
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       const engulfing = patterns.find(p => p.type === 'bullish-engulfing')
@@ -112,8 +114,8 @@ describe('ChartPatternEngine', () => {
 
     it('detects bearish engulfing', () => {
       const candles: Candle[] = [
-        makeCandle(1.1000, 1.1025, 1.0995, 1.1020), // bullish
-        makeCandle(1.1025, 1.1030, 1.0990, 1.0995), // bearish, engulfs previous
+        makeCandle(1.1, 1.1025, 1.0995, 1.102), // bullish
+        makeCandle(1.1025, 1.103, 1.099, 1.0995), // bearish, engulfs previous
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       expect(patterns.find(p => p.type === 'bearish-engulfing')).toBeDefined()
@@ -121,9 +123,9 @@ describe('ChartPatternEngine', () => {
 
     it('detects morning star (3 candles)', () => {
       const candles: Candle[] = [
-        makeCandle(1.1040, 1.1045, 1.1000, 1.1005), // big red
-        makeCandle(1.1005, 1.1010, 1.1000, 1.1008), // small body
-        makeCandle(1.1010, 1.1050, 1.1005, 1.1045), // big green
+        makeCandle(1.104, 1.1045, 1.1, 1.1005), // big red
+        makeCandle(1.1005, 1.101, 1.1, 1.1008), // small body
+        makeCandle(1.101, 1.105, 1.1005, 1.1045), // big green
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       expect(patterns.find(p => p.type === 'morning-star')).toBeDefined()
@@ -131,9 +133,9 @@ describe('ChartPatternEngine', () => {
 
     it('detects evening star (3 candles)', () => {
       const candles: Candle[] = [
-        makeCandle(1.1000, 1.1045, 1.0995, 1.1040), // big green
-        makeCandle(1.1040, 1.1045, 1.1035, 1.1038), // small body
-        makeCandle(1.1038, 1.1040, 1.0995, 1.1000), // big red
+        makeCandle(1.1, 1.1045, 1.0995, 1.104), // big green
+        makeCandle(1.104, 1.1045, 1.1035, 1.1038), // small body
+        makeCandle(1.1038, 1.104, 1.0995, 1.1), // big red
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       expect(patterns.find(p => p.type === 'evening-star')).toBeDefined()
@@ -141,7 +143,7 @@ describe('ChartPatternEngine', () => {
 
     it('detects marubozu bullish (full body, no wicks)', () => {
       const candles: Candle[] = [
-        makeCandle(1.1000, 1.1050, 1.1000, 1.1050), // pure bullish body
+        makeCandle(1.1, 1.105, 1.1, 1.105), // pure bullish body
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       expect(patterns.find(p => p.type === 'marubozu-bullish')).toBeDefined()
@@ -149,7 +151,7 @@ describe('ChartPatternEngine', () => {
 
     it('detects marubozu bearish', () => {
       const candles: Candle[] = [
-        makeCandle(1.1050, 1.1050, 1.1000, 1.1000), // pure bearish body
+        makeCandle(1.105, 1.105, 1.1, 1.1), // pure bearish body
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       expect(patterns.find(p => p.type === 'marubozu-bearish')).toBeDefined()
@@ -157,9 +159,9 @@ describe('ChartPatternEngine', () => {
 
     it('detects three white soldiers', () => {
       const candles: Candle[] = [
-        makeCandle(1.1000, 1.1025, 1.0995, 1.1020), // bullish
-        makeCandle(1.1020, 1.1050, 1.1015, 1.1045), // bullish, higher close
-        makeCandle(1.1045, 1.1075, 1.1040, 1.1070), // bullish, higher close
+        makeCandle(1.1, 1.1025, 1.0995, 1.102), // bullish
+        makeCandle(1.102, 1.105, 1.1015, 1.1045), // bullish, higher close
+        makeCandle(1.1045, 1.1075, 1.104, 1.107), // bullish, higher close
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       expect(patterns.find(p => p.type === 'three-white-soldiers')).toBeDefined()
@@ -167,9 +169,9 @@ describe('ChartPatternEngine', () => {
 
     it('detects three black crows', () => {
       const candles: Candle[] = [
-        makeCandle(1.1060, 1.1065, 1.1030, 1.1035), // bearish
-        makeCandle(1.1035, 1.1040, 1.1005, 1.1010), // bearish, lower close
-        makeCandle(1.1010, 1.1015, 1.0980, 1.0985), // bearish, lower close
+        makeCandle(1.106, 1.1065, 1.103, 1.1035), // bearish
+        makeCandle(1.1035, 1.104, 1.1005, 1.101), // bearish, lower close
+        makeCandle(1.101, 1.1015, 1.098, 1.0985), // bearish, lower close
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       expect(patterns.find(p => p.type === 'three-black-crows')).toBeDefined()
@@ -177,8 +179,8 @@ describe('ChartPatternEngine', () => {
 
     it('detects bullish harami', () => {
       const candles: Candle[] = [
-        makeCandle(1.1040, 1.1045, 1.0990, 1.1000), // large red
-        makeCandle(1.1010, 1.1020, 1.1005, 1.1018), // small green inside
+        makeCandle(1.104, 1.1045, 1.099, 1.1), // large red
+        makeCandle(1.101, 1.102, 1.1005, 1.1018), // small green inside
       ]
       const patterns = engine.detectCandlestickPatterns(candles)
       expect(patterns.find(p => p.type === 'bullish-harami')).toBeDefined()
@@ -195,7 +197,7 @@ describe('ChartPatternEngine', () => {
     })
 
     it('tracks patterns found in stats', () => {
-      engine.detectCandlestickPatterns([makeCandle(1.1000, 1.1050, 1.1000, 1.1050)])
+      engine.detectCandlestickPatterns([makeCandle(1.1, 1.105, 1.1, 1.105)])
       const stats = engine.getStats()
       expect(Object.keys(stats.patternsFound).length).toBeGreaterThan(0)
     })
@@ -239,8 +241,8 @@ describe('ChartPatternEngine', () => {
       // Create data with repeated low at 1.1000
       const candles: Candle[] = []
       for (let i = 0; i < 20; i++) {
-        const base = 1.1000 + Math.sin(i * 0.5) * 0.005
-        candles.push(makeCandle(base, base + 0.003, 1.1000 + (i % 3 === 0 ? 0 : 0.002), base + 0.001))
+        const base = 1.1 + Math.sin(i * 0.5) * 0.005
+        candles.push(makeCandle(base, base + 0.003, 1.1 + (i % 3 === 0 ? 0 : 0.002), base + 0.001))
       }
       const levels = engine.detectSupportResistance(candles, 20)
       expect(levels.length).toBeGreaterThanOrEqual(0) // might not find if no clear pivots
@@ -287,14 +289,14 @@ describe('ChartPatternEngine', () => {
 
   describe('fibonacci levels', () => {
     it('calculates fibonacci retracement (uptrend)', () => {
-      const levels = engine.calculateFibonacci(1.2000, 1.1000, 'up')
+      const levels = engine.calculateFibonacci(1.2, 1.1, 'up')
       expect(levels.length).toBe(10) // 10 fib levels
       // 0% = swing high
-      expect(levels[0].price).toBeCloseTo(1.2000, 4)
+      expect(levels[0].price).toBeCloseTo(1.2, 4)
       // 100% = swing low
-      expect(levels[6].price).toBeCloseTo(1.1000, 4)
+      expect(levels[6].price).toBeCloseTo(1.1, 4)
       // 50% retracement
-      expect(levels[3].price).toBeCloseTo(1.1500, 4)
+      expect(levels[3].price).toBeCloseTo(1.15, 4)
       // 38.2%
       expect(levels[2].price).toBeCloseTo(1.1618, 3)
       // 61.8%
@@ -302,9 +304,9 @@ describe('ChartPatternEngine', () => {
     })
 
     it('calculates fibonacci (downtrend)', () => {
-      const levels = engine.calculateFibonacci(1.2000, 1.1000, 'down')
+      const levels = engine.calculateFibonacci(1.2, 1.1, 'down')
       expect(levels.length).toBe(10)
-      expect(levels[0].price).toBeCloseTo(1.1000, 4) // 0% = swing low (bottom up)
+      expect(levels[0].price).toBeCloseTo(1.1, 4) // 0% = swing low (bottom up)
     })
 
     it('returns empty for invalid range', () => {
@@ -320,10 +322,7 @@ describe('ChartPatternEngine', () => {
     })
 
     it('autoFibonacci finds swing high/low', () => {
-      const candles = [
-        ...makeUptrend(1.1, 10, 0.001),
-        ...makeDowntrend(1.11, 5, 0.001),
-      ]
+      const candles = [...makeUptrend(1.1, 10, 0.001), ...makeDowntrend(1.11, 5, 0.001)]
       const result = engine.autoFibonacci(candles)
       expect(result.swingHigh).toBeGreaterThan(result.swingLow)
       expect(result.levels.length).toBe(10)
@@ -357,8 +356,10 @@ describe('ChartPatternEngine', () => {
     it('detects double top from M-shaped price', () => {
       const candles: Candle[] = []
       // Create M-shape: up → peak1 → dip → peak2 → down
-      const values = [1.10, 1.11, 1.12, 1.13, 1.14, 1.145, 1.14, 1.13, 1.12, 1.11,
-        1.12, 1.13, 1.14, 1.145, 1.14, 1.13, 1.12, 1.11, 1.10, 1.09]
+      const values = [
+        1.1, 1.11, 1.12, 1.13, 1.14, 1.145, 1.14, 1.13, 1.12, 1.11, 1.12, 1.13, 1.14, 1.145, 1.14,
+        1.13, 1.12, 1.11, 1.1, 1.09,
+      ]
       for (const v of values) {
         candles.push(makeCandle(v - 0.002, v + 0.003, v - 0.003, v + 0.001))
       }
@@ -410,7 +411,7 @@ describe('ChartPatternEngine', () => {
     it('ATR is positive for volatile data', () => {
       const candles: Candle[] = []
       for (let i = 0; i < 20; i++) {
-        const v = (i % 2 === 0) ? 0.01 : -0.01
+        const v = i % 2 === 0 ? 0.01 : -0.01
         candles.push(makeCandle(1.1 + v, 1.12 + v, 1.08 + v, 1.1 - v))
       }
       expect(engine.calculateATR(candles)).toBeGreaterThan(0)
@@ -428,8 +429,8 @@ describe('ChartPatternEngine', () => {
       // Bullish setup: downtrend then bullish engulfing
       const candles = [
         ...makeDowntrend(1.12, 5, 0.002),
-        makeCandle(1.1120, 1.1125, 1.1090, 1.1100), // bearish
-        makeCandle(1.1095, 1.1140, 1.1090, 1.1130), // bullish engulfing
+        makeCandle(1.112, 1.1125, 1.109, 1.11), // bearish
+        makeCandle(1.1095, 1.114, 1.109, 1.113), // bullish engulfing
       ]
       const signal = engine.generateSignal(candles)
       // Signal may or may not meet confidence threshold
@@ -447,10 +448,12 @@ describe('ChartPatternEngine', () => {
       // Strong bullish signal: hammer + support
       const candles: Candle[] = []
       for (let i = 0; i < 20; i++) {
-        candles.push(makeCandle(1.1 + i * 0.001, 1.102 + i * 0.001, 1.098 + i * 0.001, 1.101 + i * 0.001))
+        candles.push(
+          makeCandle(1.1 + i * 0.001, 1.102 + i * 0.001, 1.098 + i * 0.001, 1.101 + i * 0.001),
+        )
       }
       // Add hammer at end
-      candles.push(makeCandle(1.1200, 1.1210, 1.1150, 1.1208))
+      candles.push(makeCandle(1.12, 1.121, 1.115, 1.1208))
       const signal = engine.generateSignal(candles)
       if (signal) {
         expect(['buy', 'sell']).toContain(signal.direction)

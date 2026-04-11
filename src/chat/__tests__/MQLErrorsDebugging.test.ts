@@ -21,7 +21,9 @@ describe('MQL Errors & Debugging Knowledge', () => {
 
   it('covers MQL compilation errors and fixes', async () => {
     const r = await brain.chat('How to fix common MQL compilation syntax errors?')
-    expect(r.text.toLowerCase()).toMatch(/semicolon|undeclared|implicit\s+conversion|compile|#property\s+strict/)
+    expect(r.text.toLowerCase()).toMatch(
+      /semicolon|undeclared|implicit\s+conversion|compile|#property\s+strict/,
+    )
   })
 
   describe('Semantic Memory', () => {

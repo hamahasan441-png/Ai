@@ -1,16 +1,7 @@
-import type {
-  RenderableMessage,
-  SystemStopHookSummaryMessage,
-} from '../types/message.js'
+import type { RenderableMessage, SystemStopHookSummaryMessage } from '../types/message.js'
 
-function isLabeledHookSummary(
-  msg: RenderableMessage,
-): msg is SystemStopHookSummaryMessage {
-  return (
-    msg.type === 'system' &&
-    msg.subtype === 'stop_hook_summary' &&
-    msg.hookLabel !== undefined
-  )
+function isLabeledHookSummary(msg: RenderableMessage): msg is SystemStopHookSummaryMessage {
+  return msg.type === 'system' && msg.subtype === 'stop_hook_summary' && msg.hookLabel !== undefined
 }
 
 /**
@@ -18,9 +9,7 @@ function isLabeledHookSummary(
  * (e.g. PostToolUse) into a single summary. This happens when parallel
  * tool calls each emit their own hook summary.
  */
-export function collapseHookSummaries(
-  messages: RenderableMessage[],
-): RenderableMessage[] {
+export function collapseHookSummaries(messages: RenderableMessage[]): RenderableMessage[] {
   const result: RenderableMessage[] = []
   let i = 0
 

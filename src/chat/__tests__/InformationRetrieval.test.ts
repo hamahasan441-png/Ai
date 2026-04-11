@@ -11,21 +11,33 @@ describe('Information Retrieval & Search Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about information retrieval and ranking', async () => {
-      const r = await brain.chat('explain information retrieval search engine indexing ranking tf idf bm25 vector search semantic search inverted index')
+      const r = await brain.chat(
+        'explain information retrieval search engine indexing ranking tf idf bm25 vector search semantic search inverted index',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/retrieval|ranking|tf.idf|bm25|inverted\s*index|search|semantic/)
+      expect(r.text.toLowerCase()).toMatch(
+        /retrieval|ranking|tf.idf|bm25|inverted\s*index|search|semantic/,
+      )
     })
 
     it('answers about query expansion and learning to rank', async () => {
-      const r = await brain.chat('explain query expansion reformulation relevance feedback learning to rank pairwise listwise faceted search autocomplete')
+      const r = await brain.chat(
+        'explain query expansion reformulation relevance feedback learning to rank pairwise listwise faceted search autocomplete',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/query|expansion|relevance|learning\s*to\s*rank|faceted|autocomplete/)
+      expect(r.text.toLowerCase()).toMatch(
+        /query|expansion|relevance|learning\s*to\s*rank|faceted|autocomplete/,
+      )
     })
 
     it('answers about RAG and search engines', async () => {
-      const r = await brain.chat('explain knowledge retrieval augmented generation rag document chunking passage retrieval search index elasticsearch solr')
+      const r = await brain.chat(
+        'explain knowledge retrieval augmented generation rag document chunking passage retrieval search index elasticsearch solr',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/rag|retrieval|chunking|passage|elasticsearch|search|document/)
+      expect(r.text.toLowerCase()).toMatch(
+        /rag|retrieval|chunking|passage|elasticsearch|search|document/,
+      )
     })
   })
 

@@ -109,7 +109,7 @@ const SUFFIXES: ReadonlyMap<string, string> = new Map([
  * Order matters for multi-char sequences during reverse lookup.
  */
 const ARABIC_TO_LATIN: ReadonlyArray<readonly [string, string]> = [
-  ['ئ', '\''],
+  ['ئ', "'"],
   ['ا', 'a'],
   ['ب', 'b'],
   ['پ', 'p'],
@@ -125,7 +125,7 @@ const ARABIC_TO_LATIN: ReadonlyArray<readonly [string, string]> = [
   ['ژ', 'j'],
   ['س', 's'],
   ['ش', 'ş'],
-  ['ع', '\''],
+  ['ع', "'"],
   ['غ', 'ẍ'],
   ['ف', 'f'],
   ['ڤ', 'v'],
@@ -187,7 +187,8 @@ const LATIN_TO_ARABIC: ReadonlyArray<readonly [string, string]> = [
 ]
 
 /** Regex for valid Kurdish Arabic-script text (letters, diacritics, spaces). */
-const KURDISH_SCRIPT_PATTERN = /^[\u0626-\u06D5\u06A4\u06A9\u06AF\u06B5\u06C6\u06CC\u06CE\u06D5\u0695\u200C\u200D\s]+$/
+const KURDISH_SCRIPT_PATTERN =
+  /^[\u0626-\u06D5\u06A4\u06A9\u06AF\u06B5\u06C6\u06CC\u06CE\u06D5\u0695\u200C\u200D\s]+$/
 
 // ─── KurdishMorphologicalAnalyzer ──────────────────────────────────────────────
 
@@ -340,9 +341,10 @@ export class KurdishMorphologicalAnalyzer {
     return {
       isCorrect: false,
       suggestions,
-      explanation: suggestions.length > 0
-        ? `Unknown root. Did you mean: ${suggestions.join(', ')}?`
-        : 'Unknown root. No close matches found.',
+      explanation:
+        suggestions.length > 0
+          ? `Unknown root. Did you mean: ${suggestions.join(', ')}?`
+          : 'Unknown root. No close matches found.',
     }
   }
 
@@ -355,9 +357,7 @@ export class KurdishMorphologicalAnalyzer {
    * @returns Transliteration result with original and converted text
    */
   transliterate(text: string, targetScript: 'arabic' | 'latin'): TransliterationResult {
-    const converted = targetScript === 'latin'
-      ? this.arabicToLatin(text)
-      : this.latinToArabic(text)
+    const converted = targetScript === 'latin' ? this.arabicToLatin(text) : this.latinToArabic(text)
 
     return { original: text, converted, script: targetScript }
   }
@@ -423,7 +423,11 @@ export class KurdishMorphologicalAnalyzer {
 
   // ── Serialization ──────────────────────────────────────────────────────────
 
-  serialize(): { analyzedCount: number; cacheHitCount: number; cacheEntries: [string, MorphemeAnalysis][] } {
+  serialize(): {
+    analyzedCount: number
+    cacheHitCount: number
+    cacheEntries: [string, MorphemeAnalysis][]
+  } {
     return {
       analyzedCount: this.analyzedCount,
       cacheHitCount: this.cacheHitCount,
@@ -431,7 +435,11 @@ export class KurdishMorphologicalAnalyzer {
     }
   }
 
-  deserialize(data: { analyzedCount: number; cacheHitCount: number; cacheEntries: [string, MorphemeAnalysis][] }): void {
+  deserialize(data: {
+    analyzedCount: number
+    cacheHitCount: number
+    cacheEntries: [string, MorphemeAnalysis][]
+  }): void {
     this.analyzedCount = data.analyzedCount
     this.cacheHitCount = data.cacheHitCount
     this.cache.clear()
@@ -716,7 +724,7 @@ export class KurdishMorphologicalAnalyzer {
     roots.set('ڕەش', { meaning: 'black', pos: 'adjective' })
     roots.set('زەرد', { meaning: 'yellow', pos: 'adjective' })
     roots.set('سەوز', { meaning: 'green', pos: 'adjective' })
-    roots.set('خوێن', { meaning: 'read', pos: 'verb' })  // re-alias to avoid collision
+    roots.set('خوێن', { meaning: 'read', pos: 'verb' }) // re-alias to avoid collision
 
     // ── Nouns (numbers as words) ──
     roots.set('یەک', { meaning: 'one', pos: 'numeral' })
@@ -899,11 +907,7 @@ export class KurdishMorphologicalAnalyzer {
     for (let i = 1; i <= m; i++) {
       for (let j = 1; j <= n; j++) {
         const cost = a[i - 1] === b[j - 1] ? 0 : 1
-        dp[i]![j] = Math.min(
-          dp[i - 1]![j]! + 1,
-          dp[i]![j - 1]! + 1,
-          dp[i - 1]![j - 1]! + cost,
-        )
+        dp[i]![j] = Math.min(dp[i - 1]![j]! + 1, dp[i]![j - 1]! + 1, dp[i - 1]![j - 1]! + cost)
       }
     }
 

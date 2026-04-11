@@ -11,15 +11,23 @@ describe('RecommendationSystems', () => {
 
   describe('KB entry tests', () => {
     it('should match collaborative/content-based keywords', async () => {
-      const r = await brain.chat('explain collaborative filtering user item matrix factorization content based filtering feature similarity cosine recommendation system')
+      const r = await brain.chat(
+        'explain collaborative filtering user item matrix factorization content based filtering feature similarity cosine recommendation system',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/collaborative|content.based|matrix|filtering|recommendation/)
+      expect(r.text.toLowerCase()).toMatch(
+        /collaborative|content.based|matrix|filtering|recommendation/,
+      )
     })
 
     it('should match deep learning/bandits keywords', async () => {
-      const r = await brain.chat('explain deep learning recommendation neural collaborative ncf session based recommendation sequential gru4rec multi armed bandit thompson')
+      const r = await brain.chat(
+        'explain deep learning recommendation neural collaborative ncf session based recommendation sequential gru4rec multi armed bandit thompson',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/neural|session|bandit|deep|sequential|recommendation|collaborative/)
+      expect(r.text.toLowerCase()).toMatch(
+        /neural|session|bandit|deep|sequential|recommendation|collaborative/,
+      )
     })
   })
 

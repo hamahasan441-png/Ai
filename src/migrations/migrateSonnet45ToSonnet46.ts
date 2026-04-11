@@ -2,17 +2,10 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   logEvent,
 } from '../services/analytics/index.js'
-import {
-  isMaxSubscriber,
-  isProSubscriber,
-  isTeamPremiumSubscriber,
-} from '../utils/auth.js'
+import { isMaxSubscriber, isProSubscriber, isTeamPremiumSubscriber } from '../utils/auth.js'
 import { getGlobalConfig, saveGlobalConfig } from '../utils/config.js'
 import { getAPIProvider } from '../utils/model/providers.js'
-import {
-  getSettingsForSource,
-  updateSettingsForSource,
-} from '../utils/settings/settings.js'
+import { getSettingsForSource, updateSettingsForSource } from '../utils/settings/settings.js'
 
 /**
  * Migrate Pro/Max/Team Premium first-party users off explicit Sonnet 4.5
@@ -60,8 +53,7 @@ export function migrateSonnet45ToSonnet46(): void {
   }
 
   logEvent('tengu_sonnet45_to_46_migration', {
-    from_model:
-      model as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    from_model: model as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     has_1m: has1m,
   })
 }

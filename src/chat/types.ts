@@ -177,11 +177,30 @@ export interface ContextWindowResult {
 
 /** All languages the AI can write code in. */
 export type ProgrammingLanguage =
-  | 'typescript' | 'javascript' | 'python' | 'rust' | 'go'
-  | 'java' | 'c' | 'cpp' | 'csharp' | 'swift'
-  | 'kotlin' | 'ruby' | 'php' | 'html' | 'css'
-  | 'sql' | 'bash' | 'powershell' | 'r' | 'dart'
-  | 'scala' | 'lua' | 'haskell' | 'elixir'
+  | 'typescript'
+  | 'javascript'
+  | 'python'
+  | 'rust'
+  | 'go'
+  | 'java'
+  | 'c'
+  | 'cpp'
+  | 'csharp'
+  | 'swift'
+  | 'kotlin'
+  | 'ruby'
+  | 'php'
+  | 'html'
+  | 'css'
+  | 'sql'
+  | 'bash'
+  | 'powershell'
+  | 'r'
+  | 'dart'
+  | 'scala'
+  | 'lua'
+  | 'haskell'
+  | 'elixir'
 
 /** Request to generate code. */
 export interface CodeRequest {
@@ -349,25 +368,31 @@ const CODE_TEMPLATES: Record<string, Record<string, string>> = {
   },
   python: {
     function: 'def {{name}}({{params}}){{returnType}}:\n    """{{description}}"""\n    {{body}}',
-    class: 'class {{name}}:\n    """{{description}}"""\n\n    def __init__(self, {{params}}):\n        {{body}}',
+    class:
+      'class {{name}}:\n    """{{description}}"""\n\n    def __init__(self, {{params}}):\n        {{body}}',
     test: 'def test_{{name}}():\n    """{{description}}"""\n    {{body}}\n    assert result == expected',
     api: '@app.route("/{{name}}", methods=["GET"])\ndef {{name}}():\n    """{{description}}"""\n    {{body}}\n    return jsonify({"ok": True})',
-    dataclass: 'from dataclasses import dataclass\n\n@dataclass\nclass {{name}}:\n    """{{description}}"""\n    {{body}}',
+    dataclass:
+      'from dataclasses import dataclass\n\n@dataclass\nclass {{name}}:\n    """{{description}}"""\n    {{body}}',
   },
   rust: {
     function: 'pub fn {{name}}({{params}}) -> {{returnType}} {\n    {{body}}\n}',
-    struct: 'pub struct {{name}} {\n    {{body}}\n}\n\nimpl {{name}} {\n    pub fn new({{params}}) -> Self {\n        Self { {{body}} }\n    }\n}',
+    struct:
+      'pub struct {{name}} {\n    {{body}}\n}\n\nimpl {{name}} {\n    pub fn new({{params}}) -> Self {\n        Self { {{body}} }\n    }\n}',
     test: '#[cfg(test)]\nmod tests {\n    use super::*;\n\n    #[test]\n    fn test_{{name}}() {\n        {{body}}\n    }\n}',
     enum_: 'pub enum {{name}} {\n    {{body}}\n}',
   },
   go: {
     function: 'func {{name}}({{params}}) {{returnType}} {\n\t{{body}}\n}',
-    struct: 'type {{name}} struct {\n\t{{body}}\n}\n\nfunc New{{name}}({{params}}) *{{name}} {\n\treturn &{{name}}{{{body}}}\n}',
+    struct:
+      'type {{name}} struct {\n\t{{body}}\n}\n\nfunc New{{name}}({{params}}) *{{name}} {\n\treturn &{{name}}{{{body}}}\n}',
     test: 'func Test{{name}}(t *testing.T) {\n\t{{body}}\n}',
-    handler: 'func {{name}}Handler(w http.ResponseWriter, r *http.Request) {\n\t{{body}}\n\tjson.NewEncoder(w).Encode(map[string]bool{"ok": true})\n}',
+    handler:
+      'func {{name}}Handler(w http.ResponseWriter, r *http.Request) {\n\t{{body}}\n\tjson.NewEncoder(w).Encode(map[string]bool{"ok": true})\n}',
   },
   java: {
-    class: 'public class {{name}} {\n    {{body}}\n\n    public {{name}}({{params}}) {\n        {{body}}\n    }\n}',
+    class:
+      'public class {{name}} {\n    {{body}}\n\n    public {{name}}({{params}}) {\n        {{body}}\n    }\n}',
     method: 'public {{returnType}} {{name}}({{params}}) {\n    {{body}}\n}',
     test: '@Test\npublic void test{{name}}() {\n    {{body}}\n    assertEquals(expected, result);\n}',
     interface: 'public interface {{name}} {\n    {{body}}\n}',
@@ -379,7 +404,10 @@ const SUPPORTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/we
 /** Detect the programming language from source code. */
 export function detectLanguage(code: string): ProgrammingLanguage {
   const indicators: Array<[ProgrammingLanguage, RegExp[]]> = [
-    ['typescript', [/:\s*(string|number|boolean|void|any)\b/, /interface\s+\w+/, /import\s+type\s/]],
+    [
+      'typescript',
+      [/:\s*(string|number|boolean|void|any)\b/, /interface\s+\w+/, /import\s+type\s/],
+    ],
     ['python', [/def\s+\w+\s*\(/, /import\s+\w+/, /if\s+__name__\s*==\s*['"]__main__['"]/]],
     ['rust', [/fn\s+\w+\s*\(/, /let\s+mut\s/, /impl\s+\w+/, /pub\s+fn\s/]],
     ['go', [/func\s+\w+\s*\(/, /package\s+\w+/, /import\s+\(/, /:=\s/]],
@@ -408,18 +436,39 @@ export function detectLanguage(code: string): ProgrammingLanguage {
 }
 
 /** Count lines of code (excluding blank lines and comments). */
-export function countLinesOfCode(code: string, language: ProgrammingLanguage): { total: number; code: number; blank: number; comment: number } {
+export function countLinesOfCode(
+  code: string,
+  language: ProgrammingLanguage,
+): { total: number; code: number; blank: number; comment: number } {
   const lines = code.split('\n')
   const info = LANG_INFO[language]
-  let codeLines = 0, blank = 0, comment = 0, inBlock = false
-  const blockStart = info?.block?.[0], blockEnd = info?.block?.[1]
+  let codeLines = 0,
+    blank = 0,
+    comment = 0,
+    inBlock = false
+  const blockStart = info?.block?.[0],
+    blockEnd = info?.block?.[1]
 
   for (const line of lines) {
     const trimmed = line.trim()
-    if (!trimmed) { blank++; continue }
-    if (inBlock) { comment++; if (blockEnd && trimmed.includes(blockEnd)) inBlock = false; continue }
-    if (blockStart && trimmed.startsWith(blockStart)) { comment++; if (blockEnd && !trimmed.includes(blockEnd)) inBlock = true; continue }
-    if (info?.comment && trimmed.startsWith(info.comment)) { comment++; continue }
+    if (!trimmed) {
+      blank++
+      continue
+    }
+    if (inBlock) {
+      comment++
+      if (blockEnd && trimmed.includes(blockEnd)) inBlock = false
+      continue
+    }
+    if (blockStart && trimmed.startsWith(blockStart)) {
+      comment++
+      if (blockEnd && !trimmed.includes(blockEnd)) inBlock = true
+      continue
+    }
+    if (info?.comment && trimmed.startsWith(info.comment)) {
+      comment++
+      continue
+    }
     codeLines++
   }
   return { total: lines.length, code: codeLines, blank, comment }
@@ -428,7 +477,13 @@ export function countLinesOfCode(code: string, language: ProgrammingLanguage): {
 /** Estimate complexity of code. */
 export function estimateComplexity(code: string): 'simple' | 'moderate' | 'complex' {
   const lines = code.split('\n').length
-  const nesting = Math.max(...code.split('\n').map(l => l.search(/\S/)).filter(n => n >= 0)) / 2
+  const nesting =
+    Math.max(
+      ...code
+        .split('\n')
+        .map(l => l.search(/\S/))
+        .filter(n => n >= 0),
+    ) / 2
   const branches = (code.match(/\b(if|else|switch|case|for|while|try|catch)\b/g) || []).length
   const score = lines * 0.3 + nesting * 2 + branches * 1.5
   if (score < 15) return 'simple'
@@ -437,7 +492,10 @@ export function estimateComplexity(code: string): 'simple' | 'moderate' | 'compl
 }
 
 /** Get a code template for a specific language and pattern. */
-export function getCodeTemplate(language: ProgrammingLanguage, pattern: string): string | undefined {
+export function getCodeTemplate(
+  language: ProgrammingLanguage,
+  pattern: string,
+): string | undefined {
   return CODE_TEMPLATES[language]?.[pattern]
 }
 
@@ -450,14 +508,18 @@ export function getLanguageInfo(language: ProgrammingLanguage) {
 export function formatCode(code: string, indentSize = 2): string {
   const indent = ' '.repeat(indentSize)
   let level = 0
-  return code.split('\n').map(line => {
-    const trimmed = line.trim()
-    if (!trimmed) return ''
-    if (trimmed.startsWith('}') || trimmed.startsWith(')') || trimmed.startsWith(']')) level = Math.max(0, level - 1)
-    const result = indent.repeat(level) + trimmed
-    if (trimmed.endsWith('{') || trimmed.endsWith('(') || trimmed.endsWith('[')) level++
-    return result
-  }).join('\n')
+  return code
+    .split('\n')
+    .map(line => {
+      const trimmed = line.trim()
+      if (!trimmed) return ''
+      if (trimmed.startsWith('}') || trimmed.startsWith(')') || trimmed.startsWith(']'))
+        level = Math.max(0, level - 1)
+      const result = indent.repeat(level) + trimmed
+      if (trimmed.endsWith('{') || trimmed.endsWith('(') || trimmed.endsWith('[')) level++
+      return result
+    })
+    .join('\n')
 }
 
 /** Check if a media type is supported for image analysis. */
@@ -479,20 +541,31 @@ export function estimateImageSize(base64Data: string): number {
 }
 
 /** Build a vision content block for an image. */
-export function buildImageContentBlock(imageData: string, mediaType: string, question?: string): ApiContentBlock[] {
+export function buildImageContentBlock(
+  imageData: string,
+  mediaType: string,
+  question?: string,
+): ApiContentBlock[] {
   const blocks: ApiContentBlock[] = [
     { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageData } },
   ]
   if (question) {
     blocks.push({ type: 'text', text: question })
   } else {
-    blocks.push({ type: 'text', text: 'Describe this image in detail. What do you see? Include objects, colors, text, people, actions, and any other notable elements.' })
+    blocks.push({
+      type: 'text',
+      text: 'Describe this image in detail. What do you see? Include objects, colors, text, people, actions, and any other notable elements.',
+    })
   }
   return blocks
 }
 
 /** Create a ChatMessage content block for an analyzed image. */
-export function createImageBlock(imageData: string, mediaType: string, description?: string): ContentBlock {
+export function createImageBlock(
+  imageData: string,
+  mediaType: string,
+  description?: string,
+): ContentBlock {
   return {
     type: 'image',
     imageData,
@@ -503,16 +576,24 @@ export function createImageBlock(imageData: string, mediaType: string, descripti
 
 /** Parse a text description into structured image analysis. */
 export function parseImageAnalysis(description: string): ImageAnalysisResult {
-  const colorPatterns = /\b(red|blue|green|yellow|orange|purple|pink|black|white|gray|grey|brown|cyan|magenta|gold|silver|beige|navy|teal|maroon|olive|coral|salmon|lavender|turquoise|indigo|violet)\b/gi
+  const colorPatterns =
+    /\b(red|blue|green|yellow|orange|purple|pink|black|white|gray|grey|brown|cyan|magenta|gold|silver|beige|navy|teal|maroon|olive|coral|salmon|lavender|turquoise|indigo|violet)\b/gi
   const colors = [...new Set((description.match(colorPatterns) ?? []).map(c => c.toLowerCase()))]
 
-  const objectPatterns = /\b(person|people|man|woman|child|dog|cat|car|tree|building|house|table|chair|phone|computer|book|flower|mountain|sky|sun|moon|water|road|door|window|wall|lamp|clock|cup|bottle|bag|hat|shirt|shoe|hand|face|eye|cloud|bird|fish|boat|airplane|train|bridge|park|garden|street|sign|light|shadow)\b/gi
+  const objectPatterns =
+    /\b(person|people|man|woman|child|dog|cat|car|tree|building|house|table|chair|phone|computer|book|flower|mountain|sky|sun|moon|water|road|door|window|wall|lamp|clock|cup|bottle|bag|hat|shirt|shoe|hand|face|eye|cloud|bird|fish|boat|airplane|train|bridge|park|garden|street|sign|light|shadow)\b/gi
   const objects = [...new Set((description.match(objectPatterns) ?? []).map(o => o.toLowerCase()))]
 
-  const textMatch = description.match(/text\s+(?:that\s+)?(?:reads?|says?|shows?)\s*[:"]?\s*["']?([^"'\n.]+)/i)
+  const textMatch = description.match(
+    /text\s+(?:that\s+)?(?:reads?|says?|shows?)\s*[:"]?\s*["']?([^"'\n.]+)/i,
+  )
   const text = textMatch?.[1]?.trim()
 
-  const sentimentWords = { positive: /\b(happy|beautiful|bright|cheerful|peaceful|stunning|elegant|vibrant|warm|inviting|cozy)\b/i, negative: /\b(dark|gloomy|sad|lonely|broken|damaged|dirty|ugly|scary|ominous|bleak)\b/i }
+  const sentimentWords = {
+    positive:
+      /\b(happy|beautiful|bright|cheerful|peaceful|stunning|elegant|vibrant|warm|inviting|cozy)\b/i,
+    negative: /\b(dark|gloomy|sad|lonely|broken|damaged|dirty|ugly|scary|ominous|bleak)\b/i,
+  }
   const posCount = (description.match(sentimentWords.positive) ?? []).length
   const negCount = (description.match(sentimentWords.negative) ?? []).length
   const sentiment = posCount > negCount ? 'positive' : negCount > posCount ? 'negative' : 'neutral'
@@ -522,7 +603,8 @@ export function parseImageAnalysis(description: string): ImageAnalysisResult {
   if (description.toLowerCase().includes('photo')) tags.push('photograph')
   if (description.toLowerCase().includes('screenshot')) tags.push('screenshot')
   if (description.toLowerCase().includes('diagram')) tags.push('diagram')
-  if (description.toLowerCase().includes('chart') || description.toLowerCase().includes('graph')) tags.push('data-visualization')
+  if (description.toLowerCase().includes('chart') || description.toLowerCase().includes('graph'))
+    tags.push('data-visualization')
 
   return { description, objects, colors, text, sentiment, tags }
 }

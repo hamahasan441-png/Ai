@@ -421,36 +421,13 @@ export const nonAlphanumericKeys = [
 ]
 
 const isShiftKey = (code: string): boolean => {
-  return [
-    '[a',
-    '[b',
-    '[c',
-    '[d',
-    '[e',
-    '[2$',
-    '[3$',
-    '[5$',
-    '[6$',
-    '[7$',
-    '[8$',
-    '[Z',
-  ].includes(code)
+  return ['[a', '[b', '[c', '[d', '[e', '[2$', '[3$', '[5$', '[6$', '[7$', '[8$', '[Z'].includes(
+    code,
+  )
 }
 
 const isCtrlKey = (code: string): boolean => {
-  return [
-    'Oa',
-    'Ob',
-    'Oc',
-    'Od',
-    'Oe',
-    '[2^',
-    '[3^',
-    '[5^',
-    '[6^',
-    '[7^',
-    '[8^',
-  ].includes(code)
+  return ['Oa', 'Ob', 'Oc', 'Od', 'Oe', '[2^', '[3^', '[5^', '[6^', '[7^', '[8^'].includes(code)
 }
 
 /**
@@ -740,9 +717,7 @@ function parseKeypress(s: string = ''): ParsedKey {
       key.option = true
     }
 
-    const code = [parts[1], parts[2], parts[4], parts[6]]
-      .filter(Boolean)
-      .join('')
+    const code = [parts[1], parts[2], parts[4], parts[6]].filter(Boolean).join('')
 
     const modifier = ((parts[3] || parts[5] || 1) as number) - 1
 

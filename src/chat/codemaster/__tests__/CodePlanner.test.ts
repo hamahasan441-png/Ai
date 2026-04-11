@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  CodePlanner,
-  type PlannedChange,
-  type RiskLevel,
-} from '../CodePlanner'
+import { CodePlanner, type PlannedChange, type RiskLevel } from '../CodePlanner'
 
 // ── Helper to build a minimal PlannedChange ──
 
@@ -81,7 +77,9 @@ describe('detectMentionedFiles', () => {
   })
 
   it('extracts a .ts file path', () => {
-    const files = planner.detectMentionedFiles('update src/utils/helpers.ts to export the new function')
+    const files = planner.detectMentionedFiles(
+      'update src/utils/helpers.ts to export the new function',
+    )
     expect(files).toContain('src/utils/helpers.ts')
   })
 
@@ -180,43 +178,113 @@ describe('assessRisk', () => {
   })
 
   it('returns low for create changes', () => {
-    expect(planner.assessRisk({ changeType: 'create', filePath: 'src/new.ts', linesAdded: 100, linesRemoved: 0 })).toBe('low')
+    expect(
+      planner.assessRisk({
+        changeType: 'create',
+        filePath: 'src/new.ts',
+        linesAdded: 100,
+        linesRemoved: 0,
+      }),
+    ).toBe('low')
   })
 
   it('returns high for delete changes', () => {
-    expect(planner.assessRisk({ changeType: 'delete', filePath: 'src/old.ts', linesAdded: 0, linesRemoved: 50 })).toBe('high')
+    expect(
+      planner.assessRisk({
+        changeType: 'delete',
+        filePath: 'src/old.ts',
+        linesAdded: 0,
+        linesRemoved: 50,
+      }),
+    ).toBe('high')
   })
 
   it('returns critical for large modifications (>200 delta)', () => {
-    expect(planner.assessRisk({ changeType: 'modify', filePath: 'src/big.ts', linesAdded: 150, linesRemoved: 60 })).toBe('critical')
+    expect(
+      planner.assessRisk({
+        changeType: 'modify',
+        filePath: 'src/big.ts',
+        linesAdded: 150,
+        linesRemoved: 60,
+      }),
+    ).toBe('critical')
   })
 
   it('returns high for modifications with >100 delta', () => {
-    expect(planner.assessRisk({ changeType: 'modify', filePath: 'src/medium.ts', linesAdded: 80, linesRemoved: 30 })).toBe('high')
+    expect(
+      planner.assessRisk({
+        changeType: 'modify',
+        filePath: 'src/medium.ts',
+        linesAdded: 80,
+        linesRemoved: 30,
+      }),
+    ).toBe('high')
   })
 
   it('returns medium for modifications with >50 delta', () => {
-    expect(planner.assessRisk({ changeType: 'modify', filePath: 'src/med.ts', linesAdded: 40, linesRemoved: 20 })).toBe('medium')
+    expect(
+      planner.assessRisk({
+        changeType: 'modify',
+        filePath: 'src/med.ts',
+        linesAdded: 40,
+        linesRemoved: 20,
+      }),
+    ).toBe('medium')
   })
 
   it('returns low for modifications with >10 delta', () => {
-    expect(planner.assessRisk({ changeType: 'modify', filePath: 'src/small.ts', linesAdded: 10, linesRemoved: 5 })).toBe('low')
+    expect(
+      planner.assessRisk({
+        changeType: 'modify',
+        filePath: 'src/small.ts',
+        linesAdded: 10,
+        linesRemoved: 5,
+      }),
+    ).toBe('low')
   })
 
   it('returns medium for config file changes with small delta', () => {
-    expect(planner.assessRisk({ changeType: 'modify', filePath: 'package.json', linesAdded: 2, linesRemoved: 1 })).toBe('medium')
+    expect(
+      planner.assessRisk({
+        changeType: 'modify',
+        filePath: 'package.json',
+        linesAdded: 2,
+        linesRemoved: 1,
+      }),
+    ).toBe('medium')
   })
 
   it('returns medium for tsconfig changes with small delta', () => {
-    expect(planner.assessRisk({ changeType: 'modify', filePath: 'tsconfig.json', linesAdded: 1, linesRemoved: 1 })).toBe('medium')
+    expect(
+      planner.assessRisk({
+        changeType: 'modify',
+        filePath: 'tsconfig.json',
+        linesAdded: 1,
+        linesRemoved: 1,
+      }),
+    ).toBe('medium')
   })
 
   it('returns medium for .env file changes with small delta', () => {
-    expect(planner.assessRisk({ changeType: 'modify', filePath: '.env', linesAdded: 1, linesRemoved: 0 })).toBe('medium')
+    expect(
+      planner.assessRisk({
+        changeType: 'modify',
+        filePath: '.env',
+        linesAdded: 1,
+        linesRemoved: 0,
+      }),
+    ).toBe('medium')
   })
 
   it('returns minimal for small non-config modifications', () => {
-    expect(planner.assessRisk({ changeType: 'modify', filePath: 'src/utils.ts', linesAdded: 3, linesRemoved: 2 })).toBe('minimal')
+    expect(
+      planner.assessRisk({
+        changeType: 'modify',
+        filePath: 'src/utils.ts',
+        linesAdded: 3,
+        linesRemoved: 2,
+      }),
+    ).toBe('minimal')
   })
 })
 

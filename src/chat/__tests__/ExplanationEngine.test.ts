@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  ExplanationEngine,
-  DEFAULT_EXPLANATION_ENGINE_CONFIG,
-} from '../ExplanationEngine'
+import { ExplanationEngine, DEFAULT_EXPLANATION_ENGINE_CONFIG } from '../ExplanationEngine'
 import type {
   ExpertiseLevel,
   AbstractionLevel,
@@ -520,31 +517,41 @@ describe('ExplanationEngine generateAnalogies', () => {
   it('uses programming analogies for programming domain', () => {
     const result = engine.generateAnalogies('function', 'programming')
     const domains = result.map(a => a.familiarDomain)
-    expect(domains.some(d => d.includes('recipe') || d.includes('house') || d.includes('assembly'))).toBe(true)
+    expect(
+      domains.some(d => d.includes('recipe') || d.includes('house') || d.includes('assembly')),
+    ).toBe(true)
   })
 
   it('uses security analogies for security domain', () => {
     const result = engine.generateAnalogies('firewall', 'security')
     const domains = result.map(a => a.familiarDomain)
-    expect(domains.some(d => d.includes('security') || d.includes('vault') || d.includes('castle'))).toBe(true)
+    expect(
+      domains.some(d => d.includes('security') || d.includes('vault') || d.includes('castle')),
+    ).toBe(true)
   })
 
   it('uses networking analogies for networking domain', () => {
     const result = engine.generateAnalogies('protocol', 'networking')
     const domains = result.map(a => a.familiarDomain)
-    expect(domains.some(d => d.includes('postal') || d.includes('highway') || d.includes('telephone'))).toBe(true)
+    expect(
+      domains.some(d => d.includes('postal') || d.includes('highway') || d.includes('telephone')),
+    ).toBe(true)
   })
 
   it('uses database analogies for databases domain', () => {
     const result = engine.generateAnalogies('index', 'databases')
     const domains = result.map(a => a.familiarDomain)
-    expect(domains.some(d => d.includes('cabinet') || d.includes('catalog') || d.includes('phone book'))).toBe(true)
+    expect(
+      domains.some(d => d.includes('cabinet') || d.includes('catalog') || d.includes('phone book')),
+    ).toBe(true)
   })
 
   it('uses algorithm analogies for algorithms domain', () => {
     const result = engine.generateAnalogies('sort', 'algorithms')
     const domains = result.map(a => a.familiarDomain)
-    expect(domains.some(d => d.includes('cards') || d.includes('dictionary') || d.includes('maze'))).toBe(true)
+    expect(
+      domains.some(d => d.includes('cards') || d.includes('dictionary') || d.includes('maze')),
+    ).toBe(true)
   })
 
   it('falls back to general analogies for unknown domain', () => {
@@ -727,7 +734,13 @@ describe('ExplanationEngine trackProgress', () => {
   })
 
   it('currentLevel is a valid AbstractionLevel', () => {
-    const validLevels: AbstractionLevel[] = ['eli5', 'simplified', 'standard', 'detailed', 'technical']
+    const validLevels: AbstractionLevel[] = [
+      'eli5',
+      'simplified',
+      'standard',
+      'detailed',
+      'technical',
+    ]
     const progress = engine.trackProgress('user1', 'api')
     expect(validLevels).toContain(progress.currentLevel)
   })

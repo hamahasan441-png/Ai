@@ -9,8 +9,7 @@ import { MODEL_COSTS } from '../../utils/modelCost.js'
 import { isAnalyticsDisabled } from './config.js'
 import { getEventMetadata } from './metadata.js'
 
-const DATADOG_LOGS_ENDPOINT =
-  'https://http-intake.logs.us5.datadoghq.com/api/v2/logs'
+const DATADOG_LOGS_ENDPOINT = 'https://http-intake.logs.us5.datadoghq.com/api/v2/logs'
 const DATADOG_CLIENT_TOKEN = 'pubbbf48e6d78dae54bceaa4acf463299bf'
 const DEFAULT_FLUSH_INTERVAL_MS = 15000
 const MAX_BATCH_SIZE = 100
@@ -194,10 +193,7 @@ export async function trackDatadogEvent(
     }
 
     // Normalize MCP tool names to "mcp" for cardinality reduction
-    if (
-      typeof allData.toolName === 'string' &&
-      allData.toolName.startsWith('mcp__')
-    ) {
+    if (typeof allData.toolName === 'string' && allData.toolName.startsWith('mcp__')) {
       allData.toolName = 'mcp'
     }
 
@@ -240,8 +236,7 @@ export async function trackDatadogEvent(
     const tags = [
       `event:${eventName}`,
       ...TAG_FIELDS.filter(
-        field =>
-          allDataRecord[field] !== undefined && allDataRecord[field] !== null,
+        field => allDataRecord[field] !== undefined && allDataRecord[field] !== null,
       ).map(field => `${camelToSnakeCase(field)}:${allDataRecord[field]}`),
     ]
 

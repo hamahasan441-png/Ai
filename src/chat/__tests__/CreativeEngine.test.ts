@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  CreativeEngine,
-  type CreativeIdea,
-} from '../CreativeEngine'
+import { CreativeEngine, type CreativeIdea } from '../CreativeEngine'
 
 // ── Constructor Tests ──
 
@@ -86,7 +83,10 @@ describe('CreativeEngine brainstorm', () => {
   })
 
   it('generates ideas with constraints applied', () => {
-    const result = engine.brainstorm('Build a chat application', ['must be real-time', 'low latency'])
+    const result = engine.brainstorm('Build a chat application', [
+      'must be real-time',
+      'low latency',
+    ])
     expect(result.ideas.length).toBeGreaterThan(0)
   })
 
@@ -195,7 +195,10 @@ describe('CreativeEngine combineCreatively', () => {
   })
 
   it('handles multi-word concepts', () => {
-    const result = engine.combineCreatively('event-driven architecture', 'natural language processing')
+    const result = engine.combineCreatively(
+      'event-driven architecture',
+      'natural language processing',
+    )
     expect(result.conceptA).toBe('event-driven architecture')
     expect(result.conceptB).toBe('natural language processing')
     expect(result.combination.length).toBeGreaterThan(0)
@@ -421,7 +424,10 @@ describe('CreativeEngine evaluateNovelty', () => {
       'Use a CDN for static assets',
     ]
     const commonScore = engine.evaluateNovelty('Use caching to speed up reads', existing)
-    const uniqueScore = engine.evaluateNovelty('Apply genetic algorithms to optimize query routing', existing)
+    const uniqueScore = engine.evaluateNovelty(
+      'Apply genetic algorithms to optimize query routing',
+      existing,
+    )
     expect(uniqueScore).toBeGreaterThan(commonScore)
   })
 

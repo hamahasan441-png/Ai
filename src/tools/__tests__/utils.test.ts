@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  tagMessagesWithToolUseID,
-  getToolUseIDFromParentMessage,
-} from '../utils.js'
+import { tagMessagesWithToolUseID, getToolUseIDFromParentMessage } from '../utils.js'
 import type { AssistantMessage, UserMessage, SystemMessage } from '../../types/message.js'
 
 describe('tagMessagesWithToolUseID', () => {
@@ -64,15 +61,11 @@ describe('getToolUseIDFromParentMessage', () => {
       type: 'assistant',
       message: {
         role: 'assistant',
-        content: [
-          { type: 'tool_use', id: 'toolu_abc123', name: 'bash', input: {} },
-        ],
+        content: [{ type: 'tool_use', id: 'toolu_abc123', name: 'bash', input: {} }],
       },
     } as AssistantMessage
 
-    expect(getToolUseIDFromParentMessage(parentMessage, 'bash')).toBe(
-      'toolu_abc123',
-    )
+    expect(getToolUseIDFromParentMessage(parentMessage, 'bash')).toBe('toolu_abc123')
   })
 
   it('returns undefined when no matching tool name', () => {
@@ -80,15 +73,11 @@ describe('getToolUseIDFromParentMessage', () => {
       type: 'assistant',
       message: {
         role: 'assistant',
-        content: [
-          { type: 'tool_use', id: 'toolu_abc123', name: 'bash', input: {} },
-        ],
+        content: [{ type: 'tool_use', id: 'toolu_abc123', name: 'bash', input: {} }],
       },
     } as AssistantMessage
 
-    expect(
-      getToolUseIDFromParentMessage(parentMessage, 'editor'),
-    ).toBeUndefined()
+    expect(getToolUseIDFromParentMessage(parentMessage, 'editor')).toBeUndefined()
   })
 
   it('returns undefined when content has no tool_use blocks', () => {
@@ -100,9 +89,7 @@ describe('getToolUseIDFromParentMessage', () => {
       },
     } as AssistantMessage
 
-    expect(
-      getToolUseIDFromParentMessage(parentMessage, 'bash'),
-    ).toBeUndefined()
+    expect(getToolUseIDFromParentMessage(parentMessage, 'bash')).toBeUndefined()
   })
 
   it('finds the correct tool among multiple tool_use blocks', () => {
@@ -117,9 +104,7 @@ describe('getToolUseIDFromParentMessage', () => {
       },
     } as AssistantMessage
 
-    expect(getToolUseIDFromParentMessage(parentMessage, 'editor')).toBe(
-      'toolu_222',
-    )
+    expect(getToolUseIDFromParentMessage(parentMessage, 'editor')).toBe('toolu_222')
   })
 
   it('returns undefined for empty content array', () => {
@@ -131,8 +116,6 @@ describe('getToolUseIDFromParentMessage', () => {
       },
     } as AssistantMessage
 
-    expect(
-      getToolUseIDFromParentMessage(parentMessage, 'bash'),
-    ).toBeUndefined()
+    expect(getToolUseIDFromParentMessage(parentMessage, 'bash')).toBeUndefined()
   })
 })

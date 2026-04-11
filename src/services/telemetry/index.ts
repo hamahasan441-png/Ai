@@ -124,9 +124,7 @@ export class RateLimitSampler implements Sampler {
   private count = 0
   private windowStart = Date.now()
 
-  constructor(
-    private readonly maxPerSecond: number,
-  ) {}
+  constructor(private readonly maxPerSecond: number) {}
 
   shouldSample(): boolean {
     const now = Date.now()

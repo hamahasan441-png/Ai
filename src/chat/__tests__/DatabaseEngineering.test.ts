@@ -13,19 +13,27 @@ describe('Database Engineering Knowledge', () => {
 
   describe('PostgreSQL Advanced', () => {
     it('explains PostgreSQL indexing strategies', async () => {
-      const r = await brain.chat('What are the PostgreSQL indexing strategies with BTree GIN GiST and BRIN?')
+      const r = await brain.chat(
+        'What are the PostgreSQL indexing strategies with BTree GIN GiST and BRIN?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/postgres|index|btree|gin|gist|brin|query/)
     })
 
     it('describes PostgreSQL query optimization with EXPLAIN', async () => {
-      const r = await brain.chat('How does PostgreSQL query optimization with EXPLAIN ANALYZE work?')
+      const r = await brain.chat(
+        'How does PostgreSQL query optimization with EXPLAIN ANALYZE work?',
+      )
       expect(r.text.toLowerCase()).toMatch(/postgres|explain|analyze|query|optim|index|scan/)
     })
 
     it('covers PostgreSQL partitioning and VACUUM', async () => {
-      const r = await brain.chat('How do PostgreSQL partitioning and VACUUM analyze maintenance work?')
-      expect(r.text.toLowerCase()).toMatch(/postgres|partition|vacuum|autovacuum|dead\s*tuple|range/)
+      const r = await brain.chat(
+        'How do PostgreSQL partitioning and VACUUM analyze maintenance work?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /postgres|partition|vacuum|autovacuum|dead\s*tuple|range/,
+      )
     })
   })
 
@@ -33,19 +41,29 @@ describe('Database Engineering Knowledge', () => {
 
   describe('Redis Engineering', () => {
     it('explains Redis data structures and patterns', async () => {
-      const r = await brain.chat('What are the Redis data structures and caching patterns for engineering?')
+      const r = await brain.chat(
+        'What are the Redis data structures and caching patterns for engineering?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/redis|data\s*structure|string|hash|sorted\s*set|cache|pattern/)
+      expect(r.text.toLowerCase()).toMatch(
+        /redis|data\s*structure|string|hash|sorted\s*set|cache|pattern/,
+      )
     })
 
     it('describes Redis pub/sub and streams', async () => {
-      const r = await brain.chat('How do Redis pub-sub messaging and streams event processing work?')
+      const r = await brain.chat(
+        'How do Redis pub-sub messaging and streams event processing work?',
+      )
       expect(r.text.toLowerCase()).toMatch(/redis|pub.?sub|stream|message|event|xadd|subscribe/)
     })
 
     it('covers Redis cluster and sentinel HA', async () => {
-      const r = await brain.chat('How does Redis cluster and sentinel high availability failover work?')
-      expect(r.text.toLowerCase()).toMatch(/redis|cluster|sentinel|failover|shard|hash\s*slot|avail/)
+      const r = await brain.chat(
+        'How does Redis cluster and sentinel high availability failover work?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /redis|cluster|sentinel|failover|shard|hash\s*slot|avail/,
+      )
     })
   })
 
@@ -53,13 +71,17 @@ describe('Database Engineering Knowledge', () => {
 
   describe('MongoDB Advanced', () => {
     it('explains MongoDB aggregation pipeline', async () => {
-      const r = await brain.chat('How does the MongoDB document database aggregation pipeline work?')
+      const r = await brain.chat(
+        'How does the MongoDB document database aggregation pipeline work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/mongodb|aggregat|pipeline|match|group|project|lookup/)
     })
 
     it('describes MongoDB sharding and replica sets', async () => {
-      const r = await brain.chat('How do MongoDB indexing sharding and replica set configurations work?')
+      const r = await brain.chat(
+        'How do MongoDB indexing sharding and replica set configurations work?',
+      )
       expect(r.text.toLowerCase()).toMatch(/mongodb|shard|replica\s*set|index|primary|secondary/)
     })
   })
@@ -68,14 +90,20 @@ describe('Database Engineering Knowledge', () => {
 
   describe('Database Migrations', () => {
     it('explains schema migration tools and patterns', async () => {
-      const r = await brain.chat('What are the database migration schema evolution tools like Flyway and Liquibase?')
+      const r = await brain.chat(
+        'What are the database migration schema evolution tools like Flyway and Liquibase?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/migration|schema|flyway|liquibase|alembic|evolut|version/)
+      expect(r.text.toLowerCase()).toMatch(
+        /migration|schema|flyway|liquibase|alembic|evolut|version/,
+      )
     })
 
     it('covers zero-downtime migration strategy', async () => {
       const r = await brain.chat('How does a zero downtime database migration strategy work?')
-      expect(r.text.toLowerCase()).toMatch(/zero.?downtime|migration|expand|contract|backfill|column|schema/)
+      expect(r.text.toLowerCase()).toMatch(
+        /zero.?downtime|migration|expand|contract|backfill|column|schema/,
+      )
     })
   })
 
@@ -83,9 +111,13 @@ describe('Database Engineering Knowledge', () => {
 
   describe('Database Replication & HA', () => {
     it('explains database replication and failover', async () => {
-      const r = await brain.chat('How does database replication master slave synchronization and failover work?')
+      const r = await brain.chat(
+        'How does database replication master slave synchronization and failover work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/replic|synchron|failover|primary|secondary|async|cluster/)
+      expect(r.text.toLowerCase()).toMatch(
+        /replic|synchron|failover|primary|secondary|async|cluster/,
+      )
     })
   })
 
@@ -93,9 +125,13 @@ describe('Database Engineering Knowledge', () => {
 
   describe('Specialized Databases', () => {
     it('explains time series and analytical databases', async () => {
-      const r = await brain.chat('What are specialized time series database InfluxDB and TimescaleDB for analytics?')
+      const r = await brain.chat(
+        'What are specialized time series database InfluxDB and TimescaleDB for analytics?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/time.?series|influxdb|timescaledb|columnar|clickhouse|analytic/)
+      expect(r.text.toLowerCase()).toMatch(
+        /time.?series|influxdb|timescaledb|columnar|clickhouse|analytic/,
+      )
     })
   })
 
@@ -103,13 +139,17 @@ describe('Database Engineering Knowledge', () => {
 
   describe('SQL Query Optimization', () => {
     it('explains SQL query optimization and execution plans', async () => {
-      const r = await brain.chat('How does SQL query optimization with execution plan analysis work?')
+      const r = await brain.chat(
+        'How does SQL query optimization with execution plan analysis work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/sql|query|optim|explain|execution|plan|index|join|scan/)
     })
 
     it('covers N+1 query problem and solutions', async () => {
-      const r = await brain.chat('How to solve the SQL performance indexing and explain analyze N+1 query problem?')
+      const r = await brain.chat(
+        'How to solve the SQL performance indexing and explain analyze N+1 query problem?',
+      )
       expect(r.text.toLowerCase()).toMatch(/n\+1|query|optim|eager|join|batch|index|pool|explain/)
     })
   })
@@ -118,7 +158,9 @@ describe('Database Engineering Knowledge', () => {
 
   describe('Distributed SQL', () => {
     it('explains distributed SQL databases like CockroachDB', async () => {
-      const r = await brain.chat('How do distributed SQL databases like CockroachDB and Spanner work?')
+      const r = await brain.chat(
+        'How do distributed SQL databases like CockroachDB and Spanner work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/distribut|sql|cockroach|spanner|consensus|raft|shard/)
     })

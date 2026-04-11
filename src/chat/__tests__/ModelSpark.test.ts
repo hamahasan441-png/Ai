@@ -176,7 +176,9 @@ describe('ModelSpark — Dual-Model Ensemble Engine', () => {
     })
 
     it('should detect exploit research', () => {
-      const result = spark.detectDomain('Develop an exploit chain for this buffer overflow vulnerability')
+      const result = spark.detectDomain(
+        'Develop an exploit chain for this buffer overflow vulnerability',
+      )
       expect(result.domain).toBe('exploit_research')
     })
 
@@ -253,7 +255,7 @@ describe('ModelSpark — Dual-Model Ensemble Engine', () => {
     it('should route creative writing to LLaMA', () => {
       const rule = spark.getRoutingRule('creative_writing')
       expect(rule.preference).toBe('llama')
-      expect(rule.llamaWeight).toBe(0.90)
+      expect(rule.llamaWeight).toBe(0.9)
     })
 
     it('should route planning to ensemble', () => {
@@ -264,8 +266,8 @@ describe('ModelSpark — Dual-Model Ensemble Engine', () => {
     it('should route data analysis to ensemble', () => {
       const rule = spark.getRoutingRule('data_analysis')
       expect(rule.preference).toBe('ensemble')
-      expect(rule.qwenWeight).toBe(0.50)
-      expect(rule.llamaWeight).toBe(0.50)
+      expect(rule.qwenWeight).toBe(0.5)
+      expect(rule.llamaWeight).toBe(0.5)
     })
 
     it('should get all routing rules', () => {
@@ -275,10 +277,20 @@ describe('ModelSpark — Dual-Model Ensemble Engine', () => {
 
     it('should have routing rules for every domain', () => {
       const domains: TaskDomain[] = [
-        'code_generation', 'code_review', 'code_completion', 'debugging',
-        'security_analysis', 'exploit_research', 'general_reasoning',
-        'math_logic', 'creative_writing', 'summarization', 'translation',
-        'conversation', 'planning', 'data_analysis',
+        'code_generation',
+        'code_review',
+        'code_completion',
+        'debugging',
+        'security_analysis',
+        'exploit_research',
+        'general_reasoning',
+        'math_logic',
+        'creative_writing',
+        'summarization',
+        'translation',
+        'conversation',
+        'planning',
+        'data_analysis',
       ]
       for (const domain of domains) {
         const rule = spark.getRoutingRule(domain)
@@ -682,8 +694,15 @@ describe('ModelSpark — Dual-Model Ensemble Engine', () => {
 
     it('should identify best strategy in benchmark', async () => {
       const result = await spark.benchmark('debugging', 'Fix this null pointer error')
-      expect(['route', 'ensemble', 'cascade', 'speculative', 'fusion', 'parallel_race', 'chain_of_thought'])
-        .toContain(result.bestStrategy)
+      expect([
+        'route',
+        'ensemble',
+        'cascade',
+        'speculative',
+        'fusion',
+        'parallel_race',
+        'chain_of_thought',
+      ]).toContain(result.bestStrategy)
     })
   })
 
@@ -1027,7 +1046,11 @@ describe('ModelSpark — Dual-Model Ensemble Engine', () => {
     it('should not escalate when quality is high', async () => {
       // With a very low threshold, cascade should NOT escalate
       const easySparkCascade = new ModelSpark({ cascadeQualityThreshold: 0.01 })
-      await easySparkCascade.infer({ prompt: 'easy test', domain: 'conversation', strategy: 'cascade' })
+      await easySparkCascade.infer({
+        prompt: 'easy test',
+        domain: 'conversation',
+        strategy: 'cascade',
+      })
       const stats = easySparkCascade.getStats()
       expect(stats.cascadeEscalations).toBe(0)
     })
@@ -1039,7 +1062,11 @@ describe('ModelSpark — Dual-Model Ensemble Engine', () => {
 
   describe('Speculative Strategy Stats', () => {
     it('should track speculative acceptances/rejections', async () => {
-      await spark.infer({ prompt: 'test speculative', domain: 'general_reasoning', strategy: 'speculative' })
+      await spark.infer({
+        prompt: 'test speculative',
+        domain: 'general_reasoning',
+        strategy: 'speculative',
+      })
       const stats = spark.getStats()
       expect(stats.speculativeAcceptances + stats.speculativeRejections).toBeGreaterThanOrEqual(1)
     })
@@ -1051,7 +1078,13 @@ describe('ModelSpark — Dual-Model Ensemble Engine', () => {
 
   describe('All Strategies on Code Domain', () => {
     const strategies: InferenceStrategy[] = [
-      'route', 'ensemble', 'cascade', 'speculative', 'fusion', 'parallel_race', 'chain_of_thought',
+      'route',
+      'ensemble',
+      'cascade',
+      'speculative',
+      'fusion',
+      'parallel_race',
+      'chain_of_thought',
     ]
 
     for (const strategy of strategies) {
@@ -1278,7 +1311,10 @@ describe('ModelSpark — Enhanced Features', () => {
 
     it('should respect domain in stream routing', async () => {
       const tokens: StreamToken[] = []
-      for await (const token of spark.inferStream({ prompt: 'Write a function', domain: 'code_generation' })) {
+      for await (const token of spark.inferStream({
+        prompt: 'Write a function',
+        domain: 'code_generation',
+      })) {
         tokens.push(token)
       }
       // Code tasks should route to Qwen
@@ -1287,7 +1323,10 @@ describe('ModelSpark — Enhanced Features', () => {
 
     it('should route reasoning tasks to LLaMA in stream', async () => {
       const tokens: StreamToken[] = []
-      for await (const token of spark.inferStream({ prompt: 'Explain why', domain: 'general_reasoning' })) {
+      for await (const token of spark.inferStream({
+        prompt: 'Explain why',
+        domain: 'general_reasoning',
+      })) {
         tokens.push(token)
       }
       expect(tokens[0]!.modelFamily).toBe('llama3')
@@ -1455,7 +1494,13 @@ describe('ModelSpark — Enhanced Features', () => {
   describe('Prompt Chaining', () => {
     it('should execute a simple single-step chain', async () => {
       const steps: PromptChainStep[] = [
-        { id: 'step1', prompt: 'Write hello world', model: 'qwen2.5', domain: 'code_generation', dependsOn: [] },
+        {
+          id: 'step1',
+          prompt: 'Write hello world',
+          model: 'qwen2.5',
+          domain: 'code_generation',
+          dependsOn: [],
+        },
       ]
       const result = await spark.executePromptChain(steps)
       expect(result.steps).toHaveLength(1)
@@ -1465,8 +1510,20 @@ describe('ModelSpark — Enhanced Features', () => {
 
     it('should execute a multi-step chain with dependencies', async () => {
       const steps: PromptChainStep[] = [
-        { id: 'plan', prompt: 'Plan a sorting algorithm', model: 'llama3', domain: 'planning', dependsOn: [] },
-        { id: 'code', prompt: 'Implement: {plan}', model: 'qwen2.5', domain: 'code_generation', dependsOn: ['plan'] },
+        {
+          id: 'plan',
+          prompt: 'Plan a sorting algorithm',
+          model: 'llama3',
+          domain: 'planning',
+          dependsOn: [],
+        },
+        {
+          id: 'code',
+          prompt: 'Implement: {plan}',
+          model: 'qwen2.5',
+          domain: 'code_generation',
+          dependsOn: ['plan'],
+        },
       ]
       const result = await spark.executePromptChain(steps)
       expect(result.steps).toHaveLength(2)
@@ -1476,7 +1533,13 @@ describe('ModelSpark — Enhanced Features', () => {
 
     it('should resolve dependencies in correct order', async () => {
       const steps: PromptChainStep[] = [
-        { id: 'c', prompt: 'Final: {a} and {b}', model: 'auto', domain: 'auto', dependsOn: ['a', 'b'] },
+        {
+          id: 'c',
+          prompt: 'Final: {a} and {b}',
+          model: 'auto',
+          domain: 'auto',
+          dependsOn: ['a', 'b'],
+        },
         { id: 'a', prompt: 'First step', model: 'auto', domain: 'auto', dependsOn: [] },
         { id: 'b', prompt: 'Second step', model: 'auto', domain: 'auto', dependsOn: [] },
       ]
@@ -1488,7 +1551,14 @@ describe('ModelSpark — Enhanced Features', () => {
 
     it('should apply extract_code transform', async () => {
       const steps: PromptChainStep[] = [
-        { id: 'gen', prompt: 'Write a function', model: 'qwen2.5', domain: 'code_generation', dependsOn: [], transform: 'extract_code' },
+        {
+          id: 'gen',
+          prompt: 'Write a function',
+          model: 'qwen2.5',
+          domain: 'code_generation',
+          dependsOn: [],
+          transform: 'extract_code',
+        },
       ]
       const result = await spark.executePromptChain(steps)
       expect(result.steps[0]!.output.length).toBeGreaterThan(0)
@@ -1537,7 +1607,8 @@ describe('ModelSpark — Enhanced Features', () => {
 
   describe('Output Parsing', () => {
     it('should extract code blocks', () => {
-      const text = 'Here is code:\n```python\ndef hello():\n    print("hi")\n```\nAnd more:\n```js\nconsole.log("hi")\n```'
+      const text =
+        'Here is code:\n```python\ndef hello():\n    print("hi")\n```\nAnd more:\n```js\nconsole.log("hi")\n```'
       const parsed = spark.parseOutput(text)
       expect(parsed.codeBlocks).toHaveLength(2)
       expect(parsed.codeBlocks[0]!.language).toBe('python')
@@ -1580,7 +1651,8 @@ describe('ModelSpark — Enhanced Features', () => {
     })
 
     it('should generate summary from first paragraph', () => {
-      const text = 'This is the first paragraph with enough content to be a summary.\n\nSecond paragraph here.'
+      const text =
+        'This is the first paragraph with enough content to be a summary.\n\nSecond paragraph here.'
       const parsed = spark.parseOutput(text)
       expect(parsed.summary).toContain('first paragraph')
     })
@@ -1630,7 +1702,10 @@ describe('ModelSpark — Enhanced Features', () => {
   // ══════════════════════════════════════════════════════════════════════════
 
   describe('Context Window Management', () => {
-    const makeMessage = (role: 'system' | 'user' | 'assistant', content: string): SparkChatMessage => ({
+    const makeMessage = (
+      role: 'system' | 'user' | 'assistant',
+      content: string,
+    ): SparkChatMessage => ({
       role,
       content,
       timestamp: Date.now(),
@@ -1638,10 +1713,7 @@ describe('ModelSpark — Enhanced Features', () => {
     })
 
     it('should return all messages when within budget', () => {
-      const messages = [
-        makeMessage('user', 'Hello'),
-        makeMessage('assistant', 'Hi there'),
-      ]
+      const messages = [makeMessage('user', 'Hello'), makeMessage('assistant', 'Hi there')]
       const result = spark.manageContextWindow(messages, {
         maxTokens: 1000,
         strategy: 'truncate_oldest',
@@ -1817,7 +1889,7 @@ describe('ModelSpark — Enhanced Features', () => {
       const req = spark.buildOllamaChatRequest(messages, model)
       expect(req.model).toBe(model.ollamaName)
       expect(Array.isArray(req.messages)).toBe(true)
-      expect((req.messages as Array<{role: string}>).length).toBe(2)
+      expect((req.messages as Array<{ role: string }>).length).toBe(2)
     })
 
     it('should build OpenAI-compatible request', () => {
@@ -1825,7 +1897,7 @@ describe('ModelSpark — Enhanced Features', () => {
       const req = spark.buildOpenAICompatRequest('Hello', model, { systemPrompt: 'Be helpful' })
       expect(req.model).toBe(model.id)
       expect(Array.isArray(req.messages)).toBe(true)
-      expect((req.messages as Array<{role: string}>).length).toBe(2) // system + user
+      expect((req.messages as Array<{ role: string }>).length).toBe(2) // system + user
       expect(req.stream).toBe(false)
     })
 
@@ -1849,9 +1921,17 @@ describe('ModelSpark — Enhanced Features', () => {
     it('should include all management commands', () => {
       const cmds = spark.getModelManagementCommands()
       const expectedKeys = [
-        'install_qwen', 'install_llama', 'list_models',
-        'show_qwen', 'show_llama', 'remove_qwen', 'remove_llama',
-        'start_server', 'check_status', 'run_qwen', 'run_llama',
+        'install_qwen',
+        'install_llama',
+        'list_models',
+        'show_qwen',
+        'show_llama',
+        'remove_qwen',
+        'remove_llama',
+        'start_server',
+        'check_status',
+        'run_qwen',
+        'run_llama',
       ]
       for (const key of expectedKeys) {
         expect(cmds[key]).toBeTruthy()
@@ -1916,7 +1996,9 @@ describe('ModelSpark — Enhanced Features', () => {
     })
 
     it('should handle special characters in prompts', async () => {
-      const response = await spark.infer({ prompt: 'Test <script>alert("xss")</script> & special © chars' })
+      const response = await spark.infer({
+        prompt: 'Test <script>alert("xss")</script> & special © chars',
+      })
       expect(response).toBeTruthy()
     })
 
@@ -1940,7 +2022,10 @@ describe('ModelSpark — Enhanced Features', () => {
 
       // Stream a follow-up response (separate inference)
       const tokens: StreamToken[] = []
-      for await (const token of spark.inferStream({ prompt: 'Write quicksort', domain: 'code_generation' })) {
+      for await (const token of spark.inferStream({
+        prompt: 'Write quicksort',
+        domain: 'code_generation',
+      })) {
         tokens.push(token)
       }
       expect(tokens.length).toBeGreaterThan(0)

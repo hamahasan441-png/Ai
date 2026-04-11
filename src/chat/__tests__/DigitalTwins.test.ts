@@ -5,24 +5,38 @@ import { createProgrammingKnowledgeGraph } from '../SemanticMemory'
 describe('Digital Twins / Simulation Knowledge', () => {
   let brain: LocalBrain
 
-  beforeAll(() => { brain = new LocalBrain({ enableIntelligence: true }) })
+  beforeAll(() => {
+    brain = new LocalBrain({ enableIntelligence: true })
+  })
 
   it('knows about digital twins', async () => {
-    const r = await brain.chat('explain digital twin virtual model real time synchronization physics simulation finite element')
+    const r = await brain.chat(
+      'explain digital twin virtual model real time synchronization physics simulation finite element',
+    )
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/digital\s+twin|virtual|simulation|physics|finite\s+element|agent/)
+    expect(r.text.toLowerCase()).toMatch(
+      /digital\s+twin|virtual|simulation|physics|finite\s+element|agent/,
+    )
   })
 
   it('knows about simulation methods', async () => {
-    const r = await brain.chat('explain monte carlo simulation random sampling discrete event simulation queuing system dynamics')
+    const r = await brain.chat(
+      'explain monte carlo simulation random sampling discrete event simulation queuing system dynamics',
+    )
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/monte\s+carlo|discrete\s+event|queuing|system\s+dynamics|simulation/)
+    expect(r.text.toLowerCase()).toMatch(
+      /monte\s+carlo|discrete\s+event|queuing|system\s+dynamics|simulation/,
+    )
   })
 
   it('knows about advanced simulation', async () => {
-    const r = await brain.chat('explain computational fluid dynamics cfd simulation optimization hardware in loop digital twin platform')
+    const r = await brain.chat(
+      'explain computational fluid dynamics cfd simulation optimization hardware in loop digital twin platform',
+    )
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/cfd|fluid|simulation|optimization|hardware|digital\s+twin/)
+    expect(r.text.toLowerCase()).toMatch(
+      /cfd|fluid|simulation|optimization|hardware|digital\s+twin/,
+    )
   })
 
   it('has Digital Twins concept', () => {

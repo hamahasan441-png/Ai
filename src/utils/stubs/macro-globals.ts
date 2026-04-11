@@ -10,18 +10,25 @@
  */
 
 import { createRequire } from 'module'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
+import { join } from 'path'
 import { readFileSync } from 'fs'
 
-const _require = createRequire(import.meta.url)
-const __dirname = dirname(fileURLToPath(import.meta.url))
+// In CommonJS output (module: Node16 for .ts files) __filename and __dirname
+// are built-in globals.  We use them instead of import.meta.url so that
+// TypeScript does not raise TS1470.
+declare const __filename: string
+declare const __dirname: string
+
+const _require = createRequire(__filename)
 
 // ─── CJS loader for .md / .txt files ─────────────────────────────────────────
 // `require.extensions` is deprecated but still works in all Node.js versions.
 // This covers the cases where tsx transpiles `import x from 'file.md'` to CJS.
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
-const reqExts = (_require as any).extensions as Record<string, (m: NodeJS.Module, filename: string) => void>
+const reqExts = (_require as any).extensions as Record<
+  string,
+  (m: NodeJS.Module, filename: string) => void
+>
 if (reqExts && !reqExts['.md']) {
   reqExts['.md'] = (m: NodeJS.Module, filename: string) => {
     const content = readFileSync(filename, 'utf-8')
@@ -71,4 +78,3 @@ globalThis.MACRO = {
   NATIVE_PACKAGE_URL: undefined,
   VERSION_CHANGELOG: '',
 }
-

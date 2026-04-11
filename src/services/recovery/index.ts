@@ -133,7 +133,7 @@ export interface RecoveryEvent {
 // ── Helpers ──
 
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 /** Categorise an error as transient, permanent, or unknown */
@@ -155,9 +155,17 @@ export function categorizeError(error: unknown): ErrorCategory {
     'unavailable',
     'too many requests',
   ]
-  if (transientPatterns.some((p) => msg.includes(p))) return 'transient'
-  const permanentPatterns = ['401', '403', '404', 'not found', 'unauthorized', 'forbidden', 'invalid']
-  if (permanentPatterns.some((p) => msg.includes(p))) return 'permanent'
+  if (transientPatterns.some(p => msg.includes(p))) return 'transient'
+  const permanentPatterns = [
+    '401',
+    '403',
+    '404',
+    'not found',
+    'unauthorized',
+    'forbidden',
+    'invalid',
+  ]
+  if (permanentPatterns.some(p => msg.includes(p))) return 'permanent'
   return 'unknown'
 }
 
@@ -424,7 +432,7 @@ export class Bulkhead {
 
     return new Promise<T>((resolve, reject) => {
       const timer = setTimeout(() => {
-        const idx = this.queue.findIndex((q) => q.resolve === resolve)
+        const idx = this.queue.findIndex(q => q.resolve === resolve)
         if (idx !== -1) {
           this.queue.splice(idx, 1)
           this.stats.failures++

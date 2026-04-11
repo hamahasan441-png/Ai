@@ -4,10 +4,7 @@ import { getSessionId } from '../../bootstrap/state.js'
 import type { AppState } from '../../state/AppState.js'
 import type { EditableSettingSource } from '../settings/constants.js'
 import { SOURCES } from '../settings/constants.js'
-import {
-  getSettingsFilePathForSource,
-  getSettingsForSource,
-} from '../settings/settings.js'
+import { getSettingsFilePathForSource, getSettingsForSource } from '../settings/settings.js'
 import type { HookCommand, HookMatcher } from '../settings/types.js'
 import { DEFAULT_HOOK_SHELL } from '../shell/shellProvider.js'
 import { getSessionHooks } from './sessionHooks.js'
@@ -40,8 +37,7 @@ export function isHookEqual(
   // Note: We only compare command/prompt content, not timeout
   // `if` is part of identity: same command with different `if` conditions
   // are distinct hooks (e.g., setup.sh if=Bash(git *) vs if=Bash(npm *)).
-  const sameIf = (x: { if?: string }, y: { if?: string }) =>
-    (x.if ?? '') === (y.if ?? '')
+  const sameIf = (x: { if?: string }, y: { if?: string }) => (x.if ?? '') === (y.if ?? '')
   switch (a.type) {
     case 'command':
       // shell is part of identity: same command string with different
@@ -100,11 +96,7 @@ export function getAllHooks(appState: AppState): IndividualHookConfig[] {
   // (user/project/local are blocked, and managed hooks are intentionally hidden)
   if (!restrictedToManagedOnly) {
     // Get hooks from all editable sources
-    const sources = [
-      'userSettings',
-      'projectSettings',
-      'localSettings',
-    ] as EditableSettingSource[]
+    const sources = ['userSettings', 'projectSettings', 'localSettings'] as EditableSettingSource[]
 
     // Track which settings files we've already processed to avoid duplicates
     // (e.g., when running from home directory, userSettings and projectSettings
@@ -160,10 +152,7 @@ export function getAllHooks(appState: AppState): IndividualHookConfig[] {
   return hooks
 }
 
-export function getHooksForEvent(
-  appState: AppState,
-  event: HookEvent,
-): IndividualHookConfig[] {
+export function getHooksForEvent(appState: AppState, event: HookEvent): IndividualHookConfig[] {
   return getAllHooks(appState).filter(hook => hook.event === event)
 }
 
@@ -229,10 +218,7 @@ export function hookSourceInlineDisplayString(source: HookSource): string {
 
 export function sortMatchersByPriority(
   matchers: string[],
-  hooksByEventAndMatcher: Record<
-    string,
-    Record<string, IndividualHookConfig[]>
-  >,
+  hooksByEventAndMatcher: Record<string, Record<string, IndividualHookConfig[]>>,
   selectedEvent: HookEvent,
 ): string[] {
   // Create a priority map based on SOURCES order (lower index = higher priority)

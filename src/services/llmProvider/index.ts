@@ -190,8 +190,8 @@ export class TokenEstimator {
    * Returns cost in USD based on rough per-token pricing tiers.
    */
   estimateCost(request: LLMRequest, provider: LLMProvider): number {
-    const promptTokens = this.estimateTokens(request.prompt) +
-      this.estimateTokens(request.system ?? '')
+    const promptTokens =
+      this.estimateTokens(request.prompt) + this.estimateTokens(request.system ?? '')
     const completionTokens = request.maxTokens ?? provider.maxTokens
 
     // Rough per-token pricing tiers (USD per 1K tokens)
@@ -368,9 +368,8 @@ export class LLMRouter {
   // ── Private methods ──
 
   private buildChain(): string[] {
-    const candidates = this.config.fallbackChain.length > 0
-      ? [...this.config.fallbackChain]
-      : this.registry.list()
+    const candidates =
+      this.config.fallbackChain.length > 0 ? [...this.config.fallbackChain] : this.registry.list()
 
     // Prepend default if not already in the list
     if (this.config.defaultProvider && !candidates.includes(this.config.defaultProvider)) {
@@ -378,7 +377,7 @@ export class LLMRouter {
     }
 
     // Apply balancing strategy to healthy candidates
-    const healthy = candidates.filter((n) => this.isHealthy(n))
+    const healthy = candidates.filter(n => this.isHealthy(n))
     return this.applyStrategy(healthy)
   }
 
@@ -412,8 +411,8 @@ export class LLMRouter {
       case 'random': {
         const shuffled = [...providers]
         for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
         }
         return shuffled
       }
@@ -506,7 +505,8 @@ export function createClaudeProvider(config?: LLMProviderConfig): LLMProvider {
     capabilities: { streaming: true, tools: true, vision: true, embeddings: false, jsonMode: true },
 
     async generate(request: LLMRequest): Promise<LLMResponse> {
-      void baseUrl; void timeout
+      void baseUrl
+      void timeout
       const estimator = new TokenEstimator()
       return {
         text: `[Claude] Response to: ${request.prompt.slice(0, 50)}`,
@@ -550,7 +550,8 @@ export function createOpenAIProvider(config?: LLMProviderConfig): LLMProvider {
     capabilities: { streaming: true, tools: true, vision: true, embeddings: true, jsonMode: true },
 
     async generate(request: LLMRequest): Promise<LLMResponse> {
-      void baseUrl; void timeout
+      void baseUrl
+      void timeout
       const estimator = new TokenEstimator()
       return {
         text: `[OpenAI] Response to: ${request.prompt.slice(0, 50)}`,
@@ -574,10 +575,13 @@ export function createOpenAIProvider(config?: LLMProviderConfig): LLMProvider {
     },
 
     async embed(request: EmbeddingRequest): Promise<EmbeddingResponse> {
-      void baseUrl; void timeout
+      void baseUrl
+      void timeout
       const estimator = new TokenEstimator()
       return {
-        embeddings: request.inputs.map(() => Array.from({ length: 1536 }, () => Math.random() * 2 - 1)),
+        embeddings: request.inputs.map(() =>
+          Array.from({ length: 1536 }, () => Math.random() * 2 - 1),
+        ),
         model: 'text-embedding-3-small',
         usage: {
           promptTokens: request.inputs.reduce((sum, t) => sum + estimator.estimateTokens(t), 0),
@@ -599,10 +603,17 @@ export function createLocalProvider(config?: LLMProviderConfig): LLMProvider {
     name: 'local',
     model: 'llama3',
     maxTokens: 2048,
-    capabilities: { streaming: true, tools: false, vision: false, embeddings: true, jsonMode: false },
+    capabilities: {
+      streaming: true,
+      tools: false,
+      vision: false,
+      embeddings: true,
+      jsonMode: false,
+    },
 
     async generate(request: LLMRequest): Promise<LLMResponse> {
-      void baseUrl; void timeout
+      void baseUrl
+      void timeout
       const estimator = new TokenEstimator()
       return {
         text: `[Local] Response to: ${request.prompt.slice(0, 50)}`,
@@ -626,10 +637,13 @@ export function createLocalProvider(config?: LLMProviderConfig): LLMProvider {
     },
 
     async embed(request: EmbeddingRequest): Promise<EmbeddingResponse> {
-      void baseUrl; void timeout
+      void baseUrl
+      void timeout
       const estimator = new TokenEstimator()
       return {
-        embeddings: request.inputs.map(() => Array.from({ length: 768 }, () => Math.random() * 2 - 1)),
+        embeddings: request.inputs.map(() =>
+          Array.from({ length: 768 }, () => Math.random() * 2 - 1),
+        ),
         model: 'llama3',
         usage: {
           promptTokens: request.inputs.reduce((sum, t) => sum + estimator.estimateTokens(t), 0),
@@ -700,9 +714,6 @@ export function createLLMProviderRegistry(): LLMProviderRegistry {
 }
 
 /** Create an LLMRouter wired to a registry */
-export function createLLMRouter(
-  registry: LLMProviderRegistry,
-  config?: RouterConfig,
-): LLMRouter {
+export function createLLMRouter(registry: LLMProviderRegistry, config?: RouterConfig): LLMRouter {
   return new LLMRouter(registry, config)
 }

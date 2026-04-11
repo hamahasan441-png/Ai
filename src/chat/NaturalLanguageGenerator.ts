@@ -22,16 +22,31 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type WritingStyle = 'formal' | 'casual' | 'technical' | 'friendly' | 'academic' | 'persuasive' | 'narrative'
+export type WritingStyle =
+  | 'formal'
+  | 'casual'
+  | 'technical'
+  | 'friendly'
+  | 'academic'
+  | 'persuasive'
+  | 'narrative'
 
-export type DiscourseRelation = 'elaboration' | 'contrast' | 'cause' | 'result' | 'sequence' | 'condition' | 'comparison' | 'summary'
+export type DiscourseRelation =
+  | 'elaboration'
+  | 'contrast'
+  | 'cause'
+  | 'result'
+  | 'sequence'
+  | 'condition'
+  | 'comparison'
+  | 'summary'
 
 export type SentenceType = 'declarative' | 'interrogative' | 'imperative' | 'exclamatory'
 
 export interface NLGTemplate {
   readonly id: string
   readonly name: string
-  readonly pattern: string            // e.g. "The {subject} {verb} {object}."
+  readonly pattern: string // e.g. "The {subject} {verb} {object}."
   readonly slots: readonly string[]
   readonly style: WritingStyle
   readonly category: string
@@ -79,7 +94,7 @@ export interface SentenceVariety {
   readonly avgLength: number
   readonly lengthVariance: number
   readonly typeDistribution: Record<SentenceType, number>
-  readonly score: number   // 0–1
+  readonly score: number // 0–1
 }
 
 export interface GeneratedText {
@@ -154,15 +169,65 @@ function buildConnectives(): ReadonlyMap<DiscourseRelation, readonly string[]> {
   return m
 }
 
-function buildStyleMarkers(): ReadonlyMap<WritingStyle, { readonly openers: readonly string[]; readonly closers: readonly string[]; readonly tone: string }> {
-  const m = new Map<WritingStyle, { readonly openers: readonly string[]; readonly closers: readonly string[]; readonly tone: string }>()
-  m.set('formal', { openers: ['It is worth noting that', 'One should consider', 'It is evident that'], closers: ['In conclusion,', 'To summarize,', 'In light of the above,'], tone: 'professional' })
-  m.set('casual', { openers: ['So basically', 'Here\'s the thing', 'Let me tell you'], closers: ['Anyway,', 'So yeah,', 'That\'s about it.'], tone: 'relaxed' })
-  m.set('technical', { openers: ['The implementation involves', 'Technically speaking', 'From an engineering perspective'], closers: ['In terms of performance,', 'This approach ensures', 'The architecture supports'], tone: 'precise' })
-  m.set('friendly', { openers: ['Great question!', 'I\'m glad you asked', 'Let\'s explore this together'], closers: ['Hope this helps!', 'Feel free to ask more!', 'Happy to help further!'], tone: 'warm' })
-  m.set('academic', { openers: ['Research indicates that', 'According to the literature', 'Studies have shown'], closers: ['Further research is needed', 'These findings suggest', 'The evidence demonstrates'], tone: 'scholarly' })
-  m.set('persuasive', { openers: ['Consider the compelling evidence', 'It is undeniable that', 'The facts clearly show'], closers: ['The choice is clear.', 'Take action now.', 'Don\'t miss this opportunity.'], tone: 'convincing' })
-  m.set('narrative', { openers: ['Once upon a time', 'Picture this:', 'Imagine a world where'], closers: ['And so the story goes.', 'That\'s how it all unfolded.', 'The journey continues.'], tone: 'storytelling' })
+function buildStyleMarkers(): ReadonlyMap<
+  WritingStyle,
+  {
+    readonly openers: readonly string[]
+    readonly closers: readonly string[]
+    readonly tone: string
+  }
+> {
+  const m = new Map<
+    WritingStyle,
+    {
+      readonly openers: readonly string[]
+      readonly closers: readonly string[]
+      readonly tone: string
+    }
+  >()
+  m.set('formal', {
+    openers: ['It is worth noting that', 'One should consider', 'It is evident that'],
+    closers: ['In conclusion,', 'To summarize,', 'In light of the above,'],
+    tone: 'professional',
+  })
+  m.set('casual', {
+    openers: ['So basically', "Here's the thing", 'Let me tell you'],
+    closers: ['Anyway,', 'So yeah,', "That's about it."],
+    tone: 'relaxed',
+  })
+  m.set('technical', {
+    openers: [
+      'The implementation involves',
+      'Technically speaking',
+      'From an engineering perspective',
+    ],
+    closers: ['In terms of performance,', 'This approach ensures', 'The architecture supports'],
+    tone: 'precise',
+  })
+  m.set('friendly', {
+    openers: ['Great question!', "I'm glad you asked", "Let's explore this together"],
+    closers: ['Hope this helps!', 'Feel free to ask more!', 'Happy to help further!'],
+    tone: 'warm',
+  })
+  m.set('academic', {
+    openers: ['Research indicates that', 'According to the literature', 'Studies have shown'],
+    closers: ['Further research is needed', 'These findings suggest', 'The evidence demonstrates'],
+    tone: 'scholarly',
+  })
+  m.set('persuasive', {
+    openers: [
+      'Consider the compelling evidence',
+      'It is undeniable that',
+      'The facts clearly show',
+    ],
+    closers: ['The choice is clear.', 'Take action now.', "Don't miss this opportunity."],
+    tone: 'convincing',
+  })
+  m.set('narrative', {
+    openers: ['Once upon a time', 'Picture this:', 'Imagine a world where'],
+    closers: ['And so the story goes.', "That's how it all unfolded.", 'The journey continues.'],
+    tone: 'storytelling',
+  })
   return m
 }
 
@@ -204,8 +269,16 @@ function classifySentence(s: string): SentenceType {
 export class NaturalLanguageGenerator {
   private readonly config: NaturalLanguageGeneratorConfig
   private readonly templates = new Map<string, NLGTemplate>()
-  private stats: { totalGenerations: number; totalParaphrases: number; totalStyleTransfers: number; feedbackCount: number } = {
-    totalGenerations: 0, totalParaphrases: 0, totalStyleTransfers: 0, feedbackCount: 0,
+  private stats: {
+    totalGenerations: number
+    totalParaphrases: number
+    totalStyleTransfers: number
+    feedbackCount: number
+  } = {
+    totalGenerations: 0,
+    totalParaphrases: 0,
+    totalStyleTransfers: 0,
+    feedbackCount: 0,
   }
 
   constructor(config: Partial<NaturalLanguageGeneratorConfig> = {}) {
@@ -214,7 +287,12 @@ export class NaturalLanguageGenerator {
 
   // ── Template management ──────────────────────────────────────────────
 
-  registerTemplate(name: string, pattern: string, style: WritingStyle = 'formal', category: string = 'general'): NLGTemplate {
+  registerTemplate(
+    name: string,
+    pattern: string,
+    style: WritingStyle = 'formal',
+    category: string = 'general',
+  ): NLGTemplate {
     const slots = [...pattern.matchAll(/\{(\w+)\}/g)].map(m => m[1])
     const id = `tpl_${this.templates.size + 1}`
     const tpl: NLGTemplate = { id, name, pattern, slots, style, category }
@@ -258,7 +336,9 @@ export class NaturalLanguageGenerator {
         if (syns && syns.length > i) {
           const replacement = syns[i % syns.length]
           // Preserve original casing
-          return w[0] === w[0].toUpperCase() ? replacement[0].toUpperCase() + replacement.slice(1) : replacement
+          return w[0] === w[0].toUpperCase()
+            ? replacement[0].toUpperCase() + replacement.slice(1)
+            : replacement
         }
         return w
       })
@@ -285,7 +365,13 @@ export class NaturalLanguageGenerator {
     this.stats.totalStyleTransfers++
     const markers = STYLE_MARKERS.get(targetStyle)
     if (!markers) {
-      return { original: text, transferred: text, fromStyle: 'formal', toStyle: targetStyle, confidence: 0 }
+      return {
+        original: text,
+        transferred: text,
+        fromStyle: 'formal',
+        toStyle: targetStyle,
+        confidence: 0,
+      }
     }
 
     // Detect current style
@@ -327,7 +413,12 @@ export class NaturalLanguageGenerator {
 
   // ── Text planning ────────────────────────────────────────────────────
 
-  createTextPlan(goal: string, points: string[], style: WritingStyle = 'formal', audience: string = 'general'): TextPlan {
+  createTextPlan(
+    goal: string,
+    points: string[],
+    style: WritingStyle = 'formal',
+    audience: string = 'general',
+  ): TextPlan {
     const relations: DiscourseRelation[] = ['elaboration', 'sequence', 'result', 'summary']
     const sections: TextSection[] = []
 
@@ -336,7 +427,12 @@ export class NaturalLanguageGenerator {
       const chunk = points.slice(i, i + chunkSize)
       const sectionIdx = Math.floor(i / chunkSize)
       sections.push({
-        heading: sectionIdx === 0 ? 'Introduction' : sectionIdx === Math.floor(points.length / chunkSize) ? 'Conclusion' : `Section ${sectionIdx + 1}`,
+        heading:
+          sectionIdx === 0
+            ? 'Introduction'
+            : sectionIdx === Math.floor(points.length / chunkSize)
+              ? 'Conclusion'
+              : `Section ${sectionIdx + 1}`,
         points: chunk,
         relation: relations[Math.min(sectionIdx, relations.length - 1)],
       })
@@ -391,7 +487,8 @@ export class NaturalLanguageGenerator {
     const sentenceCount = Math.max(1, sentences.length)
     const wordCount = Math.max(1, words.length)
     const avgSentenceLength = wordCount / sentenceCount
-    const avgWordLength = words.reduce((s, w) => s + w.replace(/[^a-z]/gi, '').length, 0) / wordCount
+    const avgWordLength =
+      words.reduce((s, w) => s + w.replace(/[^a-z]/gi, '').length, 0) / wordCount
 
     // Flesch-Kincaid Grade Level
     const fk = 0.39 * avgSentenceLength + 11.8 * (syllables / wordCount) - 15.59
@@ -402,7 +499,15 @@ export class NaturalLanguageGenerator {
     else if (fk < 14) complexity = 'hard'
     else complexity = 'very_hard'
 
-    return { fleschKincaid: Math.round(fk * 100) / 100, avgSentenceLength, avgWordLength, syllableCount: syllables, wordCount, sentenceCount, complexity }
+    return {
+      fleschKincaid: Math.round(fk * 100) / 100,
+      avgSentenceLength,
+      avgWordLength,
+      syllableCount: syllables,
+      wordCount,
+      sentenceCount,
+      complexity,
+    }
   }
 
   // ── Sentence variety ─────────────────────────────────────────────────
@@ -410,7 +515,13 @@ export class NaturalLanguageGenerator {
   analyzeSentenceVariety(text: string): SentenceVariety {
     const sentences = splitSentences(text)
     if (sentences.length === 0) {
-      return { uniqueStarters: 0, avgLength: 0, lengthVariance: 0, typeDistribution: { declarative: 0, interrogative: 0, imperative: 0, exclamatory: 0 }, score: 0 }
+      return {
+        uniqueStarters: 0,
+        avgLength: 0,
+        lengthVariance: 0,
+        typeDistribution: { declarative: 0, interrogative: 0, imperative: 0, exclamatory: 0 },
+        score: 0,
+      }
     }
 
     const starters = new Set(sentences.map(s => s.split(/\s+/)[0]?.toLowerCase()))
@@ -418,16 +529,30 @@ export class NaturalLanguageGenerator {
     const avgLength = lengths.reduce((a, b) => a + b, 0) / lengths.length
     const variance = lengths.reduce((sum, l) => sum + (l - avgLength) ** 2, 0) / lengths.length
 
-    const typeDist: Record<SentenceType, number> = { declarative: 0, interrogative: 0, imperative: 0, exclamatory: 0 }
+    const typeDist: Record<SentenceType, number> = {
+      declarative: 0,
+      interrogative: 0,
+      imperative: 0,
+      exclamatory: 0,
+    }
     for (const s of sentences) {
       typeDist[classifySentence(s)]++
     }
 
     const starterRatio = starters.size / sentences.length
     const typeCount = Object.values(typeDist).filter(v => v > 0).length
-    const score = Math.min(1, starterRatio * 0.5 + (typeCount / 4) * 0.3 + Math.min(1, variance / 10) * 0.2)
+    const score = Math.min(
+      1,
+      starterRatio * 0.5 + (typeCount / 4) * 0.3 + Math.min(1, variance / 10) * 0.2,
+    )
 
-    return { uniqueStarters: starters.size, avgLength, lengthVariance: variance, typeDistribution: typeDist, score }
+    return {
+      uniqueStarters: starters.size,
+      avgLength,
+      lengthVariance: variance,
+      typeDistribution: typeDist,
+      score,
+    }
   }
 
   // ── Stats & serialization ────────────────────────────────────────────
@@ -442,7 +567,9 @@ export class NaturalLanguageGenerator {
     }
   }
 
-  provideFeedback(): void { this.stats.feedbackCount++ }
+  provideFeedback(): void {
+    this.stats.feedbackCount++
+  }
 
   serialize(): string {
     return JSON.stringify({
@@ -451,7 +578,10 @@ export class NaturalLanguageGenerator {
     })
   }
 
-  static deserialize(json: string, config?: Partial<NaturalLanguageGeneratorConfig>): NaturalLanguageGenerator {
+  static deserialize(
+    json: string,
+    config?: Partial<NaturalLanguageGeneratorConfig>,
+  ): NaturalLanguageGenerator {
     const data = JSON.parse(json)
     const engine = new NaturalLanguageGenerator(config)
     for (const t of data.templates ?? []) {

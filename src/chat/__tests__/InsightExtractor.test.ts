@@ -132,51 +132,65 @@ describe('InsightExtractor', () => {
 
   describe('Text insight extraction', () => {
     it('should extract key findings', () => {
-      const text = 'The most important finding is that performance improved significantly. This is a critical observation for the project. The key insight is that we need more data.'
+      const text =
+        'The most important finding is that performance improved significantly. This is a critical observation for the project. The key insight is that we need more data.'
       const insights = engine.extractTextInsights(text)
       expect(insights.keyFindings.length).toBeGreaterThan(0)
     })
 
     it('should identify themes', () => {
-      const text = 'Machine learning models use neural networks for training. Neural networks are composed of layers. Training involves optimization of parameters.'
+      const text =
+        'Machine learning models use neural networks for training. Neural networks are composed of layers. Training involves optimization of parameters.'
       const insights = engine.extractTextInsights(text)
       expect(insights.themes.length).toBeGreaterThan(0)
     })
 
     it('should detect positive sentiment', () => {
-      const text = 'The results are excellent and show great improvement. The success of this approach is a positive sign for future growth.'
+      const text =
+        'The results are excellent and show great improvement. The success of this approach is a positive sign for future growth.'
       const insights = engine.extractTextInsights(text)
       expect(insights.sentiment).toBe('positive')
     })
 
     it('should detect negative sentiment', () => {
-      const text = 'The system has poor performance and keeps failing. There are multiple problems and issues with weak security and risk of decline.'
+      const text =
+        'The system has poor performance and keeps failing. There are multiple problems and issues with weak security and risk of decline.'
       const insights = engine.extractTextInsights(text)
       expect(insights.sentiment).toBe('negative')
     })
 
     it('should detect mixed sentiment', () => {
-      const text = 'The system shows great performance but has a poor user interface. Good progress on security but bad documentation.'
+      const text =
+        'The system shows great performance but has a poor user interface. Good progress on security but bad documentation.'
       const insights = engine.extractTextInsights(text)
       expect(insights.sentiment).toBe('mixed')
     })
 
     it('should extract action items', () => {
-      const text = 'We should improve testing coverage. The team must address the performance issues. Consider implementing caching for better response times.'
+      const text =
+        'We should improve testing coverage. The team must address the performance issues. Consider implementing caching for better response times.'
       const insights = engine.extractTextInsights(text)
       expect(insights.actionItems.length).toBeGreaterThan(0)
     })
 
     it('should assess text complexity', () => {
       const simple = engine.extractTextInsights('The cat sat on the mat. It was a big red cat.')
-      const complex = engine.extractTextInsights('The implementation necessitates architectural considerations regarding distributed infrastructure scalability. Comprehensive observability instrumentations facilitate anomaly identification.')
+      const complex = engine.extractTextInsights(
+        'The implementation necessitates architectural considerations regarding distributed infrastructure scalability. Comprehensive observability instrumentations facilitate anomaly identification.',
+      )
       expect(simple.complexity).not.toBe('complex')
     })
   })
 
   describe('Insight management', () => {
     it('should add insight', () => {
-      const insight = engine.addInsight('finding', 'Revenue growth', 'Revenue grew 25% YoY', ['Q4 report'], ['finance'])
+      const insight = engine.addInsight(
+        'finding',
+        'Revenue growth',
+        'Revenue grew 25% YoY',
+        ['Q4 report'],
+        ['finance'],
+      )
       expect(insight.id).toBeDefined()
       expect(insight.category).toBe('finding')
       expect(insight.tags).toContain('finance')

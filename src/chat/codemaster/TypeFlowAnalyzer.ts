@@ -158,15 +158,19 @@ export class TypeFlowAnalyzer {
           severity: 'medium',
           line: i + 1,
           title: 'Explicit `any` type usage',
-          description: 'Using `any` disables type checking for this variable, allowing type-unsafe operations.',
-          suggestion: 'Use a specific type, `unknown` for safe dynamic types, or a generic constraint.',
+          description:
+            'Using `any` disables type checking for this variable, allowing type-unsafe operations.',
+          suggestion:
+            'Use a specific type, `unknown` for safe dynamic types, or a generic constraint.',
           confidence: 0.95,
         })
       }
 
       // Function parameter without type (in .ts files)
       if (this.language === 'typescript') {
-        const paramMatch = line.match(/(?:function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s+)?\()([^)]*)\)/)
+        const paramMatch = line.match(
+          /(?:function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s+)?\()([^)]*)\)/,
+        )
         if (paramMatch) {
           const params = paramMatch[1]
           if (params && params.trim() && !/:\s*\w/.test(params) && !/\.\.\.\w/.test(params)) {
@@ -176,7 +180,8 @@ export class TypeFlowAnalyzer {
               severity: 'low',
               line: i + 1,
               title: 'Function parameters without type annotations',
-              description: 'Parameters without type annotations are implicitly `any` when noImplicitAny is off.',
+              description:
+                'Parameters without type annotations are implicitly `any` when noImplicitAny is off.',
               suggestion: 'Add explicit type annotations to function parameters.',
               confidence: 0.7,
             })
@@ -205,7 +210,8 @@ export class TypeFlowAnalyzer {
           line: i + 1,
           title: 'Unsafe `as any` assertion',
           description: '`as any` bypasses all type checking. This can hide bugs and type errors.',
-          suggestion: 'Use `as unknown as TargetType` for explicit unsafe casts, or fix the types properly.',
+          suggestion:
+            'Use `as unknown as TargetType` for explicit unsafe casts, or fix the types properly.',
           confidence: 0.98,
         })
       }
@@ -218,7 +224,8 @@ export class TypeFlowAnalyzer {
           severity: 'medium',
           line: i + 1,
           title: 'Double type assertion (as unknown as T)',
-          description: 'Double assertion through `unknown` forces a type conversion that may be incorrect at runtime.',
+          description:
+            'Double assertion through `unknown` forces a type conversion that may be incorrect at runtime.',
           suggestion: 'Consider using a type guard function or runtime validation instead.',
           confidence: 0.9,
         })
@@ -232,7 +239,8 @@ export class TypeFlowAnalyzer {
           severity: 'medium',
           line: i + 1,
           title: 'Non-null assertion operator (!)',
-          description: 'Non-null assertion `!` tells TypeScript to trust that a value is not null/undefined, but provides no runtime safety.',
+          description:
+            'Non-null assertion `!` tells TypeScript to trust that a value is not null/undefined, but provides no runtime safety.',
           suggestion: 'Use optional chaining `?.` or add a proper null check.',
           confidence: 0.8,
         })
@@ -260,7 +268,9 @@ export class TypeFlowAnalyzer {
 
       // Track variables that could be null/undefined
       // Pattern: let x = something | undefined | null
-      const nullDeclMatch = line.match(/(?:let|var)\s+(\w+)\s*(?::\s*[^=]*(?:\|\s*(?:null|undefined)))?(?:\s*=\s*(?:null|undefined))?/)
+      const nullDeclMatch = line.match(
+        /(?:let|var)\s+(\w+)\s*(?::\s*[^=]*(?:\|\s*(?:null|undefined)))?(?:\s*=\s*(?:null|undefined))?/,
+      )
       if (nullDeclMatch) {
         const varName = nullDeclMatch[1]
         if (/\|\s*(?:null|undefined)/.test(line) || /=\s*(?:null|undefined)/.test(line)) {
@@ -275,7 +285,9 @@ export class TypeFlowAnalyzer {
       }
 
       // Track function return that could be nullable
-      const nullReturnMatch = line.match(/(?:const|let|var)\s+(\w+)\s*=\s*(?:\w+\.)?(?:getElementById|querySelector|get|find|pop|shift)\s*\(/)
+      const nullReturnMatch = line.match(
+        /(?:const|let|var)\s+(\w+)\s*=\s*(?:\w+\.)?(?:getElementById|querySelector|get|find|pop|shift)\s*\(/,
+      )
       if (nullReturnMatch) {
         nullableDeclarations.set(nullReturnMatch[1], i + 1)
       }
@@ -293,14 +305,20 @@ export class TypeFlowAnalyzer {
         if (accessPattern.test(line) && i + 1 !== declLine) {
           // Check if there's a null check above
           const contextBefore = lines.slice(Math.max(0, i - 3), i).join('\n')
-          const hasNullCheck = new RegExp(`(?:if\\s*\\(\\s*${varName}\\b|${varName}\\s*(?:!==?|===?)\\s*(?:null|undefined)|${varName}\\s*\\?\\.)`)
-            .test(contextBefore + '\n' + line)
+          const hasNullCheck = new RegExp(
+            `(?:if\\s*\\(\\s*${varName}\\b|${varName}\\s*(?:!==?|===?)\\s*(?:null|undefined)|${varName}\\s*\\?\\.)`,
+          ).test(contextBefore + '\n' + line)
 
           if (!hasNullCheck) {
             // Find or create nullable var entry
             let entry = nullableVars.find(v => v.name === varName)
             if (!entry) {
-              entry = { name: varName, declaredLine: declLine, unsafeAccessLines: [], guardedLines: [] }
+              entry = {
+                name: varName,
+                declaredLine: declLine,
+                unsafeAccessLines: [],
+                guardedLines: [],
+              }
               nullableVars.push(entry)
             }
             entry.unsafeAccessLines.push(i + 1)
@@ -317,7 +335,12 @@ export class TypeFlowAnalyzer {
           } else {
             let entry = nullableVars.find(v => v.name === varName)
             if (!entry) {
-              entry = { name: varName, declaredLine: declLine, unsafeAccessLines: [], guardedLines: [] }
+              entry = {
+                name: varName,
+                declaredLine: declLine,
+                unsafeAccessLines: [],
+                guardedLines: [],
+              }
               nullableVars.push(entry)
             }
             entry.guardedLines.push(i + 1)
@@ -368,27 +391,38 @@ export class TypeFlowAnalyzer {
       if (trimmed.startsWith('//') || trimmed.startsWith('*')) continue
 
       // Empty array literal without type annotation
-      if (/(?:const|let|var)\s+\w+\s*=\s*\[\s*\]/.test(line) && !/:/.test(line.split('=')[0] || '')) {
+      if (
+        /(?:const|let|var)\s+\w+\s*=\s*\[\s*\]/.test(line) &&
+        !/:/.test(line.split('=')[0] || '')
+      ) {
         issues.push({
           type: 'implicit-any',
           severity: 'low',
           line: i + 1,
           title: 'Empty array without type annotation',
-          description: 'Empty array literal `[]` without a type annotation may be inferred as `any[]`.',
-          suggestion: 'Add a type annotation: `const items: string[] = []` or `const items = [] as string[]`.',
+          description:
+            'Empty array literal `[]` without a type annotation may be inferred as `any[]`.',
+          suggestion:
+            'Add a type annotation: `const items: string[] = []` or `const items = [] as string[]`.',
           confidence: 0.7,
         })
       }
 
       // JSON.parse without type assertion
-      if (/JSON\.parse\s*\(/.test(line) && !/:\s*\w/.test(line.split('=')[0] || '') && !/\bas\s+/.test(line)) {
+      if (
+        /JSON\.parse\s*\(/.test(line) &&
+        !/:\s*\w/.test(line.split('=')[0] || '') &&
+        !/\bas\s+/.test(line)
+      ) {
         issues.push({
           type: 'implicit-any',
           severity: 'medium',
           line: i + 1,
           title: 'JSON.parse returns `any`',
-          description: 'JSON.parse() returns `any`. Without a type assertion or validation, type safety is lost.',
-          suggestion: 'Add type assertion: `JSON.parse(str) as MyType` or validate with a schema library (Zod, io-ts).',
+          description:
+            'JSON.parse() returns `any`. Without a type assertion or validation, type safety is lost.',
+          suggestion:
+            'Add type assertion: `JSON.parse(str) as MyType` or validate with a schema library (Zod, io-ts).',
           confidence: 0.9,
         })
       }
@@ -428,7 +462,8 @@ export class TypeFlowAnalyzer {
               line: switchLine,
               title: 'Switch without default case',
               description: `Switch statement (${caseCount} cases) has no default case. Unhandled values will silently fall through.`,
-              suggestion: 'Add a `default:` case, or use `never` type assertion for exhaustiveness: `const _exhaustive: never = value`.',
+              suggestion:
+                'Add a `default:` case, or use `never` type assertion for exhaustiveness: `const _exhaustive: never = value`.',
               confidence: 0.8,
             })
           }
@@ -485,14 +520,20 @@ export class TypeFlowAnalyzer {
       // let x = "string" → type widens to string (not literal)
       if (/\blet\s+\w+\s*=\s*['"`]/.test(line)) {
         // Only flag if the value looks like it could be a union discriminator
-        if (/\blet\s+\w+\s*=\s*['"](?:success|error|pending|loading|idle|active|inactive)['"]/.test(line)) {
+        if (
+          /\blet\s+\w+\s*=\s*['"](?:success|error|pending|loading|idle|active|inactive)['"]/.test(
+            line,
+          )
+        ) {
           issues.push({
             type: 'type-widening',
             severity: 'info',
             line: i + 1,
             title: 'Possible unintended type widening with `let`',
-            description: '`let` declarations widen string literal types to `string`. If this is a status/discriminator value, use `const` or `as const`.',
-            suggestion: 'Use `const` for constant values, or add `as const` for literal type preservation.',
+            description:
+              '`let` declarations widen string literal types to `string`. If this is a status/discriminator value, use `const` or `as const`.',
+            suggestion:
+              'Use `const` for constant values, or add `as const` for literal type preservation.',
             confidence: 0.6,
           })
         }
@@ -509,15 +550,25 @@ export class TypeFlowAnalyzer {
       if (trimmed.startsWith('#')) continue
 
       // No type hints on function parameters
-      if (/\bdef\s+\w+\s*\([^)]*\)/.test(line) && !/:\s*\w/.test(line.split(')')[0] || '') && !/self|cls/.test(line.split(',').join(' '))) {
+      if (
+        /\bdef\s+\w+\s*\([^)]*\)/.test(line) &&
+        !/:\s*\w/.test(line.split(')')[0] || '') &&
+        !/self|cls/.test(line.split(',').join(' '))
+      ) {
         const params = line.match(/\(([^)]*)\)/)
-        if (params && params[1].trim() && params[1].trim() !== 'self' && params[1].trim() !== 'cls') {
+        if (
+          params &&
+          params[1].trim() &&
+          params[1].trim() !== 'self' &&
+          params[1].trim() !== 'cls'
+        ) {
           issues.push({
             type: 'implicit-any',
             severity: 'low',
             line: i + 1,
             title: 'Function parameters without type hints',
-            description: 'Python function parameters without type hints lose static analysis benefits.',
+            description:
+              'Python function parameters without type hints lose static analysis benefits.',
             suggestion: 'Add type hints: `def func(name: str, age: int) -> bool:`.',
             confidence: 0.7,
           })
@@ -544,7 +595,8 @@ export class TypeFlowAnalyzer {
           severity: 'info',
           line: i + 1,
           title: 'isinstance() not used as type guard',
-          description: 'isinstance() call not in an if-statement, so type narrowing does not occur.',
+          description:
+            'isinstance() call not in an if-statement, so type narrowing does not occur.',
           suggestion: 'Use isinstance() in an if-statement for proper type narrowing.',
           confidence: 0.6,
         })
@@ -559,11 +611,21 @@ export class TypeFlowAnalyzer {
     for (const issue of issues) {
       const weight = issue.confidence
       switch (issue.severity) {
-        case 'critical': score -= 20 * weight; break
-        case 'high': score -= 12 * weight; break
-        case 'medium': score -= 6 * weight; break
-        case 'low': score -= 3 * weight; break
-        case 'info': score -= 1 * weight; break
+        case 'critical':
+          score -= 20 * weight
+          break
+        case 'high':
+          score -= 12 * weight
+          break
+        case 'medium':
+          score -= 6 * weight
+          break
+        case 'low':
+          score -= 3 * weight
+          break
+        case 'info':
+          score -= 1 * weight
+          break
       }
     }
     return Math.max(0, Math.min(100, Math.round(score)))

@@ -22,7 +22,12 @@ describe('ProblemDecomposer', () => {
 
   describe('Problem creation', () => {
     it('should define a problem', () => {
-      const p = engine.defineProblem('Fix performance', 'We need to optimize the database queries to reduce response time and improve speed', ['Must maintain compatibility'], ['50% faster'])
+      const p = engine.defineProblem(
+        'Fix performance',
+        'We need to optimize the database queries to reduce response time and improve speed',
+        ['Must maintain compatibility'],
+        ['50% faster'],
+      )
       expect(p.id).toBeDefined()
       expect(p.title).toBe('Fix performance')
       expect(p.type).toBe('optimization')
@@ -31,7 +36,10 @@ describe('ProblemDecomposer', () => {
     })
 
     it('should classify optimization problems', () => {
-      const p = engine.defineProblem('Speed', 'Optimize the algorithm to be faster and more efficient')
+      const p = engine.defineProblem(
+        'Speed',
+        'Optimize the algorithm to be faster and more efficient',
+      )
       expect(p.type).toBe('optimization')
     })
 
@@ -41,33 +49,52 @@ describe('ProblemDecomposer', () => {
     })
 
     it('should classify debugging problems', () => {
-      const p = engine.defineProblem('Fix crash', 'Debug the error causing the application to crash')
+      const p = engine.defineProblem(
+        'Fix crash',
+        'Debug the error causing the application to crash',
+      )
       expect(p.type).toBe('debugging')
     })
 
     it('should classify analysis problems', () => {
-      const p = engine.defineProblem('Review', 'Analyze and evaluate the current system performance metrics')
+      const p = engine.defineProblem(
+        'Review',
+        'Analyze and evaluate the current system performance metrics',
+      )
       expect(p.type).toBe('analysis')
     })
 
     it('should classify decision problems', () => {
-      const p = engine.defineProblem('Choose', 'Decide between options and select the best framework to use')
+      const p = engine.defineProblem(
+        'Choose',
+        'Decide between options and select the best framework to use',
+      )
       expect(p.type).toBe('decision')
     })
 
     it('should classify integration problems', () => {
-      const p = engine.defineProblem('Connect', 'Integrate the payment system and combine with the existing API')
+      const p = engine.defineProblem(
+        'Connect',
+        'Integrate the payment system and combine with the existing API',
+      )
       expect(p.type).toBe('integration')
     })
 
     it('should classify transformation problems', () => {
-      const p = engine.defineProblem('Migrate', 'Transform and migrate the legacy system to cloud native')
+      const p = engine.defineProblem(
+        'Migrate',
+        'Transform and migrate the legacy system to cloud native',
+      )
       expect(p.type).toBe('transformation')
     })
 
     it('should estimate complexity', () => {
       const simple = engine.defineProblem('Simple', 'Fix typo')
-      const complex = engine.defineProblem('Complex', 'Design and implement a distributed microservice architecture with event sourcing, CQRS, saga patterns, and comprehensive monitoring across multiple cloud regions with automatic failover', ['Constraint 1', 'Constraint 2', 'Constraint 3', 'Constraint 4'])
+      const complex = engine.defineProblem(
+        'Complex',
+        'Design and implement a distributed microservice architecture with event sourcing, CQRS, saga patterns, and comprehensive monitoring across multiple cloud regions with automatic failover',
+        ['Constraint 1', 'Constraint 2', 'Constraint 3', 'Constraint 4'],
+      )
       expect(['trivial', 'simple']).toContain(simple.complexity)
       expect(['complex', 'very_complex']).toContain(complex.complexity)
     })
@@ -101,7 +128,11 @@ describe('ProblemDecomposer', () => {
         { title: 'Add tests', description: 'Add test suite', dependsOn: [] },
       ])
       const sub3 = engine.decompose(p.id, [
-        { title: 'Deploy', description: 'Deploy to production', dependsOn: [subs[0].id, subs[1].id] },
+        {
+          title: 'Deploy',
+          description: 'Deploy to production',
+          dependsOn: [subs[0].id, subs[1].id],
+        },
       ])
       expect(sub3[0].dependsOn.length).toBe(2)
     })
@@ -124,7 +155,14 @@ describe('ProblemDecomposer', () => {
     it('should add solution approach', () => {
       const p = engine.defineProblem('Test', 'Test')
       const subs = engine.decompose(p.id, [{ title: 'Sub', description: 'Sub' }])
-      const approach = engine.addApproach(subs[0].id, 'Brute force', 'Try all combinations', 'divide_and_conquer', ['Simple'], ['Slow'])
+      const approach = engine.addApproach(
+        subs[0].id,
+        'Brute force',
+        'Try all combinations',
+        'divide_and_conquer',
+        ['Simple'],
+        ['Slow'],
+      )
       expect(approach).not.toBeNull()
       expect(approach!.strategy).toBe('divide_and_conquer')
       expect(approach!.feasibility).toBeGreaterThan(0)
@@ -137,8 +175,22 @@ describe('ProblemDecomposer', () => {
     it('should score approaches with more pros higher', () => {
       const p = engine.defineProblem('Test', 'Test')
       const subs = engine.decompose(p.id, [{ title: 'Sub', description: 'Sub' }])
-      const good = engine.addApproach(subs[0].id, 'Good', 'Desc', 'top_down', ['Pro1', 'Pro2', 'Pro3'], ['Con1'])
-      const bad = engine.addApproach(subs[0].id, 'Bad', 'Desc', 'bottom_up', ['Pro1'], ['Con1', 'Con2', 'Con3'])
+      const good = engine.addApproach(
+        subs[0].id,
+        'Good',
+        'Desc',
+        'top_down',
+        ['Pro1', 'Pro2', 'Pro3'],
+        ['Con1'],
+      )
+      const bad = engine.addApproach(
+        subs[0].id,
+        'Bad',
+        'Desc',
+        'bottom_up',
+        ['Pro1'],
+        ['Con1', 'Con2', 'Con3'],
+      )
       expect(good!.feasibility).toBeGreaterThan(bad!.feasibility)
     })
 
@@ -182,12 +234,8 @@ describe('ProblemDecomposer', () => {
 
     it('should compute topological order', () => {
       const p = engine.defineProblem('Test', 'Test')
-      const subs = engine.decompose(p.id, [
-        { title: 'A', description: 'First' },
-      ])
-      engine.decompose(p.id, [
-        { title: 'B', description: 'Second', dependsOn: [subs[0].id] },
-      ])
+      const subs = engine.decompose(p.id, [{ title: 'A', description: 'First' }])
+      engine.decompose(p.id, [{ title: 'B', description: 'Second', dependsOn: [subs[0].id] }])
       const graph = engine.buildDependencyGraph(p.id)
       expect(graph!.topologicalOrder[0]).toBe(subs[0].id)
     })
@@ -271,7 +319,10 @@ describe('ProblemDecomposer', () => {
 
     it('should compute avg sub-problems per problem', () => {
       const p1 = engine.defineProblem('P1', 'Test')
-      engine.decompose(p1.id, [{ title: 'A', description: 'A' }, { title: 'B', description: 'B' }])
+      engine.decompose(p1.id, [
+        { title: 'A', description: 'A' },
+        { title: 'B', description: 'B' },
+      ])
       const p2 = engine.defineProblem('P2', 'Test')
       engine.decompose(p2.id, [{ title: 'C', description: 'C' }])
       const stats = engine.getStats()

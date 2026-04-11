@@ -64,9 +64,7 @@ export function formatToken(
       const bar = chalk.dim(BLOCKQUOTE_BAR)
       return inner
         .split(EOL)
-        .map(line =>
-          stripAnsi(line).trim() ? `${bar} ${chalk.italic(line)}` : line,
-        )
+        .map(line => (stripAnsi(line).trim() ? `${bar} ${chalk.italic(line)}` : line))
         .join(EOL)
     }
     case 'code': {
@@ -91,15 +89,11 @@ export function formatToken(
     }
     case 'em':
       return chalk.italic(
-        (token.tokens ?? [])
-          .map(_ => formatToken(_, theme, 0, null, parent, highlight))
-          .join(''),
+        (token.tokens ?? []).map(_ => formatToken(_, theme, 0, null, parent, highlight)).join(''),
       )
     case 'strong':
       return chalk.bold(
-        (token.tokens ?? [])
-          .map(_ => formatToken(_, theme, 0, null, parent, highlight))
-          .join(''),
+        (token.tokens ?? []).map(_ => formatToken(_, theme, 0, null, parent, highlight)).join(''),
       )
     case 'heading':
       switch (token.depth) {
@@ -182,9 +176,8 @@ export function formatToken(
         .join('')
     case 'paragraph':
       return (
-        (token.tokens ?? [])
-          .map(_ => formatToken(_, theme, 0, null, null, highlight))
-          .join('') + EOL
+        (token.tokens ?? []).map(_ => formatToken(_, theme, 0, null, null, highlight)).join('') +
+        EOL
       )
     case 'space':
       return EOL
@@ -208,9 +201,7 @@ export function formatToken(
       // Helper function to get the text content that will be displayed (after stripAnsi)
       function getDisplayText(tokens: Token[] | undefined): string {
         return stripAnsi(
-          tokens
-            ?.map(_ => formatToken(_, theme, 0, null, null, highlight))
-            .join('') ?? '',
+          tokens?.map(_ => formatToken(_, theme, 0, null, null, highlight)).join('') ?? '',
         )
       }
 
@@ -228,14 +219,11 @@ export function formatToken(
       let tableOutput = '| '
       tableToken.header.forEach((header, index) => {
         const content =
-          header.tokens
-            ?.map(_ => formatToken(_, theme, 0, null, null, highlight))
-            .join('') ?? ''
+          header.tokens?.map(_ => formatToken(_, theme, 0, null, null, highlight)).join('') ?? ''
         const displayText = getDisplayText(header.tokens)
         const width = columnWidths[index]!
         const align = tableToken.align?.[index]
-        tableOutput +=
-          padAligned(content, stringWidth(displayText), width, align) + ' | '
+        tableOutput += padAligned(content, stringWidth(displayText), width, align) + ' | '
       })
       tableOutput = tableOutput.trimEnd() + EOL
 
@@ -253,14 +241,11 @@ export function formatToken(
         tableOutput += '| '
         row.forEach((cell, index) => {
           const content =
-            cell.tokens
-              ?.map(_ => formatToken(_, theme, 0, null, null, highlight))
-              .join('') ?? ''
+            cell.tokens?.map(_ => formatToken(_, theme, 0, null, null, highlight)).join('') ?? ''
           const displayText = getDisplayText(cell.tokens)
           const width = columnWidths[index]!
           const align = tableToken.align?.[index]
-          tableOutput +=
-            padAligned(content, stringWidth(displayText), width, align) + ' | '
+          tableOutput += padAligned(content, stringWidth(displayText), width, align) + ' | '
         })
         tableOutput = tableOutput.trimEnd() + EOL
       })
@@ -286,8 +271,7 @@ export function formatToken(
 // only) so hostnames like docs.github.io/guide#42 don't false-positive. Repo
 // segment allows dots (e.g. cc.kurs.web). Lookbehind is avoided — it defeats
 // YARR JIT in JSC.
-const ISSUE_REF_PATTERN =
-  /(^|[^\w./-])([A-Za-z0-9][\w-]*\/[A-Za-z0-9][\w.-]*)#(\d+)\b/g
+const ISSUE_REF_PATTERN = /(^|[^\w./-])([A-Za-z0-9][\w-]*\/[A-Za-z0-9][\w.-]*)#(\d+)\b/g
 
 /**
  * Replaces owner/repo#123 references with clickable hyperlinks to GitHub.
@@ -299,11 +283,7 @@ function linkifyIssueReferences(text: string): string {
   return text.replace(
     ISSUE_REF_PATTERN,
     (_match, prefix, repo, num) =>
-      prefix +
-      createHyperlink(
-        `https://github.com/${repo}/issues/${num}`,
-        `${repo}#${num}`,
-      ),
+      prefix + createHyperlink(`https://github.com/${repo}/issues/${num}`, `${repo}#${num}`),
   )
 }
 

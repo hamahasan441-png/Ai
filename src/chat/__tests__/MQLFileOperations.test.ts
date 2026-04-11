@@ -17,7 +17,9 @@ describe('MQL File Operations Knowledge', () => {
 
     it('explains MQL5 SQLite database operations', async () => {
       const r = await brain.chat('How to use SQLite database in MQL5 for trade data storage?')
-      expect(r.text.toLowerCase()).toMatch(/database|sqlite|databaseopen|databaseexecute|create\s+table/)
+      expect(r.text.toLowerCase()).toMatch(
+        /database|sqlite|databaseopen|databaseexecute|create\s+table/,
+      )
     })
 
     it('covers persistent state and settings save/load', async () => {

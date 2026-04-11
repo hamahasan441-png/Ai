@@ -59,7 +59,7 @@ describe('isOperatorKey', () => {
 describe('SIMPLE_MOTIONS', () => {
   const expected = ['h', 'l', 'j', 'k', 'w', 'b', 'e', 'W', 'B', 'E', '0', '^', '$']
 
-  it.each(expected)('contains %s', (key) => {
+  it.each(expected)('contains %s', key => {
     expect(SIMPLE_MOTIONS.has(key)).toBe(true)
   })
 
@@ -81,7 +81,7 @@ describe('SIMPLE_MOTIONS', () => {
 })
 
 describe('FIND_KEYS', () => {
-  it.each(['f', 'F', 't', 'T'])('contains %s', (key) => {
+  it.each(['f', 'F', 't', 'T'])('contains %s', key => {
     expect(FIND_KEYS.has(key)).toBe(true)
   })
 
@@ -137,7 +137,7 @@ describe('isTextObjScopeKey', () => {
 describe('TEXT_OBJ_TYPES', () => {
   const expected = ['w', 'W', '"', "'", '`', '(', ')', 'b', '[', ']', '{', '}', 'B', '<', '>']
 
-  it.each(expected)('contains %s', (key) => {
+  it.each(expected)('contains %s', key => {
     expect(TEXT_OBJ_TYPES.has(key)).toBe(true)
   })
 

@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  PlanningEngine,
-  type PlanStep,
-  type DependencyGraph,
-} from '../PlanningEngine'
+import { PlanningEngine, type PlanStep, type DependencyGraph } from '../PlanningEngine'
 
 // ── Constructor Tests ──
 
@@ -73,7 +69,10 @@ describe('PlanningEngine createPlan', () => {
   })
 
   it('creates a plan with constraints', () => {
-    const plan = engine.createPlan('Deploy a microservice', ['Must use Docker', 'No downtime allowed'])
+    const plan = engine.createPlan('Deploy a microservice', [
+      'Must use Docker',
+      'No downtime allowed',
+    ])
     expect(plan).toBeDefined()
     expect(plan.steps.length).toBeGreaterThan(0)
   })
@@ -193,7 +192,8 @@ describe('PlanningEngine evaluatePlan', () => {
   it('overall score is a weighted combination of subscores', () => {
     const plan = engine.createPlan('Refactor the payment module')
     const evaluation = engine.evaluatePlan(plan)
-    const expected = evaluation.feasibility * 0.35 + evaluation.completeness * 0.35 + evaluation.efficiency * 0.3
+    const expected =
+      evaluation.feasibility * 0.35 + evaluation.completeness * 0.35 + evaluation.efficiency * 0.3
     expect(evaluation.overallScore).toBeCloseTo(expected, 1)
   })
 })
@@ -321,8 +321,24 @@ describe('PlanningEngine buildDependencyGraph', () => {
 
   it('handles steps without dependencies', () => {
     const steps: PlanStep[] = [
-      { id: 'a', action: 'do_a', description: 'Step A', estimatedEffort: 1, dependencies: [], risks: [], alternatives: [] },
-      { id: 'b', action: 'do_b', description: 'Step B', estimatedEffort: 2, dependencies: [], risks: [], alternatives: [] },
+      {
+        id: 'a',
+        action: 'do_a',
+        description: 'Step A',
+        estimatedEffort: 1,
+        dependencies: [],
+        risks: [],
+        alternatives: [],
+      },
+      {
+        id: 'b',
+        action: 'do_b',
+        description: 'Step B',
+        estimatedEffort: 2,
+        dependencies: [],
+        risks: [],
+        alternatives: [],
+      },
     ]
     const graph = engine.buildDependencyGraph(steps)
     expect(graph.nodes).toEqual(['a', 'b'])
@@ -333,9 +349,33 @@ describe('PlanningEngine buildDependencyGraph', () => {
 
   it('correctly builds edges from dependencies', () => {
     const steps: PlanStep[] = [
-      { id: 'a', action: 'do_a', description: 'Step A', estimatedEffort: 1, dependencies: [], risks: [], alternatives: [] },
-      { id: 'b', action: 'do_b', description: 'Step B', estimatedEffort: 2, dependencies: ['a'], risks: [], alternatives: [] },
-      { id: 'c', action: 'do_c', description: 'Step C', estimatedEffort: 3, dependencies: ['a', 'b'], risks: [], alternatives: [] },
+      {
+        id: 'a',
+        action: 'do_a',
+        description: 'Step A',
+        estimatedEffort: 1,
+        dependencies: [],
+        risks: [],
+        alternatives: [],
+      },
+      {
+        id: 'b',
+        action: 'do_b',
+        description: 'Step B',
+        estimatedEffort: 2,
+        dependencies: ['a'],
+        risks: [],
+        alternatives: [],
+      },
+      {
+        id: 'c',
+        action: 'do_c',
+        description: 'Step C',
+        estimatedEffort: 3,
+        dependencies: ['a', 'b'],
+        risks: [],
+        alternatives: [],
+      },
     ]
     const graph = engine.buildDependencyGraph(steps)
     expect(graph.edges.length).toBe(3)
@@ -346,7 +386,15 @@ describe('PlanningEngine buildDependencyGraph', () => {
 
   it('ignores dependencies referencing unknown step IDs', () => {
     const steps: PlanStep[] = [
-      { id: 'a', action: 'do_a', description: 'Step A', estimatedEffort: 1, dependencies: ['unknown_id'], risks: [], alternatives: [] },
+      {
+        id: 'a',
+        action: 'do_a',
+        description: 'Step A',
+        estimatedEffort: 1,
+        dependencies: ['unknown_id'],
+        risks: [],
+        alternatives: [],
+      },
     ]
     const graph = engine.buildDependencyGraph(steps)
     expect(graph.edges.length).toBe(0)
@@ -365,9 +413,33 @@ describe('PlanningEngine detectCycles', () => {
 
   it('detects no cycles in an acyclic graph', () => {
     const steps: PlanStep[] = [
-      { id: 'a', action: 'do_a', description: 'A', estimatedEffort: 1, dependencies: [], risks: [], alternatives: [] },
-      { id: 'b', action: 'do_b', description: 'B', estimatedEffort: 1, dependencies: ['a'], risks: [], alternatives: [] },
-      { id: 'c', action: 'do_c', description: 'C', estimatedEffort: 1, dependencies: ['b'], risks: [], alternatives: [] },
+      {
+        id: 'a',
+        action: 'do_a',
+        description: 'A',
+        estimatedEffort: 1,
+        dependencies: [],
+        risks: [],
+        alternatives: [],
+      },
+      {
+        id: 'b',
+        action: 'do_b',
+        description: 'B',
+        estimatedEffort: 1,
+        dependencies: ['a'],
+        risks: [],
+        alternatives: [],
+      },
+      {
+        id: 'c',
+        action: 'do_c',
+        description: 'C',
+        estimatedEffort: 1,
+        dependencies: ['b'],
+        risks: [],
+        alternatives: [],
+      },
     ]
     const graph = engine.buildDependencyGraph(steps)
     const cycles = engine.detectCycles(graph)
@@ -377,7 +449,10 @@ describe('PlanningEngine detectCycles', () => {
   it('detects a simple cycle', () => {
     const graph: DependencyGraph = {
       nodes: ['a', 'b'],
-      edges: [{ from: 'a', to: 'b' }, { from: 'b', to: 'a' }],
+      edges: [
+        { from: 'a', to: 'b' },
+        { from: 'b', to: 'a' },
+      ],
       adjacency: { a: ['b'], b: ['a'] },
       inDegree: { a: 1, b: 1 },
     }
@@ -467,7 +542,7 @@ describe('PlanningEngine adaptPlan', () => {
   it('returns an adapted plan with changed conditions noted in risks', () => {
     const plan = engine.createPlan('Build a REST API')
     const adapted = engine.adaptPlan(plan, ['API requirements changed'])
-    expect(adapted.risks.some((r) => r.includes('Condition changed'))).toBe(true)
+    expect(adapted.risks.some(r => r.includes('Condition changed'))).toBe(true)
   })
 
   it('adapted plan has reduced confidence', () => {
@@ -485,14 +560,14 @@ describe('PlanningEngine adaptPlan', () => {
   it('adds reassessment step when many conditions change', () => {
     const plan = engine.createPlan('Build a web app')
     const adapted = engine.adaptPlan(plan, ['Budget cut', 'Timeline shortened', 'Team reorganized'])
-    const hasReassess = adapted.steps.some((s) => s.action === 'reassess_plan')
+    const hasReassess = adapted.steps.some(s => s.action === 'reassess_plan')
     expect(hasReassess).toBe(true)
   })
 
   it('marks affected steps as adapted', () => {
     const plan = engine.createPlan('Implement user authentication with security review')
     const adapted = engine.adaptPlan(plan, ['security requirements tightened'])
-    const _adaptedSteps = adapted.steps.filter((s) => s.description.startsWith('[Adapted]'))
+    const _adaptedSteps = adapted.steps.filter(s => s.description.startsWith('[Adapted]'))
     // At least some steps could be adapted if keywords overlap
     expect(adapted.steps.length).toBeGreaterThan(0)
   })
@@ -534,7 +609,7 @@ describe('PlanningEngine mergePlans', () => {
     const plan1 = engine.createPlan('Implement a feature')
     const plan2 = engine.createPlan('Implement another feature')
     const merged = engine.mergePlans([plan1, plan2])
-    const actions = merged.steps.map((s) => s.action.toLowerCase().trim())
+    const actions = merged.steps.map(s => s.action.toLowerCase().trim())
     const uniqueActions = new Set(actions)
     expect(uniqueActions.size).toBe(actions.length)
   })

@@ -21,7 +21,9 @@ describe('MQL Network & Web Knowledge', () => {
     })
 
     it('covers copy trading and inter-terminal communication', async () => {
-      const r = await brain.chat('How to implement MQL copy trading signal between multiple terminals?')
+      const r = await brain.chat(
+        'How to implement MQL copy trading signal between multiple terminals?',
+      )
       expect(r.text.toLowerCase()).toMatch(/copy|signal|master|slave|file|pipe|common/)
     })
   })

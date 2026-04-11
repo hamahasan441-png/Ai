@@ -40,7 +40,12 @@ const LANGUAGE_SIGNATURES: LanguageSignature[] = [
   {
     language: 'typescript',
     keywords: ['interface', 'type', 'enum', 'namespace', 'readonly', 'as const'],
-    patterns: [/:\s*(string|number|boolean|void|any|never|unknown)/, /import\s+type\s/, /<[A-Z]\w*>/, /export\s+interface\s/],
+    patterns: [
+      /:\s*(string|number|boolean|void|any|never|unknown)/,
+      /import\s+type\s/,
+      /<[A-Z]\w*>/,
+      /export\s+interface\s/,
+    ],
     weight: 1.2,
   },
   {
@@ -58,7 +63,12 @@ const LANGUAGE_SIGNATURES: LanguageSignature[] = [
   {
     language: 'java',
     keywords: ['public', 'private', 'protected', 'class', 'extends', 'implements', 'throws'],
-    patterns: [/public\s+static\s+void\s+main/, /System\.out\.println/, /import\s+java\./, /@Override/],
+    patterns: [
+      /public\s+static\s+void\s+main/,
+      /System\.out\.println/,
+      /import\s+java\./,
+      /@Override/,
+    ],
     weight: 1.0,
   },
   {
@@ -183,19 +193,56 @@ const LANGUAGE_SIGNATURES: LanguageSignature[] = [
   },
   {
     language: 'mql4',
-    keywords: ['#property', 'extern', 'datetime', 'OrderSend', 'OrderClose', 'OrderModify', 'iMA', 'iRSI'],
-    patterns: [/int\s+(?:init|start|deinit)\s*\(\)/, /OrderSend\s*\(/, /iMA\s*\(/, /#property\s+(?:indicator|script|copyright)/],
+    keywords: [
+      '#property',
+      'extern',
+      'datetime',
+      'OrderSend',
+      'OrderClose',
+      'OrderModify',
+      'iMA',
+      'iRSI',
+    ],
+    patterns: [
+      /int\s+(?:init|start|deinit)\s*\(\)/,
+      /OrderSend\s*\(/,
+      /iMA\s*\(/,
+      /#property\s+(?:indicator|script|copyright)/,
+    ],
     weight: 1.2,
   },
   {
     language: 'mql5',
-    keywords: ['#property', 'input', 'datetime', 'CTrade', 'CPositionInfo', 'OnInit', 'OnTick', 'OnDeinit'],
-    patterns: [/int\s+OnInit\s*\(\)/, /void\s+OnTick\s*\(\)/, /void\s+OnDeinit\s*\(/, /#property\s+(?:indicator|script|copyright)/],
+    keywords: [
+      '#property',
+      'input',
+      'datetime',
+      'CTrade',
+      'CPositionInfo',
+      'OnInit',
+      'OnTick',
+      'OnDeinit',
+    ],
+    patterns: [
+      /int\s+OnInit\s*\(\)/,
+      /void\s+OnTick\s*\(\)/,
+      /void\s+OnDeinit\s*\(/,
+      /#property\s+(?:indicator|script|copyright)/,
+    ],
     weight: 1.3,
   },
   {
     language: 'pinescript',
-    keywords: ['//@version', 'strategy', 'indicator', 'plot', 'ta.sma', 'ta.ema', 'ta.rsi', 'ta.crossover'],
+    keywords: [
+      '//@version',
+      'strategy',
+      'indicator',
+      'plot',
+      'ta.sma',
+      'ta.ema',
+      'ta.rsi',
+      'ta.crossover',
+    ],
     patterns: [/\/\/@version\s*=\s*\d+/, /strategy\s*\(/, /indicator\s*\(/, /ta\.\w+\s*\(/],
     weight: 1.3,
   },
@@ -205,7 +252,10 @@ const LANGUAGE_SIGNATURES: LanguageSignature[] = [
  * Detect the programming language of a code snippet.
  * Returns language and confidence score.
  */
-export function detectLanguageAdvanced(code: string): { language: AnalysisLanguage; confidence: number } {
+export function detectLanguageAdvanced(code: string): {
+  language: AnalysisLanguage
+  confidence: number
+} {
   if (!code.trim()) return { language: 'unknown', confidence: 0 }
 
   const scores = new Map<AnalysisLanguage, number>()
@@ -263,15 +313,30 @@ export function analyzeComplexity(code: string): ComplexityMetrics {
   const lines = code.split('\n')
   const codeLines = lines.filter(l => {
     const trimmed = l.trim()
-    return trimmed.length > 0 && !trimmed.startsWith('//') && !trimmed.startsWith('#') && !trimmed.startsWith('*')
+    return (
+      trimmed.length > 0 &&
+      !trimmed.startsWith('//') &&
+      !trimmed.startsWith('#') &&
+      !trimmed.startsWith('*')
+    )
   })
 
   // Cyclomatic complexity: count decision points
   let cyclomatic = 1
   const decisionPatterns = [
-    /\bif\b/, /\belse\s+if\b/, /\belif\b/, /\bwhile\b/, /\bfor\b/,
-    /\bcase\b/, /\bcatch\b/, /\b\?\?/, /\?\s*\./, /&&/, /\|\|/,
-    /\btry\b/, /\bswitch\b/,
+    /\bif\b/,
+    /\belse\s+if\b/,
+    /\belif\b/,
+    /\bwhile\b/,
+    /\bfor\b/,
+    /\bcase\b/,
+    /\bcatch\b/,
+    /\b\?\?/,
+    /\?\s*\./,
+    /&&/,
+    /\|\|/,
+    /\btry\b/,
+    /\bswitch\b/,
   ]
   for (const line of codeLines) {
     for (const pat of decisionPatterns) {
@@ -309,17 +374,26 @@ export function analyzeComplexity(code: string): ComplexityMetrics {
 
   // Count functions
   const functionPatterns = [
-    /\bfunction\s+\w+/, /\bconst\s+\w+\s*=\s*(?:async\s*)?\(/, /\b(?:async\s+)?function\b/,
-    /\bdef\s+\w+/, /\bfn\s+\w+/, /\bfunc\s+\w+/, /\bpublic\s+\w+\s+\w+\s*\(/,
+    /\bfunction\s+\w+/,
+    /\bconst\s+\w+\s*=\s*(?:async\s*)?\(/,
+    /\b(?:async\s+)?function\b/,
+    /\bdef\s+\w+/,
+    /\bfn\s+\w+/,
+    /\bfunc\s+\w+/,
+    /\bpublic\s+\w+\s+\w+\s*\(/,
   ]
   let functionCount = 0
   for (const line of codeLines) {
     for (const pat of functionPatterns) {
-      if (pat.test(line)) { functionCount++; break }
+      if (pat.test(line)) {
+        functionCount++
+        break
+      }
     }
   }
 
-  const avgFunctionLength = functionCount > 0 ? Math.round(codeLines.length / functionCount) : codeLines.length
+  const avgFunctionLength =
+    functionCount > 0 ? Math.round(codeLines.length / functionCount) : codeLines.length
 
   return {
     cyclomatic,
@@ -395,7 +469,8 @@ const ANTI_PATTERN_RULES: AntiPatternRule[] = [
   {
     name: 'unhandled-promise',
     severity: 'high',
-    pattern: /new\s+Promise\s*\(\s*(?:async\s*)?\([^)]*\)\s*=>\s*\{(?:(?!\.catch|catch\s*\()[\s\S])*\}\s*\)/,
+    pattern:
+      /new\s+Promise\s*\(\s*(?:async\s*)?\([^)]*\)\s*=>\s*\{(?:(?!\.catch|catch\s*\()[\s\S])*\}\s*\)/,
     description: 'Promise without .catch() or try/catch may have unhandled rejections.',
     suggestion: 'Always handle Promise rejections with .catch() or try/catch in async functions.',
     category: 'error-handling',
@@ -446,14 +521,26 @@ const ANTI_PATTERN_RULES: AntiPatternRule[] = [
     description: 'Code contains a TODO/FIXME marker that needs attention.',
     suggestion: 'Address the TODO/FIXME or create a tracked issue for it.',
     category: 'maintenance',
-    languages: ['typescript', 'javascript', 'java', 'csharp', 'go', 'rust', 'cpp', 'c', 'swift', 'kotlin', 'scala'],
+    languages: [
+      'typescript',
+      'javascript',
+      'java',
+      'csharp',
+      'go',
+      'rust',
+      'cpp',
+      'c',
+      'swift',
+      'kotlin',
+      'scala',
+    ],
   },
   {
     name: 'empty-function',
     severity: 'low',
     pattern: /(?:function\s+\w+|=>\s*)\s*\(\s*\)\s*\{\s*\}/,
     description: 'Empty function body — likely a placeholder or mistake.',
-    suggestion: 'Add implementation or a comment explaining why it\'s empty.',
+    suggestion: "Add implementation or a comment explaining why it's empty.",
     category: 'readability',
     languages: ['typescript', 'javascript', 'java', 'csharp', 'go', 'cpp', 'c'],
   },
@@ -592,7 +679,9 @@ export function detectCodeSmells(code: string, language: AnalysisLanguage): Code
     const trimmed = line.trim()
 
     // Detect function starts
-    const funcMatch = trimmed.match(/(?:function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=|def\s+(\w+)|fn\s+(\w+)|func\s+(\w+))/)
+    const funcMatch = trimmed.match(
+      /(?:function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=|def\s+(\w+)|fn\s+(\w+)|func\s+(\w+))/,
+    )
     if (funcMatch) {
       if (funcStart >= 0 && i - funcStart > 50) {
         smells.push({
@@ -604,7 +693,8 @@ export function detectCodeSmells(code: string, language: AnalysisLanguage): Code
         })
       }
       funcStart = i
-      funcName = funcMatch[1] || funcMatch[2] || funcMatch[3] || funcMatch[4] || funcMatch[5] || 'anonymous'
+      funcName =
+        funcMatch[1] || funcMatch[2] || funcMatch[3] || funcMatch[4] || funcMatch[5] || 'anonymous'
       braceDepth = 0
     }
 
@@ -622,7 +712,13 @@ export function detectCodeSmells(code: string, language: AnalysisLanguage): Code
     if (braceDepth < 0) braceDepth = 0
 
     // Duplicate consecutive blank lines
-    if (trimmed === '' && i > 0 && lines[i - 1].trim() === '' && i > 1 && lines[i - 2].trim() === '') {
+    if (
+      trimmed === '' &&
+      i > 0 &&
+      lines[i - 1].trim() === '' &&
+      i > 1 &&
+      lines[i - 2].trim() === ''
+    ) {
       smells.push({
         type: 'excessive-blank-lines',
         severity: 'info',
@@ -676,7 +772,8 @@ const SECURITY_RULES: SecurityRule[] = [
   {
     type: 'sql-injection',
     severity: 'critical',
-    pattern: /(?:query|execute|exec)\s*\(\s*[`'"]\s*(?:SELECT|INSERT|UPDATE|DELETE|DROP)\b[^'"]*\$\{/i,
+    pattern:
+      /(?:query|execute|exec)\s*\(\s*[`'"]\s*(?:SELECT|INSERT|UPDATE|DELETE|DROP)\b[^'"]*\$\{/i,
     description: 'Possible SQL injection via string interpolation in query.',
     cwe: 'CWE-89',
     owasp: 'A03:2021-Injection',
@@ -707,7 +804,19 @@ const SECURITY_RULES: SecurityRule[] = [
     description: 'Possible hardcoded secret or credential in source code.',
     cwe: 'CWE-798',
     owasp: 'A07:2021-Identification and Authentication Failures',
-    languages: ['typescript', 'javascript', 'python', 'java', 'go', 'rust', 'ruby', 'php', 'csharp', 'kotlin', 'swift'],
+    languages: [
+      'typescript',
+      'javascript',
+      'python',
+      'java',
+      'go',
+      'rust',
+      'ruby',
+      'php',
+      'csharp',
+      'kotlin',
+      'swift',
+    ],
   },
   {
     type: 'eval-usage',
@@ -739,7 +848,8 @@ const SECURITY_RULES: SecurityRule[] = [
     type: 'insecure-random',
     severity: 'medium',
     pattern: /Math\.random\s*\(\)/,
-    description: 'Math.random() is not cryptographically secure. Use crypto.randomBytes() for security-sensitive operations.',
+    description:
+      'Math.random() is not cryptographically secure. Use crypto.randomBytes() for security-sensitive operations.',
     cwe: 'CWE-330',
     languages: ['javascript', 'typescript'],
   },
@@ -831,7 +941,11 @@ export function calculateQualityScore(
 
   // Anti-pattern penalties
   const severityPenalty: Record<Severity, number> = {
-    critical: 10, high: 7, medium: 4, low: 2, info: 1,
+    critical: 10,
+    high: 7,
+    medium: 4,
+    low: 2,
+    info: 1,
   }
   for (const ap of antiPatterns) {
     score -= severityPenalty[ap.severity]
@@ -873,7 +987,10 @@ export class CodeAnalyzer {
   private depth: AnalysisDepth
   private securityLevel: 'basic' | 'standard' | 'strict'
 
-  constructor(options?: { depth?: AnalysisDepth; securityLevel?: 'basic' | 'standard' | 'strict' }) {
+  constructor(options?: {
+    depth?: AnalysisDepth
+    securityLevel?: 'basic' | 'standard' | 'strict'
+  }) {
     this.depth = options?.depth ?? 'standard'
     this.securityLevel = options?.securityLevel ?? 'standard'
   }
@@ -906,7 +1023,14 @@ export class CodeAnalyzer {
     const qualityScore = calculateQualityScore(complexity, antiPatterns, codeSmells, securityIssues)
 
     // Step 8: Generate summary
-    const summary = this.generateSummary(language, complexity, antiPatterns, codeSmells, securityIssues, qualityScore)
+    const summary = this.generateSummary(
+      language,
+      complexity,
+      antiPatterns,
+      codeSmells,
+      securityIssues,
+      qualityScore,
+    )
 
     return {
       language,
@@ -963,7 +1087,9 @@ export class CodeAnalyzer {
   ): string {
     const parts: string[] = []
 
-    parts.push(`Language: ${language}. ${complexity.linesOfCode} lines of code, ${complexity.functionCount} functions.`)
+    parts.push(
+      `Language: ${language}. ${complexity.linesOfCode} lines of code, ${complexity.functionCount} functions.`,
+    )
 
     if (qualityScore >= 80) parts.push(`Quality: excellent (${qualityScore}/100).`)
     else if (qualityScore >= 60) parts.push(`Quality: good (${qualityScore}/100).`)
@@ -972,7 +1098,9 @@ export class CodeAnalyzer {
 
     if (securityIssues.length > 0) {
       const critical = securityIssues.filter(i => i.severity === 'critical').length
-      parts.push(`⚠️ ${securityIssues.length} security issue(s)${critical > 0 ? ` (${critical} critical)` : ''}.`)
+      parts.push(
+        `⚠️ ${securityIssues.length} security issue(s)${critical > 0 ? ` (${critical} critical)` : ''}.`,
+      )
     }
 
     if (antiPatterns.length > 0) {

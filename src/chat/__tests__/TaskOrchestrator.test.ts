@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  TaskOrchestrator,
-  type TaskPlan,
-  type TaskStep,
-} from '../TaskOrchestrator'
+import { TaskOrchestrator, type TaskPlan, type TaskStep } from '../TaskOrchestrator'
 
 // ── Constructor Tests ──
 
@@ -57,7 +53,9 @@ describe('TaskOrchestrator decomposeGoal', () => {
     const stepNames = apiPlan.steps.map(s => s.name.toLowerCase())
     expect(stepNames.some(n => n.includes('api'))).toBe(true)
 
-    const unknownPlan = orchestrator.decomposeGoal('Generate a quarterly financial report from raw data')
+    const unknownPlan = orchestrator.decomposeGoal(
+      'Generate a quarterly financial report from raw data',
+    )
     const types = unknownPlan.steps.map(s => s.type)
     expect(types).toContain('design')
     expect(types).toContain('implement')
@@ -65,7 +63,10 @@ describe('TaskOrchestrator decomposeGoal', () => {
   })
 
   it('stores constraints and throws when maxTasks limit is reached', () => {
-    const plan = orchestrator.decomposeGoal('Build a chat app', ['must be real-time', 'use WebSocket'])
+    const plan = orchestrator.decomposeGoal('Build a chat app', [
+      'must be real-time',
+      'use WebSocket',
+    ])
     expect(plan.constraints).toContain('must be real-time')
     expect(plan.constraints).toContain('use WebSocket')
 
@@ -145,7 +146,12 @@ describe('TaskOrchestrator step lifecycle', () => {
   it('advanceStep completes a step and resolves downstream dependencies', () => {
     const executable = orchestrator.getExecutableSteps(plan.id)
     orchestrator.beginStep(executable[0].id)
-    orchestrator.advanceStep(executable[0].id, { success: true, output: 'Done', duration: 100, artifacts: [] })
+    orchestrator.advanceStep(executable[0].id, {
+      success: true,
+      output: 'Done',
+      duration: 100,
+      artifacts: [],
+    })
     const status = orchestrator.getTaskStatus(plan.id)
     expect(status.completedSteps).toBe(1)
     expect(status.progressPercent).toBeGreaterThan(0)
@@ -379,22 +385,46 @@ describe('TaskOrchestrator parallel detection', () => {
   it('hasResourceConflict detects deploy conflicts and allows independent types', () => {
     const orchestrator = new TaskOrchestrator()
     const deployA: TaskStep = {
-      id: 'a', name: 'Deploy A', description: '', type: 'deploy',
-      dependencies: [], state: 'pending', estimatedComplexity: 3, retryCount: 0,
+      id: 'a',
+      name: 'Deploy A',
+      description: '',
+      type: 'deploy',
+      dependencies: [],
+      state: 'pending',
+      estimatedComplexity: 3,
+      retryCount: 0,
     }
     const deployB: TaskStep = {
-      id: 'b', name: 'Deploy B', description: '', type: 'deploy',
-      dependencies: [], state: 'pending', estimatedComplexity: 3, retryCount: 0,
+      id: 'b',
+      name: 'Deploy B',
+      description: '',
+      type: 'deploy',
+      dependencies: [],
+      state: 'pending',
+      estimatedComplexity: 3,
+      retryCount: 0,
     }
     expect(orchestrator.hasResourceConflict(deployA, deployB)).toBe(true)
 
     const testStep: TaskStep = {
-      id: 'c', name: 'Test', description: '', type: 'test',
-      dependencies: [], state: 'pending', estimatedComplexity: 3, retryCount: 0,
+      id: 'c',
+      name: 'Test',
+      description: '',
+      type: 'test',
+      dependencies: [],
+      state: 'pending',
+      estimatedComplexity: 3,
+      retryCount: 0,
     }
     const docStep: TaskStep = {
-      id: 'd', name: 'Document', description: '', type: 'document',
-      dependencies: [], state: 'pending', estimatedComplexity: 2, retryCount: 0,
+      id: 'd',
+      name: 'Document',
+      description: '',
+      type: 'document',
+      dependencies: [],
+      state: 'pending',
+      estimatedComplexity: 2,
+      retryCount: 0,
     }
     expect(orchestrator.hasResourceConflict(testStep, docStep)).toBe(false)
   })

@@ -87,10 +87,7 @@ export const renderSync = (
     ...opts,
   }
 
-  const instance: Ink = getInstance(
-    inkOptions.stdout,
-    () => new Ink(inkOptions),
-  )
+  const instance: Ink = getInstance(inkOptions.stdout, () => new Ink(inkOptions))
 
   instance.render(node)
 
@@ -156,9 +153,7 @@ export async function createRoot({
   }
 }
 
-const getOptions = (
-  stdout: NodeJS.WriteStream | RenderOptions | undefined = {},
-): RenderOptions => {
+const getOptions = (stdout: NodeJS.WriteStream | RenderOptions | undefined = {}): RenderOptions => {
   if (stdout instanceof Stream) {
     return {
       stdout,
@@ -169,10 +164,7 @@ const getOptions = (
   return stdout
 }
 
-const getInstance = (
-  stdout: NodeJS.WriteStream,
-  createInstance: () => Ink,
-): Ink => {
+const getInstance = (stdout: NodeJS.WriteStream, createInstance: () => Ink): Ink => {
   let instance = instances.get(stdout)
 
   if (!instance) {

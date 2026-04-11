@@ -22,7 +22,15 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type InsightCategory = 'trend' | 'anomaly' | 'pattern' | 'correlation' | 'finding' | 'recommendation' | 'warning' | 'opportunity'
+export type InsightCategory =
+  | 'trend'
+  | 'anomaly'
+  | 'pattern'
+  | 'correlation'
+  | 'finding'
+  | 'recommendation'
+  | 'warning'
+  | 'opportunity'
 export type SignificanceLevel = 'low' | 'medium' | 'high' | 'critical'
 export type TrendDirection = 'increasing' | 'decreasing' | 'stable' | 'volatile' | 'cyclical'
 
@@ -132,7 +140,11 @@ function linearRegression(values: number[]): { slope: number; intercept: number;
   const n = values.length
   if (n < 2) return { slope: 0, intercept: values[0] ?? 0, r2: 0 }
 
-  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0
+  let sumX = 0,
+    sumY = 0,
+    sumXY = 0,
+    sumX2 = 0,
+    sumY2 = 0
   for (let i = 0; i < n; i++) {
     sumX += i
     sumY += values[i]
@@ -185,13 +197,22 @@ export class InsightExtractor {
   detectTrend(values: number[]): TrendResult {
     this.stats.totalTrends++
     if (values.length < 2) {
-      return { direction: 'stable', slope: 0, confidence: 0, startValue: values[0] ?? 0, endValue: values[0] ?? 0, changePercent: 0, dataPoints: values.length }
+      return {
+        direction: 'stable',
+        slope: 0,
+        confidence: 0,
+        startValue: values[0] ?? 0,
+        endValue: values[0] ?? 0,
+        changePercent: 0,
+        dataPoints: values.length,
+      }
     }
 
     const { slope, r2 } = linearRegression(values)
     const startValue = values[0]
     const endValue = values[values.length - 1]
-    const changePercent = startValue !== 0 ? ((endValue - startValue) / Math.abs(startValue)) * 100 : 0
+    const changePercent =
+      startValue !== 0 ? ((endValue - startValue) / Math.abs(startValue)) * 100 : 0
 
     const sd = stdDev(values)
     const m = mean(values)
@@ -213,7 +234,15 @@ export class InsightExtractor {
       direction = 'decreasing'
     }
 
-    return { direction, slope, confidence: Math.abs(r2), startValue, endValue, changePercent, dataPoints: values.length }
+    return {
+      direction,
+      slope,
+      confidence: Math.abs(r2),
+      startValue,
+      endValue,
+      changePercent,
+      dataPoints: values.length,
+    }
   }
 
   // ── Anomaly detection ────────────────────────────────────────────────
@@ -250,7 +279,10 @@ export class InsightExtractor {
     const ngramCounts = new Map<string, { count: number; examples: string[] }>()
 
     for (const text of texts) {
-      const words = text.toLowerCase().split(/\s+/).filter(w => w.length > 2)
+      const words = text
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 2)
       for (let n = 2; n <= 3; n++) {
         for (let i = 0; i <= words.length - n; i++) {
           const ngram = words.slice(i, i + n).join(' ')
@@ -284,11 +316,47 @@ export class InsightExtractor {
     const words = text.toLowerCase().split(/\s+/)
 
     // Key findings: sentences with important signal words
-    const keySignals = /\b(important|significant|critical|notable|key|major|primary|essential|crucial|fundamental)\b/i
-    const keyFindings = sentences.filter(s => keySignals.test(s)).map(s => s.trim()).slice(0, 5)
+    const keySignals =
+      /\b(important|significant|critical|notable|key|major|primary|essential|crucial|fundamental)\b/i
+    const keyFindings = sentences
+      .filter(s => keySignals.test(s))
+      .map(s => s.trim())
+      .slice(0, 5)
 
     // Themes: frequent meaningful words
-    const stopWords = new Set(['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'has', 'her', 'was', 'one', 'our', 'out', 'this', 'that', 'with', 'from', 'they', 'have', 'been', 'said', 'each', 'which', 'their', 'will', 'other', 'about', 'than', 'into'])
+    const stopWords = new Set([
+      'the',
+      'and',
+      'for',
+      'are',
+      'but',
+      'not',
+      'you',
+      'all',
+      'can',
+      'has',
+      'her',
+      'was',
+      'one',
+      'our',
+      'out',
+      'this',
+      'that',
+      'with',
+      'from',
+      'they',
+      'have',
+      'been',
+      'said',
+      'each',
+      'which',
+      'their',
+      'will',
+      'other',
+      'about',
+      'than',
+      'into',
+    ])
     const wordFreq = new Map<string, number>()
     for (const w of words) {
       if (w.length > 3 && !stopWords.has(w)) wordFreq.set(w, (wordFreq.get(w) ?? 0) + 1)
@@ -299,28 +367,53 @@ export class InsightExtractor {
       .map(([w]) => w)
 
     // Sentiment
-    const posWords = /\b(good|great|excellent|positive|success|improve|benefit|advantage|strong|growth)\b/gi
+    const posWords =
+      /\b(good|great|excellent|positive|success|improve|benefit|advantage|strong|growth)\b/gi
     const negWords = /\b(bad|poor|fail|negative|problem|issue|risk|threat|weak|decline)\b/gi
     const posCount = (text.match(posWords) ?? []).length
     const negCount = (text.match(negWords) ?? []).length
-    const sentiment = posCount > negCount * 1.5 ? 'positive' : negCount > posCount * 1.5 ? 'negative' : posCount > 0 && negCount > 0 ? 'mixed' : 'neutral'
+    const sentiment =
+      posCount > negCount * 1.5
+        ? 'positive'
+        : negCount > posCount * 1.5
+          ? 'negative'
+          : posCount > 0 && negCount > 0
+            ? 'mixed'
+            : 'neutral'
 
     // Complexity
     const avgWordLen = words.reduce((s, w) => s + w.length, 0) / Math.max(1, words.length)
     const complexity = avgWordLen > 6 ? 'complex' : avgWordLen > 4.5 ? 'moderate' : 'simple'
 
     // Action items
-    const actionPatterns = /\b(should|must|need\s+to|recommend|suggest|ensure|consider|implement|address)\b/i
-    const actionItems = sentences.filter(s => actionPatterns.test(s)).map(s => s.trim()).slice(0, 5)
+    const actionPatterns =
+      /\b(should|must|need\s+to|recommend|suggest|ensure|consider|implement|address)\b/i
+    const actionItems = sentences
+      .filter(s => actionPatterns.test(s))
+      .map(s => s.trim())
+      .slice(0, 5)
 
     return { keyFindings, themes, sentiment, complexity, actionItems }
   }
 
   // ── Insight creation ─────────────────────────────────────────────────
 
-  addInsight(category: InsightCategory, title: string, description: string, evidence: string[] = [], tags: string[] = [], source: string = 'manual'): Insight {
-    const actionable = category === 'recommendation' || category === 'opportunity' || category === 'warning'
-    const baseScore = category === 'anomaly' || category === 'warning' ? 0.7 : category === 'recommendation' || category === 'opportunity' ? 0.6 : 0.4
+  addInsight(
+    category: InsightCategory,
+    title: string,
+    description: string,
+    evidence: string[] = [],
+    tags: string[] = [],
+    source: string = 'manual',
+  ): Insight {
+    const actionable =
+      category === 'recommendation' || category === 'opportunity' || category === 'warning'
+    const baseScore =
+      category === 'anomaly' || category === 'warning'
+        ? 0.7
+        : category === 'recommendation' || category === 'opportunity'
+          ? 0.6
+          : 0.4
     const evidenceBonus = Math.min(0.3, evidence.length * 0.1)
     const score = Math.min(1, baseScore + evidenceBonus)
 
@@ -365,15 +458,19 @@ export class InsightExtractor {
     const topInsights = this.getTopInsights()
     const trends = this.insights.filter(i => i.category === 'trend')
     const anomalies = this.insights.filter(i => i.category === 'anomaly')
-    const recommendations = this.insights.filter(i => i.category === 'recommendation').map(i => i.description)
+    const recommendations = this.insights
+      .filter(i => i.category === 'recommendation')
+      .map(i => i.description)
 
-    const trendSummary = trends.length > 0
-      ? `${trends.length} trend(s) detected: ${trends.map(t => t.title).join(', ')}`
-      : 'No trends detected'
+    const trendSummary =
+      trends.length > 0
+        ? `${trends.length} trend(s) detected: ${trends.map(t => t.title).join(', ')}`
+        : 'No trends detected'
 
-    const anomalySummary = anomalies.length > 0
-      ? `${anomalies.length} anomaly/anomalies detected: ${anomalies.map(a => a.title).join(', ')}`
-      : 'No anomalies detected'
+    const anomalySummary =
+      anomalies.length > 0
+        ? `${anomalies.length} anomaly/anomalies detected: ${anomalies.map(a => a.title).join(', ')}`
+        : 'No anomalies detected'
 
     return {
       title,

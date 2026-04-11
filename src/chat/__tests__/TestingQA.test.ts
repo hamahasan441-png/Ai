@@ -11,7 +11,9 @@ describe('Testing & QA Engineering Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about unit testing frameworks like Jest and Vitest', async () => {
-      const r = await brain.chat('Tell me about unit testing framework jest vitest mocha for test driven development tdd')
+      const r = await brain.chat(
+        'Tell me about unit testing framework jest vitest mocha for test driven development tdd',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/test|jest|vitest|tdd|unit/)
     })
@@ -23,25 +25,33 @@ describe('Testing & QA Engineering Knowledge', () => {
     })
 
     it('answers about BDD and Cucumber', async () => {
-      const r = await brain.chat('Explain behavior driven development bdd cucumber gherkin acceptance testing')
+      const r = await brain.chat(
+        'Explain behavior driven development bdd cucumber gherkin acceptance testing',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/bdd|cucumber|gherkin|given|when|then|behavior/)
     })
 
     it('answers about code coverage and mutation testing', async () => {
-      const r = await brain.chat('What is code coverage istanbul nyc branch statement and mutation testing stryker?')
+      const r = await brain.chat(
+        'What is code coverage istanbul nyc branch statement and mutation testing stryker?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/coverage|mutation|istanbul|stryker|branch/)
     })
 
     it('answers about performance and load testing', async () => {
-      const r = await brain.chat('How does performance testing load stress jmeter k6 api testing postman work?')
+      const r = await brain.chat(
+        'How does performance testing load stress jmeter k6 api testing postman work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/performance|load|stress|k6|jmeter|test|api/)
     })
 
     it('answers about test pyramid and CI strategy', async () => {
-      const r = await brain.chat('What is the test pyramid strategy and continuous testing ci cd pipeline?')
+      const r = await brain.chat(
+        'What is the test pyramid strategy and continuous testing ci cd pipeline?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/pyramid|ci|test|strategy|integration/)
     })

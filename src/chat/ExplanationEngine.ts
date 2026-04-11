@@ -135,7 +135,10 @@ export const DEFAULT_EXPLANATION_ENGINE_CONFIG: ExplanationEngineConfig = {
 const LEVEL_ORDER: AbstractionLevel[] = ['eli5', 'simplified', 'standard', 'detailed', 'technical']
 
 /** Templates for different abstraction levels. */
-const LEVEL_TEMPLATES: Record<AbstractionLevel, { prefix: string; style: string; maxSentenceLength: number }> = {
+const LEVEL_TEMPLATES: Record<
+  AbstractionLevel,
+  { prefix: string; style: string; maxSentenceLength: number }
+> = {
   eli5: {
     prefix: 'Imagine',
     style: 'Use simple words, short sentences, everyday analogies. No jargon.',
@@ -166,28 +169,47 @@ const LEVEL_TEMPLATES: Record<AbstractionLevel, { prefix: string; style: string;
 /** Common analogy source domains. */
 const ANALOGY_DOMAINS: Record<string, string[]> = {
   programming: [
-    'cooking recipe', 'building a house', 'assembly line', 'library organization',
-    'traffic control', 'postal service', 'orchestra conductor',
+    'cooking recipe',
+    'building a house',
+    'assembly line',
+    'library organization',
+    'traffic control',
+    'postal service',
+    'orchestra conductor',
   ],
   security: [
-    'home security', 'bank vault', 'castle defense', 'immune system',
-    'airport security', 'locks and keys',
+    'home security',
+    'bank vault',
+    'castle defense',
+    'immune system',
+    'airport security',
+    'locks and keys',
   ],
   networking: [
-    'postal service', 'highway system', 'telephone network', 'water pipes',
-    'restaurant ordering', 'mail sorting',
+    'postal service',
+    'highway system',
+    'telephone network',
+    'water pipes',
+    'restaurant ordering',
+    'mail sorting',
   ],
   databases: [
-    'filing cabinet', 'library catalog', 'phone book', 'spreadsheet',
-    'recipe book index', 'warehouse inventory',
+    'filing cabinet',
+    'library catalog',
+    'phone book',
+    'spreadsheet',
+    'recipe book index',
+    'warehouse inventory',
   ],
   algorithms: [
-    'sorting cards', 'finding a word in dictionary', 'maze solving',
-    'treasure hunt', 'assembly instructions', 'GPS navigation',
+    'sorting cards',
+    'finding a word in dictionary',
+    'maze solving',
+    'treasure hunt',
+    'assembly instructions',
+    'GPS navigation',
   ],
-  general: [
-    'everyday life', 'cooking', 'sports', 'travel', 'building', 'nature',
-  ],
+  general: ['everyday life', 'cooking', 'sports', 'travel', 'building', 'nature'],
 }
 
 /** Domain detection keywords. */
@@ -204,20 +226,20 @@ const DOMAIN_KEYWORDS: Record<string, string[]> = {
 
 /** Prerequisite mappings for common concepts. */
 const PREREQUISITE_MAP: Record<string, string[]> = {
-  'recursion': ['functions', 'call stack', 'base case'],
-  'api': ['http', 'client-server', 'request-response'],
-  'database': ['data structures', 'queries', 'tables'],
-  'encryption': ['binary', 'keys', 'algorithms'],
+  recursion: ['functions', 'call stack', 'base case'],
+  api: ['http', 'client-server', 'request-response'],
+  database: ['data structures', 'queries', 'tables'],
+  encryption: ['binary', 'keys', 'algorithms'],
   'machine learning': ['statistics', 'linear algebra', 'optimization'],
-  'docker': ['containers', 'operating systems', 'networking'],
-  'kubernetes': ['docker', 'containers', 'networking', 'yaml'],
-  'react': ['javascript', 'html', 'components', 'state'],
-  'typescript': ['javascript', 'types', 'interfaces'],
-  'git': ['version control', 'files', 'branches'],
+  docker: ['containers', 'operating systems', 'networking'],
+  kubernetes: ['docker', 'containers', 'networking', 'yaml'],
+  react: ['javascript', 'html', 'components', 'state'],
+  typescript: ['javascript', 'types', 'interfaces'],
+  git: ['version control', 'files', 'branches'],
   'rest api': ['http', 'urls', 'json', 'client-server'],
-  'sql': ['tables', 'data types', 'relational model'],
-  'css': ['html', 'selectors', 'box model'],
-  'async': ['callbacks', 'event loop', 'promises'],
+  sql: ['tables', 'data types', 'relational model'],
+  css: ['html', 'selectors', 'box model'],
+  async: ['callbacks', 'event loop', 'promises'],
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -248,7 +270,7 @@ function estimateReadingTime(wordCount: number): number {
 function extractTechnicalTerms(text: string): string[] {
   const techPatterns = [
     /\b[A-Z][a-z]+(?:[A-Z][a-z]+)+\b/g, // CamelCase
-    /\b[a-z]+_[a-z_]+\b/g,               // snake_case
+    /\b[a-z]+_[a-z_]+\b/g, // snake_case
     /\b(?:API|HTTP|SQL|DNS|TCP|IP|URL|JSON|XML|HTML|CSS|JWT|OAuth|REST|CRUD|ACID)\b/gi,
   ]
   const terms = new Set<string>()
@@ -309,9 +331,10 @@ export class ExplanationEngine {
     domain: string,
   ): LevelExplanation {
     const template = LEVEL_TEMPLATES[level]
-    const analogies = level === 'eli5' || level === 'simplified'
-      ? this.generateAnalogies(topic, domain).map(a => a.mapping)
-      : []
+    const analogies =
+      level === 'eli5' || level === 'simplified'
+        ? this.generateAnalogies(topic, domain).map(a => a.mapping)
+        : []
 
     // Build explanation text based on level
     const parts: string[] = []
@@ -354,33 +377,45 @@ export class ExplanationEngine {
     // Simple templates based on level
     switch (level) {
       case 'eli5':
-        return `${topic} is like a special tool that helps with ${domain} tasks. ` +
+        return (
+          `${topic} is like a special tool that helps with ${domain} tasks. ` +
           `It makes things easier by handling the hard parts for you.`
+        )
       case 'simplified':
-        return `${topic} is a concept in ${domain} that provides a way to ` +
+        return (
+          `${topic} is a concept in ${domain} that provides a way to ` +
           `organize and process information more effectively. ` +
           `It works by breaking down complex tasks into simpler ones.`
+        )
       case 'standard':
-        return `${topic} is a ${domain} concept that enables structured ` +
+        return (
+          `${topic} is a ${domain} concept that enables structured ` +
           `processing of data or operations. It provides a framework for ` +
           `managing complexity through well-defined interfaces and patterns.`
+        )
       case 'detailed':
-        return `${topic} in the context of ${domain} refers to a systematic approach ` +
+        return (
+          `${topic} in the context of ${domain} refers to a systematic approach ` +
           `for handling complex operations. It involves multiple components working together ` +
           `through defined protocols and data flows. The key aspects include initialization, ` +
           `processing, error handling, and cleanup phases.`
+        )
       case 'technical':
-        return `${topic} is a ${domain} construct characterized by its specific ` +
+        return (
+          `${topic} is a ${domain} construct characterized by its specific ` +
           `computational properties and interface contracts. Implementation typically involves ` +
           `state management, event-driven processing, and resource lifecycle control. ` +
           `Performance characteristics depend on the underlying data structures and algorithms used.`
+        )
     }
   }
 
   private addTechnicalDetails(topic: string, domain: string): string {
-    return `Key considerations for ${topic} in ${domain} include ` +
+    return (
+      `Key considerations for ${topic} in ${domain} include ` +
       `performance implications, error handling strategies, ` +
       `scalability patterns, and integration with existing systems.`
+    )
   }
 
   private recommendLevel(audience?: Partial<AudienceProfile>): AbstractionLevel {
@@ -421,7 +456,8 @@ export class ExplanationEngine {
     steps.push({
       stepNumber: stepNum++,
       title: `What is ${topic}?`,
-      content: `${topic} is a concept in ${domain} that provides a foundation for more advanced operations. ` +
+      content:
+        `${topic} is a concept in ${domain} that provides a foundation for more advanced operations. ` +
         `Understanding this core idea is essential before moving to practical applications.`,
       prerequisites: prerequisites.length > 0 ? [1] : [],
       difficulty: 0.3,
@@ -432,7 +468,8 @@ export class ExplanationEngine {
     steps.push({
       stepNumber: stepNum++,
       title: `How ${topic} works`,
-      content: `The mechanism behind ${topic} involves processing inputs through defined rules or algorithms. ` +
+      content:
+        `The mechanism behind ${topic} involves processing inputs through defined rules or algorithms. ` +
         `Each input is transformed step by step until the desired output is produced.`,
       prerequisites: [stepNum - 2],
       difficulty: 0.5,
@@ -443,7 +480,8 @@ export class ExplanationEngine {
     steps.push({
       stepNumber: stepNum++,
       title: 'Common patterns and use cases',
-      content: `${topic} is commonly used in scenarios involving ${domain}-related tasks. ` +
+      content:
+        `${topic} is commonly used in scenarios involving ${domain}-related tasks. ` +
         `Typical patterns include initialization, processing loops, and cleanup operations.`,
       prerequisites: [stepNum - 2],
       difficulty: 0.6,
@@ -454,7 +492,8 @@ export class ExplanationEngine {
     steps.push({
       stepNumber: stepNum++,
       title: 'Best practices',
-      content: `When working with ${topic}, follow these practices: handle errors gracefully, ` +
+      content:
+        `When working with ${topic}, follow these practices: handle errors gracefully, ` +
         `test edge cases, document your approach, and consider performance implications.`,
       prerequisites: [stepNum - 2],
       difficulty: 0.7,
@@ -466,7 +505,8 @@ export class ExplanationEngine {
       steps.push({
         stepNumber: stepNum++,
         title: 'Advanced considerations',
-        content: `Advanced usage of ${topic} includes optimization strategies, ` +
+        content:
+          `Advanced usage of ${topic} includes optimization strategies, ` +
           `scalability patterns, integration with other systems, and custom extensions.`,
         prerequisites: [stepNum - 2],
         difficulty: 0.85,
@@ -505,7 +545,8 @@ export class ExplanationEngine {
   }
 
   private createAnalogy(concept: string, familiarDomain: string, conceptDomain: string): Analogy {
-    const mapping = `${concept} is like ${familiarDomain} — ` +
+    const mapping =
+      `${concept} is like ${familiarDomain} — ` +
       `just as ${familiarDomain} organizes and manages its elements, ` +
       `${concept} does the same for ${conceptDomain} tasks.`
 
@@ -520,8 +561,11 @@ export class ExplanationEngine {
     ]
 
     // Effectiveness based on domain match
-    const effectiveness = familiarDomain.includes('everyday') ? 0.8 :
-      familiarDomain.includes('cook') ? 0.7 : 0.6
+    const effectiveness = familiarDomain.includes('everyday')
+      ? 0.8
+      : familiarDomain.includes('cook')
+        ? 0.7
+        : 0.6
 
     return {
       concept,
@@ -605,7 +649,10 @@ export class ExplanationEngine {
     const prerequisites = this.identifyPrerequisites(topic)
     const prereqCount = prerequisites.length || 1
     const masteredPrereqs = prerequisites.filter(p => conceptsMastered.includes(p.concept)).length
-    const progressScore = Math.min(1, (masteredPrereqs + conceptsMastered.length) / (prereqCount + 3))
+    const progressScore = Math.min(
+      1,
+      (masteredPrereqs + conceptsMastered.length) / (prereqCount + 3),
+    )
 
     // Update level based on progress
     const levelIndex = Math.min(
@@ -621,7 +668,7 @@ export class ExplanationEngine {
       currentLevel: LEVEL_ORDER[levelIndex],
     }
 
-    records = records.map(r => r.topic === topic ? updated : r)
+    records = records.map(r => (r.topic === topic ? updated : r))
 
     // Enforce max records
     if (records.length > this.config.maxProgressRecords) {
@@ -650,9 +697,10 @@ export class ExplanationEngine {
       totalExplanationsGenerated: this.stats.totalExplanations,
       totalBreakdownsCreated: this.stats.totalBreakdowns,
       totalAnalogiesGenerated: this.stats.totalAnalogies,
-      avgExplanationLevels: this.stats.totalExplanations > 0
-        ? this.stats.totalLevels / this.stats.totalExplanations
-        : 0,
+      avgExplanationLevels:
+        this.stats.totalExplanations > 0
+          ? this.stats.totalLevels / this.stats.totalExplanations
+          : 0,
       mostExplainedDomains,
     }
   }

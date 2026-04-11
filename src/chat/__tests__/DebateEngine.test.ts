@@ -42,7 +42,12 @@ describe('DebateEngine', () => {
   describe('Arguments', () => {
     it('should add pro argument', () => {
       const debate = engine.startDebate('Test proposition')
-      const arg = engine.addArgument(debate.id, 'pro', 'AI is advancing rapidly', 'Deep learning breakthroughs happen yearly with increasing scale and capability')
+      const arg = engine.addArgument(
+        debate.id,
+        'pro',
+        'AI is advancing rapidly',
+        'Deep learning breakthroughs happen yearly with increasing scale and capability',
+      )
       expect(arg).not.toBeNull()
       expect(arg!.side).toBe('pro')
       expect(arg!.strength).toBeDefined()
@@ -51,7 +56,12 @@ describe('DebateEngine', () => {
 
     it('should add con argument', () => {
       const debate = engine.startDebate('Test')
-      const arg = engine.addArgument(debate.id, 'con', 'Consciousness is not computable', 'There are fundamental limits to what computation can achieve in understanding subjective experience')
+      const arg = engine.addArgument(
+        debate.id,
+        'con',
+        'Consciousness is not computable',
+        'There are fundamental limits to what computation can achieve in understanding subjective experience',
+      )
       expect(arg!.side).toBe('con')
     })
 
@@ -62,18 +72,44 @@ describe('DebateEngine', () => {
     it('should score argument higher with evidence', () => {
       const debate = engine.startDebate('Test')
       const evidence: Evidence[] = [
-        { type: 'empirical', description: 'Published study', reliability: 0.9, source: 'Nature 2024' },
-        { type: 'statistical', description: 'Data shows 80% improvement', reliability: 0.85, source: 'ArXiv' }
+        {
+          type: 'empirical',
+          description: 'Published study',
+          reliability: 0.9,
+          source: 'Nature 2024',
+        },
+        {
+          type: 'statistical',
+          description: 'Data shows 80% improvement',
+          reliability: 0.85,
+          source: 'ArXiv',
+        },
       ]
-      const withEvidence = engine.addArgument(debate.id, 'pro', 'Strong claim', 'Detailed reasoning with lots of supporting information and context', evidence)
+      const withEvidence = engine.addArgument(
+        debate.id,
+        'pro',
+        'Strong claim',
+        'Detailed reasoning with lots of supporting information and context',
+        evidence,
+      )
       const withoutEvidence = engine.addArgument(debate.id, 'pro', 'Weak claim', 'Short reason')
       expect(withEvidence!.score).toBeGreaterThan(withoutEvidence!.score)
     })
 
     it('should penalize arguments with fallacies', () => {
       const debate = engine.startDebate('Test')
-      const clean = engine.addArgument(debate.id, 'pro', 'Data shows improvement', 'Studies demonstrate a clear trend toward improvement with detailed statistical analysis')
-      const fallacious = engine.addArgument(debate.id, 'con', 'Everyone knows this is wrong', 'All people always agree this fails and everyone is doing it the opposite way')
+      const clean = engine.addArgument(
+        debate.id,
+        'pro',
+        'Data shows improvement',
+        'Studies demonstrate a clear trend toward improvement with detailed statistical analysis',
+      )
+      const fallacious = engine.addArgument(
+        debate.id,
+        'con',
+        'Everyone knows this is wrong',
+        'All people always agree this fails and everyone is doing it the opposite way',
+      )
       expect(fallacious!.fallacies.length).toBeGreaterThan(0)
     })
 
@@ -90,7 +126,10 @@ describe('DebateEngine', () => {
     it('should add rebuttal to argument', () => {
       const debate = engine.startDebate('Test')
       const arg = engine.addArgument(debate.id, 'pro', 'Claim', 'Reasoning')
-      const reb = engine.addRebuttal(arg!.id, 'This argument ignores key factors that significantly impact the conclusion and should be reconsidered')
+      const reb = engine.addRebuttal(
+        arg!.id,
+        'This argument ignores key factors that significantly impact the conclusion and should be reconsidered',
+      )
       expect(reb).not.toBeNull()
       expect(reb!.effectiveness).toBeGreaterThan(0)
     })
@@ -109,8 +148,14 @@ describe('DebateEngine', () => {
     it('should score higher effectiveness with counter-evidence', () => {
       const debate = engine.startDebate('Test')
       const arg = engine.addArgument(debate.id, 'pro', 'Claim', 'Reason')
-      const evidence: Evidence[] = [{ type: 'empirical', description: 'Counter study', reliability: 0.8, source: 'Journal' }]
-      const reb = engine.addRebuttal(arg!.id, 'Strong counterpoint with detailed analysis and alternative explanation for the observed phenomena', evidence)
+      const evidence: Evidence[] = [
+        { type: 'empirical', description: 'Counter study', reliability: 0.8, source: 'Journal' },
+      ]
+      const reb = engine.addRebuttal(
+        arg!.id,
+        'Strong counterpoint with detailed analysis and alternative explanation for the observed phenomena',
+        evidence,
+      )
       expect(reb!.effectiveness).toBeGreaterThan(0.5)
     })
   })
@@ -142,7 +187,9 @@ describe('DebateEngine', () => {
     })
 
     it('should return empty for clean text', () => {
-      const fallacies = engine.detectFallacies('The data shows a 15% improvement in performance metrics.')
+      const fallacies = engine.detectFallacies(
+        'The data shows a 15% improvement in performance metrics.',
+      )
       expect(fallacies.length).toBe(0)
     })
   })
@@ -150,8 +197,16 @@ describe('DebateEngine', () => {
   describe('Verdict generation', () => {
     it('should generate verdict when pro wins', () => {
       const debate = engine.startDebate('Test')
-      const ev: Evidence[] = [{ type: 'empirical', description: 'Study', reliability: 0.9, source: 'Nature' }]
-      engine.addArgument(debate.id, 'pro', 'Strong pro', 'Very detailed reasoning with extensive supporting analysis and well-structured logical chain', ev)
+      const ev: Evidence[] = [
+        { type: 'empirical', description: 'Study', reliability: 0.9, source: 'Nature' },
+      ]
+      engine.addArgument(
+        debate.id,
+        'pro',
+        'Strong pro',
+        'Very detailed reasoning with extensive supporting analysis and well-structured logical chain',
+        ev,
+      )
       engine.addArgument(debate.id, 'con', 'Weak con', 'Short reason')
       const verdict = engine.generateVerdict(debate.id)
       expect(verdict).not.toBeNull()
@@ -162,8 +217,16 @@ describe('DebateEngine', () => {
     it('should generate verdict when con wins', () => {
       const debate = engine.startDebate('Test')
       engine.addArgument(debate.id, 'pro', 'Weak pro', 'Short')
-      const ev: Evidence[] = [{ type: 'statistical', description: 'Data', reliability: 0.95, source: 'WHO' }]
-      engine.addArgument(debate.id, 'con', 'Strong con', 'Extensive reasoning backed by multiple sources and carefully analyzed data sets showing clear trend', ev)
+      const ev: Evidence[] = [
+        { type: 'statistical', description: 'Data', reliability: 0.95, source: 'WHO' },
+      ]
+      engine.addArgument(
+        debate.id,
+        'con',
+        'Strong con',
+        'Extensive reasoning backed by multiple sources and carefully analyzed data sets showing clear trend',
+        ev,
+      )
       const verdict = engine.generateVerdict(debate.id)
       expect(verdict!.winningSide).toBe('con')
     })
@@ -179,8 +242,16 @@ describe('DebateEngine', () => {
 
     it('should include key factors', () => {
       const debate = engine.startDebate('Test')
-      const ev: Evidence[] = [{ type: 'empirical', description: 'X', reliability: 0.9, source: 'Y' }]
-      engine.addArgument(debate.id, 'pro', 'Critical factor for success', 'Detailed reasoning with comprehensive evidence and thoughtful analysis of multiple angles', ev)
+      const ev: Evidence[] = [
+        { type: 'empirical', description: 'X', reliability: 0.9, source: 'Y' },
+      ]
+      engine.addArgument(
+        debate.id,
+        'pro',
+        'Critical factor for success',
+        'Detailed reasoning with comprehensive evidence and thoughtful analysis of multiple angles',
+        ev,
+      )
       engine.addArgument(debate.id, 'con', 'Minor issue', 'Brief note')
       const verdict = engine.generateVerdict(debate.id)
       expect(verdict!.keyFactors.length).toBeGreaterThan(0)

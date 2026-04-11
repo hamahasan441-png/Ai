@@ -16,21 +16,33 @@ describe('SystemsProgramming', () => {
 
   describe('KB entry tests', () => {
     it('should match memory management and CPU architecture keywords', async () => {
-      const r = await brain.chat('explain memory management stack heap malloc free raii reference counting smart pointers cpu architecture cache lines branch prediction simd sse avx')
+      const r = await brain.chat(
+        'explain memory management stack heap malloc free raii reference counting smart pointers cpu architecture cache lines branch prediction simd sse avx',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/memory\s+management|stack|heap|malloc|raii|smart\s+pointer|cpu|cache\s+line|simd/)
+      expect(r.text.toLowerCase()).toMatch(
+        /memory\s+management|stack|heap|malloc|raii|smart\s+pointer|cpu|cache\s+line|simd/,
+      )
     })
 
     it('should match linkers loaders and system calls keywords', async () => {
-      const r = await brain.chat('explain linkers loaders elf format dynamic linking symbol resolution plt got system calls syscall file descriptors mmap epoll kqueue io_uring')
+      const r = await brain.chat(
+        'explain linkers loaders elf format dynamic linking symbol resolution plt got system calls syscall file descriptors mmap epoll kqueue io_uring',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/linker|elf|dynamic|symbol|plt|got|system\s+call|syscall|mmap|epoll/)
+      expect(r.text.toLowerCase()).toMatch(
+        /linker|elf|dynamic|symbol|plt|got|system\s+call|syscall|mmap|epoll/,
+      )
     })
 
     it('should match unsafe code FFI and binary protocols keywords', async () => {
-      const r = await brain.chat('explain unsafe code ffi rust unsafe c interop jni ctypes wasm interop binary protocols endianness protocol buffers flatbuffers capn proto')
+      const r = await brain.chat(
+        'explain unsafe code ffi rust unsafe c interop jni ctypes wasm interop binary protocols endianness protocol buffers flatbuffers capn proto',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/unsafe|ffi|rust|interop|jni|ctypes|wasm|binary|endian|protobuf|protocol\s+buffer|flatbuffer/)
+      expect(r.text.toLowerCase()).toMatch(
+        /unsafe|ffi|rust|interop|jni|ctypes|wasm|binary|endian|protobuf|protocol\s+buffer|flatbuffer/,
+      )
     })
   })
 

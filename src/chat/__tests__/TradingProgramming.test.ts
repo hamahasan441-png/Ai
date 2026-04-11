@@ -85,11 +85,15 @@ describe('Trading Programming Knowledge', () => {
 
     it('knows MQL5 event handlers', async () => {
       const r = await brain.chat('What event handlers are available in MQL5 Expert Advisors?')
-      expect(r.text.toLowerCase()).toMatch(/oninit|ontick|ontimer|onchartevent|ontrade|event.driven|class|mql5/)
+      expect(r.text.toLowerCase()).toMatch(
+        /oninit|ontick|ontimer|onchartevent|ontrade|event.driven|class|mql5/,
+      )
     })
 
     it('mentions MQL5 Standard Library', async () => {
-      const r = await brain.chat('Tell me about MQL5 classes and Standard Library for Expert Advisors')
+      const r = await brain.chat(
+        'Tell me about MQL5 classes and Standard Library for Expert Advisors',
+      )
       expect(r.text.toLowerCase()).toMatch(/cexpert|ctrade|class|standard\s*library|mql5/)
     })
   })
@@ -109,7 +113,9 @@ describe('Trading Programming Knowledge', () => {
     })
 
     it('covers Pine Script built-in functions', async () => {
-      const r = await brain.chat('What built-in technical analysis functions does Pine Script have?')
+      const r = await brain.chat(
+        'What built-in technical analysis functions does Pine Script have?',
+      )
       expect(r.text.toLowerCase()).toMatch(/ta\.(sma|ema|rsi|macd)|pine\s*script/)
     })
 
@@ -134,7 +140,9 @@ describe('Trading Programming Knowledge', () => {
     })
 
     it('explains the [] operator in Pine Script', async () => {
-      const r = await brain.chat('How does the bracket history reference operator work in Pine Script?')
+      const r = await brain.chat(
+        'How does the bracket history reference operator work in Pine Script?',
+      )
       expect(r.text.toLowerCase()).toMatch(/\[|\]|previous|close\[1\]|series|lookback/)
     })
   })
@@ -148,7 +156,9 @@ describe('Trading Programming Knowledge', () => {
     })
 
     it('compares trading platforms', async () => {
-      const r = await brain.chat('How does MT4 compare to MT5 and TradingView for trading bot development?')
+      const r = await brain.chat(
+        'How does MT4 compare to MT5 and TradingView for trading bot development?',
+      )
       expect(r.text.toLowerCase()).toMatch(/mt4|mt5|tradingview|pine|mql/)
     })
 
@@ -168,7 +178,9 @@ describe('Trading Programming Knowledge', () => {
     })
 
     it('knows strategy evaluation metrics', async () => {
-      const r = await brain.chat('What metrics should I use to evaluate an algorithmic trading strategy?')
+      const r = await brain.chat(
+        'What metrics should I use to evaluate an algorithmic trading strategy?',
+      )
       expect(r.text.toLowerCase()).toMatch(/sharpe|drawdown|profit\s*factor|win\s*rate/)
     })
 

@@ -135,30 +135,49 @@ export interface ImpactAnalysis {
 // ══════════════════════════════════════════════════════════════════════════════
 
 const EXTENSION_LANGUAGE: Record<string, AnalysisLanguage> = {
-  '.ts': 'typescript', '.tsx': 'typescript', '.mts': 'typescript', '.cts': 'typescript',
-  '.js': 'javascript', '.jsx': 'javascript', '.mjs': 'javascript', '.cjs': 'javascript',
-  '.py': 'python', '.pyw': 'python',
+  '.ts': 'typescript',
+  '.tsx': 'typescript',
+  '.mts': 'typescript',
+  '.cts': 'typescript',
+  '.js': 'javascript',
+  '.jsx': 'javascript',
+  '.mjs': 'javascript',
+  '.cjs': 'javascript',
+  '.py': 'python',
+  '.pyw': 'python',
   '.rs': 'rust',
   '.go': 'go',
   '.java': 'java',
-  '.c': 'c', '.h': 'c',
-  '.cpp': 'cpp', '.cc': 'cpp', '.cxx': 'cpp', '.hpp': 'cpp',
+  '.c': 'c',
+  '.h': 'c',
+  '.cpp': 'cpp',
+  '.cc': 'cpp',
+  '.cxx': 'cpp',
+  '.hpp': 'cpp',
   '.cs': 'csharp',
   '.swift': 'swift',
-  '.kt': 'kotlin', '.kts': 'kotlin',
+  '.kt': 'kotlin',
+  '.kts': 'kotlin',
   '.rb': 'ruby',
   '.php': 'php',
-  '.html': 'html', '.htm': 'html',
-  '.css': 'css', '.scss': 'css', '.less': 'css', '.sass': 'css',
+  '.html': 'html',
+  '.htm': 'html',
+  '.css': 'css',
+  '.scss': 'css',
+  '.less': 'css',
+  '.sass': 'css',
   '.sql': 'sql',
-  '.sh': 'bash', '.bash': 'bash',
+  '.sh': 'bash',
+  '.bash': 'bash',
   '.ps1': 'powershell',
-  '.r': 'r', '.R': 'r',
+  '.r': 'r',
+  '.R': 'r',
   '.dart': 'dart',
   '.scala': 'scala',
   '.lua': 'lua',
   '.hs': 'haskell',
-  '.ex': 'elixir', '.exs': 'elixir',
+  '.ex': 'elixir',
+  '.exs': 'elixir',
 }
 
 const TEST_PATTERNS = [
@@ -208,9 +227,21 @@ const DOC_PATTERNS = [
 ]
 
 const IGNORE_DIRS = new Set([
-  'node_modules', '.git', 'dist', 'build', 'out', 'coverage',
-  '.next', '.nuxt', '.cache', '__pycache__', '.pytest_cache',
-  'target', 'vendor', '.idea', '.vscode',
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  'out',
+  'coverage',
+  '.next',
+  '.nuxt',
+  '.cache',
+  '__pycache__',
+  '.pytest_cache',
+  'target',
+  'vendor',
+  '.idea',
+  '.vscode',
 ])
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -224,7 +255,6 @@ const IGNORE_DIRS = new Set([
  * like GitHub Copilot agent does when exploring repositories.
  */
 export class FileNavigator {
-
   /**
    * Create a FileEntry from a file path.
    */
@@ -260,8 +290,10 @@ export class FileNavigator {
 
     // Entry points are very important
     const name = path.split('/').pop()?.toLowerCase() ?? ''
-    if (name === 'index.ts' || name === 'index.js' || name === 'main.ts' || name === 'main.js') score += 0.3
-    if (name === 'app.ts' || name === 'app.js' || name === 'server.ts' || name === 'server.js') score += 0.25
+    if (name === 'index.ts' || name === 'index.js' || name === 'main.ts' || name === 'main.js')
+      score += 0.3
+    if (name === 'app.ts' || name === 'app.js' || name === 'server.ts' || name === 'server.js')
+      score += 0.25
 
     // Package.json / config at root
     if (name === 'package.json' && !path.includes('/')) score += 0.3
@@ -301,7 +333,11 @@ export class FileNavigator {
       let reason = ''
 
       // Exact filename match
-      if (fileName === lowerQuery || fileName === lowerQuery + '.ts' || fileName === lowerQuery + '.js') {
+      if (
+        fileName === lowerQuery ||
+        fileName === lowerQuery + '.ts' ||
+        fileName === lowerQuery + '.js'
+      ) {
         score = 1.0
         reason = 'exact filename match'
       }
@@ -419,7 +455,11 @@ export class FileNavigator {
     const entries = files.map(f => this.createFileEntry(f))
     const languageBreakdown = new Map<AnalysisLanguage, number>()
 
-    let source = 0, test = 0, config = 0, docs = 0, other = 0
+    let source = 0,
+      test = 0,
+      config = 0,
+      docs = 0,
+      other = 0
 
     for (const entry of entries) {
       // Language counting
@@ -489,7 +529,8 @@ export class FileNavigator {
 
       let type: FileGroup['type'] = 'module'
       if (dir.includes('test') || dir.includes('spec')) type = 'type'
-      else if (dir.includes('api') || dir.includes('routes') || dir.includes('controllers')) type = 'layer'
+      else if (dir.includes('api') || dir.includes('routes') || dir.includes('controllers'))
+        type = 'layer'
       else if (hasSource && hasTests) type = 'feature'
 
       groups.push({
@@ -519,19 +560,27 @@ export class FileNavigator {
       for (const [file, imports] of importMap) {
         const normalizedChanged = changedFile.replace(/\.\w+$/, '')
         const changedBaseName = normalizedChanged.split('/').pop() ?? ''
-        if (imports.some(imp => {
-          const normalizedImp = imp.replace(/^\.\//, '').replace(/\.\w+$/, '')
-          return normalizedImp === normalizedChanged ||
-                 normalizedImp === changedBaseName ||
-                 normalizedChanged.endsWith(normalizedImp)
-        })) {
+        if (
+          imports.some(imp => {
+            const normalizedImp = imp.replace(/^\.\//, '').replace(/\.\w+$/, '')
+            return (
+              normalizedImp === normalizedChanged ||
+              normalizedImp === changedBaseName ||
+              normalizedChanged.endsWith(normalizedImp)
+            )
+          })
+        ) {
           directDependents.push(file)
         }
       }
     }
 
     // Find related test files by naming convention
-    const baseName = changedFile.replace(/\.\w+$/, '').split('/').pop() ?? ''
+    const baseName =
+      changedFile
+        .replace(/\.\w+$/, '')
+        .split('/')
+        .pop() ?? ''
     for (const file of allFiles) {
       if (file.includes(baseName) && TEST_PATTERNS.some(p => p.test(file))) {
         affectedTests.push(file)
@@ -541,7 +590,11 @@ export class FileNavigator {
     // Find co-located tests
     const dir = changedFile.substring(0, changedFile.lastIndexOf('/'))
     for (const file of allFiles) {
-      if (file.startsWith(dir) && TEST_PATTERNS.some(p => p.test(file)) && !affectedTests.includes(file)) {
+      if (
+        file.startsWith(dir) &&
+        TEST_PATTERNS.some(p => p.test(file)) &&
+        !affectedTests.includes(file)
+      ) {
         affectedTests.push(file)
       }
     }
@@ -552,7 +605,11 @@ export class FileNavigator {
       for (const dep of directDependents) {
         const depBaseName = dep.replace(/\.\w+$/, '')
         for (const [file, imports] of importMap) {
-          if (imports.some(imp => imp.includes(depBaseName)) && !directDependents.includes(file) && file !== changedFile) {
+          if (
+            imports.some(imp => imp.includes(depBaseName)) &&
+            !directDependents.includes(file) &&
+            file !== changedFile
+          ) {
             indirectDependents.push(file)
           }
         }
@@ -622,14 +679,20 @@ export class FileNavigator {
   }
 
   private renderNode(
-    node: DirectoryNode, prefix: string, lines: string[],
-    depth: number, maxDepth: number, showFiles: boolean,
+    node: DirectoryNode,
+    prefix: string,
+    lines: string[],
+    depth: number,
+    maxDepth: number,
+    showFiles: boolean,
   ): void {
     if (depth >= maxDepth) return
 
     const items = [
       ...node.directories.map(d => ({ name: d.name + '/', isDir: true, node: d })),
-      ...(showFiles ? node.files.map(f => ({ name: f.name, isDir: false, node: null as DirectoryNode | null })) : []),
+      ...(showFiles
+        ? node.files.map(f => ({ name: f.name, isDir: false, node: null as DirectoryNode | null }))
+        : []),
     ].sort((a, b) => {
       // Directories first
       if (a.isDir && !b.isDir) return -1
@@ -652,10 +715,15 @@ export class FileNavigator {
 
   private detectProjectType(files: string[]): ProjectType {
     const fileSet = new Set(files.map(f => f.toLowerCase()))
-    const hasFile = (name: string) => fileSet.has(name) || files.some(f => f.toLowerCase().endsWith('/' + name))
+    const hasFile = (name: string) =>
+      fileSet.has(name) || files.some(f => f.toLowerCase().endsWith('/' + name))
 
     // Monorepo detection
-    if (hasFile('lerna.json') || hasFile('pnpm-workspace.yaml') || files.some(f => f.startsWith('packages/'))) {
+    if (
+      hasFile('lerna.json') ||
+      hasFile('pnpm-workspace.yaml') ||
+      files.some(f => f.startsWith('packages/'))
+    ) {
       return 'monorepo'
     }
 
@@ -671,7 +739,10 @@ export class FileNavigator {
     }
 
     // Express/Fastify API
-    if (files.some(f => f.includes('routes') || f.includes('controllers')) && hasFile('package.json')) {
+    if (
+      files.some(f => f.includes('routes') || f.includes('controllers')) &&
+      hasFile('package.json')
+    ) {
       return 'express-api'
     }
 

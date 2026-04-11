@@ -216,12 +216,7 @@ export function classifyAxiosError(e: unknown): {
   message: string
 } {
   const message = errorMessage(e)
-  if (
-    !e ||
-    typeof e !== 'object' ||
-    !('isAxiosError' in e) ||
-    !e.isAxiosError
-  ) {
+  if (!e || typeof e !== 'object' || !('isAxiosError' in e) || !e.isAxiosError) {
     return { kind: 'other', message }
   }
   const err = e as {
@@ -297,7 +292,11 @@ export class AiError extends Error {
   readonly context?: Record<string, unknown>
   readonly timestamp: number
 
-  constructor(message: string, code: AiErrorCode = AiErrorCode.UNKNOWN, context?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    code: AiErrorCode = AiErrorCode.UNKNOWN,
+    context?: Record<string, unknown>,
+  ) {
     super(message)
     this.name = 'AiError'
     this.code = code
@@ -328,7 +327,12 @@ export class AiError extends Error {
 export class ToolError extends AiError {
   readonly toolName: string
 
-  constructor(toolName: string, message: string, code: AiErrorCode = AiErrorCode.TOOL_EXECUTION_FAILED, context?: Record<string, unknown>) {
+  constructor(
+    toolName: string,
+    message: string,
+    code: AiErrorCode = AiErrorCode.TOOL_EXECUTION_FAILED,
+    context?: Record<string, unknown>,
+  ) {
     super(`[${toolName}] ${message}`, code, { ...context, toolName })
     this.name = 'ToolError'
     this.toolName = toolName
@@ -344,7 +348,11 @@ export class ToolError extends AiError {
  * ```
  */
 export class BrainError extends AiError {
-  constructor(message: string, code: AiErrorCode = AiErrorCode.BRAIN_QUERY_FAILED, context?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    code: AiErrorCode = AiErrorCode.BRAIN_QUERY_FAILED,
+    context?: Record<string, unknown>,
+  ) {
     super(message, code, context)
     this.name = 'BrainError'
   }
@@ -361,7 +369,12 @@ export class BrainError extends AiError {
 export class ServiceError extends AiError {
   readonly serviceName: string
 
-  constructor(serviceName: string, message: string, code: AiErrorCode = AiErrorCode.SERVICE_UNAVAILABLE, context?: Record<string, unknown>) {
+  constructor(
+    serviceName: string,
+    message: string,
+    code: AiErrorCode = AiErrorCode.SERVICE_UNAVAILABLE,
+    context?: Record<string, unknown>,
+  ) {
     super(`[${serviceName}] ${message}`, code, { ...context, serviceName })
     this.name = 'ServiceError'
     this.serviceName = serviceName

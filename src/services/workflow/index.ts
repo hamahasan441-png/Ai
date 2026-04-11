@@ -107,13 +107,19 @@ export class WorkflowContext {
   }
 
   /** Retrieve a variable by key */
-  get<T = unknown>(key: string): T | undefined { return this.variables[key] as T | undefined }
+  get<T = unknown>(key: string): T | undefined {
+    return this.variables[key] as T | undefined
+  }
 
   /** Set a variable */
-  set(key: string, value: unknown): void { this.variables[key] = value }
+  set(key: string, value: unknown): void {
+    this.variables[key] = value
+  }
 
   /** Check whether a variable exists */
-  has(key: string): boolean { return key in this.variables }
+  has(key: string): boolean {
+    return key in this.variables
+  }
 
   /** Remove a variable */
   delete(key: string): boolean {
@@ -123,14 +129,22 @@ export class WorkflowContext {
   }
 
   /** Get the output produced by a previous step */
-  getStepOutput<T = unknown>(stepId: string): T | undefined { return this.stepOutputs[stepId] as T | undefined }
+  getStepOutput<T = unknown>(stepId: string): T | undefined {
+    return this.stepOutputs[stepId] as T | undefined
+  }
 
   /** @internal Record step output — called by the executor */
-  setStepOutput(stepId: string, value: unknown): void { this.stepOutputs[stepId] = value }
+  setStepOutput(stepId: string, value: unknown): void {
+    this.stepOutputs[stepId] = value
+  }
 
   /** Serialise the full context to a plain object */
   toJSON(): Record<string, unknown> {
-    return { variables: { ...this.variables }, stepOutputs: { ...this.stepOutputs }, metadata: { ...this.metadata } }
+    return {
+      variables: { ...this.variables },
+      stepOutputs: { ...this.stepOutputs },
+      metadata: { ...this.metadata },
+    }
   }
 
   /** Restore context from a plain object */
@@ -158,16 +172,24 @@ export class WorkflowRegistry {
   }
 
   /** Remove a workflow definition */
-  unregister(id: string): boolean { return this.definitions.delete(id) }
+  unregister(id: string): boolean {
+    return this.definitions.delete(id)
+  }
 
   /** Get a definition by id */
-  get(id: string): WorkflowDefinition | undefined { return this.definitions.get(id) }
+  get(id: string): WorkflowDefinition | undefined {
+    return this.definitions.get(id)
+  }
 
   /** List all registered definitions */
-  list(): WorkflowDefinition[] { return Array.from(this.definitions.values()) }
+  list(): WorkflowDefinition[] {
+    return Array.from(this.definitions.values())
+  }
 
   /** Check if a definition is registered */
-  has(id: string): boolean { return this.definitions.has(id) }
+  has(id: string): boolean {
+    return this.definitions.has(id)
+  }
 
   /** Validate a definition for duplicate step ids and missing fields */
   validate(definition: WorkflowDefinition): void {
@@ -247,12 +269,16 @@ export class WorkflowExecutor {
     try {
       for (let i = 0; i < definition.steps.length; i++) {
         if (shouldCancel?.()) {
-          instance.status = 'cancelled'; instance.completedAt = Date.now()
-          instance.context = ctx.toJSON(); return instance
+          instance.status = 'cancelled'
+          instance.completedAt = Date.now()
+          instance.context = ctx.toJSON()
+          return instance
         }
         if (shouldPause?.()) {
-          instance.status = 'paused'; instance.currentStep = i
-          instance.context = ctx.toJSON(); return instance
+          instance.status = 'paused'
+          instance.currentStep = i
+          instance.context = ctx.toJSON()
+          return instance
         }
         if (Date.now() > deadline) {
           throw new Error(`Workflow "${definition.id}" timed out after ${workflowTimeout}ms`)
@@ -262,7 +288,12 @@ export class WorkflowExecutor {
         instance.currentStep = i
 
         if (step.condition && !step.condition(ctx)) {
-          instance.stepResults.push({ stepId: step.id, status: 'skipped', duration: 0, retryCount: 0 })
+          instance.stepResults.push({
+            stepId: step.id,
+            status: 'skipped',
+            duration: 0,
+            retryCount: 0,
+          })
           continue
         }
 
@@ -270,20 +301,24 @@ export class WorkflowExecutor {
         instance.stepResults.push(result)
 
         if (result.status === 'failed') {
-          instance.status = 'failed'; instance.error = result.error
-          instance.completedAt = Date.now(); instance.context = ctx.toJSON()
+          instance.status = 'failed'
+          instance.error = result.error
+          instance.completedAt = Date.now()
+          instance.context = ctx.toJSON()
           await this.invokeHook('onError', instanceId, { error: result.error, stepId: step.id })
           return instance
         }
       }
 
-      instance.status = 'completed'; instance.completedAt = Date.now()
+      instance.status = 'completed'
+      instance.completedAt = Date.now()
       instance.context = ctx.toJSON()
       await this.invokeHook('onComplete', instanceId, { definitionId: definition.id })
     } catch (err) {
       instance.status = 'failed'
       instance.error = err instanceof Error ? err.message : String(err)
-      instance.completedAt = Date.now(); instance.context = ctx.toJSON()
+      instance.completedAt = Date.now()
+      instance.context = ctx.toJSON()
       await this.invokeHook('onError', instanceId, { error: instance.error })
     }
 
@@ -315,7 +350,13 @@ export class WorkflowExecutor {
         const duration = Date.now() - start
         ctx.setStepOutput(step.id, output)
 
-        const result: StepResult = { stepId: step.id, status: 'completed', output, duration, retryCount: attempt }
+        const result: StepResult = {
+          stepId: step.id,
+          status: 'completed',
+          output,
+          duration,
+          retryCount: attempt,
+        }
         await this.invokeHook('afterStep', instanceId, { stepId: step.id, result })
         return result
       } catch (err) {
@@ -324,29 +365,58 @@ export class WorkflowExecutor {
 
         if (attempt === maxAttempts - 1) {
           const status: StepStatus = step.onError === 'skip' ? 'skipped' : 'failed'
-          const result: StepResult = { stepId: step.id, status, error: lastError, duration, retryCount: attempt }
+          const result: StepResult = {
+            stepId: step.id,
+            status,
+            error: lastError,
+            duration,
+            retryCount: attempt,
+          }
           await this.invokeHook('afterStep', instanceId, { stepId: step.id, result })
           return result
         }
       }
     }
 
-    return { stepId: step.id, status: 'failed', error: lastError, duration: 0, retryCount: maxAttempts - 1 }
+    return {
+      stepId: step.id,
+      status: 'failed',
+      error: lastError,
+      duration: 0,
+      retryCount: maxAttempts - 1,
+    }
   }
 
   private withTimeout<T>(promise: Promise<T>, ms: number, stepId: string): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error(`Step "${stepId}" timed out after ${ms}ms`)), ms)
+      const timer = setTimeout(
+        () => reject(new Error(`Step "${stepId}" timed out after ${ms}ms`)),
+        ms,
+      )
       promise
-        .then((val) => { clearTimeout(timer); resolve(val) })
-        .catch((err) => { clearTimeout(timer); reject(err) })
+        .then(val => {
+          clearTimeout(timer)
+          resolve(val)
+        })
+        .catch(err => {
+          clearTimeout(timer)
+          reject(err)
+        })
     })
   }
 
-  private async invokeHook(hook: WorkflowHook, instanceId: string, detail: Record<string, unknown>): Promise<void> {
+  private async invokeHook(
+    hook: WorkflowHook,
+    instanceId: string,
+    detail: Record<string, unknown>,
+  ): Promise<void> {
     const handlers = this.hooks.get(hook) ?? []
     for (const handler of handlers) {
-      try { await handler(instanceId, detail) } catch { /* hook errors are swallowed */ }
+      try {
+        await handler(instanceId, detail)
+      } catch {
+        /* hook errors are swallowed */
+      }
     }
   }
 }
@@ -370,12 +440,17 @@ export class WorkflowEngine {
       defaultWorkflowTimeout: options?.defaultWorkflowTimeout ?? 300_000,
     }
     this.registry = new WorkflowRegistry()
-    this.executor = new WorkflowExecutor(this.opts.defaultStepTimeout, this.opts.defaultWorkflowTimeout)
+    this.executor = new WorkflowExecutor(
+      this.opts.defaultStepTimeout,
+      this.opts.defaultWorkflowTimeout,
+    )
     this.registerBuiltInWorkflows()
   }
 
   /** Register a workflow definition */
-  defineWorkflow(definition: WorkflowDefinition): void { this.registry.register(definition) }
+  defineWorkflow(definition: WorkflowDefinition): void {
+    this.registry.register(definition)
+  }
 
   /** Start a new workflow instance and return its id */
   startWorkflow(definitionId: string, initialContext?: Record<string, unknown>): string {
@@ -397,14 +472,19 @@ export class WorkflowEngine {
     this.pauseFlags.set(instanceId, false)
     this.cancelFlags.set(instanceId, false)
 
-    void this.executor.execute(
-      definition, instanceId, initialContext,
-      () => this.pauseFlags.get(instanceId) === true,
-      () => this.cancelFlags.get(instanceId) === true,
-    ).then((result) => {
-      this.instances.set(instanceId, result)
-      if (result.completedAt && result.startedAt) this.totalDuration += result.completedAt - result.startedAt
-    })
+    void this.executor
+      .execute(
+        definition,
+        instanceId,
+        initialContext,
+        () => this.pauseFlags.get(instanceId) === true,
+        () => this.cancelFlags.get(instanceId) === true,
+      )
+      .then(result => {
+        this.instances.set(instanceId, result)
+        if (result.completedAt && result.startedAt)
+          this.totalDuration += result.completedAt - result.startedAt
+      })
 
     return instanceId
   }
@@ -430,21 +510,29 @@ export class WorkflowEngine {
     instance.status = 'running'
     this.instances.set(instanceId, instance)
 
-    const remaining: WorkflowDefinition = { ...definition, steps: definition.steps.slice(instance.currentStep) }
+    const remaining: WorkflowDefinition = {
+      ...definition,
+      steps: definition.steps.slice(instance.currentStep),
+    }
 
-    void this.executor.execute(
-      remaining, instanceId, instance.context,
-      () => this.pauseFlags.get(instanceId) === true,
-      () => this.cancelFlags.get(instanceId) === true,
-    ).then((result) => {
-      const merged: WorkflowInstance = {
-        ...result,
-        stepResults: [...instance.stepResults, ...result.stepResults],
-        startedAt: instance.startedAt,
-      }
-      this.instances.set(instanceId, merged)
-      if (merged.completedAt && merged.startedAt) this.totalDuration += merged.completedAt - merged.startedAt
-    })
+    void this.executor
+      .execute(
+        remaining,
+        instanceId,
+        instance.context,
+        () => this.pauseFlags.get(instanceId) === true,
+        () => this.cancelFlags.get(instanceId) === true,
+      )
+      .then(result => {
+        const merged: WorkflowInstance = {
+          ...result,
+          stepResults: [...instance.stepResults, ...result.stepResults],
+          startedAt: instance.startedAt,
+        }
+        this.instances.set(instanceId, merged)
+        if (merged.completedAt && merged.startedAt)
+          this.totalDuration += merged.completedAt - merged.startedAt
+      })
 
     return true
   }
@@ -464,25 +552,32 @@ export class WorkflowEngine {
   }
 
   /** Get the current state of a workflow instance */
-  getStatus(instanceId: string): WorkflowInstance | undefined { return this.instances.get(instanceId) }
+  getStatus(instanceId: string): WorkflowInstance | undefined {
+    return this.instances.get(instanceId)
+  }
 
   /** List instances, optionally filtered by status or definitionId */
   listInstances(filter?: { status?: WorkflowStatus; definitionId?: string }): WorkflowInstance[] {
     let results = Array.from(this.instances.values())
-    if (filter?.status) results = results.filter((i) => i.status === filter.status)
-    if (filter?.definitionId) results = results.filter((i) => i.definitionId === filter.definitionId)
+    if (filter?.status) results = results.filter(i => i.status === filter.status)
+    if (filter?.definitionId) results = results.filter(i => i.definitionId === filter.definitionId)
     return results
   }
 
   /** Register a lifecycle hook */
-  onHook(hook: WorkflowHook, handler: (id: string, detail: Record<string, unknown>) => void | Promise<void>): void { this.executor.onHook(hook, handler) }
+  onHook(
+    hook: WorkflowHook,
+    handler: (id: string, detail: Record<string, unknown>) => void | Promise<void>,
+  ): void {
+    this.executor.onHook(hook, handler)
+  }
 
   /** Aggregate statistics across all instances */
   getStats(): WorkflowStats {
     const all = Array.from(this.instances.values())
-    const completed = all.filter((i) => i.status === 'completed').length
-    const failed = all.filter((i) => i.status === 'failed').length
-    const cancelled = all.filter((i) => i.status === 'cancelled').length
+    const completed = all.filter(i => i.status === 'completed').length
+    const failed = all.filter(i => i.status === 'failed').length
+    const cancelled = all.filter(i => i.status === 'cancelled').length
     const finished = completed + failed + cancelled
 
     const stepStats: WorkflowStats['stepStats'] = {}
@@ -496,11 +591,20 @@ export class WorkflowEngine {
       }
     }
 
-    return { totalRuns: all.length, completed, failed, cancelled, avgDuration: finished > 0 ? this.totalDuration / finished : 0, stepStats }
+    return {
+      totalRuns: all.length,
+      completed,
+      failed,
+      cancelled,
+      avgDuration: finished > 0 ? this.totalDuration / finished : 0,
+      stepStats,
+    }
   }
 
   /** Access the underlying registry */
-  getRegistry(): WorkflowRegistry { return this.registry }
+  getRegistry(): WorkflowRegistry {
+    return this.registry
+  }
 
   /** Clear all instances and reset counters */
   clear(): void {
@@ -512,20 +616,29 @@ export class WorkflowEngine {
 
   // ── Private methods ──
 
-  private generateId(): string { return `wf_${Date.now()}_${++this.idCounter}` }
+  private generateId(): string {
+    return `wf_${Date.now()}_${++this.idCounter}`
+  }
 
   private registerBuiltInWorkflows(): void {
     const h = async () => ({ ok: true })
     const defs: WorkflowDefinition[] = [
-      { id: 'code-review', name: 'Code Review', version: '1.0.0',
+      {
+        id: 'code-review',
+        name: 'Code Review',
+        version: '1.0.0',
         triggers: [{ type: 'event', config: { event: 'pull_request.opened' } }],
         steps: [
           { id: 'lint', name: 'Run linter', handler: h },
           { id: 'type-check', name: 'Type check', handler: h },
           { id: 'review', name: 'AI code review', handler: h },
           { id: 'comment', name: 'Post review comments', handler: h },
-        ] },
-      { id: 'deploy', name: 'Deployment Pipeline', version: '1.0.0',
+        ],
+      },
+      {
+        id: 'deploy',
+        name: 'Deployment Pipeline',
+        version: '1.0.0',
         triggers: [{ type: 'manual' }],
         steps: [
           { id: 'build', name: 'Build artefacts', handler: h },
@@ -533,23 +646,32 @@ export class WorkflowEngine {
           { id: 'stage', name: 'Deploy to staging', handler: h },
           { id: 'verify', name: 'Smoke tests', handler: h, onError: 'retry', retries: 2 },
           { id: 'promote', name: 'Promote to production', handler: h },
-        ] },
-      { id: 'test-suite', name: 'Test Suite', version: '1.0.0',
+        ],
+      },
+      {
+        id: 'test-suite',
+        name: 'Test Suite',
+        version: '1.0.0',
         triggers: [{ type: 'event', config: { event: 'push' } }],
         steps: [
           { id: 'unit', name: 'Unit tests', handler: h },
           { id: 'integration', name: 'Integration tests', handler: h, onError: 'skip' },
           { id: 'e2e', name: 'End-to-end tests', handler: h, onError: 'skip' },
           { id: 'coverage', name: 'Coverage report', handler: h },
-        ] },
-      { id: 'refactor', name: 'Refactor Workflow', version: '1.0.0',
+        ],
+      },
+      {
+        id: 'refactor',
+        name: 'Refactor Workflow',
+        version: '1.0.0',
         triggers: [{ type: 'manual' }],
         steps: [
           { id: 'analyse', name: 'Static analysis', handler: h },
           { id: 'transform', name: 'Apply transforms', handler: h },
           { id: 'validate', name: 'Validate changes', handler: h },
           { id: 'format', name: 'Format code', handler: h },
-        ] },
+        ],
+      },
     ]
     for (const def of defs) this.registry.register(def)
   }

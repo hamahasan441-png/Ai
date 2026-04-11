@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  DeepUnderstandingEngine,
-  type ConversationTurn,
-} from '../DeepUnderstandingEngine'
+import { DeepUnderstandingEngine, type ConversationTurn } from '../DeepUnderstandingEngine'
 
 // ── Constructor Tests ──
 
@@ -202,7 +199,11 @@ describe('DeepUnderstandingEngine detectAmbiguity', () => {
   it('resolves pronouns from conversation context', () => {
     const context: ConversationTurn[] = [
       { role: 'user', content: 'Tell me about TypeScript', timestamp: 1000 },
-      { role: 'assistant', content: 'TypeScript is a typed superset of JavaScript', timestamp: 2000 },
+      {
+        role: 'assistant',
+        content: 'TypeScript is a typed superset of JavaScript',
+        timestamp: 2000,
+      },
     ]
     const result = engine.detectAmbiguity('Can you explain it more?', context)
     expect(result.resolvedReferences.length).toBeGreaterThan(0)
@@ -227,18 +228,24 @@ describe('DeepUnderstandingEngine extractEntities', () => {
 
   it('extracts frameworks', () => {
     const entities = engine.extractEntities('Build a React component')
-    const framework = entities.find(e => e.type === 'framework' && e.value.toLowerCase() === 'react')
+    const framework = entities.find(
+      e => e.type === 'framework' && e.value.toLowerCase() === 'react',
+    )
     expect(framework).toBeDefined()
   })
 
   it('extracts data structures', () => {
     const entities = engine.extractEntities('Implement a binary tree traversal')
-    const ds = entities.find(e => e.type === 'data_structure' && e.value.toLowerCase() === 'binary tree')
+    const ds = entities.find(
+      e => e.type === 'data_structure' && e.value.toLowerCase() === 'binary tree',
+    )
     expect(ds).toBeDefined()
   })
 
   it('extracts multiple entity types from a complex message', () => {
-    const entities = engine.extractEntities('Build a React app with TypeScript using the observer pattern')
+    const entities = engine.extractEntities(
+      'Build a React app with TypeScript using the observer pattern',
+    )
     const types = new Set(entities.map(e => e.type))
     expect(types.size).toBeGreaterThanOrEqual(2)
   })
@@ -324,17 +331,18 @@ describe('DeepUnderstandingEngine classifyWithContext', () => {
       { role: 'user', content: 'Fix the bug in my code', timestamp: 1000 },
       { role: 'assistant', content: 'Here is a fix', timestamp: 2000 },
     ]
-    const result = engine.classifyWithContext(
-      'It still doesn\'t work!! I\'m frustrated',
-      history,
-    )
+    const result = engine.classifyWithContext("It still doesn't work!! I'm frustrated", history)
     expect(result.isEscalation).toBe(true)
   })
 
   it('computes topic continuity from conversation history', () => {
     const history: ConversationTurn[] = [
       { role: 'user', content: 'Explain React hooks', timestamp: 1000 },
-      { role: 'assistant', content: 'React hooks are functions that let you use state', timestamp: 2000 },
+      {
+        role: 'assistant',
+        content: 'React hooks are functions that let you use state',
+        timestamp: 2000,
+      },
     ]
     const result = engine.classifyWithContext('Tell me more about React hooks', history)
     expect(result.topicContinuity).toBeGreaterThan(0)

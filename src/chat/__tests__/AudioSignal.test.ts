@@ -11,37 +11,49 @@ describe('Audio & Signal Processing Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about digital audio and FFT', async () => {
-      const r = await brain.chat('Explain digital audio processing dsp sample rate and fourier transform fft spectral analysis')
+      const r = await brain.chat(
+        'Explain digital audio processing dsp sample rate and fourier transform fft spectral analysis',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/audio|sample|fft|fourier|frequency|spectrum/)
     })
 
     it('answers about audio synthesis and MIDI', async () => {
-      const r = await brain.chat('How does audio synthesis oscillator filter envelope and midi music programming work?')
+      const r = await brain.chat(
+        'How does audio synthesis oscillator filter envelope and midi music programming work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/synthesis|oscillator|midi|filter|envelope/)
     })
 
     it('answers about Web Audio API', async () => {
-      const r = await brain.chat('How does web audio api javascript sound browser and tone js audio worklet real time processing node work?')
+      const r = await brain.chat(
+        'How does web audio api javascript sound browser and tone js audio worklet real time processing node work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/web\s*audio|audiocontext|worklet|tone\.?js|node|audio/)
     })
 
     it('answers about audio effects', async () => {
-      const r = await brain.chat('How do audio effect reverb delay distortion eq and compression limiter dynamics work?')
+      const r = await brain.chat(
+        'How do audio effect reverb delay distortion eq and compression limiter dynamics work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/reverb|delay|distortion|compressor|eq|effect/)
     })
 
     it('answers about speech processing and features', async () => {
-      const r = await brain.chat('Explain speech processing recognition voice analysis and audio feature extraction mfcc mel spectrogram noise reduction')
+      const r = await brain.chat(
+        'Explain speech processing recognition voice analysis and audio feature extraction mfcc mel spectrogram noise reduction',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/speech|mfcc|mel|feature|voice|recognition|audio|noise/)
     })
 
     it('answers about music information retrieval', async () => {
-      const r = await brain.chat('How does music information retrieval mir audio analysis and beat detection tempo work?')
+      const r = await brain.chat(
+        'How does music information retrieval mir audio analysis and beat detection tempo work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/music|mir|beat|tempo|retrieval|fingerprint/)
     })

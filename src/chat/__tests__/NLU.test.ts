@@ -11,21 +11,31 @@ describe('Natural Language Understanding Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about NLU and semantic parsing', async () => {
-      const r = await brain.chat('explain natural language understanding nlu semantic parsing word embedding word2vec glove fasttext contextual embedding')
+      const r = await brain.chat(
+        'explain natural language understanding nlu semantic parsing word embedding word2vec glove fasttext contextual embedding',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/nlu|semantic|embedding|word2vec|glove|parsing/)
     })
 
     it('answers about text classification and relation extraction', async () => {
-      const r = await brain.chat('explain text classification sentiment analysis relation extraction question answering reading comprehension')
+      const r = await brain.chat(
+        'explain text classification sentiment analysis relation extraction question answering reading comprehension',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/classification|sentiment|relation|question\s*answer|extraction/)
+      expect(r.text.toLowerCase()).toMatch(
+        /classification|sentiment|relation|question\s*answer|extraction/,
+      )
     })
 
     it('answers about coreference and discourse parsing', async () => {
-      const r = await brain.chat('explain coreference resolution anaphora pronoun discourse parsing rhetorical structure pragmatics implicature presupposition')
+      const r = await brain.chat(
+        'explain coreference resolution anaphora pronoun discourse parsing rhetorical structure pragmatics implicature presupposition',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/coreference|anaphora|discourse|pragmatics|implicature|presupposition/)
+      expect(r.text.toLowerCase()).toMatch(
+        /coreference|anaphora|discourse|pragmatics|implicature|presupposition/,
+      )
     })
   })
 

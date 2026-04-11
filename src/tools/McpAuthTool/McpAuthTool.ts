@@ -1,14 +1,8 @@
 import reject from 'lodash-es/reject.js'
 import { z } from 'zod/v4'
 import { performMCPOAuthFlow } from '../../services/mcp/auth.js'
-import {
-  clearMcpAuthCache,
-  reconnectMcpServerImpl,
-} from '../../services/mcp/client.js'
-import {
-  buildMcpToolName,
-  getMcpPrefix,
-} from '../../services/mcp/mcpStringUtils.js'
+import { clearMcpAuthCache, reconnectMcpServerImpl } from '../../services/mcp/client.js'
+import { buildMcpToolName, getMcpPrefix } from '../../services/mcp/mcpStringUtils.js'
 import type {
   McpHTTPServerConfig,
   McpSSEServerConfig,
@@ -107,10 +101,9 @@ export function createMcpAuthTool(
         }
       }
 
-      const sseOrHttpConfig = config as (
-        | McpSSEServerConfig
-        | McpHTTPServerConfig
-      ) & { scope: ScopedMcpServerConfig['scope'] }
+      const sseOrHttpConfig = config as (McpSSEServerConfig | McpHTTPServerConfig) & {
+        scope: ScopedMcpServerConfig['scope']
+      }
 
       // Mirror cli/print.ts mcp_authenticate: start the flow, capture the
       // URL via onAuthorizationUrl, return it immediately. The flow's
@@ -143,13 +136,8 @@ export function createMcpAuthTool(
             ...prev,
             mcp: {
               ...prev.mcp,
-              clients: prev.mcp.clients.map(c =>
-                c.name === serverName ? result.client : c,
-              ),
-              tools: [
-                ...reject(prev.mcp.tools, t => t.name?.startsWith(prefix)),
-                ...result.tools,
-              ],
+              clients: prev.mcp.clients.map(c => (c.name === serverName ? result.client : c)),
+              tools: [...reject(prev.mcp.tools, t => t.name?.startsWith(prefix)), ...result.tools],
               commands: [
                 ...reject(prev.mcp.commands, c => c.name?.startsWith(prefix)),
                 ...result.commands,
@@ -159,10 +147,7 @@ export function createMcpAuthTool(
                 : prev.mcp.resources,
             },
           }))
-          logMCPDebug(
-            serverName,
-            `OAuth complete, reconnected with ${result.tools.length} tool(s)`,
-          )
+          logMCPDebug(serverName, `OAuth complete, reconnected with ${result.tools.length} tool(s)`)
         })
         .catch(err => {
           logMCPError(

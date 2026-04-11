@@ -242,9 +242,7 @@ function parseCSI(rawSequence: string): Action | null {
 /**
  * Identify the type of escape sequence from its raw form.
  */
-function identifySequence(
-  seq: string,
-): 'csi' | 'osc' | 'esc' | 'ss3' | 'unknown' {
+function identifySequence(seq: string): 'csi' | 'osc' | 'esc' | 'ss3' | 'unknown' {
   if (seq.length < 2) return 'unknown'
   if (seq.charCodeAt(0) !== C0.ESC) return 'unknown'
 

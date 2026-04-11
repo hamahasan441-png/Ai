@@ -46,11 +46,7 @@ export class LearningEngine {
   /**
    * Learn from a code review finding.
    */
-  learnFromReview(
-    codeContext: string,
-    language: AnalysisLanguage,
-    finding: ReviewFinding,
-  ): void {
+  learnFromReview(codeContext: string, language: AnalysisLanguage, finding: ReviewFinding): void {
     const existing = this.findExistingReviewPattern(codeContext, finding.category)
 
     if (existing) {
@@ -253,9 +249,7 @@ export class LearningEngine {
     const results = this.reviewScorer.score(codeContext, 1, 0.6)
     if (results.length === 0) return undefined
 
-    return this.reviewPatterns.find(
-      p => p.id === results[0].id && p.category === category,
-    )
+    return this.reviewPatterns.find(p => p.id === results[0].id && p.category === category)
   }
 
   private prunePatterns(): void {

@@ -3,10 +3,7 @@ import { logEvent } from 'src/services/analytics/index.js'
 import { getGlobalConfig, saveGlobalConfig } from '../utils/config.js'
 import { logError } from '../utils/log.js'
 import { getAutoModeEnabledState } from '../utils/permissions/permissionSetup.js'
-import {
-  getSettingsForSource,
-  updateSettingsForSource,
-} from '../utils/settings/settings.js'
+import { getSettingsForSource, updateSettingsForSource } from '../utils/settings/settings.js'
 
 /**
  * One-shot migration: clear skipAutoPermissionPrompt for users who accepted
@@ -30,10 +27,7 @@ export function resetAutoModeOptInForDefaultOffer(): void {
 
     try {
       const user = getSettingsForSource('userSettings')
-      if (
-        user?.skipAutoPermissionPrompt &&
-        user?.permissions?.defaultMode !== 'auto'
-      ) {
+      if (user?.skipAutoPermissionPrompt && user?.permissions?.defaultMode !== 'auto') {
         updateSettingsForSource('userSettings', {
           skipAutoPermissionPrompt: undefined,
         })

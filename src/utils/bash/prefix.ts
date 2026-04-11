@@ -48,8 +48,7 @@ export async function getCommandPrefixStatic(
   const spec = await getCommandSpec(cmd)
   // Check if this is a wrapper command
   let isWrapper =
-    WRAPPER_COMMANDS.has(cmd) ||
-    (spec?.args && toArray(spec.args).some(arg => arg?.isCommand))
+    WRAPPER_COMMANDS.has(cmd) || (spec?.args && toArray(spec.args).some(arg => arg?.isCommand))
 
   // Special case: if the command has subcommands and the first arg matches a subcommand,
   // treat it as a regular command, not a wrapper
@@ -95,20 +94,14 @@ async function handleWrapper(
             return parts.join(' ')
           }
           break
-        } else if (
-          args[i] &&
-          !args[i]!.startsWith('-') &&
-          !ENV_VAR.test(args[i]!)
-        ) {
+        } else if (args[i] && !args[i]!.startsWith('-') && !ENV_VAR.test(args[i]!)) {
           parts.push(args[i]!)
         }
       }
     }
   }
 
-  const wrapped = args.find(
-    arg => !arg.startsWith('-') && !NUMERIC.test(arg) && !ENV_VAR.test(arg),
-  )
+  const wrapped = args.find(arg => !arg.startsWith('-') && !NUMERIC.test(arg) && !ENV_VAR.test(arg))
   if (!wrapped) return command
 
   const result = await getCommandPrefixStatic(

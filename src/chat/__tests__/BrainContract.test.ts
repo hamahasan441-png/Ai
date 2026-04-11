@@ -4,12 +4,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 import { describe, it, expect } from 'vitest'
-import {
-  BrainStep,
-  BRAIN_STEP_ORDER,
-  TraceBuilder,
-  validateTrace,
-} from '../BrainContract.js'
+import { BrainStep, BRAIN_STEP_ORDER, TraceBuilder, validateTrace } from '../BrainContract.js'
 import type {
   InputStepData,
   ThinkStepData,
@@ -46,41 +41,66 @@ describe('BrainContract', () => {
       const now = Date.now()
       const builder = new TraceBuilder('test-trace')
 
-      builder.recordStep(BrainStep.INPUT, {
-        rawMessage: 'Hello',
-        normalizedMessage: 'hello',
-        keywords: ['hello'],
-        detectedLanguage: 'en',
-        timestamp: now,
-      } satisfies InputStepData, now, now + 1)
+      builder.recordStep(
+        BrainStep.INPUT,
+        {
+          rawMessage: 'Hello',
+          normalizedMessage: 'hello',
+          keywords: ['hello'],
+          detectedLanguage: 'en',
+          timestamp: now,
+        } satisfies InputStepData,
+        now,
+        now + 1,
+      )
 
-      builder.recordStep(BrainStep.THINK, {
-        intent: 'greeting',
-        entities: [],
-        knowledgeHits: 0,
-        memoryHits: 0,
-        reasoningChain: ['classify intent'],
-        confidence: 0.8,
-      } satisfies ThinkStepData, now + 1, now + 5)
+      builder.recordStep(
+        BrainStep.THINK,
+        {
+          intent: 'greeting',
+          entities: [],
+          knowledgeHits: 0,
+          memoryHits: 0,
+          reasoningChain: ['classify intent'],
+          confidence: 0.8,
+        } satisfies ThinkStepData,
+        now + 1,
+        now + 5,
+      )
 
-      builder.recordStep(BrainStep.TOOL, {
-        toolsInvoked: [],
-        skippedReason: 'No tools needed',
-      } satisfies ToolStepData, now + 5, now + 5)
+      builder.recordStep(
+        BrainStep.TOOL,
+        {
+          toolsInvoked: [],
+          skippedReason: 'No tools needed',
+        } satisfies ToolStepData,
+        now + 5,
+        now + 5,
+      )
 
-      builder.recordStep(BrainStep.VERIFY, {
-        decision: 'respond',
-        confidence: 0.8,
-        gateExplanation: 'Confidence adequate',
-        adjustedResponse: null,
-      } satisfies VerifyStepData, now + 5, now + 6)
+      builder.recordStep(
+        BrainStep.VERIFY,
+        {
+          decision: 'respond',
+          confidence: 0.8,
+          gateExplanation: 'Confidence adequate',
+          adjustedResponse: null,
+        } satisfies VerifyStepData,
+        now + 5,
+        now + 6,
+      )
 
-      builder.recordStep(BrainStep.OUTPUT, {
-        text: 'Hello! How can I help?',
-        wasHedged: false,
-        wasAbstained: false,
-        tokenEstimate: { input: 2, output: 6 },
-      } satisfies OutputStepData, now + 6, now + 7)
+      builder.recordStep(
+        BrainStep.OUTPUT,
+        {
+          text: 'Hello! How can I help?',
+          wasHedged: false,
+          wasAbstained: false,
+          tokenEstimate: { input: 2, output: 6 },
+        } satisfies OutputStepData,
+        now + 6,
+        now + 7,
+      )
 
       expect(builder.isComplete()).toBe(true)
 
@@ -97,14 +117,19 @@ describe('BrainContract', () => {
 
       // Trying to record THINK before INPUT should throw
       expect(() => {
-        builder.recordStep(BrainStep.THINK, {
-          intent: 'test',
-          entities: [],
-          knowledgeHits: 0,
-          memoryHits: 0,
-          reasoningChain: [],
-          confidence: 0,
-        } satisfies ThinkStepData, now, now + 1)
+        builder.recordStep(
+          BrainStep.THINK,
+          {
+            intent: 'test',
+            entities: [],
+            knowledgeHits: 0,
+            memoryHits: 0,
+            reasoningChain: [],
+            confidence: 0,
+          } satisfies ThinkStepData,
+          now,
+          now + 1,
+        )
       }).toThrow('Contract violation')
     })
 
@@ -132,19 +157,29 @@ describe('BrainContract', () => {
       recordThinkStep(builder, now + 1)
       recordToolStep(builder, now + 5)
 
-      builder.recordStep(BrainStep.VERIFY, {
-        decision: 'abstain',
-        confidence: 0.1,
-        gateExplanation: 'Too uncertain',
-        adjustedResponse: null,
-      } satisfies VerifyStepData, now + 5, now + 6)
+      builder.recordStep(
+        BrainStep.VERIFY,
+        {
+          decision: 'abstain',
+          confidence: 0.1,
+          gateExplanation: 'Too uncertain',
+          adjustedResponse: null,
+        } satisfies VerifyStepData,
+        now + 5,
+        now + 6,
+      )
 
-      builder.recordStep(BrainStep.OUTPUT, {
-        text: 'I don\'t know.',
-        wasHedged: false,
-        wasAbstained: true,
-        tokenEstimate: { input: 2, output: 4 },
-      } satisfies OutputStepData, now + 6, now + 7)
+      builder.recordStep(
+        BrainStep.OUTPUT,
+        {
+          text: "I don't know.",
+          wasHedged: false,
+          wasAbstained: true,
+          tokenEstimate: { input: 2, output: 4 },
+        } satisfies OutputStepData,
+        now + 6,
+        now + 7,
+      )
 
       const trace = builder.build()
       expect(trace.finalDecision).toBe('abstain')
@@ -209,14 +244,19 @@ describe('BrainContract', () => {
 
       recordInputStep(builder, now)
 
-      builder.recordStep(BrainStep.THINK, {
-        intent: 'test',
-        entities: [],
-        knowledgeHits: 0,
-        memoryHits: 0,
-        reasoningChain: [],
-        confidence: -0.5, // Invalid
-      } satisfies ThinkStepData, now + 1, now + 2)
+      builder.recordStep(
+        BrainStep.THINK,
+        {
+          intent: 'test',
+          entities: [],
+          knowledgeHits: 0,
+          memoryHits: 0,
+          reasoningChain: [],
+          confidence: -0.5, // Invalid
+        } satisfies ThinkStepData,
+        now + 1,
+        now + 2,
+      )
 
       recordToolStep(builder, now + 2)
       recordVerifyStep(builder, now + 3)
@@ -274,49 +314,74 @@ function buildCompleteTrace(): TraceBuilder {
 }
 
 function recordInputStep(builder: TraceBuilder, time: number): void {
-  builder.recordStep(BrainStep.INPUT, {
-    rawMessage: 'Test input',
-    normalizedMessage: 'test input',
-    keywords: ['test', 'input'],
-    detectedLanguage: 'en',
-    timestamp: time,
-  } satisfies InputStepData, time, time + 1)
+  builder.recordStep(
+    BrainStep.INPUT,
+    {
+      rawMessage: 'Test input',
+      normalizedMessage: 'test input',
+      keywords: ['test', 'input'],
+      detectedLanguage: 'en',
+      timestamp: time,
+    } satisfies InputStepData,
+    time,
+    time + 1,
+  )
 }
 
 function recordThinkStep(builder: TraceBuilder, time: number): void {
-  builder.recordStep(BrainStep.THINK, {
-    intent: 'question',
-    entities: [],
-    knowledgeHits: 1,
-    memoryHits: 0,
-    reasoningChain: ['classify'],
-    confidence: 0.7,
-  } satisfies ThinkStepData, time, time + 4)
+  builder.recordStep(
+    BrainStep.THINK,
+    {
+      intent: 'question',
+      entities: [],
+      knowledgeHits: 1,
+      memoryHits: 0,
+      reasoningChain: ['classify'],
+      confidence: 0.7,
+    } satisfies ThinkStepData,
+    time,
+    time + 4,
+  )
 }
 
 function recordToolStep(builder: TraceBuilder, time: number): void {
-  builder.recordStep(BrainStep.TOOL, {
-    toolsInvoked: [],
-    skippedReason: 'No tools needed',
-  } satisfies ToolStepData, time, time)
+  builder.recordStep(
+    BrainStep.TOOL,
+    {
+      toolsInvoked: [],
+      skippedReason: 'No tools needed',
+    } satisfies ToolStepData,
+    time,
+    time,
+  )
 }
 
 function recordVerifyStep(builder: TraceBuilder, time: number): void {
-  builder.recordStep(BrainStep.VERIFY, {
-    decision: 'respond',
-    confidence: 0.7,
-    gateExplanation: 'OK',
-    adjustedResponse: null,
-  } satisfies VerifyStepData, time, time + 1)
+  builder.recordStep(
+    BrainStep.VERIFY,
+    {
+      decision: 'respond',
+      confidence: 0.7,
+      gateExplanation: 'OK',
+      adjustedResponse: null,
+    } satisfies VerifyStepData,
+    time,
+    time + 1,
+  )
 }
 
 function recordOutputStep(builder: TraceBuilder, time: number): void {
-  builder.recordStep(BrainStep.OUTPUT, {
-    text: 'Test response',
-    wasHedged: false,
-    wasAbstained: false,
-    tokenEstimate: { input: 2, output: 3 },
-  } satisfies OutputStepData, time, time + 1)
+  builder.recordStep(
+    BrainStep.OUTPUT,
+    {
+      text: 'Test response',
+      wasHedged: false,
+      wasAbstained: false,
+      tokenEstimate: { input: 2, output: 3 },
+    } satisfies OutputStepData,
+    time,
+    time + 1,
+  )
 }
 
 function buildRemainingSteps(startTime: number) {

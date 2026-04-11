@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  SemanticEngine,
-  cosineSimilarity,
-  type SemanticDocument,
-} from '../SemanticEngine'
+import { SemanticEngine, cosineSimilarity, type SemanticDocument } from '../SemanticEngine'
 
 // ── cosineSimilarity (standalone export) ──
 
@@ -123,7 +119,8 @@ describe('SemanticEngine.embed', () => {
   })
 
   it('handles long text input', () => {
-    const longText = 'sort algorithm binary search tree graph hash table linked list queue stack heap'
+    const longText =
+      'sort algorithm binary search tree graph hash table linked list queue stack heap'
     const vec = engine.embed(longText)
     expect(vec).toHaveLength(50)
     const magnitude = Math.sqrt(vec.reduce((sum, v) => sum + v * v, 0))
@@ -341,7 +338,10 @@ describe('SemanticEngine.disambiguate', () => {
   })
 
   it('returns programming sense of "class" in a code context', () => {
-    const sense = engine.disambiguate('class', 'define a class with methods and inheritance in Python')
+    const sense = engine.disambiguate(
+      'class',
+      'define a class with methods and inheritance in Python',
+    )
     expect(sense).toContain('object')
   })
 

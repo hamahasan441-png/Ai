@@ -12,12 +12,7 @@ import type { AppState } from './AppState.js'
 // teammateViewHelpers → LocalAgentTask runtime edge that creates a cycle
 // through BackgroundTasksDialog.
 function isLocalAgent(task: unknown): task is LocalAgentTaskState {
-  return (
-    typeof task === 'object' &&
-    task !== null &&
-    'type' in task &&
-    task.type === 'local_agent'
-  )
+  return typeof task === 'object' && task !== null && 'type' in task && task.type === 'local_agent'
 }
 
 /**
@@ -31,9 +26,7 @@ function release(task: LocalAgentTaskState): LocalAgentTaskState {
     retain: false,
     messages: undefined,
     diskLoaded: false,
-    evictAfter: isTerminalTaskStatus(task.status)
-      ? Date.now() + PANEL_GRACE_MS
-      : undefined,
+    evictAfter: isTerminalTaskStatus(task.status) ? Date.now() + PANEL_GRACE_MS : undefined,
   }
 }
 
@@ -53,15 +46,10 @@ export function enterTeammateView(
     const prevId = prev.viewingAgentTaskId
     const prevTask = prevId !== undefined ? prev.tasks[prevId] : undefined
     const switching =
-      prevId !== undefined &&
-      prevId !== taskId &&
-      isLocalAgent(prevTask) &&
-      prevTask.retain
-    const needsRetain =
-      isLocalAgent(task) && (!task.retain || task.evictAfter !== undefined)
+      prevId !== undefined && prevId !== taskId && isLocalAgent(prevTask) && prevTask.retain
+    const needsRetain = isLocalAgent(task) && (!task.retain || task.evictAfter !== undefined)
     const needsView =
-      prev.viewingAgentTaskId !== taskId ||
-      prev.viewSelectionMode !== 'viewing-agent'
+      prev.viewingAgentTaskId !== taskId || prev.viewSelectionMode !== 'viewing-agent'
     if (!needsRetain && !needsView && !switching) return prev
     let tasks = prev.tasks
     if (switching || needsRetain) {

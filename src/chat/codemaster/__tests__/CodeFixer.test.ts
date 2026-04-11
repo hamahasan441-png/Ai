@@ -106,17 +106,19 @@ describe('CodeFixer fixCode', () => {
 
   it('skips fixes when findings filter excludes the line', () => {
     const code = 'if (x == 1) {}'
-    const findings: ReviewFinding[] = [{
-      category: 'bug',
-      severity: 'medium',
-      line: 999,
-      title: 'Unrelated',
-      description: 'Unrelated finding',
-      suggestion: 'N/A',
-      fixAvailable: true,
-      autoFixable: true,
-      id: 'unrelated',
-    }]
+    const findings: ReviewFinding[] = [
+      {
+        category: 'bug',
+        severity: 'medium',
+        line: 999,
+        title: 'Unrelated',
+        description: 'Unrelated finding',
+        suggestion: 'N/A',
+        fixAvailable: true,
+        autoFixable: true,
+        id: 'unrelated',
+      },
+    ]
     const result = fixer.fixCode(code, 'javascript', findings)
     expect(result.summary.skipped).toBeGreaterThan(0)
     expect(result.summary.applied).toBe(0)
@@ -124,17 +126,19 @@ describe('CodeFixer fixCode', () => {
 
   it('applies fixes when findings match the line', () => {
     const code = 'if (x == 1) {}'
-    const findings: ReviewFinding[] = [{
-      category: 'bug',
-      severity: 'medium',
-      line: 1,
-      title: 'Loose equality',
-      description: 'Use strict equality',
-      suggestion: 'Use ===',
-      fixAvailable: true,
-      autoFixable: true,
-      id: 'eq-fix',
-    }]
+    const findings: ReviewFinding[] = [
+      {
+        category: 'bug',
+        severity: 'medium',
+        line: 1,
+        title: 'Loose equality',
+        description: 'Use strict equality',
+        suggestion: 'Use ===',
+        fixAvailable: true,
+        autoFixable: true,
+        id: 'eq-fix',
+      },
+    ]
     const result = fixer.fixCode(code, 'javascript', findings)
     expect(result.summary.applied).toBeGreaterThan(0)
   })
@@ -216,8 +220,22 @@ describe('CodeFixer applyFixes', () => {
   it('applies multiple non-conflicting fixes in order', () => {
     const code = 'var a = 1\nvar b = 2'
     const fixes: CodeFix[] = [
-      { findingId: 'f1', original: 'var a', fixed: 'const a', diff: '', applied: false, validated: true },
-      { findingId: 'f2', original: 'var b', fixed: 'const b', diff: '', applied: false, validated: true },
+      {
+        findingId: 'f1',
+        original: 'var a',
+        fixed: 'const a',
+        diff: '',
+        applied: false,
+        validated: true,
+      },
+      {
+        findingId: 'f2',
+        original: 'var b',
+        fixed: 'const b',
+        diff: '',
+        applied: false,
+        validated: true,
+      },
     ]
     const result = fixer.applyFixes(code, fixes)
     expect(result.code).toBe('const a = 1\nconst b = 2')
@@ -228,8 +246,22 @@ describe('CodeFixer applyFixes', () => {
   it('skips conflicting fixes when original is no longer found', () => {
     const code = 'var x = 1'
     const fixes: CodeFix[] = [
-      { findingId: 'f1', original: 'var x', fixed: 'const x', diff: '', applied: false, validated: true },
-      { findingId: 'f2', original: 'var x', fixed: 'let x', diff: '', applied: false, validated: true },
+      {
+        findingId: 'f1',
+        original: 'var x',
+        fixed: 'const x',
+        diff: '',
+        applied: false,
+        validated: true,
+      },
+      {
+        findingId: 'f2',
+        original: 'var x',
+        fixed: 'let x',
+        diff: '',
+        applied: false,
+        validated: true,
+      },
     ]
     const result = fixer.applyFixes(code, fixes)
     expect(result.code).toBe('const x = 1')
@@ -241,7 +273,14 @@ describe('CodeFixer applyFixes', () => {
   it('skips fixes with empty original', () => {
     const code = 'const x = 1'
     const fixes: CodeFix[] = [
-      { findingId: 'f1', original: '', fixed: 'something', diff: '', applied: false, validated: true },
+      {
+        findingId: 'f1',
+        original: '',
+        fixed: 'something',
+        diff: '',
+        applied: false,
+        validated: true,
+      },
     ]
     const result = fixer.applyFixes(code, fixes)
     expect(result.code).toBe(code)
@@ -251,7 +290,14 @@ describe('CodeFixer applyFixes', () => {
   it('stores rollback state before applying fixes', () => {
     const code = 'var x = 1'
     const fixes: CodeFix[] = [
-      { findingId: 'f1', original: 'var x', fixed: 'const x', diff: '', applied: false, validated: true },
+      {
+        findingId: 'f1',
+        original: 'var x',
+        fixed: 'const x',
+        diff: '',
+        applied: false,
+        validated: true,
+      },
     ]
     fixer.applyFixes(code, fixes)
     expect(fixer.getRollbackCode()).toBe(code)
@@ -280,7 +326,14 @@ describe('CodeFixer rollback', () => {
   it('returns original code after applyFixes', () => {
     const original = 'var a = 1'
     fixer.applyFixes(original, [
-      { findingId: 'f1', original: 'var a', fixed: 'const a', diff: '', applied: false, validated: true },
+      {
+        findingId: 'f1',
+        original: 'var a',
+        fixed: 'const a',
+        diff: '',
+        applied: false,
+        validated: true,
+      },
     ])
     expect(fixer.rollback()).toBe(original)
   })

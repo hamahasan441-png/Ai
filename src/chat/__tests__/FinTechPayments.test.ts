@@ -11,13 +11,17 @@ describe('FinTechPayments', () => {
 
   describe('KB entry tests', () => {
     it('should respond to payments and open banking queries', async () => {
-      const response = await brain.chat('explain payment processing gateway stripe square adyen pci dss open banking psd2 api banking as a service fintech digital banking')
+      const response = await brain.chat(
+        'explain payment processing gateway stripe square adyen pci dss open banking psd2 api banking as a service fintech digital banking',
+      )
       expect(response.text.length).toBeGreaterThan(50)
       expect(response.text.toLowerCase()).toMatch(/payment|stripe|pci|open\s+banking|psd2|fintech/)
     })
 
     it('should respond to lending trading and compliance queries', async () => {
-      const response = await brain.chat('explain lending credit scoring underwriting algorithmic trading high frequency kyc know your customer aml anti money laundering compliance')
+      const response = await brain.chat(
+        'explain lending credit scoring underwriting algorithmic trading high frequency kyc know your customer aml anti money laundering compliance',
+      )
       expect(response.text.length).toBeGreaterThan(50)
       expect(response.text.toLowerCase()).toMatch(/credit|lending|trading|kyc|aml|compliance/)
     })

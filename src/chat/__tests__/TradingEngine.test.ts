@@ -1,17 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  TradingEngine,
-  type OHLCV,
-} from '../TradingEngine'
+import { TradingEngine, type OHLCV } from '../TradingEngine'
 
 // ── Helpers: generate synthetic OHLCV data ──
 
-function makeCandle(
-  close: number,
-  index: number,
-  spread = 2,
-  volume = 1000,
-): OHLCV {
+function makeCandle(close: number, index: number, spread = 2, volume = 1000): OHLCV {
   const open = close - spread * 0.3
   const high = close + spread * 0.5
   const low = close - spread * 0.5
@@ -39,23 +31,65 @@ function makeVolatile(length: number, basePrice = 100, amplitude = 10): OHLCV[] 
 }
 
 function makeDoji(index: number, price = 100): OHLCV {
-  return { open: price, high: price + 5, low: price - 5, close: price + 0.01, volume: 1000, timestamp: 1_700_000_000_000 + index * 60_000 }
+  return {
+    open: price,
+    high: price + 5,
+    low: price - 5,
+    close: price + 0.01,
+    volume: 1000,
+    timestamp: 1_700_000_000_000 + index * 60_000,
+  }
 }
 
 function makeHammer(index: number, price = 100): OHLCV {
   const body = 1
-  return { open: price, high: price + body * 0.3, low: price - body * 5, close: price + body, volume: 1000, timestamp: 1_700_000_000_000 + index * 60_000 }
+  return {
+    open: price,
+    high: price + body * 0.3,
+    low: price - body * 5,
+    close: price + body,
+    volume: 1000,
+    timestamp: 1_700_000_000_000 + index * 60_000,
+  }
 }
 
 function makeBullishEngulfing(index: number): [OHLCV, OHLCV] {
-  const prev: OHLCV = { open: 105, high: 106, low: 99, close: 100, volume: 1000, timestamp: 1_700_000_000_000 + index * 60_000 }
-  const curr: OHLCV = { open: 99, high: 108, low: 98, close: 107, volume: 1500, timestamp: 1_700_000_000_000 + (index + 1) * 60_000 }
+  const prev: OHLCV = {
+    open: 105,
+    high: 106,
+    low: 99,
+    close: 100,
+    volume: 1000,
+    timestamp: 1_700_000_000_000 + index * 60_000,
+  }
+  const curr: OHLCV = {
+    open: 99,
+    high: 108,
+    low: 98,
+    close: 107,
+    volume: 1500,
+    timestamp: 1_700_000_000_000 + (index + 1) * 60_000,
+  }
   return [prev, curr]
 }
 
 function makeBearishEngulfing(index: number): [OHLCV, OHLCV] {
-  const prev: OHLCV = { open: 100, high: 106, low: 99, close: 105, volume: 1000, timestamp: 1_700_000_000_000 + index * 60_000 }
-  const curr: OHLCV = { open: 106, high: 107, low: 97, close: 98, volume: 1500, timestamp: 1_700_000_000_000 + (index + 1) * 60_000 }
+  const prev: OHLCV = {
+    open: 100,
+    high: 106,
+    low: 99,
+    close: 105,
+    volume: 1000,
+    timestamp: 1_700_000_000_000 + index * 60_000,
+  }
+  const curr: OHLCV = {
+    open: 106,
+    high: 107,
+    low: 97,
+    close: 98,
+    volume: 1500,
+    timestamp: 1_700_000_000_000 + (index + 1) * 60_000,
+  }
   return [prev, curr]
 }
 
@@ -646,7 +680,11 @@ describe('TradingEngine classifyMarketRegime', () => {
     engine.addCandles(makeUptrend(60))
     const regime = engine.classifyMarketRegime()
     expect([
-      'trending-up', 'trending-down', 'mean-reverting', 'high-volatility', 'low-volatility',
+      'trending-up',
+      'trending-down',
+      'mean-reverting',
+      'high-volatility',
+      'low-volatility',
     ]).toContain(regime.regime)
   })
 

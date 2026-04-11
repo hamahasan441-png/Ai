@@ -11,17 +11,25 @@ describe('MQL Code Optimization Knowledge', () => {
 
   it('explains MQL performance optimization techniques', async () => {
     const r = await brain.chat('How to optimize MQL EA performance and speed?')
-    expect(r.text.toLowerCase()).toMatch(/cache|static|arrayresize|string|timer|gettickcount|performance/)
+    expect(r.text.toLowerCase()).toMatch(
+      /cache|static|arrayresize|string|timer|gettickcount|performance/,
+    )
   })
 
   it('covers MQL array handling and data structures', async () => {
-    const r = await brain.chat('Best practices for MQL array handling and efficient data structures?')
-    expect(r.text.toLowerCase()).toMatch(/array|arraysetasseries|struct|iterate|backwards|dynamic|static/)
+    const r = await brain.chat(
+      'Best practices for MQL array handling and efficient data structures?',
+    )
+    expect(r.text.toLowerCase()).toMatch(
+      /array|arraysetasseries|struct|iterate|backwards|dynamic|static/,
+    )
   })
 
   it('explains MQL preprocessor and code organization', async () => {
     const r = await brain.chat('How to use MQL preprocessor directives and organize MQL code?')
-    expect(r.text.toLowerCase()).toMatch(/#ifdef|#define|#include|__mql[45]__|preprocessor|organize|property\s+strict/)
+    expect(r.text.toLowerCase()).toMatch(
+      /#ifdef|#define|#include|__mql[45]__|preprocessor|organize|property\s+strict/,
+    )
   })
 
   describe('Semantic Memory', () => {

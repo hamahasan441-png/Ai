@@ -190,9 +190,7 @@ export class ReplayStore {
   serialize(): string {
     const data = {
       sessions: [...this.sessions.values()],
-      snapshots: Object.fromEntries(
-        [...this.snapshots.entries()].map(([k, v]) => [k, v]),
-      ),
+      snapshots: Object.fromEntries([...this.snapshots.entries()].map(([k, v]) => [k, v])),
     }
     return JSON.stringify(data, null, 2)
   }

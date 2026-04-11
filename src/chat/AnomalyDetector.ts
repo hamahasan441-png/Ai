@@ -18,10 +18,10 @@
 
 export interface AnomalyResult {
   isAnomaly: boolean
-  score: number          // 0-1 anomaly severity
+  score: number // 0-1 anomaly severity
   type: AnomalyType
   description: string
-  confidence: number     // 0-1
+  confidence: number // 0-1
   details: Record<string, unknown>
 }
 
@@ -128,7 +128,9 @@ export class AnomalyDetector {
 
     return {
       isAnomaly,
-      score: isAnomaly ? Math.min(1, Math.abs(value - (value < lowerBound ? lowerBound : upperBound)) / iqr) : 0,
+      score: isAnomaly
+        ? Math.min(1, Math.abs(value - (value < lowerBound ? lowerBound : upperBound)) / iqr)
+        : 0,
       type: isAnomaly ? 'statistical_outlier' : 'none',
       description: isAnomaly
         ? `IQR outlier: value ${value} outside [${lowerBound.toFixed(2)}, ${upperBound.toFixed(2)}]`
@@ -153,9 +155,11 @@ export class AnomalyDetector {
 
     // Update running averages
     const prevAvgLen = this.queryPatterns.avgLength
-    this.queryPatterns.avgLength += (length - this.queryPatterns.avgLength) / this.queryPatterns.queryCount
+    this.queryPatterns.avgLength +=
+      (length - this.queryPatterns.avgLength) / this.queryPatterns.queryCount
     const prevAvgComp = this.queryPatterns.avgComplexity
-    this.queryPatterns.avgComplexity += (complexity - this.queryPatterns.avgComplexity) / this.queryPatterns.queryCount
+    this.queryPatterns.avgComplexity +=
+      (complexity - this.queryPatterns.avgComplexity) / this.queryPatterns.queryCount
 
     // Only check for anomalies after learning period
     if (this.queryPatterns.queryCount > 5) {
@@ -167,7 +171,9 @@ export class AnomalyDetector {
 
       // Check complexity deviation
       if (prevAvgComp > 0 && Math.abs(complexity - prevAvgComp) > prevAvgComp * 2.5) {
-        anomalies.push(`Unusual complexity: ${complexity.toFixed(2)} (avg: ${prevAvgComp.toFixed(2)})`)
+        anomalies.push(
+          `Unusual complexity: ${complexity.toFixed(2)} (avg: ${prevAvgComp.toFixed(2)})`,
+        )
         score += 0.3
       }
 
@@ -283,11 +289,14 @@ export class AnomalyDetector {
       return this.noAnomaly('No variance in baseline period')
     }
 
-    const changeRatio = previousMean !== 0
-      ? Math.abs(recentMean - previousMean) / Math.abs(previousMean)
-      : Math.abs(recentMean - previousMean)
+    const changeRatio =
+      previousMean !== 0
+        ? Math.abs(recentMean - previousMean) / Math.abs(previousMean)
+        : Math.abs(recentMean - previousMean)
 
-    const isBreak = changeRatio > 0.5 || (previousStd > 0 && Math.abs(recentMean - previousMean) > 3 * previousStd)
+    const isBreak =
+      changeRatio > 0.5 ||
+      (previousStd > 0 && Math.abs(recentMean - previousMean) > 3 * previousStd)
 
     return {
       isAnomaly: isBreak,
@@ -440,7 +449,10 @@ export class AnomalyDetector {
     let max = 0
     let current = 0
     for (const ch of code) {
-      if (ch === '{' || ch === '(' || ch === '[') { current++; max = Math.max(max, current) }
+      if (ch === '{' || ch === '(' || ch === '[') {
+        current++
+        max = Math.max(max, current)
+      }
       if (ch === '}' || ch === ')' || ch === ']') current = Math.max(0, current - 1)
     }
     return max

@@ -201,9 +201,7 @@ export async function prepareApiRequest(): Promise<{
  * Fetches code sessions from the new Sessions API (/v1/sessions)
  * @returns Array of code sessions
  */
-export async function fetchCodeSessionsFromSessionsAPI(): Promise<
-  CodeSession[]
-> {
+export async function fetchCodeSessionsFromSessionsAPI(): Promise<CodeSession[]> {
   const { accessToken, orgUUID } = await prepareApiRequest()
 
   const url = `${getOauthConfig().BASE_API_URL}/v1/sessions`
@@ -286,9 +284,7 @@ export function getOAuthHeaders(accessToken: string): Record<string, string> {
  * @param sessionId The session ID to fetch
  * @returns The session resource
  */
-export async function fetchSession(
-  sessionId: string,
-): Promise<SessionResource> {
+export async function fetchSession(sessionId: string): Promise<SessionResource> {
   const { accessToken, orgUUID } = await prepareApiRequest()
 
   const url = `${getOauthConfig().BASE_API_URL}/v1/sessions/${sessionId}`
@@ -318,8 +314,7 @@ export async function fetchSession(
     }
 
     throw new Error(
-      apiMessage ||
-        `Failed to fetch session: ${response.status} ${response.statusText}`,
+      apiMessage || `Failed to fetch session: ${response.status} ${response.statusText}`,
     )
   }
 
@@ -331,12 +326,9 @@ export async function fetchSession(
  * @param session The session resource to extract from
  * @returns The first branch name, or undefined if none found
  */
-export function getBranchFromSession(
-  session: SessionResource,
-): string | undefined {
+export function getBranchFromSession(session: SessionResource): string | undefined {
   const gitOutcome = session.session_context.outcomes?.find(
-    (outcome): outcome is GitRepositoryOutcome =>
-      outcome.type === 'git_repository',
+    (outcome): outcome is GitRepositoryOutcome => outcome.type === 'git_repository',
   )
   return gitOutcome?.git_info?.branches[0]
 }
@@ -346,9 +338,7 @@ export function getBranchFromSession(
  * Accepts a plain string or an array of content blocks (text, image, etc.)
  * following the Anthropic API messages spec.
  */
-export type RemoteMessageContent =
-  | string
-  | Array<{ type: string; [key: string]: unknown }>
+export type RemoteMessageContent = string | Array<{ type: string; [key: string]: unknown }>
 
 /**
  * Sends a user message event to an existing remote session via the Sessions API
@@ -388,9 +378,7 @@ export async function sendEventToRemoteSession(
       events: [userEvent],
     }
 
-    logForDebugging(
-      `[sendEventToRemoteSession] Sending event to session ${sessionId}`,
-    )
+    logForDebugging(`[sendEventToRemoteSession] Sending event to session ${sessionId}`)
     // The endpoint may block until the CCR worker is ready. Observed ~2.6s
     // in normal cases; allow a generous margin for cold-start containers.
     const response = await axios.post(url, requestBody, {
@@ -400,9 +388,7 @@ export async function sendEventToRemoteSession(
     })
 
     if (response.status === 200 || response.status === 201) {
-      logForDebugging(
-        `[sendEventToRemoteSession] Successfully sent event to session ${sessionId}`,
-      )
+      logForDebugging(`[sendEventToRemoteSession] Successfully sent event to session ${sessionId}`)
       return true
     }
 
@@ -422,10 +408,7 @@ export async function sendEventToRemoteSession(
  * @param title The new title for the session
  * @returns Promise<boolean> True if successful, false otherwise
  */
-export async function updateSessionTitle(
-  sessionId: string,
-  title: string,
-): Promise<boolean> {
+export async function updateSessionTitle(sessionId: string, title: string): Promise<boolean> {
   try {
     const { accessToken, orgUUID } = await prepareApiRequest()
 
@@ -436,9 +419,7 @@ export async function updateSessionTitle(
       'x-organization-uuid': orgUUID,
     }
 
-    logForDebugging(
-      `[updateSessionTitle] Updating title for session ${sessionId}: "${title}"`,
-    )
+    logForDebugging(`[updateSessionTitle] Updating title for session ${sessionId}: "${title}"`)
     const response = await axios.patch(
       url,
       { title },
@@ -449,9 +430,7 @@ export async function updateSessionTitle(
     )
 
     if (response.status === 200) {
-      logForDebugging(
-        `[updateSessionTitle] Successfully updated title for session ${sessionId}`,
-      )
+      logForDebugging(`[updateSessionTitle] Successfully updated title for session ${sessionId}`)
       return true
     }
 

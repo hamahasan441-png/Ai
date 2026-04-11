@@ -139,7 +139,8 @@ interface VulnPattern {
 const VULN_PATTERNS: VulnPattern[] = [
   // SQL Injection
   {
-    pattern: /(?:query|execute|exec)\s*\(\s*(?:`[^`]*\$\{|['"][^'"]*['"]\s*\+\s*\w+|['"][^'"]*['"]\s*\+)/,
+    pattern:
+      /(?:query|execute|exec)\s*\(\s*(?:`[^`]*\$\{|['"][^'"]*['"]\s*\+\s*\w+|['"][^'"]*['"]\s*\+)/,
     title: 'SQL Injection',
     cwe: 'CWE-89',
     owasp: 'A03:2021-Injection',
@@ -183,31 +184,36 @@ const VULN_PATTERNS: VulnPattern[] = [
     owasp: 'A03:2021-Injection',
     severity: 'critical',
     cvss: 9.8,
-    remediation: 'Use parameterized commands or escape shell arguments. Avoid exec with user input.',
+    remediation:
+      'Use parameterized commands or escape shell arguments. Avoid exec with user input.',
     fpRisk: 'low',
     languages: ['typescript', 'javascript', 'python', 'ruby', 'php'],
   },
   // Path Traversal
   {
-    pattern: /(?:readFile|readFileSync|createReadStream|open)\s*\(\s*(?:req\.|request\.|params\.|query\.|\w+\s*\+)/,
+    pattern:
+      /(?:readFile|readFileSync|createReadStream|open)\s*\(\s*(?:req\.|request\.|params\.|query\.|\w+\s*\+)/,
     title: 'Path Traversal',
     cwe: 'CWE-22',
     owasp: 'A01:2021-Broken-Access-Control',
     severity: 'high',
     cvss: 7.5,
-    remediation: 'Validate and sanitize file paths. Use path.resolve() and check against a whitelist.',
+    remediation:
+      'Validate and sanitize file paths. Use path.resolve() and check against a whitelist.',
     fpRisk: 'medium',
     languages: ['typescript', 'javascript', 'python'],
   },
   // SSRF
   {
-    pattern: /(?:fetch|axios|request|http\.get|urllib)\s*\(\s*(?:req\.|request\.|params\.|query\.|user)/,
+    pattern:
+      /(?:fetch|axios|request|http\.get|urllib)\s*\(\s*(?:req\.|request\.|params\.|query\.|user)/,
     title: 'Server-Side Request Forgery (SSRF)',
     cwe: 'CWE-918',
     owasp: 'A10:2021-SSRF',
     severity: 'high',
     cvss: 7.5,
-    remediation: 'Validate URLs against an allowlist. Block internal IPs (127.0.0.1, 10.x, 192.168.x).',
+    remediation:
+      'Validate URLs against an allowlist. Block internal IPs (127.0.0.1, 10.x, 192.168.x).',
     fpRisk: 'medium',
     languages: ['typescript', 'javascript', 'python', 'java', 'go'],
   },
@@ -257,7 +263,8 @@ const VULN_PATTERNS: VulnPattern[] = [
     owasp: 'A03:2021-Injection',
     severity: 'high',
     cvss: 8.0,
-    remediation: 'Avoid eval(). Use JSON.parse() for data, or Function constructor if absolutely needed.',
+    remediation:
+      'Avoid eval(). Use JSON.parse() for data, or Function constructor if absolutely needed.',
     fpRisk: 'medium',
     languages: ['typescript', 'javascript', 'python'],
   },
@@ -311,7 +318,8 @@ const VULN_PATTERNS: VulnPattern[] = [
   },
   // Unvalidated redirect
   {
-    pattern: /(?:redirect|location\.href|window\.location)\s*=\s*(?:req\.|request\.|params\.|query\.)/,
+    pattern:
+      /(?:redirect|location\.href|window\.location)\s*=\s*(?:req\.|request\.|params\.|query\.)/,
     title: 'Open Redirect',
     cwe: 'CWE-601',
     owasp: 'A01:2021-Broken-Access-Control',
@@ -336,24 +344,56 @@ interface SecretPattern {
 const SECRET_PATTERNS: SecretPattern[] = [
   // AWS
   { pattern: /(?:AKIA|ASIA)[0-9A-Z]{16}/g, type: 'aws-key', severity: 'critical' },
-  { pattern: /aws_secret_access_key\s*=\s*['"]([^'"]{20,})['"]/gi, type: 'aws-key', severity: 'critical' },
+  {
+    pattern: /aws_secret_access_key\s*=\s*['"]([^'"]{20,})['"]/gi,
+    type: 'aws-key',
+    severity: 'critical',
+  },
   // GitHub tokens
   { pattern: /gh[pousr]_[A-Za-z0-9_]{36,}/g, type: 'github-token', severity: 'critical' },
   { pattern: /github_pat_[A-Za-z0-9_]{22,}/g, type: 'github-token', severity: 'critical' },
   // Generic API keys
-  { pattern: /(?:api[_-]?key|apikey)\s*[:=]\s*['"]([A-Za-z0-9_\-]{20,})['"]/gi, type: 'api-key', severity: 'high' },
+  {
+    pattern: /(?:api[_-]?key|apikey)\s*[:=]\s*['"]([A-Za-z0-9_\-]{20,})['"]/gi,
+    type: 'api-key',
+    severity: 'high',
+  },
   // Passwords
-  { pattern: /(?:password|passwd|pwd)\s*[:=]\s*['"]([^'"]{8,})['"]/gi, type: 'password', severity: 'critical' },
+  {
+    pattern: /(?:password|passwd|pwd)\s*[:=]\s*['"]([^'"]{8,})['"]/gi,
+    type: 'password',
+    severity: 'critical',
+  },
   // Private keys
-  { pattern: /-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----/g, type: 'private-key', severity: 'critical' },
+  {
+    pattern: /-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----/g,
+    type: 'private-key',
+    severity: 'critical',
+  },
   // JWT secrets
-  { pattern: /(?:jwt[_-]?secret|JWT_SECRET)\s*[:=]\s*['"]([^'"]{10,})['"]/gi, type: 'jwt-secret', severity: 'high' },
+  {
+    pattern: /(?:jwt[_-]?secret|JWT_SECRET)\s*[:=]\s*['"]([^'"]{10,})['"]/gi,
+    type: 'jwt-secret',
+    severity: 'high',
+  },
   // Database URLs with credentials
-  { pattern: /(?:postgres|mysql|mongodb|redis):\/\/\w+:[^@\s]+@/gi, type: 'database-url', severity: 'high' },
+  {
+    pattern: /(?:postgres|mysql|mongodb|redis):\/\/\w+:[^@\s]+@/gi,
+    type: 'database-url',
+    severity: 'high',
+  },
   // OAuth secrets
-  { pattern: /(?:client[_-]?secret|oauth[_-]?secret)\s*[:=]\s*['"]([^'"]{10,})['"]/gi, type: 'oauth-secret', severity: 'high' },
+  {
+    pattern: /(?:client[_-]?secret|oauth[_-]?secret)\s*[:=]\s*['"]([^'"]{10,})['"]/gi,
+    type: 'oauth-secret',
+    severity: 'high',
+  },
   // Generic secret patterns
-  { pattern: /(?:secret|SECRET)\s*[:=]\s*['"]([A-Za-z0-9+/=_\-]{20,})['"]/g, type: 'generic-secret', severity: 'medium' },
+  {
+    pattern: /(?:secret|SECRET)\s*[:=]\s*['"]([A-Za-z0-9+/=_\-]{20,})['"]/g,
+    type: 'generic-secret',
+    severity: 'medium',
+  },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -369,7 +409,6 @@ let vulnCounter = 0
  * like GitHub Copilot agent's security awareness.
  */
 export class SecurityScanner {
-
   /**
    * Scan a single file for vulnerabilities.
    */
@@ -417,10 +456,16 @@ export class SecurityScanner {
         if (sp.pattern.test(lines[i])) {
           // Skip if in a comment
           const trimmed = lines[i].trim()
-          if (trimmed.startsWith('//') || trimmed.startsWith('#') || trimmed.startsWith('*')) continue
+          if (trimmed.startsWith('//') || trimmed.startsWith('#') || trimmed.startsWith('*'))
+            continue
 
           // Skip test files and example files
-          if (filePath.includes('.test.') || filePath.includes('.spec.') || filePath.includes('example')) continue
+          if (
+            filePath.includes('.test.') ||
+            filePath.includes('.spec.') ||
+            filePath.includes('example')
+          )
+            continue
 
           secrets.push({
             type: sp.type,
@@ -450,12 +495,20 @@ export class SecurityScanner {
 
     for (const [filePath, content] of files) {
       // Skip test files if requested
-      if (options?.skipTests && (filePath.includes('.test.') || filePath.includes('.spec.') || filePath.includes('__tests__'))) {
+      if (
+        options?.skipTests &&
+        (filePath.includes('.test.') ||
+          filePath.includes('.spec.') ||
+          filePath.includes('__tests__'))
+      ) {
         continue
       }
 
       // Skip docs if requested
-      if (options?.skipDocs && (filePath.endsWith('.md') || filePath.endsWith('.txt') || filePath.includes('docs/'))) {
+      if (
+        options?.skipDocs &&
+        (filePath.endsWith('.md') || filePath.endsWith('.txt') || filePath.includes('docs/'))
+      ) {
         continue
       }
 
@@ -477,7 +530,13 @@ export class SecurityScanner {
     else riskLevel = 'minimal'
 
     // Stats by severity
-    const bySeverity: Record<Severity, number> = { critical: 0, high: 0, medium: 0, low: 0, info: 0 }
+    const bySeverity: Record<Severity, number> = {
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0,
+      info: 0,
+    }
     for (const v of allVulns) bySeverity[v.severity]++
     for (const s of allSecrets) bySeverity[s.severity]++
 
@@ -536,10 +595,17 @@ export class SecurityScanner {
   private detectLanguage(filePath: string): AnalysisLanguage {
     const ext = filePath.substring(filePath.lastIndexOf('.'))
     const map: Record<string, AnalysisLanguage> = {
-      '.ts': 'typescript', '.tsx': 'typescript',
-      '.js': 'javascript', '.jsx': 'javascript', '.mjs': 'javascript',
-      '.py': 'python', '.rs': 'rust', '.go': 'go',
-      '.java': 'java', '.cs': 'csharp', '.php': 'php',
+      '.ts': 'typescript',
+      '.tsx': 'typescript',
+      '.js': 'javascript',
+      '.jsx': 'javascript',
+      '.mjs': 'javascript',
+      '.py': 'python',
+      '.rs': 'rust',
+      '.go': 'go',
+      '.java': 'java',
+      '.cs': 'csharp',
+      '.php': 'php',
       '.rb': 'ruby',
     }
     return map[ext] ?? 'unknown'
@@ -547,7 +613,7 @@ export class SecurityScanner {
 
   private maskValue(line: string): string {
     // Show first 4 chars of value, mask the rest
-    const match = line.match(/['"]([^'"]{4})([^'"]*)['"]/);
+    const match = line.match(/['"]([^'"]{4})([^'"]*)['"]/)
     if (match) return `${match[1]}${'*'.repeat(Math.min(match[2].length, 20))}`
     return '****'
   }
@@ -556,15 +622,24 @@ export class SecurityScanner {
     let score = 0
 
     for (const v of vulns) {
-      score += v.cvssScore * (v.falsePositiveRisk === 'low' ? 1.0 : v.falsePositiveRisk === 'medium' ? 0.7 : 0.4)
+      score +=
+        v.cvssScore *
+        (v.falsePositiveRisk === 'low' ? 1.0 : v.falsePositiveRisk === 'medium' ? 0.7 : 0.4)
     }
 
     for (const s of secrets) {
       switch (s.severity) {
-        case 'critical': score += 10; break
-        case 'high': score += 7; break
-        case 'medium': score += 4; break
-        default: score += 2
+        case 'critical':
+          score += 10
+          break
+        case 'high':
+          score += 7
+          break
+        case 'medium':
+          score += 4
+          break
+        default:
+          score += 2
       }
     }
 
@@ -572,7 +647,10 @@ export class SecurityScanner {
     return Math.min(100, Math.round(score))
   }
 
-  private generateRecommendations(vulns: SecurityVulnerability[], secrets: DetectedSecret[]): string[] {
+  private generateRecommendations(
+    vulns: SecurityVulnerability[],
+    secrets: DetectedSecret[],
+  ): string[] {
     const recs: string[] = []
 
     // Critical vulnerabilities first

@@ -5,10 +5,7 @@ import { logForDebugging } from '../utils/debug.js'
 import { isENOENT } from '../utils/errors.js'
 import { getWorktreePathsPortable } from '../utils/getWorktreePathsPortable.js'
 import { lazySchema } from '../utils/lazySchema.js'
-import {
-  getProjectsDir,
-  sanitizePath,
-} from '../utils/sessionStoragePortable.js'
+import { getProjectsDir, sanitizePath } from '../utils/sessionStoragePortable.js'
 import { jsonParse, jsonStringify } from '../utils/slowOperations.js'
 
 /**
@@ -59,10 +56,7 @@ export function getBridgePointerPath(dir: string): string {
  * the staleness clock. Best-effort — a crash-recovery file must never
  * itself cause a crash. Logs and swallows on error.
  */
-export async function writeBridgePointer(
-  dir: string,
-  pointer: BridgePointer,
-): Promise<void> {
+export async function writeBridgePointer(dir: string, pointer: BridgePointer): Promise<void> {
   const path = getBridgePointerPath(dir)
   try {
     await mkdir(dirname(path), { recursive: true })

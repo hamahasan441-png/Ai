@@ -53,11 +53,7 @@ export const linuxSecretStorage: SecureStorage = {
       // secret-tool doesn't have a sync mode, but we need sync for the interface.
       // Use execFileSync equivalent via child_process
       const { execFileSync } = require('child_process')
-      const result = execFileSync('secret-tool', [
-        'lookup',
-        ATTRIBUTE_KEY,
-        ATTRIBUTE_VALUE,
-      ], {
+      const result = execFileSync('secret-tool', ['lookup', ATTRIBUTE_KEY, ATTRIBUTE_VALUE], {
         encoding: 'utf8',
         timeout: 5000,
         stdio: ['pipe', 'pipe', 'pipe'],
@@ -98,16 +94,16 @@ export const linuxSecretStorage: SecureStorage = {
       const serialized = jsonStringify(data)
       const { execFileSync } = require('child_process')
       // secret-tool store reads from stdin
-      execFileSync('secret-tool', [
-        'store',
-        '--label', SERVICE_NAME,
-        ATTRIBUTE_KEY, ATTRIBUTE_VALUE,
-      ], {
-        input: serialized,
-        encoding: 'utf8',
-        timeout: 5000,
-        stdio: ['pipe', 'pipe', 'pipe'],
-      })
+      execFileSync(
+        'secret-tool',
+        ['store', '--label', SERVICE_NAME, ATTRIBUTE_KEY, ATTRIBUTE_VALUE],
+        {
+          input: serialized,
+          encoding: 'utf8',
+          timeout: 5000,
+          stdio: ['pipe', 'pipe', 'pipe'],
+        },
+      )
       return { success: true }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
@@ -123,11 +119,7 @@ export const linuxSecretStorage: SecureStorage = {
 
     try {
       const { execFileSync } = require('child_process')
-      execFileSync('secret-tool', [
-        'clear',
-        ATTRIBUTE_KEY,
-        ATTRIBUTE_VALUE,
-      ], {
+      execFileSync('secret-tool', ['clear', ATTRIBUTE_KEY, ATTRIBUTE_VALUE], {
         encoding: 'utf8',
         timeout: 5000,
         stdio: ['pipe', 'pipe', 'pipe'],

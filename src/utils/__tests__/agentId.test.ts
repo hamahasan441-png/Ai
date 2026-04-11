@@ -1,16 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
-import {
-  formatAgentId,
-  parseAgentId,
-  generateRequestId,
-  parseRequestId,
-} from '../../utils/agentId'
+import { formatAgentId, parseAgentId, generateRequestId, parseRequestId } from '../../utils/agentId'
 
 describe('formatAgentId', () => {
   it('formats agent name and team name with @ separator', () => {
-    expect(formatAgentId('researcher', 'my-project')).toBe(
-      'researcher@my-project',
-    )
+    expect(formatAgentId('researcher', 'my-project')).toBe('researcher@my-project')
   })
 
   it('handles empty agent name', () => {
@@ -26,9 +19,7 @@ describe('formatAgentId', () => {
   })
 
   it('preserves special characters in names', () => {
-    expect(formatAgentId('team-lead', 'my-project')).toBe(
-      'team-lead@my-project',
-    )
+    expect(formatAgentId('team-lead', 'my-project')).toBe('team-lead@my-project')
   })
 })
 
@@ -111,9 +102,7 @@ describe('generateRequestId', () => {
 
 describe('parseRequestId', () => {
   it('parses a valid request ID', () => {
-    const result = parseRequestId(
-      'shutdown-1702500000000@researcher@my-project',
-    )
+    const result = parseRequestId('shutdown-1702500000000@researcher@my-project')
     expect(result).toEqual({
       requestType: 'shutdown',
       timestamp: 1702500000000,
@@ -134,9 +123,7 @@ describe('parseRequestId', () => {
   })
 
   it('handles request type with dashes', () => {
-    const result = parseRequestId(
-      'plan-approval-1702500000000@agent@team',
-    )
+    const result = parseRequestId('plan-approval-1702500000000@agent@team')
     expect(result).toEqual({
       requestType: 'plan-approval',
       timestamp: 1702500000000,

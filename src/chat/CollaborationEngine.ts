@@ -22,7 +22,13 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type AgentRole = 'analyzer' | 'generator' | 'critic' | 'verifier' | 'synthesizer' | 'specialist'
+export type AgentRole =
+  | 'analyzer'
+  | 'generator'
+  | 'critic'
+  | 'verifier'
+  | 'synthesizer'
+  | 'specialist'
 
 export interface AgentDescriptor {
   readonly id: string
@@ -60,7 +66,7 @@ export interface SynthesizedResult {
   readonly content: string
   readonly confidence: number
   readonly contributingAgents: string[]
-  readonly consensusLevel: number  // 0-1
+  readonly consensusLevel: number // 0-1
   readonly conflicts: ConflictRecord[]
   readonly synthesisMethod: 'majority_vote' | 'weighted_average' | 'best_confidence' | 'merged'
 }
@@ -109,7 +115,7 @@ export interface CollaborationEngineConfig {
   readonly maxAgents: number
   readonly maxTaskHistory: number
   readonly maxMessages: number
-  readonly consensusThreshold: number  // 0-1 agreement required
+  readonly consensusThreshold: number // 0-1 agreement required
   readonly minAgentsForConsensus: number
   readonly conflictResolutionStrategy: 'voting' | 'confidence' | 'authority'
 }
@@ -156,7 +162,12 @@ function clamp(v: number, lo: number, hi: number): number {
 }
 
 function tokenize(text: string): Set<string> {
-  return new Set(text.toLowerCase().split(/\s+/).filter(t => t.length > 2))
+  return new Set(
+    text
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(t => t.length > 2),
+  )
 }
 
 function computeCapabilityMatch(required: string[], available: string[]): number {
@@ -204,8 +215,7 @@ export class CollaborationEngine {
     this.agents.set(agent.id, agent)
     // Enforce max
     if (this.agents.size > this.config.maxAgents) {
-      const lowest = [...this.agents.entries()]
-        .sort(([, a], [, b]) => a.priority - b.priority)[0]
+      const lowest = [...this.agents.entries()].sort(([, a], [, b]) => a.priority - b.priority)[0]
       if (lowest) this.agents.delete(lowest[0])
     }
   }
@@ -224,18 +234,22 @@ export class CollaborationEngine {
   findAgentsByCapability(capability: string): AgentDescriptor[] {
     const lower = capability.toLowerCase()
     return [...this.agents.values()].filter(a =>
-      a.capabilities.some(c => c.toLowerCase().includes(lower) || lower.includes(c.toLowerCase()))
+      a.capabilities.some(c => c.toLowerCase().includes(lower) || lower.includes(c.toLowerCase())),
     )
   }
 
   // ── Task management ────────────────────────────────────────────────────
 
   /** Create a collaboration task. */
-  createTask(description: string, requiredCapabilities: string[], options: {
-    maxAgents?: number
-    consensusRequired?: boolean
-    deadline?: number | null
-  } = {}): CollaborationTask {
+  createTask(
+    description: string,
+    requiredCapabilities: string[],
+    options: {
+      maxAgents?: number
+      consensusRequired?: boolean
+      deadline?: number | null
+    } = {},
+  ): CollaborationTask {
     const task: CollaborationTask = {
       id: generateId('task'),
       description,
@@ -294,12 +308,11 @@ export class CollaborationEngine {
     const assignments = selected.map((c, i) => ({
       agentId: c.agent.id,
       subTask: task.description,
-      priority: 1 - (i / Math.max(selected.length, 1)),
+      priority: 1 - i / Math.max(selected.length, 1),
     }))
 
-    const expectedDuration = selected.length > 0
-      ? Math.max(...selected.map(c => c.agent.responseTimeMs))
-      : 0
+    const expectedDuration =
+      selected.length > 0 ? Math.max(...selected.map(c => c.agent.responseTimeMs)) : 0
 
     task.status = 'in_progress'
     this.stats.totalAgentsUsed += selected.length
@@ -392,7 +405,10 @@ export class CollaborationEngine {
     return result
   }
 
-  private buildConsensus(responses: AgentResponse[]): { consensusContent: string; consensusLevel: number } {
+  private buildConsensus(responses: AgentResponse[]): {
+    consensusContent: string
+    consensusLevel: number
+  } {
     // Group similar responses
     const groups: Array<{ content: string; count: number; totalConfidence: number }> = []
 
@@ -489,9 +505,15 @@ export class CollaborationEngine {
         // Higher confidence agent wins
         const agent1 = this.agents.get(conflict.agent1Id)
         const agent2 = this.agents.get(conflict.agent2Id)
-        const winner = (agent1?.reliability ?? 0) >= (agent2?.reliability ?? 0)
-          ? conflict.agent1Id : conflict.agent2Id
-        return { ...conflict, resolution: `Resolved by confidence: agent ${winner} preferred`, resolvedBy: 'confidence' }
+        const winner =
+          (agent1?.reliability ?? 0) >= (agent2?.reliability ?? 0)
+            ? conflict.agent1Id
+            : conflict.agent2Id
+        return {
+          ...conflict,
+          resolution: `Resolved by confidence: agent ${winner} preferred`,
+          resolvedBy: 'confidence',
+        }
       }
       case 'authority': {
         // Higher priority role wins
@@ -500,7 +522,11 @@ export class CollaborationEngine {
         const role1Priority = agent1 ? (ROLE_PRIORITY[agent1.role] ?? 0) : 0
         const role2Priority = agent2 ? (ROLE_PRIORITY[agent2.role] ?? 0) : 0
         const winner = role1Priority >= role2Priority ? conflict.agent1Id : conflict.agent2Id
-        return { ...conflict, resolution: `Resolved by authority: agent ${winner} has higher role`, resolvedBy: 'authority' }
+        return {
+          ...conflict,
+          resolution: `Resolved by authority: agent ${winner} has higher role`,
+          resolvedBy: 'authority',
+        }
       }
       case 'voting':
       default:
@@ -511,7 +537,10 @@ export class CollaborationEngine {
   // ── Ensemble decision ──────────────────────────────────────────────────
 
   /** Make an ensemble decision from multiple agent votes. */
-  ensembleDecide(question: string, votes: Array<{ agentId: string; answer: string; confidence: number }>): EnsembleDecision {
+  ensembleDecide(
+    question: string,
+    votes: Array<{ agentId: string; answer: string; confidence: number }>,
+  ): EnsembleDecision {
     // Group votes by answer
     const answerGroups: Record<string, { count: number; totalConfidence: number }> = {}
 
@@ -523,15 +552,20 @@ export class CollaborationEngine {
     }
 
     // Find winner
-    const sorted = Object.entries(answerGroups)
-      .sort(([, a], [, b]) => b.totalConfidence - a.totalConfidence)
+    const sorted = Object.entries(answerGroups).sort(
+      ([, a], [, b]) => b.totalConfidence - a.totalConfidence,
+    )
 
     const [winnerAnswer, winnerData] = sorted[0] ?? ['', { count: 0, totalConfidence: 0 }]
     const winnerConfidence = votes.length > 0 ? winnerData.totalConfidence / votes.length : 0
     const consensusLevel = votes.length > 0 ? winnerData.count / votes.length : 0
 
-    const method = consensusLevel === 1 ? 'unanimous' as const :
-      consensusLevel >= 0.5 ? 'majority' as const : 'weighted' as const
+    const method =
+      consensusLevel === 1
+        ? ('unanimous' as const)
+        : consensusLevel >= 0.5
+          ? ('majority' as const)
+          : ('weighted' as const)
 
     return {
       question,
@@ -546,7 +580,13 @@ export class CollaborationEngine {
   // ── Messaging ──────────────────────────────────────────────────────────
 
   /** Send a message between agents. */
-  sendMessage(fromAgentId: string, toAgentId: string | 'broadcast', type: CollaborationMessage['type'], content: string, replyToId?: string): CollaborationMessage {
+  sendMessage(
+    fromAgentId: string,
+    toAgentId: string | 'broadcast',
+    type: CollaborationMessage['type'],
+    content: string,
+    replyToId?: string,
+  ): CollaborationMessage {
     const msg: CollaborationMessage = {
       id: generateId('msg'),
       fromAgentId,
@@ -588,12 +628,10 @@ export class CollaborationEngine {
       totalMessagesSent: this.stats.totalMessages,
       totalConflictsDetected: this.stats.totalConflicts,
       totalConflictsResolved: this.stats.totalResolved,
-      avgConsensusLevel: this.stats.consensusCount > 0
-        ? this.stats.totalConsensus / this.stats.consensusCount
-        : 0,
-      avgAgentsPerTask: this.stats.taskCount > 0
-        ? this.stats.totalAgentsUsed / this.stats.taskCount
-        : 0,
+      avgConsensusLevel:
+        this.stats.consensusCount > 0 ? this.stats.totalConsensus / this.stats.consensusCount : 0,
+      avgAgentsPerTask:
+        this.stats.taskCount > 0 ? this.stats.totalAgentsUsed / this.stats.taskCount : 0,
     }
   }
 
@@ -610,7 +648,10 @@ export class CollaborationEngine {
     })
   }
 
-  static deserialize(json: string, config?: Partial<CollaborationEngineConfig>): CollaborationEngine {
+  static deserialize(
+    json: string,
+    config?: Partial<CollaborationEngineConfig>,
+  ): CollaborationEngine {
     const engine = new CollaborationEngine(config)
     try {
       const data = JSON.parse(json)
@@ -630,7 +671,9 @@ export class CollaborationEngine {
         for (const [key, val] of data.results) engine.results.set(key, val)
       }
       if (data.stats) Object.assign(engine.stats, data.stats)
-    } catch { /* fresh engine on failure */ }
+    } catch {
+      /* fresh engine on failure */
+    }
     return engine
   }
 }

@@ -15,10 +15,7 @@ import {
   type PermissionOption,
   type PermissionOptionWithLabel,
 } from './permissionOptions.js'
-import {
-  PERMISSION_HANDLERS,
-  type PermissionHandlerParams,
-} from './usePermissionHandler.js'
+import { PERMISSION_HANDLERS, type PermissionHandlerParams } from './usePermissionHandler.js'
 
 export interface ToolInput {
   [key: string]: unknown
@@ -115,9 +112,7 @@ export function useFilePermissionDialog<T extends ToolInput>({
         feedback,
         hasFeedback: !!feedback,
         enteredFeedbackMode:
-          option.type === 'accept-once'
-            ? yesFeedbackModeEntered
-            : noFeedbackModeEntered,
+          option.type === 'accept-once' ? yesFeedbackModeEntered : noFeedbackModeEntered,
         scope: option.type === 'accept-session' ? option.scope : undefined,
       })
     },
@@ -145,10 +140,7 @@ export function useFilePermissionDialog<T extends ToolInput>({
   }, [options, parseInput, toolUseConfirm.input, onChange])
 
   // Register keyboard shortcut handler via keybindings system
-  useKeybindings(
-    { 'confirm:cycleMode': handleCycleMode },
-    { context: 'Confirmation' },
-  )
+  useKeybindings({ 'confirm:cycleMode': handleCycleMode }, { context: 'Confirmation' })
 
   // Wrap setFocusedOption and reset input mode when navigating away
   const handleFocusedOptionChange = useCallback(

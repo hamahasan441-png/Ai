@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { EmotionEngine } from '../EmotionEngine.js'
-import type {
-  EmotionDetection,
-} from '../EmotionEngine.js'
+import type { EmotionDetection } from '../EmotionEngine.js'
 
 describe('EmotionEngine', () => {
   let engine: EmotionEngine
@@ -190,7 +188,9 @@ describe('EmotionEngine', () => {
     })
 
     it('detects excitement from positive text', () => {
-      const result = engine.detectEmotion('This is amazing! So excited about this awesome breakthrough!')
+      const result = engine.detectEmotion(
+        'This is amazing! So excited about this awesome breakthrough!',
+      )
       expect(result.primary).toBe('excitement')
     })
 
@@ -200,12 +200,16 @@ describe('EmotionEngine', () => {
     })
 
     it('detects curiosity from exploratory text', () => {
-      const result = engine.detectEmotion('I wonder how this interesting concept works? Curious to discover more')
+      const result = engine.detectEmotion(
+        'I wonder how this interesting concept works? Curious to discover more',
+      )
       expect(['curiosity', 'confusion']).toContain(result.primary)
     })
 
     it('detects anxiety from pressure text', () => {
-      const result = engine.detectEmotion('The urgent deadline is making me worried and nervous about this vulnerability')
+      const result = engine.detectEmotion(
+        'The urgent deadline is making me worried and nervous about this vulnerability',
+      )
       expect(result.primary).toBe('anxiety')
     })
 
@@ -215,17 +219,23 @@ describe('EmotionEngine', () => {
     })
 
     it('detects determination from perseverance text', () => {
-      const result = engine.detectEmotion('Going to try refactoring again, testing every step to make progress')
+      const result = engine.detectEmotion(
+        'Going to try refactoring again, testing every step to make progress',
+      )
       expect(result.primary).toBe('determination')
     })
 
     it('detects pride from achievement text', () => {
-      const result = engine.detectEmotion('So proud of this elegant solution, shipped and deployed successfully')
+      const result = engine.detectEmotion(
+        'So proud of this elegant solution, shipped and deployed successfully',
+      )
       expect(result.primary).toBe('pride')
     })
 
     it('detects overwhelmed from stress text', () => {
-      const result = engine.detectEmotion('Everything is failing, impossible to handle, overwhelmed by this nightmare')
+      const result = engine.detectEmotion(
+        'Everything is failing, impossible to handle, overwhelmed by this nightmare',
+      )
       expect(['overwhelmed', 'frustration']).toContain(result.primary)
     })
 
@@ -395,7 +405,9 @@ describe('EmotionEngine', () => {
     })
 
     it('generates empathy for pride', () => {
-      const detection = engine.detectEmotion('So proud of what I accomplished, shipped and deployed')
+      const detection = engine.detectEmotion(
+        'So proud of what I accomplished, shipped and deployed',
+      )
       const response = engine.generateEmpathy(detection)
       expect(response.acknowledgment.length).toBeGreaterThan(0)
     })

@@ -11,16 +11,16 @@ import { PipelinePhase } from './PipelineContract.js'
 
 /** Standardized error classification for the pipeline. */
 export enum EngineErrorClass {
-  NETWORK_FAIL       = 'NETWORK_FAIL',
-  MODEL_FAIL         = 'MODEL_FAIL',
-  TOOL_FAIL          = 'TOOL_FAIL',
-  VERIFICATION_FAIL  = 'VERIFICATION_FAIL',
-  TIMEOUT            = 'TIMEOUT',
-  CRITICAL           = 'CRITICAL',
-  CONFIG_FAIL        = 'CONFIG_FAIL',
-  INPUT_FAIL         = 'INPUT_FAIL',
-  DEPENDENCY_FAIL    = 'DEPENDENCY_FAIL',
-  UNKNOWN            = 'UNKNOWN',
+  NETWORK_FAIL = 'NETWORK_FAIL',
+  MODEL_FAIL = 'MODEL_FAIL',
+  TOOL_FAIL = 'TOOL_FAIL',
+  VERIFICATION_FAIL = 'VERIFICATION_FAIL',
+  TIMEOUT = 'TIMEOUT',
+  CRITICAL = 'CRITICAL',
+  CONFIG_FAIL = 'CONFIG_FAIL',
+  INPUT_FAIL = 'INPUT_FAIL',
+  DEPENDENCY_FAIL = 'DEPENDENCY_FAIL',
+  UNKNOWN = 'UNKNOWN',
 }
 
 /** Which error classes are safe to retry. */
@@ -32,16 +32,16 @@ export const RETRYABLE_ERRORS: ReadonlySet<EngineErrorClass> = new Set([
 
 /** Priority for error handling — lower number = more urgent. */
 export const ERROR_PRIORITY: Readonly<Record<EngineErrorClass, number>> = {
-  [EngineErrorClass.CRITICAL]:          0,
-  [EngineErrorClass.CONFIG_FAIL]:       1,
-  [EngineErrorClass.DEPENDENCY_FAIL]:   2,
-  [EngineErrorClass.MODEL_FAIL]:        3,
+  [EngineErrorClass.CRITICAL]: 0,
+  [EngineErrorClass.CONFIG_FAIL]: 1,
+  [EngineErrorClass.DEPENDENCY_FAIL]: 2,
+  [EngineErrorClass.MODEL_FAIL]: 3,
   [EngineErrorClass.VERIFICATION_FAIL]: 4,
-  [EngineErrorClass.NETWORK_FAIL]:      5,
-  [EngineErrorClass.TIMEOUT]:           6,
-  [EngineErrorClass.TOOL_FAIL]:         7,
-  [EngineErrorClass.INPUT_FAIL]:        8,
-  [EngineErrorClass.UNKNOWN]:           9,
+  [EngineErrorClass.NETWORK_FAIL]: 5,
+  [EngineErrorClass.TIMEOUT]: 6,
+  [EngineErrorClass.TOOL_FAIL]: 7,
+  [EngineErrorClass.INPUT_FAIL]: 8,
+  [EngineErrorClass.UNKNOWN]: 9,
 }
 
 // ─── Error Record ──────────────────────────────────────────────────────────────
@@ -88,19 +88,22 @@ export function createEngineError(
 
 /** Classify a raw JS error into an EngineErrorClass. */
 export function classifyError(error: unknown): EngineErrorClass {
-  if (error instanceof TypeError)  return EngineErrorClass.INPUT_FAIL
+  if (error instanceof TypeError) return EngineErrorClass.INPUT_FAIL
   if (error instanceof RangeError) return EngineErrorClass.INPUT_FAIL
 
   if (error instanceof Error) {
     const msg = error.message.toLowerCase()
-    if (msg.includes('timeout') || msg.includes('timed out'))
-      return EngineErrorClass.TIMEOUT
-    if (msg.includes('network') || msg.includes('econnrefused') || msg.includes('enotfound') || msg.includes('fetch'))
+    if (msg.includes('timeout') || msg.includes('timed out')) return EngineErrorClass.TIMEOUT
+    if (
+      msg.includes('network') ||
+      msg.includes('econnrefused') ||
+      msg.includes('enotfound') ||
+      msg.includes('fetch')
+    )
       return EngineErrorClass.NETWORK_FAIL
     if (msg.includes('model') || msg.includes('inference') || msg.includes('token'))
       return EngineErrorClass.MODEL_FAIL
-    if (msg.includes('config') || msg.includes('configuration'))
-      return EngineErrorClass.CONFIG_FAIL
+    if (msg.includes('config') || msg.includes('configuration')) return EngineErrorClass.CONFIG_FAIL
     if (msg.includes('dependency') || msg.includes('not initialized'))
       return EngineErrorClass.DEPENDENCY_FAIL
     if (msg.includes('verification') || msg.includes('validation') || msg.includes('invalid'))

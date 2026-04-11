@@ -131,7 +131,8 @@ export class AsyncFlowAnalyzer {
   // ── DETECTORS ──────────────────────────────────────────────────────────
 
   private detectAsyncFunctions(lines: string[], asyncFunctions: AsyncFunctionInfo[]): void {
-    const asyncFuncPattern = /(?:async\s+function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*async\s|(\w+)\s*=\s*async\s*\(|async\s+(\w+)\s*\()/
+    const asyncFuncPattern =
+      /(?:async\s+function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*async\s|(\w+)\s*=\s*async\s*\(|async\s+(\w+)\s*\()/
 
     for (let i = 0; i < lines.length; i++) {
       const match = asyncFuncPattern.exec(lines[i])
@@ -172,7 +173,9 @@ export class AsyncFlowAnalyzer {
     // Track known async functions
     const asyncFuncNames = new Set<string>()
     for (let i = 0; i < lines.length; i++) {
-      const match = lines[i].match(/(?:async\s+function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*async\s)/)
+      const match = lines[i].match(
+        /(?:async\s+function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*async\s)/,
+      )
       if (match) {
         asyncFuncNames.add(match[1] || match[2])
       }
@@ -180,8 +183,15 @@ export class AsyncFlowAnalyzer {
 
     // Common async APIs
     const commonAsyncCalls = [
-      'fetch', 'axios', 'readFile', 'writeFile', 'readdir',
-      'mkdir', 'unlink', 'stat', 'access',
+      'fetch',
+      'axios',
+      'readFile',
+      'writeFile',
+      'readdir',
+      'mkdir',
+      'unlink',
+      'stat',
+      'access',
     ]
 
     for (let i = 0; i < lines.length; i++) {
@@ -191,7 +201,12 @@ export class AsyncFlowAnalyzer {
       // Check if line calls a known async function without await
       for (const funcName of [...asyncFuncNames, ...commonAsyncCalls]) {
         const callPattern = new RegExp(`\\b${funcName}\\s*\\(`)
-        if (callPattern.test(line) && !/\bawait\b/.test(line) && !/\breturn\b/.test(line) && !/\.then\s*\(/.test(line)) {
+        if (
+          callPattern.test(line) &&
+          !/\bawait\b/.test(line) &&
+          !/\breturn\b/.test(line) &&
+          !/\.then\s*\(/.test(line)
+        ) {
           // Check if the result is assigned
           if (/(?:const|let|var)\s+\w+\s*=/.test(line)) continue // assigned, might be intentional
 
@@ -227,8 +242,10 @@ export class AsyncFlowAnalyzer {
             severity: 'high',
             line: i + 1,
             title: 'Promise .then() without .catch()',
-            description: 'Promise chain uses .then() but has no .catch() handler. Rejections will be unhandled.',
-            suggestion: 'Add `.catch(err => { ... })` to handle rejections, or use try/catch with await.',
+            description:
+              'Promise chain uses .then() but has no .catch() handler. Rejections will be unhandled.',
+            suggestion:
+              'Add `.catch(err => { ... })` to handle rejections, or use try/catch with await.',
           })
         }
       }
@@ -242,8 +259,10 @@ export class AsyncFlowAnalyzer {
             severity: 'medium',
             line: i + 1,
             title: 'Promise constructor never calls reject',
-            description: 'Promise constructor uses resolve but never calls reject. Errors will be swallowed.',
-            suggestion: 'Add reject handling for error cases, or wrap body in try/catch that calls reject(error).',
+            description:
+              'Promise constructor uses resolve but never calls reject. Errors will be swallowed.',
+            suggestion:
+              'Add reject handling for error cases, or wrap body in try/catch that calls reject(error).',
           })
         }
       }
@@ -255,8 +274,10 @@ export class AsyncFlowAnalyzer {
       const line = lines[i].trim()
 
       // async function returning void (event handlers, etc.)
-      if (/async\s+\w+\s*\([^)]*\)\s*:\s*void/.test(line) ||
-          /async\s+function\s+\w+\s*\([^)]*\)\s*:\s*void/.test(line)) {
+      if (
+        /async\s+\w+\s*\([^)]*\)\s*:\s*void/.test(line) ||
+        /async\s+function\s+\w+\s*\([^)]*\)\s*:\s*void/.test(line)
+      ) {
         // Check context — is this an event handler?
         const contextBefore = lines.slice(Math.max(0, i - 2), i).join('\n')
         if (!/addEventListener|\.on\(|@\w+/.test(contextBefore)) {
@@ -265,7 +286,8 @@ export class AsyncFlowAnalyzer {
             severity: 'medium',
             line: i + 1,
             title: 'Async function with void return type',
-            description: 'Async functions returning void cannot have their errors caught by the caller. Exceptions will be unobserved.',
+            description:
+              'Async functions returning void cannot have their errors caught by the caller. Exceptions will be unobserved.',
             suggestion: 'Return Promise<void> instead, or add internal try/catch error handling.',
           })
         }
@@ -303,7 +325,8 @@ export class AsyncFlowAnalyzer {
                 endLine: i + 1,
                 title: 'Sequential awaits could be parallel',
                 description: `Two independent await statements (lines ${prevLine + 1} and ${i + 1}) run sequentially. They could run in parallel for better performance.`,
-                suggestion: 'Use `const [a, b] = await Promise.all([promiseA, promiseB])` for parallel execution.',
+                suggestion:
+                  'Use `const [a, b] = await Promise.all([promiseA, promiseB])` for parallel execution.',
               })
             }
           }
@@ -324,13 +347,17 @@ export class AsyncFlowAnalyzer {
           severity: 'high',
           line: i + 1,
           title: 'Floating Promise — created but not awaited or stored',
-          description: 'A Promise is created but its result is neither awaited, stored, nor returned. It will execute but errors are silently lost.',
+          description:
+            'A Promise is created but its result is neither awaited, stored, nor returned. It will execute but errors are silently lost.',
           suggestion: 'Await the promise, assign it to a variable, or add a .catch() handler.',
         })
       }
 
       // Promise.all/race without await or assignment
-      if (/^Promise\.(?:all|race|allSettled|any)\s*\(/.test(line) && !/(?:const|let|var|return|await)\s/.test(line)) {
+      if (
+        /^Promise\.(?:all|race|allSettled|any)\s*\(/.test(line) &&
+        !/(?:const|let|var|return|await)\s/.test(line)
+      ) {
         issues.push({
           type: 'floating-promise',
           severity: 'high',
@@ -352,7 +379,9 @@ export class AsyncFlowAnalyzer {
       const line = lines[i]
 
       // Count callback-style nesting: function(err, data) { ... function(err, data) { ...
-      const callbacks = (line.match(/(?:function\s*\(|=>\s*\{|\((?:err|error|e)\s*(?:,|\)))/g) || []).length
+      const callbacks = (
+        line.match(/(?:function\s*\(|=>\s*\{|\((?:err|error|e)\s*(?:,|\)))/g) || []
+      ).length
       callbackDepth += callbacks
 
       const closes = (line.match(/\}\s*\)/g) || []).length
@@ -371,7 +400,8 @@ export class AsyncFlowAnalyzer {
         line: hellStartLine,
         title: `Callback nesting depth ${maxCallbackDepth}`,
         description: `Code has ${maxCallbackDepth}-level nested callbacks. This makes error handling and readability very difficult.`,
-        suggestion: 'Refactor to async/await pattern, or use Promise chains to flatten the nesting.',
+        suggestion:
+          'Refactor to async/await pattern, or use Promise chains to flatten the nesting.',
       })
     }
   }
@@ -402,7 +432,8 @@ export class AsyncFlowAnalyzer {
             line: i + 1,
             title: 'Await inside loop — sequential execution',
             description: `\`await\` inside loop (line ${loopLine}) causes each iteration to wait for the previous one. This is often much slower than necessary.`,
-            suggestion: 'Collect promises and use `await Promise.all(promises)`, or use `for await...of` for async iterators.',
+            suggestion:
+              'Collect promises and use `await Promise.all(promises)`, or use `for await...of` for async iterators.',
           })
         }
 
@@ -452,8 +483,10 @@ export class AsyncFlowAnalyzer {
       const line = lines[i].trim()
 
       // Empty catch block in promise chain: .catch(() => {})
-      if (/\.catch\s*\(\s*\(\s*\)\s*=>\s*\{\s*\}\s*\)/.test(line) ||
-          /\.catch\s*\(\s*\(\s*\w*\s*\)\s*=>\s*\{\s*\}\s*\)/.test(line)) {
+      if (
+        /\.catch\s*\(\s*\(\s*\)\s*=>\s*\{\s*\}\s*\)/.test(line) ||
+        /\.catch\s*\(\s*\(\s*\w*\s*\)\s*=>\s*\{\s*\}\s*\)/.test(line)
+      ) {
         issues.push({
           type: 'error-swallowing',
           severity: 'high',
@@ -528,7 +561,8 @@ export class AsyncFlowAnalyzer {
         line: callbackLine,
         title: 'Mixed async patterns: callbacks + promises',
         description: 'Code mixes callback-style and promise-based async patterns.',
-        suggestion: 'Wrap callbacks in Promise constructors or use util.promisify() to standardize.',
+        suggestion:
+          'Wrap callbacks in Promise constructors or use util.promisify() to standardize.',
       })
     }
   }
@@ -547,11 +581,21 @@ export class AsyncFlowAnalyzer {
     let score = 100
     for (const issue of issues) {
       switch (issue.severity) {
-        case 'critical': score -= 20; break
-        case 'high': score -= 12; break
-        case 'medium': score -= 6; break
-        case 'low': score -= 3; break
-        case 'info': score -= 1; break
+        case 'critical':
+          score -= 20
+          break
+        case 'high':
+          score -= 12
+          break
+        case 'medium':
+          score -= 6
+          break
+        case 'low':
+          score -= 3
+          break
+        case 'info':
+          score -= 1
+          break
       }
     }
     return Math.max(0, Math.min(100, score))

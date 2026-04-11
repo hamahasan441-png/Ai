@@ -22,13 +22,44 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type ResearchMethodology = 'experimental' | 'observational' | 'survey' | 'case_study' | 'meta_analysis' | 'simulation' | 'qualitative' | 'mixed_methods'
+export type ResearchMethodology =
+  | 'experimental'
+  | 'observational'
+  | 'survey'
+  | 'case_study'
+  | 'meta_analysis'
+  | 'simulation'
+  | 'qualitative'
+  | 'mixed_methods'
 
-export type VariableType = 'independent' | 'dependent' | 'control' | 'confounding' | 'moderating' | 'mediating'
+export type VariableType =
+  | 'independent'
+  | 'dependent'
+  | 'control'
+  | 'confounding'
+  | 'moderating'
+  | 'mediating'
 
-export type StatisticalTest = 't_test' | 'chi_square' | 'anova' | 'regression' | 'correlation' | 'mann_whitney' | 'wilcoxon' | 'kruskal_wallis' | 'fisher_exact'
+export type StatisticalTest =
+  | 't_test'
+  | 'chi_square'
+  | 'anova'
+  | 'regression'
+  | 'correlation'
+  | 'mann_whitney'
+  | 'wilcoxon'
+  | 'kruskal_wallis'
+  | 'fisher_exact'
 
-export type BiasType = 'selection' | 'confirmation' | 'survivorship' | 'observer' | 'sampling' | 'publication' | 'recall' | 'anchoring'
+export type BiasType =
+  | 'selection'
+  | 'confirmation'
+  | 'survivorship'
+  | 'observer'
+  | 'sampling'
+  | 'publication'
+  | 'recall'
+  | 'anchoring'
 
 export interface Hypothesis {
   readonly id: string
@@ -117,16 +148,55 @@ export const DEFAULT_SCIENTIFIC_REASONER_CONFIG: ScientificReasonerConfig = {
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 
-function buildBiasPatterns(): ReadonlyMap<BiasType, { readonly description: string; readonly indicators: readonly string[]; readonly mitigation: string }> {
+function buildBiasPatterns(): ReadonlyMap<
+  BiasType,
+  {
+    readonly description: string
+    readonly indicators: readonly string[]
+    readonly mitigation: string
+  }
+> {
   const m = new Map<BiasType, { description: string; indicators: string[]; mitigation: string }>()
-  m.set('selection', { description: 'Non-random selection of participants', indicators: ['convenience sample', 'voluntary', 'self-selected'], mitigation: 'Use random sampling from the target population' })
-  m.set('confirmation', { description: 'Seeking only confirming evidence', indicators: ['only positive results', 'ignored contradictory'], mitigation: 'Pre-register hypotheses and include disconfirming tests' })
-  m.set('survivorship', { description: 'Analyzing only successful cases', indicators: ['successful cases only', 'no failure analysis'], mitigation: 'Include failed/dropped cases in analysis' })
-  m.set('observer', { description: 'Observer expectations affect measurement', indicators: ['unblinded', 'subjective measures'], mitigation: 'Use double-blind methodology' })
-  m.set('sampling', { description: 'Sample does not represent population', indicators: ['small sample', 'non-representative'], mitigation: 'Increase sample size and ensure representativeness' })
-  m.set('publication', { description: 'Only significant results published', indicators: ['positive results only', 'file drawer'], mitigation: 'Pre-register studies and report all results' })
-  m.set('recall', { description: 'Inaccurate participant memories', indicators: ['retrospective', 'self-report'], mitigation: 'Use prospective data collection methods' })
-  m.set('anchoring', { description: 'Over-reliance on initial information', indicators: ['initial estimate', 'starting point'], mitigation: 'Use multiple independent starting points' })
+  m.set('selection', {
+    description: 'Non-random selection of participants',
+    indicators: ['convenience sample', 'voluntary', 'self-selected'],
+    mitigation: 'Use random sampling from the target population',
+  })
+  m.set('confirmation', {
+    description: 'Seeking only confirming evidence',
+    indicators: ['only positive results', 'ignored contradictory'],
+    mitigation: 'Pre-register hypotheses and include disconfirming tests',
+  })
+  m.set('survivorship', {
+    description: 'Analyzing only successful cases',
+    indicators: ['successful cases only', 'no failure analysis'],
+    mitigation: 'Include failed/dropped cases in analysis',
+  })
+  m.set('observer', {
+    description: 'Observer expectations affect measurement',
+    indicators: ['unblinded', 'subjective measures'],
+    mitigation: 'Use double-blind methodology',
+  })
+  m.set('sampling', {
+    description: 'Sample does not represent population',
+    indicators: ['small sample', 'non-representative'],
+    mitigation: 'Increase sample size and ensure representativeness',
+  })
+  m.set('publication', {
+    description: 'Only significant results published',
+    indicators: ['positive results only', 'file drawer'],
+    mitigation: 'Pre-register studies and report all results',
+  })
+  m.set('recall', {
+    description: 'Inaccurate participant memories',
+    indicators: ['retrospective', 'self-report'],
+    mitigation: 'Use prospective data collection methods',
+  })
+  m.set('anchoring', {
+    description: 'Over-reliance on initial information',
+    indicators: ['initial estimate', 'starting point'],
+    mitigation: 'Use multiple independent starting points',
+  })
   return m
 }
 
@@ -155,7 +225,13 @@ export class ScientificReasoner {
   private readonly hypotheses = new Map<string, Hypothesis>()
   private readonly experiments = new Map<string, ExperimentDesign>()
   private readonly results: StatisticalResult[] = []
-  private stats = { totalHypotheses: 0, totalExperiments: 0, totalStatTests: 0, totalBiasesDetected: 0, feedbackCount: 0 }
+  private stats = {
+    totalHypotheses: 0,
+    totalExperiments: 0,
+    totalStatTests: 0,
+    totalBiasesDetected: 0,
+    feedbackCount: 0,
+  }
 
   constructor(config: Partial<ScientificReasonerConfig> = {}) {
     this.config = { ...DEFAULT_SCIENTIFIC_REASONER_CONFIG, ...config }
@@ -168,17 +244,30 @@ export class ScientificReasoner {
     const iv = variables.find(v => v.type === 'independent')
     const dv = variables.find(v => v.type === 'dependent')
 
-    const nullH = iv && dv
-      ? `There is no significant relationship between ${iv.name} and ${dv.name}.`
-      : `There is no effect as described: ${statement}`
-    const altH = iv && dv
-      ? `There is a significant relationship between ${iv.name} and ${dv.name}.`
-      : statement
+    const nullH =
+      iv && dv
+        ? `There is no significant relationship between ${iv.name} and ${dv.name}.`
+        : `There is no effect as described: ${statement}`
+    const altH =
+      iv && dv
+        ? `There is a significant relationship between ${iv.name} and ${dv.name}.`
+        : statement
 
     const testable = variables.some(v => v.operationalization.length > 0)
-    const falsifiable = variables.length >= 2 && variables.some(v => v.type === 'independent') && variables.some(v => v.type === 'dependent')
+    const falsifiable =
+      variables.length >= 2 &&
+      variables.some(v => v.type === 'independent') &&
+      variables.some(v => v.type === 'dependent')
 
-    const hyp: Hypothesis = { id, statement, nullHypothesis: nullH, alternativeHypothesis: altH, variables, testable, falsifiable }
+    const hyp: Hypothesis = {
+      id,
+      statement,
+      nullHypothesis: nullH,
+      alternativeHypothesis: altH,
+      variables,
+      testable,
+      falsifiable,
+    }
     this.hypotheses.set(id, hyp)
     return hyp
   }
@@ -189,9 +278,17 @@ export class ScientificReasoner {
 
   // ── Experiment design ────────────────────────────────────────────────
 
-  designExperiment(hypothesisId: string, methodology: ResearchMethodology, options: {
-    sampleSize?: number; controlGroup?: boolean; randomization?: boolean; blinding?: 'none' | 'single' | 'double'; procedure?: string[]
-  } = {}): ExperimentDesign | null {
+  designExperiment(
+    hypothesisId: string,
+    methodology: ResearchMethodology,
+    options: {
+      sampleSize?: number
+      controlGroup?: boolean
+      randomization?: boolean
+      blinding?: 'none' | 'single' | 'double'
+      procedure?: string[]
+    } = {},
+  ): ExperimentDesign | null {
     const hyp = this.hypotheses.get(hypothesisId)
     if (!hyp) return null
 
@@ -199,9 +296,17 @@ export class ScientificReasoner {
     const controlGroup = options.controlGroup ?? true
     const randomization = options.randomization ?? true
     const blinding = options.blinding ?? 'none'
-    const procedure = options.procedure ?? ['Define measurement protocol', 'Collect baseline data', 'Apply treatment', 'Measure outcomes', 'Analyze results']
+    const procedure = options.procedure ?? [
+      'Define measurement protocol',
+      'Collect baseline data',
+      'Apply treatment',
+      'Measure outcomes',
+      'Analyze results',
+    ]
 
-    const biases = this.config.enableBiasDetection ? this.detectBiases(methodology, sampleSize, blinding, controlGroup) : []
+    const biases = this.config.enableBiasDetection
+      ? this.detectBiases(methodology, sampleSize, blinding, controlGroup)
+      : []
 
     // Reproducibility score
     let repro = 0.5
@@ -216,9 +321,18 @@ export class ScientificReasoner {
 
     const id = `exp_${++this.stats.totalExperiments}`
     const design: ExperimentDesign = {
-      id, hypothesisId, methodology, sampleSize, controlGroup, randomization, blinding,
-      variables: [...hyp.variables], procedure, expectedDuration: `${Math.ceil(sampleSize / 10)} weeks`,
-      biases, reproducibilityScore: Math.round(repro * 100) / 100,
+      id,
+      hypothesisId,
+      methodology,
+      sampleSize,
+      controlGroup,
+      randomization,
+      blinding,
+      variables: [...hyp.variables],
+      procedure,
+      expectedDuration: `${Math.ceil(sampleSize / 10)} weeks`,
+      biases,
+      reproducibilityScore: Math.round(repro * 100) / 100,
     }
     this.experiments.set(id, design)
     this.stats.totalBiasesDetected += biases.length
@@ -227,23 +341,53 @@ export class ScientificReasoner {
 
   // ── Bias detection ───────────────────────────────────────────────────
 
-  detectBiases(methodology: ResearchMethodology, sampleSize: number, blinding: string, controlGroup: boolean): DetectedBias[] {
+  detectBiases(
+    methodology: ResearchMethodology,
+    sampleSize: number,
+    blinding: string,
+    controlGroup: boolean,
+  ): DetectedBias[] {
     const biases: DetectedBias[] = []
 
     if (sampleSize < this.config.minSampleSize) {
-      biases.push({ type: 'sampling', description: `Sample size ${sampleSize} is below recommended minimum of ${this.config.minSampleSize}`, severity: 'high', mitigation: `Increase sample size to at least ${this.config.minSampleSize}` })
+      biases.push({
+        type: 'sampling',
+        description: `Sample size ${sampleSize} is below recommended minimum of ${this.config.minSampleSize}`,
+        severity: 'high',
+        mitigation: `Increase sample size to at least ${this.config.minSampleSize}`,
+      })
     }
     if (blinding === 'none') {
-      biases.push({ type: 'observer', description: 'No blinding may introduce observer bias', severity: 'medium', mitigation: 'Implement at least single-blind methodology' })
+      biases.push({
+        type: 'observer',
+        description: 'No blinding may introduce observer bias',
+        severity: 'medium',
+        mitigation: 'Implement at least single-blind methodology',
+      })
     }
     if (!controlGroup && methodology === 'experimental') {
-      biases.push({ type: 'selection', description: 'No control group in experimental study', severity: 'high', mitigation: 'Add a control group for comparison' })
+      biases.push({
+        type: 'selection',
+        description: 'No control group in experimental study',
+        severity: 'high',
+        mitigation: 'Add a control group for comparison',
+      })
     }
     if (methodology === 'survey') {
-      biases.push({ type: 'recall', description: 'Surveys rely on participant self-report', severity: 'low', mitigation: 'Use validated instruments and cross-reference data' })
+      biases.push({
+        type: 'recall',
+        description: 'Surveys rely on participant self-report',
+        severity: 'low',
+        mitigation: 'Use validated instruments and cross-reference data',
+      })
     }
     if (methodology === 'case_study') {
-      biases.push({ type: 'survivorship', description: 'Case studies may focus on notable cases only', severity: 'medium', mitigation: 'Include diverse and representative cases' })
+      biases.push({
+        type: 'survivorship',
+        description: 'Case studies may focus on notable cases only',
+        severity: 'medium',
+        mitigation: 'Include diverse and representative cases',
+      })
     }
 
     return biases
@@ -251,9 +395,15 @@ export class ScientificReasoner {
 
   // ── Statistical test selection ───────────────────────────────────────
 
-  recommendTest(groups: number, dataType: 'continuous' | 'categorical' | 'ordinal', paired: boolean = false, sampleSize: number = 50): StatisticalTest {
+  recommendTest(
+    groups: number,
+    dataType: 'continuous' | 'categorical' | 'ordinal',
+    paired: boolean = false,
+    sampleSize: number = 50,
+  ): StatisticalTest {
     if (groups === 2 && dataType === 'continuous') return 't_test'
-    if (groups === 2 && dataType === 'categorical') return sampleSize < 20 ? 'fisher_exact' : 'chi_square'
+    if (groups === 2 && dataType === 'categorical')
+      return sampleSize < 20 ? 'fisher_exact' : 'chi_square'
     if (groups === 2 && dataType === 'ordinal') return paired ? 'wilcoxon' : 'mann_whitney'
     if (groups > 2 && dataType === 'continuous') return 'anova'
     if (groups > 2 && dataType === 'ordinal') return 'kruskal_wallis'
@@ -263,7 +413,11 @@ export class ScientificReasoner {
 
   // ── Statistical result computation ───────────────────────────────────
 
-  computeStatistic(data1: number[], data2: number[], test: StatisticalTest = 't_test'): StatisticalResult {
+  computeStatistic(
+    data1: number[],
+    data2: number[],
+    test: StatisticalTest = 't_test',
+  ): StatisticalResult {
     this.stats.totalStatTests++
 
     const n1 = data1.length
@@ -295,11 +449,15 @@ export class ScientificReasoner {
     const diff = mean1 - mean2
 
     const result: StatisticalResult = {
-      test, pValue: Math.round(pValue * 10000) / 10000,
+      test,
+      pValue: Math.round(pValue * 10000) / 10000,
       significant: pValue < this.config.defaultSignificanceLevel,
       effectSize: Math.round(effectSize * 1000) / 1000,
       effectInterpretation,
-      confidenceInterval: [Math.round((diff - marginOfError) * 1000) / 1000, Math.round((diff + marginOfError) * 1000) / 1000],
+      confidenceInterval: [
+        Math.round((diff - marginOfError) * 1000) / 1000,
+        Math.round((diff + marginOfError) * 1000) / 1000,
+      ],
       sampleSize: n1 + n2,
       degreesOfFreedom: df,
     }
@@ -315,9 +473,10 @@ export class ScientificReasoner {
     const methodology = firstExp?.methodology ?? 'experimental'
 
     const significant = this.results.filter(r => r.significant).length
-    const conclusion = significant > 0
-      ? `Results support the alternative hypothesis with ${significant} significant finding(s).`
-      : 'Results do not provide sufficient evidence to reject the null hypothesis.'
+    const conclusion =
+      significant > 0
+        ? `Results support the alternative hypothesis with ${significant} significant finding(s).`
+        : 'Results do not provide sufficient evidence to reject the null hypothesis.'
 
     const limitations = [
       firstExp && firstExp.sampleSize < 100 ? 'Limited sample size' : null,
@@ -326,11 +485,18 @@ export class ScientificReasoner {
     ].filter(Boolean) as string[]
 
     return {
-      title, methodology, hypotheses,
-      design: firstExp, results: [...this.results],
+      title,
+      methodology,
+      hypotheses,
+      design: firstExp,
+      results: [...this.results],
       conclusion,
       limitations,
-      futureWork: ['Replicate with larger sample size', 'Extend to diverse populations', 'Investigate longitudinal effects'],
+      futureWork: [
+        'Replicate with larger sample size',
+        'Extend to diverse populations',
+        'Investigate longitudinal effects',
+      ],
     }
   }
 
@@ -340,7 +506,9 @@ export class ScientificReasoner {
     return { ...this.stats }
   }
 
-  provideFeedback(): void { this.stats.feedbackCount++ }
+  provideFeedback(): void {
+    this.stats.feedbackCount++
+  }
 
   serialize(): string {
     return JSON.stringify({

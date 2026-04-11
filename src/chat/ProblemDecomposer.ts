@@ -22,9 +22,23 @@
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export type ProblemType = 'optimization' | 'design' | 'debugging' | 'analysis' | 'decision' | 'integration' | 'transformation' | 'research'
+export type ProblemType =
+  | 'optimization'
+  | 'design'
+  | 'debugging'
+  | 'analysis'
+  | 'decision'
+  | 'integration'
+  | 'transformation'
+  | 'research'
 export type ComplexityLevel = 'trivial' | 'simple' | 'moderate' | 'complex' | 'very_complex'
-export type ApproachStrategy = 'divide_and_conquer' | 'bottom_up' | 'top_down' | 'iterative' | 'parallel' | 'reduction'
+export type ApproachStrategy =
+  | 'divide_and_conquer'
+  | 'bottom_up'
+  | 'top_down'
+  | 'iterative'
+  | 'parallel'
+  | 'reduction'
 
 export interface Problem {
   readonly id: string
@@ -157,7 +171,12 @@ export class ProblemDecomposer {
 
   // ── Problem creation ─────────────────────────────────────────────────
 
-  defineProblem(title: string, description: string, constraints: string[] = [], goals: string[] = []): Problem {
+  defineProblem(
+    title: string,
+    description: string,
+    constraints: string[] = [],
+    goals: string[] = [],
+  ): Problem {
     const problem: Problem = {
       id: pdId('prob'),
       title,
@@ -181,7 +200,10 @@ export class ProblemDecomposer {
 
   // ── Decomposition ────────────────────────────────────────────────────
 
-  decompose(problemId: string, subProblemDefs: Array<{ title: string; description: string; dependsOn?: string[] }>): SubProblem[] {
+  decompose(
+    problemId: string,
+    subProblemDefs: Array<{ title: string; description: string; dependsOn?: string[] }>,
+  ): SubProblem[] {
     const problem = this.problems.get(problemId)
     if (!problem) return []
 
@@ -214,12 +236,23 @@ export class ProblemDecomposer {
 
   // ── Approach generation ──────────────────────────────────────────────
 
-  addApproach(subProblemId: string, name: string, description: string, strategy: ApproachStrategy, pros: string[] = [], cons: string[] = [], estimatedEffort: number = 8): SolutionApproach | null {
+  addApproach(
+    subProblemId: string,
+    name: string,
+    description: string,
+    strategy: ApproachStrategy,
+    pros: string[] = [],
+    cons: string[] = [],
+    estimatedEffort: number = 8,
+  ): SolutionApproach | null {
     const sub = this.subProblems.get(subProblemId)
     if (!sub) return null
     if (sub.approaches.length >= this.config.maxApproachesPerSubProblem) return null
 
-    const feasibility = Math.min(1, 0.5 + (pros.length - cons.length) * 0.1 + (estimatedEffort < 24 ? 0.1 : -0.1))
+    const feasibility = Math.min(
+      1,
+      0.5 + (pros.length - cons.length) * 0.1 + (estimatedEffort < 24 ? 0.1 : -0.1),
+    )
     const risk = Math.min(1, Math.max(0, 0.3 + cons.length * 0.1 - pros.length * 0.05))
 
     const approach: SolutionApproach = {
@@ -301,7 +334,9 @@ export class ProblemDecomposer {
       }
     }
     const maxDist = Math.max(0, ...[...dist.values()])
-    const criticalPath = order.filter(n => dist.get(n) === maxDist || (maxDist === 0 && (inDegree.get(n) ?? 0) === 0))
+    const criticalPath = order.filter(
+      n => dist.get(n) === maxDist || (maxDist === 0 && (inDegree.get(n) ?? 0) === 0),
+    )
 
     return { nodes, edges, topologicalOrder: order, criticalPath, hasCycles }
   }
@@ -328,7 +363,7 @@ export class ProblemDecomposer {
       // Pick best approach (highest feasibility, lowest risk)
       const best = sub.selectedApproachId
         ? sub.approaches.find(a => a.id === sub.selectedApproachId)
-        : [...sub.approaches].sort((a, b) => (b.feasibility - b.risk) - (a.feasibility - a.risk))[0]
+        : [...sub.approaches].sort((a, b) => b.feasibility - b.risk - (a.feasibility - a.risk))[0]
 
       if (best) {
         approaches.set(subId, best.id)
@@ -340,9 +375,16 @@ export class ProblemDecomposer {
     }
 
     const integrationNotes: string[] = []
-    if (graph.hasCycles) integrationNotes.push('Warning: dependency cycle detected — execution order may need manual review')
-    if (graph.criticalPath.length > 3) integrationNotes.push(`Critical path has ${graph.criticalPath.length} steps — consider parallelization`)
-    if (count > 0 && riskSum / count > 0.5) integrationNotes.push('High average risk — consider risk mitigation measures')
+    if (graph.hasCycles)
+      integrationNotes.push(
+        'Warning: dependency cycle detected — execution order may need manual review',
+      )
+    if (graph.criticalPath.length > 3)
+      integrationNotes.push(
+        `Critical path has ${graph.criticalPath.length} steps — consider parallelization`,
+      )
+    if (count > 0 && riskSum / count > 0.5)
+      integrationNotes.push('High average risk — consider risk mitigation measures')
 
     this.stats.totalSolutions++
 
@@ -359,13 +401,19 @@ export class ProblemDecomposer {
 
   // ── Compare approaches ───────────────────────────────────────────────
 
-  compareApproaches(subProblemId: string): Array<{ approach: SolutionApproach; score: number; rank: number }> {
+  compareApproaches(
+    subProblemId: string,
+  ): Array<{ approach: SolutionApproach; score: number; rank: number }> {
     const sub = this.subProblems.get(subProblemId)
     if (!sub) return []
 
     const scored = sub.approaches.map(a => ({
       approach: a,
-      score: a.feasibility * 0.4 + (1 - a.risk) * 0.3 + (a.pros.length / Math.max(1, a.pros.length + a.cons.length)) * 0.2 + (a.estimatedEffort < 16 ? 0.1 : 0),
+      score:
+        a.feasibility * 0.4 +
+        (1 - a.risk) * 0.3 +
+        (a.pros.length / Math.max(1, a.pros.length + a.cons.length)) * 0.2 +
+        (a.estimatedEffort < 16 ? 0.1 : 0),
     }))
     scored.sort((a, b) => b.score - a.score)
     return scored.map((s, i) => ({ ...s, rank: i + 1 }))
@@ -375,9 +423,10 @@ export class ProblemDecomposer {
 
   getStats(): Readonly<ProblemDecomposerStats> {
     const problems = [...this.problems.values()]
-    const avgSub = problems.length > 0
-      ? problems.reduce((s, p) => s + p.subProblemIds.length, 0) / problems.length
-      : 0
+    const avgSub =
+      problems.length > 0
+        ? problems.reduce((s, p) => s + p.subProblemIds.length, 0) / problems.length
+        : 0
     return {
       totalProblems: this.stats.totalProblems,
       totalSubProblems: this.stats.totalSubProblems,

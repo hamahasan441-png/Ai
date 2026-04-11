@@ -136,11 +136,7 @@ export type {
   EffortEstimate,
 } from './CodePlanner.js'
 
-export type {
-  RefactorKind,
-  RefactorRequest,
-  RefactorResult,
-} from './AutoRefactorer.js'
+export type { RefactorKind, RefactorRequest, RefactorResult } from './AutoRefactorer.js'
 
 export type {
   SymbolInfo,
@@ -151,19 +147,9 @@ export type {
   GatheredContext,
 } from './ContextGatherer.js'
 
-export type {
-  GenerationKind,
-  GenerateRequest,
-  GenerateResult,
-} from './CodeGenerator.js'
+export type { GenerationKind, GenerateRequest, GenerateResult } from './CodeGenerator.js'
 
-export type {
-  DiffHunk,
-  DiffLine,
-  FileDiff,
-  ApplyResult,
-  DiffBatch,
-} from './DiffEngine.js'
+export type { DiffHunk, DiffLine, FileDiff, ApplyResult, DiffBatch } from './DiffEngine.js'
 
 // ── Copilot-Agent-Level Phase 2 Types ──
 export type {

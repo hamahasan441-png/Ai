@@ -150,7 +150,8 @@ export class RetryPolicy {
 
   /** Calculate delay for the given attempt using exponential backoff + jitter. */
   calculateDelay(attempt: number): number {
-    const exponentialDelay = this.config.baseDelayMs * Math.pow(this.config.backoffMultiplier, attempt)
+    const exponentialDelay =
+      this.config.baseDelayMs * Math.pow(this.config.backoffMultiplier, attempt)
     const clampedDelay = Math.min(exponentialDelay, this.config.maxDelayMs)
 
     if (this.config.jitter) {
@@ -190,7 +191,7 @@ export class RetryPolicy {
   }
 
   private _sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (this.config.abortSignal) {
         const timer = setTimeout(resolve, ms)
         const onAbort = () => {
@@ -276,10 +277,15 @@ export class CircuitBreaker {
 
     // Check if circuit should transition from open to half-open
     if (this._state === 'open') {
-      if (this._lastFailureTime && Date.now() - this._lastFailureTime >= this.config.resetTimeoutMs) {
+      if (
+        this._lastFailureTime &&
+        Date.now() - this._lastFailureTime >= this.config.resetTimeoutMs
+      ) {
         this._transitionTo('half-open')
       } else {
-        throw new Error('Circuit breaker is open — requests are being rejected to prevent cascading failures')
+        throw new Error(
+          'Circuit breaker is open — requests are being rejected to prevent cascading failures',
+        )
       }
     }
 

@@ -32,11 +32,7 @@ vi.mock('../../../utils/bash/shellQuote.js', () => ({
   },
 }))
 
-import {
-  parseSedEditCommand,
-  applySedSubstitution,
-  isSedInPlaceEdit,
-} from '../sedEditParser.js'
+import { parseSedEditCommand, applySedSubstitution, isSedInPlaceEdit } from '../sedEditParser.js'
 import type { SedEditInfo } from '../sedEditParser.js'
 
 describe('parseSedEditCommand', () => {
@@ -143,7 +139,7 @@ describe('isSedInPlaceEdit', () => {
   })
 
   it('returns false for non-sed commands', () => {
-    expect(isSedInPlaceEdit("echo hello")).toBe(false)
+    expect(isSedInPlaceEdit('echo hello')).toBe(false)
   })
 })
 

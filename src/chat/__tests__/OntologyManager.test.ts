@@ -523,10 +523,12 @@ describe('OntologyManager', () => {
       const child = om.addConcept('Child', '', root)
       om.addConcept('GrandChild', '', child)
       const res = om.query({ maxDepth: 1 })
-      expect(res.concepts.every(c => {
-        const id = c.id
-        return id === root || id === child
-      })).toBe(true)
+      expect(
+        res.concepts.every(c => {
+          const id = c.id
+          return id === root || id === child
+        }),
+      ).toBe(true)
     })
 
     it('filters by relationType', () => {
@@ -728,9 +730,7 @@ describe('OntologyManager', () => {
       other.addConcept('Car', '', root)
 
       const idMap = om.merge(other)
-      const newCarId = idMap.get(
-        other.getConcepts().find(c => c.name === 'Car')!.id,
-      )!
+      const newCarId = idMap.get(other.getConcepts().find(c => c.name === 'Car')!.id)!
       expect(om.getParent(newCarId)).not.toBeNull()
     })
 

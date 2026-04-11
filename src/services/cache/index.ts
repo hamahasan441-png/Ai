@@ -31,12 +31,7 @@ export {
   withCache,
 } from './CacheService.js'
 
-export type {
-  CacheConfig,
-  CacheSetOptions,
-  CacheTier,
-  CacheStats,
-} from './CacheService.js'
+export type { CacheConfig, CacheSetOptions, CacheTier, CacheStats } from './CacheService.js'
 
 // ── Memory Cache ──
 export { MemoryCache } from './MemoryCache.js'
@@ -47,9 +42,4 @@ export { DiskCache } from './DiskCache.js'
 export type { DiskCacheConfig } from './DiskCache.js'
 
 // ── Key Generation ──
-export {
-  cacheKey,
-  chatCacheKey,
-  knowledgeCacheKey,
-  toolCacheKey,
-} from './CacheKey.js'
+export { cacheKey, chatCacheKey, knowledgeCacheKey, toolCacheKey } from './CacheKey.js'

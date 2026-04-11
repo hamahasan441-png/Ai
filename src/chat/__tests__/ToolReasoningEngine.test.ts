@@ -240,11 +240,13 @@ describe('Tool unregistration', () => {
 
   it('tool is no longer selected after removal', () => {
     engine.unregisterTool('file_reader')
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: ['file'],
-      inputAvailable: ['filePath'],
-      expectedOutputType: 'text',
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: ['file'],
+        inputAvailable: ['filePath'],
+        expectedOutputType: 'text',
+      }),
+    )
     const names = matches.map(m => m.tool.name)
     expect(names).not.toContain('file_reader')
   })
@@ -263,7 +265,12 @@ describe('Tool selection', () => {
 
   beforeEach(() => {
     engine = new ToolReasoningEngine()
-    engine.registerTools([makeFileReader(), makeFileWriter(), makeCodeSearch(), makeExpensiveTool()])
+    engine.registerTools([
+      makeFileReader(),
+      makeFileWriter(),
+      makeCodeSearch(),
+      makeExpensiveTool(),
+    ])
   })
 
   it('returns matches sorted by cost-benefit descending', () => {
@@ -274,20 +281,29 @@ describe('Tool selection', () => {
   })
 
   it('returns tools matching required capabilities', () => {
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: ['search', 'find'],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: ['search', 'find'],
+      }),
+    )
     expect(matches.some(m => m.tool.name === 'code_search')).toBe(true)
   })
 
   it('returns empty array when no tools match capabilities', () => {
     const strict = new ToolReasoningEngine({ minRelevanceScore: 0.6 })
-    strict.registerTools([makeFileReader(), makeFileWriter(), makeCodeSearch(), makeExpensiveTool()])
-    const matches = strict.selectTools(makeRequirement({
-      requiredCapabilities: ['teleport'],
-      inputAvailable: ['wormhole_data'],
-      expectedOutputType: 'wormhole',
-    }))
+    strict.registerTools([
+      makeFileReader(),
+      makeFileWriter(),
+      makeCodeSearch(),
+      makeExpensiveTool(),
+    ])
+    const matches = strict.selectTools(
+      makeRequirement({
+        requiredCapabilities: ['teleport'],
+        inputAvailable: ['wormhole_data'],
+        expectedOutputType: 'wormhole',
+      }),
+    )
     expect(matches).toHaveLength(0)
   })
 
@@ -300,7 +316,9 @@ describe('Tool selection', () => {
   it('each match has relevance score >= minRelevanceScore', () => {
     const matches = engine.selectTools(makeRequirement())
     for (const m of matches) {
-      expect(m.relevanceScore).toBeGreaterThanOrEqual(DEFAULT_TOOL_REASONING_CONFIG.minRelevanceScore)
+      expect(m.relevanceScore).toBeGreaterThanOrEqual(
+        DEFAULT_TOOL_REASONING_CONFIG.minRelevanceScore,
+      )
     }
   })
 
@@ -355,8 +373,18 @@ describe('Tool selection', () => {
   })
 
   it('prefers low-cost tools with equal capability overlap', () => {
-    const cheap = makeTool({ name: 'cheap', capabilities: ['analyze'], cost: 0.05, reliability: 0.9 })
-    const pricey = makeTool({ name: 'pricey', capabilities: ['analyze'], cost: 0.8, reliability: 0.9 })
+    const cheap = makeTool({
+      name: 'cheap',
+      capabilities: ['analyze'],
+      cost: 0.05,
+      reliability: 0.9,
+    })
+    const pricey = makeTool({
+      name: 'pricey',
+      capabilities: ['analyze'],
+      cost: 0.8,
+      reliability: 0.9,
+    })
     const e = new ToolReasoningEngine()
     e.registerTools([pricey, cheap])
     const matches = e.selectTools(makeRequirement({ requiredCapabilities: ['analyze'] }))
@@ -386,10 +414,12 @@ describe('Constraint filtering', () => {
 
   it('max_cost excludes tools above cost threshold', () => {
     const constraint: TaskConstraint = { type: 'max_cost', value: 0.2 }
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: ['read'],
-      constraints: [constraint],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: ['read'],
+        constraints: [constraint],
+      }),
+    )
     for (const m of matches) {
       expect(m.tool.cost).toBeLessThanOrEqual(0.2)
     }
@@ -397,10 +427,12 @@ describe('Constraint filtering', () => {
 
   it('no_side_effects excludes tools with side effects', () => {
     const constraint: TaskConstraint = { type: 'no_side_effects', value: '' }
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: [],
-      constraints: [constraint],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: [],
+        constraints: [constraint],
+      }),
+    )
     for (const m of matches) {
       expect(m.tool.sideEffects).toBe(false)
     }
@@ -408,10 +440,12 @@ describe('Constraint filtering', () => {
 
   it('no_confirmation excludes tools requiring confirmation', () => {
     const constraint: TaskConstraint = { type: 'no_confirmation', value: '' }
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: [],
-      constraints: [constraint],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: [],
+        constraints: [constraint],
+      }),
+    )
     for (const m of matches) {
       expect(m.tool.requiresConfirmation).toBe(false)
     }
@@ -419,20 +453,24 @@ describe('Constraint filtering', () => {
 
   it('excluded_tool removes the specified tool', () => {
     const constraint: TaskConstraint = { type: 'excluded_tool', value: 'file_reader' }
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: ['read'],
-      constraints: [constraint],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: ['read'],
+        constraints: [constraint],
+      }),
+    )
     expect(matches.every(m => m.tool.name !== 'file_reader')).toBe(true)
   })
 
   it('preferred_tool does not exclude any tools', () => {
     const withoutPref = engine.selectTools(makeRequirement({ requiredCapabilities: [] }))
     const constraint: TaskConstraint = { type: 'preferred_tool', value: 'file_reader' }
-    const withPref = engine.selectTools(makeRequirement({
-      requiredCapabilities: [],
-      constraints: [constraint],
-    }))
+    const withPref = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: [],
+        constraints: [constraint],
+      }),
+    )
     expect(withPref.length).toBe(withoutPref.length)
   })
 
@@ -441,10 +479,12 @@ describe('Constraint filtering', () => {
       { type: 'max_cost', value: 0.5 },
       { type: 'no_side_effects', value: '' },
     ]
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: [],
-      constraints,
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: [],
+        constraints,
+      }),
+    )
     for (const m of matches) {
       expect(m.tool.cost).toBeLessThanOrEqual(0.5)
       expect(m.tool.sideEffects).toBe(false)
@@ -458,10 +498,12 @@ describe('Constraint filtering', () => {
       { type: 'excluded_tool', value: 'expensive_tool' },
       { type: 'excluded_tool', value: 'confirm_tool' },
     ]
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: [],
-      constraints,
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: [],
+        constraints,
+      }),
+    )
     expect(matches).toHaveLength(0)
   })
 })
@@ -576,7 +618,9 @@ describe('Pipeline construction', () => {
       makeTool({ name: 't2', capabilities: ['read'], cost: 0.2, reliability: 0.8 }),
       makeTool({ name: 't3', capabilities: ['read'], cost: 0.3, reliability: 0.7 }),
     ])
-    const pipeline = e.buildPipeline('fb limit', [makeRequirement({ requiredCapabilities: ['read'] })])
+    const pipeline = e.buildPipeline('fb limit', [
+      makeRequirement({ requiredCapabilities: ['read'] }),
+    ])
     if (pipeline.steps.length > 0) {
       expect(pipeline.steps[0].fallbackTools.length).toBeLessThanOrEqual(1)
     }
@@ -592,7 +636,11 @@ describe('Pipeline construction', () => {
     const strict = new ToolReasoningEngine({ minRelevanceScore: 0.6 })
     strict.registerTools([makeFileReader(), makeFileWriter(), makeCodeSearch()])
     const pipeline = strict.buildPipeline('empty', [
-      makeRequirement({ requiredCapabilities: ['teleport'], inputAvailable: ['wormhole'], expectedOutputType: 'wormhole' }),
+      makeRequirement({
+        requiredCapabilities: ['teleport'],
+        inputAvailable: ['wormhole'],
+        expectedOutputType: 'wormhole',
+      }),
     ])
     expect(pipeline.steps).toHaveLength(0)
   })
@@ -680,10 +728,12 @@ describe('Execution recording', () => {
       engine.recordExecution(makeExecResult({ toolUsed: 'a', success: true }), 'file_read')
       engine.recordExecution(makeExecResult({ toolUsed: 'b', success: false }), 'file_read')
     }
-    const matches = engine.selectTools(makeRequirement({
-      description: 'Read a file',
-      requiredCapabilities: ['read'],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        description: 'Read a file',
+        requiredCapabilities: ['read'],
+      }),
+    )
     const aMatch = matches.find(m => m.tool.name === 'a')
     const bMatch = matches.find(m => m.tool.name === 'b')
     if (aMatch && bMatch) {
@@ -784,11 +834,13 @@ describe('Cost-benefit analysis', () => {
   it('returns null recommended when no tools match', () => {
     const strict = new ToolReasoningEngine({ minRelevanceScore: 0.6 })
     strict.registerTools([makeFileReader(), makeFileWriter(), makeExpensiveTool()])
-    const result = strict.analyzeCostBenefit(makeRequirement({
-      requiredCapabilities: ['teleport'],
-      inputAvailable: ['wormhole'],
-      expectedOutputType: 'wormhole',
-    }))
+    const result = strict.analyzeCostBenefit(
+      makeRequirement({
+        requiredCapabilities: ['teleport'],
+        inputAvailable: ['wormhole'],
+        expectedOutputType: 'wormhole',
+      }),
+    )
     expect(result.recommended).toBeNull()
     expect(result.analysis).toHaveLength(0)
   })
@@ -964,7 +1016,10 @@ describe('Serialization and deserialization', () => {
     engine.registerTools([makeFileReader(), makeCodeSearch()])
     const json = engine.serialize()
     const restored = ToolReasoningEngine.deserialize(json)
-    const names = restored.getRegisteredTools().map(t => t.name).sort()
+    const names = restored
+      .getRegisteredTools()
+      .map(t => t.name)
+      .sort()
     expect(names).toEqual(['code_search', 'file_reader'])
   })
 
@@ -1037,36 +1092,44 @@ describe('Task type classification via selection', () => {
   it('description with "read" classifies as file_read', () => {
     engine.recordExecution(makeExecResult({ toolUsed: 'file_reader', success: true }), 'file_read')
     // The historical success for file_reader on file_read tasks should boost it
-    const matches = engine.selectTools(makeRequirement({
-      description: 'Read the file contents',
-      requiredCapabilities: ['read'],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        description: 'Read the file contents',
+        requiredCapabilities: ['read'],
+      }),
+    )
     expect(matches.length).toBeGreaterThan(0)
   })
 
   it('description with "search" classifies as search', () => {
     engine.recordExecution(makeExecResult({ toolUsed: 'code_search', success: true }), 'search')
-    const matches = engine.selectTools(makeRequirement({
-      description: 'Search for a pattern',
-      requiredCapabilities: ['search'],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        description: 'Search for a pattern',
+        requiredCapabilities: ['search'],
+      }),
+    )
     expect(matches.some(m => m.tool.name === 'code_search')).toBe(true)
   })
 
   it('description with "write" classifies as file_write', () => {
-    const matches = engine.selectTools(makeRequirement({
-      description: 'Write to the configuration file',
-      requiredCapabilities: ['write'],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        description: 'Write to the configuration file',
+        requiredCapabilities: ['write'],
+      }),
+    )
     expect(matches.length).toBeGreaterThanOrEqual(0)
   })
 
   it('unknown description defaults to general', () => {
     // Should not throw for a description with no known keywords
-    const matches = engine.selectTools(makeRequirement({
-      description: 'Do something unusual',
-      requiredCapabilities: ['read'],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        description: 'Do something unusual',
+        requiredCapabilities: ['read'],
+      }),
+    )
     expect(Array.isArray(matches)).toBe(true)
   })
 })
@@ -1087,7 +1150,9 @@ describe('Edge cases', () => {
 
   it('pipeline with many requirements is clamped to maxPipelineSteps', () => {
     const engine = new ToolReasoningEngine({ maxPipelineSteps: 3 })
-    engine.registerTool(makeTool({ name: 'all', capabilities: ['read', 'write', 'search', 'deploy'] }))
+    engine.registerTool(
+      makeTool({ name: 'all', capabilities: ['read', 'write', 'search', 'deploy'] }),
+    )
     const reqs = Array.from({ length: 20 }, (_, i) =>
       makeRequirement({ description: `Step ${i}`, requiredCapabilities: ['read'] }),
     )
@@ -1106,7 +1171,9 @@ describe('Edge cases', () => {
 
   it('tool with cost just above zero has high costBenefit', () => {
     const engine = new ToolReasoningEngine()
-    engine.registerTool(makeTool({ name: 'almost_free', cost: 0.001, capabilities: ['read'], reliability: 0.9 }))
+    engine.registerTool(
+      makeTool({ name: 'almost_free', cost: 0.001, capabilities: ['read'], reliability: 0.9 }),
+    )
     const matches = engine.selectTools(makeRequirement({ requiredCapabilities: ['read'] }))
     if (matches.length > 0) {
       expect(matches[0].costBenefit).toBeGreaterThan(10)
@@ -1208,10 +1275,12 @@ describe('Historical success rate', () => {
   })
 
   it('tool with no history gets neutral score', () => {
-    const matches = engine.selectTools(makeRequirement({
-      description: 'Read file',
-      requiredCapabilities: ['read'],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        description: 'Read file',
+        requiredCapabilities: ['read'],
+      }),
+    )
     // Both tools should have equal scores with no history
     if (matches.length === 2) {
       expect(matches[0].relevanceScore).toBeCloseTo(matches[1].relevanceScore, 2)
@@ -1221,12 +1290,17 @@ describe('Historical success rate', () => {
   it('successful history boosts tool scoring', () => {
     for (let i = 0; i < 5; i++) {
       engine.recordExecution(makeExecResult({ toolUsed: 'reliable', success: true }), 'file_read')
-      engine.recordExecution(makeExecResult({ toolUsed: 'unreliable', success: false }), 'file_read')
+      engine.recordExecution(
+        makeExecResult({ toolUsed: 'unreliable', success: false }),
+        'file_read',
+      )
     }
-    const matches = engine.selectTools(makeRequirement({
-      description: 'Read a file',
-      requiredCapabilities: ['read'],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        description: 'Read a file',
+        requiredCapabilities: ['read'],
+      }),
+    )
     const reliable = matches.find(m => m.tool.name === 'reliable')
     const unreliable = matches.find(m => m.tool.name === 'unreliable')
     if (reliable && unreliable) {
@@ -1241,10 +1315,12 @@ describe('Historical success rate', () => {
       engine.recordExecution(makeExecResult({ toolUsed: 'unreliable', success: false }), 'search')
     }
     // Now select for "read" (file_read) — history should not apply
-    const matches = engine.selectTools(makeRequirement({
-      description: 'Read a file',
-      requiredCapabilities: ['read'],
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        description: 'Read a file',
+        requiredCapabilities: ['read'],
+      }),
+    )
     if (matches.length === 2) {
       // Scores should be roughly equal since no file_read history
       expect(Math.abs(matches[0].relevanceScore - matches[1].relevanceScore)).toBeLessThan(0.1)
@@ -1261,10 +1337,12 @@ describe('Historical success rate', () => {
       noHistory.recordExecution(makeExecResult({ toolUsed: 'good', success: true }), 'file_read')
       noHistory.recordExecution(makeExecResult({ toolUsed: 'bad', success: false }), 'file_read')
     }
-    const matches = noHistory.selectTools(makeRequirement({
-      description: 'Read a file',
-      requiredCapabilities: ['read'],
-    }))
+    const matches = noHistory.selectTools(
+      makeRequirement({
+        description: 'Read a file',
+        requiredCapabilities: ['read'],
+      }),
+    )
     if (matches.length === 2) {
       // With 0 history weight, both should score the same
       expect(matches[0].relevanceScore).toBeCloseTo(matches[1].relevanceScore, 5)
@@ -1280,16 +1358,30 @@ describe('Output type matching', () => {
   beforeEach(() => {
     engine = new ToolReasoningEngine()
     engine.registerTools([
-      makeTool({ name: 'text_tool', capabilities: ['read'], outputTypes: ['text'], cost: 0.2, reliability: 0.9 }),
-      makeTool({ name: 'json_tool', capabilities: ['read'], outputTypes: ['json'], cost: 0.2, reliability: 0.9 }),
+      makeTool({
+        name: 'text_tool',
+        capabilities: ['read'],
+        outputTypes: ['text'],
+        cost: 0.2,
+        reliability: 0.9,
+      }),
+      makeTool({
+        name: 'json_tool',
+        capabilities: ['read'],
+        outputTypes: ['json'],
+        cost: 0.2,
+        reliability: 0.9,
+      }),
     ])
   })
 
   it('tool with matching output type scores higher', () => {
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: ['read'],
-      expectedOutputType: 'text',
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: ['read'],
+        expectedOutputType: 'text',
+      }),
+    )
     const textTool = matches.find(m => m.tool.name === 'text_tool')
     const jsonTool = matches.find(m => m.tool.name === 'json_tool')
     if (textTool && jsonTool) {
@@ -1298,10 +1390,12 @@ describe('Output type matching', () => {
   })
 
   it('partial output type match still contributes to score', () => {
-    const matches = engine.selectTools(makeRequirement({
-      requiredCapabilities: ['read'],
-      expectedOutputType: 'json_data',
-    }))
+    const matches = engine.selectTools(
+      makeRequirement({
+        requiredCapabilities: ['read'],
+        expectedOutputType: 'json_data',
+      }),
+    )
     // json_tool's outputType 'json' is included in 'json_data'
     const jsonTool = matches.find(m => m.tool.name === 'json_tool')
     expect(jsonTool).toBeDefined()

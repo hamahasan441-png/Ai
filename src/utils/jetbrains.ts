@@ -35,8 +35,7 @@ function buildCommonPluginDirectoryPaths(ideName: string): string[] {
   }
 
   const appData = process.env.APPDATA || join(homeDir, 'AppData', 'Roaming')
-  const localAppData =
-    process.env.LOCALAPPDATA || join(homeDir, 'AppData', 'Local')
+  const localAppData = process.env.LOCALAPPDATA || join(homeDir, 'AppData', 'Local')
 
   switch (platform()) {
     case 'darwin':
@@ -45,18 +44,12 @@ function buildCommonPluginDirectoryPaths(ideName: string): string[] {
         join(homeDir, 'Library', 'Application Support'),
       )
       if (ideName.toLowerCase() === 'androidstudio') {
-        directories.push(
-          join(homeDir, 'Library', 'Application Support', 'Google'),
-        )
+        directories.push(join(homeDir, 'Library', 'Application Support', 'Google'))
       }
       break
 
     case 'win32':
-      directories.push(
-        join(appData, 'JetBrains'),
-        join(localAppData, 'JetBrains'),
-        join(appData),
-      )
+      directories.push(join(appData, 'JetBrains'), join(localAppData, 'JetBrains'), join(appData))
       if (ideName.toLowerCase() === 'androidstudio') {
         directories.push(join(localAppData, 'Google'))
       }
@@ -126,14 +119,10 @@ async function detectPluginDirectories(ideName: string): Promise<string[]> {
     }
   }
 
-  return foundDirectories.filter(
-    (dir, index) => foundDirectories.indexOf(dir) === index,
-  )
+  return foundDirectories.filter((dir, index) => foundDirectories.indexOf(dir) === index)
 }
 
-export async function isJetBrainsPluginInstalled(
-  ideType: IdeType,
-): Promise<boolean> {
+export async function isJetBrainsPluginInstalled(ideType: IdeType): Promise<boolean> {
   const pluginDirs = await detectPluginDirectories(ideType)
   for (const dir of pluginDirs) {
     const pluginPath = join(dir, PLUGIN_PREFIX)
@@ -184,8 +173,6 @@ export async function isJetBrainsPluginInstalledCached(
  * Returns false if the result hasn't been resolved yet.
  * Use this only in sync contexts (e.g., status notice isActive checks).
  */
-export function isJetBrainsPluginInstalledCachedSync(
-  ideType: IdeType,
-): boolean {
+export function isJetBrainsPluginInstalledCachedSync(ideType: IdeType): boolean {
   return pluginInstalledCache.get(ideType) ?? false
 }

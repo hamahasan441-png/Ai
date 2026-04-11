@@ -22,7 +22,9 @@ vi.mock('fs', () => {
   const store = new Map<string, string>()
   return {
     existsSync: vi.fn((p: string) => store.has(p)),
-    writeFileSync: vi.fn((p: string, data: string) => { store.set(p, data) }),
+    writeFileSync: vi.fn((p: string, data: string) => {
+      store.set(p, data)
+    }),
     readFileSync: vi.fn((p: string) => {
       if (store.has(p)) return store.get(p)
       throw new Error('ENOENT')
@@ -35,7 +37,9 @@ vi.mock('fs', () => {
         store.delete(from)
       }
     }),
-    unlinkSync: vi.fn((p: string) => { store.delete(p) }),
+    unlinkSync: vi.fn((p: string) => {
+      store.delete(p)
+    }),
     __store: store,
   }
 })
@@ -218,7 +222,7 @@ describe('DevBrain', () => {
   describe('Analyze Image (offline)', () => {
     it('should analyze image using local brain', async () => {
       const result = await brain.analyzeImage({
-        imageData: 'iVBORw0KGgoAAAANSUhEUg==',  // minimal valid-ish base64
+        imageData: 'iVBORw0KGgoAAAANSUhEUg==', // minimal valid-ish base64
         mediaType: 'image/png',
       })
       expect(result).toBeDefined()
@@ -229,20 +233,24 @@ describe('DevBrain', () => {
       const { isSupportedImageType } = await import('../types')
       vi.mocked(isSupportedImageType).mockReturnValueOnce(false)
 
-      await expect(brain.analyzeImage({
-        imageData: 'abc',
-        mediaType: 'image/bmp' as 'image/png',
-      })).rejects.toThrow('Unsupported image type')
+      await expect(
+        brain.analyzeImage({
+          imageData: 'abc',
+          mediaType: 'image/bmp' as 'image/png',
+        }),
+      ).rejects.toThrow('Unsupported image type')
     })
 
     it('should reject invalid image data', async () => {
       const { validateImageData } = await import('../types')
       vi.mocked(validateImageData).mockReturnValueOnce(false)
 
-      await expect(brain.analyzeImage({
-        imageData: 'invalid',
-        mediaType: 'image/png',
-      })).rejects.toThrow('Invalid image data')
+      await expect(
+        brain.analyzeImage({
+          imageData: 'invalid',
+          mediaType: 'image/png',
+        }),
+      ).rejects.toThrow('Invalid image data')
     })
   })
 
@@ -504,7 +512,10 @@ describe('DevBrain', () => {
     })
 
     it('should analyze code with analyzeCode()', () => {
-      const analysis = brain.analyzeCode('const x = 1;\nconst y = 2;\nconsole.log(x + y);', 'typescript')
+      const analysis = brain.analyzeCode(
+        'const x = 1;\nconst y = 2;\nconsole.log(x + y);',
+        'typescript',
+      )
       expect(analysis).toBeDefined()
       expect(analysis.complexity).toBeDefined()
       expect(typeof analysis.complexity.linesOfCode).toBe('number')
@@ -641,7 +652,11 @@ describe('DevBrain', () => {
     })
 
     it('should generate multi-file project', async () => {
-      const result = await brain.generateMultiFile('user authentication', 'typescript', ['component', 'test', 'types'])
+      const result = await brain.generateMultiFile('user authentication', 'typescript', [
+        'component',
+        'test',
+        'types',
+      ])
       expect(result).toBeDefined()
       expect(Array.isArray(result.files)).toBe(true)
       expect(result.files.length).toBeGreaterThan(0)
@@ -811,7 +826,10 @@ describe('DevBrain', () => {
       })
 
       it('should create training plan with ordered topics', () => {
-        const plan = brain.getTrainingPlan('typescript', 'intermediate', ['async programming', 'testing'])
+        const plan = brain.getTrainingPlan('typescript', 'intermediate', [
+          'async programming',
+          'testing',
+        ])
         for (let i = 1; i < plan.topics.length; i++) {
           expect(plan.topics[i]!.order).toBeGreaterThanOrEqual(plan.topics[i - 1]!.order)
         }
@@ -919,8 +937,15 @@ describe('DevBrain', () => {
     })
 
     it('should preserve learned knowledge through serialization', () => {
-      brain.teach('What is a closure?', 'A closure is a function that captures variables from its enclosing scope.')
-      brain.addKnowledge('training', ['exercise', 'practice'], 'Coding exercises help reinforce learning.')
+      brain.teach(
+        'What is a closure?',
+        'A closure is a function that captures variables from its enclosing scope.',
+      )
+      brain.addKnowledge(
+        'training',
+        ['exercise', 'practice'],
+        'Coding exercises help reinforce learning.',
+      )
 
       const serialized = brain.serializeState()
       const restored = DevBrain.deserializeState(serialized)

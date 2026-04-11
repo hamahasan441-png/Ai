@@ -16,21 +16,33 @@ describe('FunctionalDeep', () => {
 
   describe('KB entry tests', () => {
     it('should match monads functors and algebraic data types keywords', async () => {
-      const r = await brain.chat('explain monads functors maybe option either result io state reader writer algebraic data types sum types product types pattern matching')
+      const r = await brain.chat(
+        'explain monads functors maybe option either result io state reader writer algebraic data types sum types product types pattern matching',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/monad|functor|maybe|option|either|result|algebraic|sum\s+type|pattern\s+matching/)
+      expect(r.text.toLowerCase()).toMatch(
+        /monad|functor|maybe|option|either|result|algebraic|sum\s+type|pattern\s+matching/,
+      )
     })
 
     it('should match type classes and immutable data structures keywords', async () => {
-      const r = await brain.chat('explain type classes traits haskell type class rust trait scala implicits immutable data structures persistent vectors hamts finger trees zippers')
+      const r = await brain.chat(
+        'explain type classes traits haskell type class rust trait scala implicits immutable data structures persistent vectors hamts finger trees zippers',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/type\s+class|trait|haskell|rust|scala|immutable|persistent|hamt|finger\s+tree|zipper/)
+      expect(r.text.toLowerCase()).toMatch(
+        /type\s+class|trait|haskell|rust|scala|immutable|persistent|hamt|finger\s+tree|zipper/,
+      )
     })
 
     it('should match effect systems and category theory keywords', async () => {
-      const r = await brain.chat('explain effect systems algebraic effects zio cats effect free monads category theory applied functors natural transformations kleisli yoneda lemma')
+      const r = await brain.chat(
+        'explain effect systems algebraic effects zio cats effect free monads category theory applied functors natural transformations kleisli yoneda lemma',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/effect\s+system|algebraic\s+effect|zio|cats|free\s+monad|category\s+theory|functor|kleisli|yoneda/)
+      expect(r.text.toLowerCase()).toMatch(
+        /effect\s+system|algebraic\s+effect|zio|cats|free\s+monad|category\s+theory|functor|kleisli|yoneda/,
+      )
     })
   })
 

@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  KnowledgeReasoner,
-  type KnowledgeFact,
-  type InferenceChain,
-} from '../KnowledgeReasoner'
+import { KnowledgeReasoner, type KnowledgeFact, type InferenceChain } from '../KnowledgeReasoner'
 
 // ── Constructor Tests ──
 
@@ -293,10 +289,7 @@ describe('KnowledgeReasoner confidence propagation', () => {
   })
 
   it('propagateConfidence applies decay for multi-hop chains', () => {
-    const chain = [
-      { confidence: 1.0 } as KnowledgeFact,
-      { confidence: 1.0 } as KnowledgeFact,
-    ]
+    const chain = [{ confidence: 1.0 } as KnowledgeFact, { confidence: 1.0 } as KnowledgeFact]
     const result = reasoner.propagateConfidence(chain)
     expect(result).toBe(0.9) // 1.0 * 1.0 * 0.9^1
   })
@@ -311,10 +304,7 @@ describe('KnowledgeReasoner confidence propagation', () => {
   })
 
   it('accumulateEvidence combines multiple chains with noisy-OR', () => {
-    const chains = [
-      { confidence: 0.5 } as InferenceChain,
-      { confidence: 0.5 } as InferenceChain,
-    ]
+    const chains = [{ confidence: 0.5 } as InferenceChain, { confidence: 0.5 } as InferenceChain]
     const result = reasoner.accumulateEvidence(chains)
     // noisy-OR: 1 - (1-0.5)*(1-0.5) = 0.75
     expect(result).toBe(0.75)

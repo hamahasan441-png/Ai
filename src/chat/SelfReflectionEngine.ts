@@ -144,55 +144,131 @@ export const DEFAULT_SELF_REFLECTION_CONFIG: SelfReflectionEngineConfig = {
 
 /** Keywords indicating potential issues per error category. */
 const ERROR_CATEGORY_SIGNALS: Record<ErrorCategory, string[]> = {
-  hallucination: ['fabricated', 'invented', 'doesn\'t exist', 'no such', 'fictional', 'made up', 'non-existent'],
-  over_generalization: ['always', 'never', 'all', 'none', 'every', 'universally', 'without exception'],
-  missing_context: ['depends on', 'need more info', 'unclear', 'context', 'ambiguous', 'insufficient'],
-  logical_inconsistency: ['contradicts', 'but earlier', 'however', 'inconsistent', 'paradox', 'conflicts with'],
-  incomplete_answer: ['also consider', 'additionally', 'missing', 'forgot to mention', 'left out', 'incomplete'],
-  wrong_assumption: ['assumed', 'presupposed', 'took for granted', 'incorrectly assumed', 'wrong premise'],
-  outdated_knowledge: ['deprecated', 'no longer', 'was replaced', 'outdated', 'obsolete', 'old version'],
+  hallucination: [
+    'fabricated',
+    'invented',
+    "doesn't exist",
+    'no such',
+    'fictional',
+    'made up',
+    'non-existent',
+  ],
+  over_generalization: [
+    'always',
+    'never',
+    'all',
+    'none',
+    'every',
+    'universally',
+    'without exception',
+  ],
+  missing_context: [
+    'depends on',
+    'need more info',
+    'unclear',
+    'context',
+    'ambiguous',
+    'insufficient',
+  ],
+  logical_inconsistency: [
+    'contradicts',
+    'but earlier',
+    'however',
+    'inconsistent',
+    'paradox',
+    'conflicts with',
+  ],
+  incomplete_answer: [
+    'also consider',
+    'additionally',
+    'missing',
+    'forgot to mention',
+    'left out',
+    'incomplete',
+  ],
+  wrong_assumption: [
+    'assumed',
+    'presupposed',
+    'took for granted',
+    'incorrectly assumed',
+    'wrong premise',
+  ],
+  outdated_knowledge: [
+    'deprecated',
+    'no longer',
+    'was replaced',
+    'outdated',
+    'obsolete',
+    'old version',
+  ],
   format_mismatch: ['format', 'expected', 'wrong type', 'should be', 'formatting', 'structure'],
   over_confidence: ['certainly', 'absolutely', 'definitely', 'without doubt', 'guaranteed', '100%'],
-  under_confidence: ['maybe', 'perhaps', 'not sure', 'might be', 'possibly', 'uncertain', 'I think'],
-  repetition: ['as I said', 'mentioned earlier', 'again', 'repeated', 'already stated', 'redundant'],
+  under_confidence: [
+    'maybe',
+    'perhaps',
+    'not sure',
+    'might be',
+    'possibly',
+    'uncertain',
+    'I think',
+  ],
+  repetition: [
+    'as I said',
+    'mentioned earlier',
+    'again',
+    'repeated',
+    'already stated',
+    'redundant',
+  ],
   tangential: ['by the way', 'off topic', 'unrelated', 'side note', 'tangent', 'digression'],
 }
 
 /** Quality dimension evaluation criteria. */
-const DIMENSION_CRITERIA: Record<QualityDimension, { keywords: string[]; antiKeywords: string[] }> = {
-  coherence: {
-    keywords: ['therefore', 'because', 'follows', 'consequently', 'thus', 'leads to', 'since'],
-    antiKeywords: ['however', 'but', 'contradicts', 'on the other hand', 'conflicting'],
-  },
-  relevance: {
-    keywords: ['specifically', 'regarding', 'about', 'concerning', 'related to', 'addresses'],
-    antiKeywords: ['unrelated', 'tangent', 'off-topic', 'by the way', 'side note'],
-  },
-  completeness: {
-    keywords: ['comprehensive', 'covers', 'including', 'additionally', 'furthermore', 'also'],
-    antiKeywords: ['missing', 'lacks', 'incomplete', 'doesn\'t cover', 'forgot', 'omitted'],
-  },
-  accuracy: {
-    keywords: ['verified', 'correct', 'accurate', 'precise', 'exact', 'validated'],
-    antiKeywords: ['wrong', 'incorrect', 'error', 'mistake', 'inaccurate', 'false'],
-  },
-  clarity: {
-    keywords: ['clearly', 'simply', 'straightforward', 'plain', 'understandable', 'explained'],
-    antiKeywords: ['confusing', 'unclear', 'ambiguous', 'vague', 'convoluted', 'complex'],
-  },
-  depth: {
-    keywords: ['detailed', 'in-depth', 'thorough', 'extensive', 'comprehensive', 'nuanced'],
-    antiKeywords: ['superficial', 'shallow', 'brief', 'overview', 'surface-level', 'basic'],
-  },
-  actionability: {
-    keywords: ['step', 'do', 'implement', 'apply', 'execute', 'follow', 'action', 'run'],
-    antiKeywords: ['theoretical', 'abstract', 'conceptual', 'vague', 'general', 'non-specific'],
-  },
-}
+const DIMENSION_CRITERIA: Record<QualityDimension, { keywords: string[]; antiKeywords: string[] }> =
+  {
+    coherence: {
+      keywords: ['therefore', 'because', 'follows', 'consequently', 'thus', 'leads to', 'since'],
+      antiKeywords: ['however', 'but', 'contradicts', 'on the other hand', 'conflicting'],
+    },
+    relevance: {
+      keywords: ['specifically', 'regarding', 'about', 'concerning', 'related to', 'addresses'],
+      antiKeywords: ['unrelated', 'tangent', 'off-topic', 'by the way', 'side note'],
+    },
+    completeness: {
+      keywords: ['comprehensive', 'covers', 'including', 'additionally', 'furthermore', 'also'],
+      antiKeywords: ['missing', 'lacks', 'incomplete', "doesn't cover", 'forgot', 'omitted'],
+    },
+    accuracy: {
+      keywords: ['verified', 'correct', 'accurate', 'precise', 'exact', 'validated'],
+      antiKeywords: ['wrong', 'incorrect', 'error', 'mistake', 'inaccurate', 'false'],
+    },
+    clarity: {
+      keywords: ['clearly', 'simply', 'straightforward', 'plain', 'understandable', 'explained'],
+      antiKeywords: ['confusing', 'unclear', 'ambiguous', 'vague', 'convoluted', 'complex'],
+    },
+    depth: {
+      keywords: ['detailed', 'in-depth', 'thorough', 'extensive', 'comprehensive', 'nuanced'],
+      antiKeywords: ['superficial', 'shallow', 'brief', 'overview', 'surface-level', 'basic'],
+    },
+    actionability: {
+      keywords: ['step', 'do', 'implement', 'apply', 'execute', 'follow', 'action', 'run'],
+      antiKeywords: ['theoretical', 'abstract', 'conceptual', 'vague', 'general', 'non-specific'],
+    },
+  }
 
 /** Domain detection keywords. */
 const DOMAIN_KEYWORDS: Record<string, string[]> = {
-  programming: ['code', 'function', 'class', 'variable', 'api', 'debug', 'compile', 'syntax', 'algorithm'],
+  programming: [
+    'code',
+    'function',
+    'class',
+    'variable',
+    'api',
+    'debug',
+    'compile',
+    'syntax',
+    'algorithm',
+  ],
   science: ['hypothesis', 'experiment', 'theory', 'observation', 'data', 'research', 'study'],
   math: ['equation', 'formula', 'proof', 'theorem', 'calculate', 'solve', 'number'],
   security: ['vulnerability', 'exploit', 'attack', 'defense', 'security', 'hack', 'threat'],
@@ -282,18 +358,28 @@ export class SelfReflectionEngine {
 
   private scoreDimensions(input: string, output: string): DimensionScore[] {
     const dimensions: QualityDimension[] = [
-      'coherence', 'relevance', 'completeness', 'accuracy', 'clarity', 'depth', 'actionability',
+      'coherence',
+      'relevance',
+      'completeness',
+      'accuracy',
+      'clarity',
+      'depth',
+      'actionability',
     ]
     return dimensions.map(dim => this.scoreSingleDimension(dim, input, output))
   }
 
-  private scoreSingleDimension(dimension: QualityDimension, input: string, output: string): DimensionScore {
+  private scoreSingleDimension(
+    dimension: QualityDimension,
+    input: string,
+    output: string,
+  ): DimensionScore {
     const criteria = DIMENSION_CRITERIA[dimension]
     const positive = countKeywordHits(output, criteria.keywords)
     const negative = countKeywordHits(output, criteria.antiKeywords)
 
     // Base score from keyword signals
-    let score = 0.5 + (positive * 0.08) - (negative * 0.1)
+    let score = 0.5 + positive * 0.08 - negative * 0.1
 
     // Length heuristics
     const outputWords = output.split(/\s+/).length
@@ -308,7 +394,7 @@ export class SelfReflectionEngine {
       const inputTokens = new Set(input.toLowerCase().split(/\s+/))
       const outputTokens = output.toLowerCase().split(/\s+/)
       const overlap = outputTokens.filter(t => inputTokens.has(t)).length
-      score += Math.min(overlap / Math.max(inputWords, 1) * 0.15, 0.2)
+      score += Math.min((overlap / Math.max(inputWords, 1)) * 0.15, 0.2)
     }
     if (dimension === 'depth') {
       // Sentences count as depth indicator
@@ -345,13 +431,33 @@ export class SelfReflectionEngine {
 
   private getDimensionSuggestions(dimension: QualityDimension, _score: number): string[] {
     const suggestions: Record<QualityDimension, string[]> = {
-      coherence: ['Improve logical flow between paragraphs', 'Add transitional phrases', 'Ensure consistent terminology'],
-      relevance: ['Focus more on the user\'s specific question', 'Remove tangential information', 'Address the core ask first'],
+      coherence: [
+        'Improve logical flow between paragraphs',
+        'Add transitional phrases',
+        'Ensure consistent terminology',
+      ],
+      relevance: [
+        "Focus more on the user's specific question",
+        'Remove tangential information',
+        'Address the core ask first',
+      ],
       completeness: ['Cover edge cases', 'Add examples', 'Address potential follow-up questions'],
-      accuracy: ['Double-check factual claims', 'Add caveats where uncertain', 'Cross-reference with known facts'],
+      accuracy: [
+        'Double-check factual claims',
+        'Add caveats where uncertain',
+        'Cross-reference with known facts',
+      ],
       clarity: ['Use simpler language', 'Break long sentences', 'Define technical terms'],
-      depth: ['Provide more detailed explanations', 'Include technical specifics', 'Add nuanced analysis'],
-      actionability: ['Include step-by-step instructions', 'Add code examples', 'Provide concrete next actions'],
+      depth: [
+        'Provide more detailed explanations',
+        'Include technical specifics',
+        'Add nuanced analysis',
+      ],
+      actionability: [
+        'Include step-by-step instructions',
+        'Add code examples',
+        'Provide concrete next actions',
+      ],
     }
     return suggestions[dimension] || []
   }
@@ -364,9 +470,9 @@ export class SelfReflectionEngine {
       coherence: 0.15,
       relevance: 0.25,
       completeness: 0.15,
-      accuracy: 0.20,
-      clarity: 0.10,
-      depth: 0.10,
+      accuracy: 0.2,
+      clarity: 0.1,
+      depth: 0.1,
       actionability: 0.05,
     }
     let total = 0
@@ -406,7 +512,9 @@ export class SelfReflectionEngine {
     for (const [category, signals] of Object.entries(ERROR_CATEGORY_SIGNALS)) {
       const hits = countKeywordHits(lower, signals)
       if (hits >= 2) {
-        corrections.push(`Potential ${category.replace(/_/g, ' ')}: review output for ${signals.slice(0, 3).join(', ')} patterns`)
+        corrections.push(
+          `Potential ${category.replace(/_/g, ' ')}: review output for ${signals.slice(0, 3).join(', ')} patterns`,
+        )
       }
     }
 
@@ -457,7 +565,10 @@ export class SelfReflectionEngine {
 
   /** Detect recurring error patterns across evaluation history. */
   detectErrorPatterns(): ErrorPattern[] {
-    const categoryFreq: Record<string, { count: number; domains: Set<string>; examples: string[] }> = {}
+    const categoryFreq: Record<
+      string,
+      { count: number; domains: Set<string>; examples: string[] }
+    > = {}
 
     for (const evaluation of this.evaluations) {
       const output = evaluation.output.toLowerCase()
@@ -482,7 +593,14 @@ export class SelfReflectionEngine {
     for (const [category, data] of Object.entries(categoryFreq)) {
       if (data.count >= 2) {
         const frequency = data.count / this.evaluations.length
-        const severity = frequency > 0.5 ? 'critical' : frequency > 0.3 ? 'high' : frequency > 0.15 ? 'medium' : 'low'
+        const severity =
+          frequency > 0.5
+            ? 'critical'
+            : frequency > 0.3
+              ? 'high'
+              : frequency > 0.15
+                ? 'medium'
+                : 'low'
         const pattern: ErrorPattern = {
           id: `ep_${category}`,
           category: category as ErrorCategory,
@@ -505,15 +623,19 @@ export class SelfReflectionEngine {
   private getSuggestedFix(category: ErrorCategory): string {
     const fixes: Record<ErrorCategory, string> = {
       hallucination: 'Add confidence scores and cite sources. Flag uncertain claims explicitly.',
-      over_generalization: 'Use qualifiers like "often", "typically", "in most cases" instead of absolutes.',
+      over_generalization:
+        'Use qualifiers like "often", "typically", "in most cases" instead of absolutes.',
       missing_context: 'Ask clarifying questions before answering. State assumptions explicitly.',
-      logical_inconsistency: 'Review entire response for internal contradictions before finalizing.',
+      logical_inconsistency:
+        'Review entire response for internal contradictions before finalizing.',
       incomplete_answer: 'Use a checklist to ensure all parts of the question are addressed.',
       wrong_assumption: 'State assumptions explicitly and verify them against the input.',
-      outdated_knowledge: 'Flag information that may be time-sensitive. Add version/date qualifiers.',
+      outdated_knowledge:
+        'Flag information that may be time-sensitive. Add version/date qualifiers.',
       format_mismatch: 'Detect the expected output format from the input and match it.',
       over_confidence: 'Add uncertainty markers. Use hedging language for non-verified claims.',
-      under_confidence: 'Commit to a position when evidence supports it. Reduce unnecessary hedging.',
+      under_confidence:
+        'Commit to a position when evidence supports it. Reduce unnecessary hedging.',
       repetition: 'Track concepts already covered. Deduplicate before finalizing response.',
       tangential: 'Stay focused on the core question. Move tangential info to footnotes.',
     }
@@ -562,8 +684,19 @@ export class SelfReflectionEngine {
   generateStrategies(): ImprovementStrategy[] {
     if (this.evaluations.length < this.config.minEvaluationsForPatterns) return []
 
-    const dimensionAvgs: Record<QualityDimension, { total: number; count: number }> = {} as Record<QualityDimension, { total: number; count: number }>
-    const allDimensions: QualityDimension[] = ['coherence', 'relevance', 'completeness', 'accuracy', 'clarity', 'depth', 'actionability']
+    const dimensionAvgs: Record<QualityDimension, { total: number; count: number }> = {} as Record<
+      QualityDimension,
+      { total: number; count: number }
+    >
+    const allDimensions: QualityDimension[] = [
+      'coherence',
+      'relevance',
+      'completeness',
+      'accuracy',
+      'clarity',
+      'depth',
+      'actionability',
+    ]
     for (const dim of allDimensions) {
       dimensionAvgs[dim] = { total: 0, count: 0 }
     }
@@ -603,13 +736,41 @@ export class SelfReflectionEngine {
 
   private getStrategyActions(dimension: QualityDimension): string[] {
     const actions: Record<QualityDimension, string[]> = {
-      coherence: ['Review logical transitions', 'Ensure consistent terminology', 'Add connecting phrases between sections'],
-      relevance: ['Reread the question before answering', 'Remove off-topic content', 'Lead with the direct answer'],
-      completeness: ['Use a mental checklist', 'Address edge cases', 'Include examples for each concept'],
-      accuracy: ['Cross-check facts', 'Add confidence markers', 'Prefer verified over speculative information'],
-      clarity: ['Simplify sentence structure', 'Define jargon on first use', 'Use formatting (headers, lists)'],
-      depth: ['Add technical details', 'Discuss trade-offs', 'Include underlying reasons, not just surface answers'],
-      actionability: ['Provide code examples', 'Add step-by-step instructions', 'Include expected outcomes for each step'],
+      coherence: [
+        'Review logical transitions',
+        'Ensure consistent terminology',
+        'Add connecting phrases between sections',
+      ],
+      relevance: [
+        'Reread the question before answering',
+        'Remove off-topic content',
+        'Lead with the direct answer',
+      ],
+      completeness: [
+        'Use a mental checklist',
+        'Address edge cases',
+        'Include examples for each concept',
+      ],
+      accuracy: [
+        'Cross-check facts',
+        'Add confidence markers',
+        'Prefer verified over speculative information',
+      ],
+      clarity: [
+        'Simplify sentence structure',
+        'Define jargon on first use',
+        'Use formatting (headers, lists)',
+      ],
+      depth: [
+        'Add technical details',
+        'Discuss trade-offs',
+        'Include underlying reasons, not just surface answers',
+      ],
+      actionability: [
+        'Provide code examples',
+        'Add step-by-step instructions',
+        'Include expected outcomes for each step',
+      ],
     }
     return actions[dimension] || ['Review and improve this dimension']
   }
@@ -620,26 +781,43 @@ export class SelfReflectionEngine {
   getPerformanceTrends(): PerformanceTrend[] {
     if (this.evaluations.length < 4) return []
 
-    const windowSize = Math.min(this.config.trendWindowSize, Math.floor(this.evaluations.length / 2))
+    const windowSize = Math.min(
+      this.config.trendWindowSize,
+      Math.floor(this.evaluations.length / 2),
+    )
     const recent = this.evaluations.slice(-windowSize)
     const historical = this.evaluations.slice(0, -windowSize)
 
-    const allDimensions: QualityDimension[] = ['coherence', 'relevance', 'completeness', 'accuracy', 'clarity', 'depth', 'actionability']
+    const allDimensions: QualityDimension[] = [
+      'coherence',
+      'relevance',
+      'completeness',
+      'accuracy',
+      'clarity',
+      'depth',
+      'actionability',
+    ]
     const trends: PerformanceTrend[] = []
 
     for (const dim of allDimensions) {
-      const recentScores = recent.flatMap(e => e.dimensionScores.filter(s => s.dimension === dim).map(s => s.score))
-      const historicalScores = historical.flatMap(e => e.dimensionScores.filter(s => s.dimension === dim).map(s => s.score))
+      const recentScores = recent.flatMap(e =>
+        e.dimensionScores.filter(s => s.dimension === dim).map(s => s.score),
+      )
+      const historicalScores = historical.flatMap(e =>
+        e.dimensionScores.filter(s => s.dimension === dim).map(s => s.score),
+      )
 
       if (recentScores.length === 0) continue
 
       const recentAvg = recentScores.reduce((a, b) => a + b, 0) / recentScores.length
-      const historicalAvg = historicalScores.length > 0
-        ? historicalScores.reduce((a, b) => a + b, 0) / historicalScores.length
-        : recentAvg
+      const historicalAvg =
+        historicalScores.length > 0
+          ? historicalScores.reduce((a, b) => a + b, 0) / historicalScores.length
+          : recentAvg
 
       const slope = recentAvg - historicalAvg
-      const direction: PerformanceTrend['direction'] = slope > 0.05 ? 'improving' : slope < -0.05 ? 'declining' : 'stable'
+      const direction: PerformanceTrend['direction'] =
+        slope > 0.05 ? 'improving' : slope < -0.05 ? 'declining' : 'stable'
 
       trends.push({
         dimension: dim,
@@ -680,9 +858,8 @@ export class SelfReflectionEngine {
   getStats(): Readonly<SelfReflectionEngineStats> {
     return {
       totalEvaluations: this.stats.totalEvaluations,
-      avgOverallScore: this.stats.totalEvaluations > 0
-        ? this.stats.totalScore / this.stats.totalEvaluations
-        : 0,
+      avgOverallScore:
+        this.stats.totalEvaluations > 0 ? this.stats.totalScore / this.stats.totalEvaluations : 0,
       errorPatternsDetected: this.stats.errorPatternsDetected,
       blindSpotsDetected: this.stats.blindSpotsDetected,
       strategiesGenerated: this.stats.strategiesGenerated,
@@ -708,9 +885,13 @@ export class SelfReflectionEngine {
     // If we were confident but wrong, record over_confidence pattern
     if (!wasCorrect && evaluation.overallScore > 0.7) {
       const lower = (notes || '').toLowerCase()
-      const category: ErrorCategory = lower.includes('wrong') ? 'wrong_assumption' :
-        lower.includes('outdated') ? 'outdated_knowledge' :
-        lower.includes('missing') ? 'incomplete_answer' : 'over_confidence'
+      const category: ErrorCategory = lower.includes('wrong')
+        ? 'wrong_assumption'
+        : lower.includes('outdated')
+          ? 'outdated_knowledge'
+          : lower.includes('missing')
+            ? 'incomplete_answer'
+            : 'over_confidence'
 
       const existing = this.errorPatterns.get(`ep_${category}`)
       if (existing) {
@@ -740,7 +921,10 @@ export class SelfReflectionEngine {
   }
 
   /** Restore engine state from serialized data. */
-  static deserialize(json: string, config?: Partial<SelfReflectionEngineConfig>): SelfReflectionEngine {
+  static deserialize(
+    json: string,
+    config?: Partial<SelfReflectionEngineConfig>,
+  ): SelfReflectionEngine {
     const engine = new SelfReflectionEngine(config)
     try {
       const data = JSON.parse(json)

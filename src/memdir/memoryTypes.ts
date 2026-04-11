@@ -11,12 +11,7 @@
  * trivial without reasoning through a helper's conditional rendering.
  */
 
-export const MEMORY_TYPES = [
-  'user',
-  'feedback',
-  'project',
-  'reference',
-] as const
+export const MEMORY_TYPES = ['user', 'feedback', 'project', 'reference'] as const
 
 export type MemoryType = (typeof MEMORY_TYPES)[number]
 

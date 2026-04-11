@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  CloudSecurityAnalyzer,
-  DEFAULT_CLOUD_SECURITY_CONFIG,
-} from '../CloudSecurityAnalyzer.js'
+import { CloudSecurityAnalyzer, DEFAULT_CLOUD_SECURITY_CONFIG } from '../CloudSecurityAnalyzer.js'
 
 describe('CloudSecurityAnalyzer', () => {
   let analyzer: CloudSecurityAnalyzer
@@ -72,7 +69,10 @@ describe('CloudSecurityAnalyzer', () => {
     })
 
     it('finds open security group for AWS', () => {
-      const results = analyzer.scanMisconfigurations('aws', 'security group unrestricted inbound 0.0.0.0/0')
+      const results = analyzer.scanMisconfigurations(
+        'aws',
+        'security group unrestricted inbound 0.0.0.0/0',
+      )
       expect(results.some(r => r.id === 'AWS-SG-001')).toBe(true)
     })
 
@@ -82,27 +82,42 @@ describe('CloudSecurityAnalyzer', () => {
     })
 
     it('finds NSG any source for Azure', () => {
-      const results = analyzer.scanMisconfigurations('azure', 'NSG rule allows any source inbound traffic network')
+      const results = analyzer.scanMisconfigurations(
+        'azure',
+        'NSG rule allows any source inbound traffic network',
+      )
       expect(results.some(r => r.provider === 'azure')).toBe(true)
     })
 
     it('finds storage anonymous access for Azure', () => {
-      const results = analyzer.scanMisconfigurations('azure', 'Storage account anonymous access public blob')
+      const results = analyzer.scanMisconfigurations(
+        'azure',
+        'Storage account anonymous access public blob',
+      )
       expect(results.some(r => r.provider === 'azure')).toBe(true)
     })
 
     it('finds GCS bucket misconfiguration for GCP', () => {
-      const results = analyzer.scanMisconfigurations('gcp', 'Cloud Storage bucket uniform bucket level access not enabled')
+      const results = analyzer.scanMisconfigurations(
+        'gcp',
+        'Cloud Storage bucket uniform bucket level access not enabled',
+      )
       expect(results.some(r => r.provider === 'gcp')).toBe(true)
     })
 
     it('finds firewall rule for GCP', () => {
-      const results = analyzer.scanMisconfigurations('gcp', 'VPC firewall rule allows all traffic 0.0.0.0/0')
+      const results = analyzer.scanMisconfigurations(
+        'gcp',
+        'VPC firewall rule allows all traffic 0.0.0.0/0',
+      )
       expect(results.some(r => r.provider === 'gcp')).toBe(true)
     })
 
     it('scans multi-cloud and returns results from all providers', () => {
-      const results = analyzer.scanMisconfigurations('multi', 'firewall security group NSG public access storage bucket')
+      const results = analyzer.scanMisconfigurations(
+        'multi',
+        'firewall security group NSG public access storage bucket',
+      )
       const providers = new Set(results.map(r => r.provider))
       expect(providers.size).toBeGreaterThanOrEqual(1)
     })
@@ -122,7 +137,9 @@ describe('CloudSecurityAnalyzer', () => {
       const results = analyzer.scanMisconfigurations('aws', 'S3 bucket security group EBS')
       const sevOrder: Record<string, number> = { critical: 5, high: 4, medium: 3, low: 2, info: 1 }
       for (let i = 1; i < results.length; i++) {
-        expect(sevOrder[results[i - 1].severity]).toBeGreaterThanOrEqual(sevOrder[results[i].severity])
+        expect(sevOrder[results[i - 1].severity]).toBeGreaterThanOrEqual(
+          sevOrder[results[i].severity],
+        )
       }
     })
 
@@ -191,25 +208,29 @@ describe('CloudSecurityAnalyzer', () => {
     })
 
     it('detects cross-account access', () => {
-      const policy = '{"Statement": [{"Effect": "Allow", "Principal": {"AWS": "arn:aws:iam::123456789012:root"}, "Action": "sts:AssumeRole"}]}'
+      const policy =
+        '{"Statement": [{"Effect": "Allow", "Principal": {"AWS": "arn:aws:iam::123456789012:root"}, "Action": "sts:AssumeRole"}]}'
       const result = analyzer.analyzeIAMPolicy(policy)
       expect(result.crossAccountAccess).toBe(true)
     })
 
     it('does not flag cross-account when Deny effect present', () => {
-      const policy = '{"Statement": [{"Effect": "Deny", "Principal": {"AWS": "arn:aws:iam::123456789012:root"}, "Action": "sts:AssumeRole"}]}'
+      const policy =
+        '{"Statement": [{"Effect": "Deny", "Principal": {"AWS": "arn:aws:iam::123456789012:root"}, "Action": "sts:AssumeRole"}]}'
       const result = analyzer.analyzeIAMPolicy(policy)
       expect(result.crossAccountAccess).toBe(false)
     })
 
     it('detects missing MFA', () => {
-      const policy = '{"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::mybucket/*"}]}'
+      const policy =
+        '{"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::mybucket/*"}]}'
       const result = analyzer.analyzeIAMPolicy(policy)
       expect(result.noMFA).toBe(true)
     })
 
     it('does not flag MFA when MultiFactorAuthPresent is included', () => {
-      const policy = '{"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::mybucket/*", "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}}}]}'
+      const policy =
+        '{"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::mybucket/*", "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}}}]}'
       const result = analyzer.analyzeIAMPolicy(policy)
       expect(result.noMFA).toBe(false)
     })
@@ -222,13 +243,15 @@ describe('CloudSecurityAnalyzer', () => {
     })
 
     it('returns clean recommendations for a tight policy', () => {
-      const policy = '{"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::mybucket/*", "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}}}]}'
+      const policy =
+        '{"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::mybucket/*", "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}}}]}'
       const result = analyzer.analyzeIAMPolicy(policy)
       expect(result.recommendations.length).toBeGreaterThan(0)
     })
 
     it('detects Resource: "*"', () => {
-      const policy = '{"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "*"}]}'
+      const policy =
+        '{"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "*"}]}'
       const result = analyzer.analyzeIAMPolicy(policy)
       expect(result.recommendations.some(r => r.includes('Resource'))).toBe(true)
     })
@@ -246,7 +269,8 @@ describe('CloudSecurityAnalyzer', () => {
     })
 
     it('clamps risk score between 0 and 10', () => {
-      const policy = '{"Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*", "NotAction": "x"}]}'
+      const policy =
+        '{"Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*", "NotAction": "x"}]}'
       const result = analyzer.analyzeIAMPolicy(policy)
       expect(result.riskScore).toBeLessThanOrEqual(10)
       expect(result.riskScore).toBeGreaterThanOrEqual(0)
@@ -384,7 +408,9 @@ spec:
       const results = analyzer.scanKubernetes(manifest)
       const sevOrder: Record<string, number> = { critical: 5, high: 4, medium: 3, low: 2, info: 1 }
       for (let i = 1; i < results.length; i++) {
-        expect(sevOrder[results[i - 1].severity]).toBeGreaterThanOrEqual(sevOrder[results[i].severity])
+        expect(sevOrder[results[i - 1].severity]).toBeGreaterThanOrEqual(
+          sevOrder[results[i].severity],
+        )
       }
     })
 
@@ -512,7 +538,8 @@ COPY . .`
     })
 
     it('detects ADD instruction', () => {
-      const dockerfile = 'FROM node:18\nADD . /app\nUSER appuser\nHEALTHCHECK CMD curl http://localhost/'
+      const dockerfile =
+        'FROM node:18\nADD . /app\nUSER appuser\nHEALTHCHECK CMD curl http://localhost/'
       const result = analyzer.scanContainer(dockerfile)
       expect(result.recommendations.some(r => r.includes('COPY over ADD'))).toBe(true)
     })
@@ -524,7 +551,8 @@ COPY . .`
     })
 
     it('detects apt-get without --no-install-recommends', () => {
-      const dockerfile = 'FROM ubuntu:22.04\nRUN apt-get install -y curl\nUSER appuser\nHEALTHCHECK CMD curl localhost'
+      const dockerfile =
+        'FROM ubuntu:22.04\nRUN apt-get install -y curl\nUSER appuser\nHEALTHCHECK CMD curl localhost'
       const result = analyzer.scanContainer(dockerfile)
       expect(result.recommendations.some(r => r.includes('--no-install-recommends'))).toBe(true)
     })
@@ -549,7 +577,8 @@ COPY . .`
     })
 
     it('detects environment secrets', () => {
-      const config = 'FunctionName: myFunc\nRuntime: python3.11\nEnvironment:\n  Variables:\n    SECRET: my-secret-value'
+      const config =
+        'FunctionName: myFunc\nRuntime: python3.11\nEnvironment:\n  Variables:\n    SECRET: my-secret-value'
       const result = analyzer.analyzeServerless(config, 'aws')
       expect(result.risks.some(r => r.includes('Secrets') || r.includes('secret'))).toBe(true)
     })
@@ -613,7 +642,8 @@ COPY . .`
     })
 
     it('clamps risk score to 0-10', () => {
-      const config = 'FunctionName: f\nRuntime: r\nAdministratorAccess\nEnvironment SECRET\nTimeout: 900\nAPI HTTP gateway'
+      const config =
+        'FunctionName: f\nRuntime: r\nAdministratorAccess\nEnvironment SECRET\nTimeout: 900\nAPI HTTP gateway'
       const result = analyzer.analyzeServerless(config, 'aws')
       expect(result.riskScore).toBeLessThanOrEqual(10)
       expect(result.riskScore).toBeGreaterThanOrEqual(0)
@@ -628,14 +658,18 @@ COPY . .`
     it('suggests VPC when not deployed in VPC', () => {
       const config = 'FunctionName: f\nRuntime: r'
       const result = analyzer.analyzeServerless(config, 'aws')
-      expect(result.eventSourceRisks.some(r => r.includes('VPC')) ||
-             result.recommendations.some(r => r.includes('VPC'))).toBe(true)
+      expect(
+        result.eventSourceRisks.some(r => r.includes('VPC')) ||
+          result.recommendations.some(r => r.includes('VPC')),
+      ).toBe(true)
     })
 
     it('suggests tracing when not configured', () => {
       const config = 'FunctionName: f\nRuntime: r'
       const result = analyzer.analyzeServerless(config, 'aws')
-      expect(result.recommendations.some(r => r.includes('tracing') || r.includes('X-Ray'))).toBe(true)
+      expect(result.recommendations.some(r => r.includes('tracing') || r.includes('X-Ray'))).toBe(
+        true,
+      )
     })
   })
 
@@ -783,7 +817,10 @@ COPY . .`
     })
 
     it('score decreases with more issues', () => {
-      const bad = analyzer.assessCloudSecurity('aws', '{"Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*"}]} FROM node:latest lambda function serverless')
+      const bad = analyzer.assessCloudSecurity(
+        'aws',
+        '{"Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*"}]} FROM node:latest lambda function serverless',
+      )
       // A config with many security keywords should have findings and a score
       expect(bad.score).toBeGreaterThanOrEqual(0)
       expect(bad.score).toBeLessThanOrEqual(100)
@@ -796,7 +833,9 @@ COPY . .`
 
     it('provides recommendations for critical misconfigs', () => {
       const result = analyzer.assessCloudSecurity('aws', 'S3 bucket public access IAM wildcard')
-      const hasCriticalRec = result.recommendations.some(r => r.includes('critical') || r.includes('CRITICAL'))
+      const hasCriticalRec = result.recommendations.some(
+        r => r.includes('critical') || r.includes('CRITICAL'),
+      )
       expect(hasCriticalRec).toBe(true)
     })
   })
@@ -834,7 +873,9 @@ COPY . .`
       const results = analyzer.getCommonMisconfigurations('aws')
       const sevOrder: Record<string, number> = { critical: 5, high: 4, medium: 3, low: 2, info: 1 }
       for (let i = 1; i < results.length; i++) {
-        expect(sevOrder[results[i - 1].severity]).toBeGreaterThanOrEqual(sevOrder[results[i].severity])
+        expect(sevOrder[results[i - 1].severity]).toBeGreaterThanOrEqual(
+          sevOrder[results[i].severity],
+        )
       }
     })
 

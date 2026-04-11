@@ -30,10 +30,7 @@ export async function walkPluginMarkdown(
     try {
       const entries = await fs.readdir(dirPath)
 
-      if (
-        opts.stopAtSkillDir &&
-        entries.some(e => e.isFile() && SKILL_MD_RE.test(e.name))
-      ) {
+      if (opts.stopAtSkillDir && entries.some(e => e.isFile() && SKILL_MD_RE.test(e.name))) {
         // Skill directory: collect .md files here, don't recurse.
         await Promise.all(
           entries.map(entry =>
@@ -58,10 +55,7 @@ export async function walkPluginMarkdown(
         }),
       )
     } catch (error) {
-      logForDebugging(
-        `Failed to scan ${label} directory ${dirPath}: ${error}`,
-        { level: 'error' },
-      )
+      logForDebugging(`Failed to scan ${label} directory ${dirPath}: ${error}`, { level: 'error' })
     }
   }
 

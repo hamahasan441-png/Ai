@@ -343,9 +343,7 @@ describe('DiffEngine createBatch', () => {
   })
 
   it('creates a batch with correct description', () => {
-    const batch = engine.createBatch('Refactor', [
-      { path: 'a.ts', original: 'a', modified: 'b' },
-    ])
+    const batch = engine.createBatch('Refactor', [{ path: 'a.ts', original: 'a', modified: 'b' }])
     expect(batch.description).toBe('Refactor')
   })
 

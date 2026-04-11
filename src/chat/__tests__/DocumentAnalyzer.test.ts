@@ -309,7 +309,14 @@ describe('DocumentAnalyzer', () => {
 
     it('assigns readability level', () => {
       const result = analyzer.analyze({ content: MARKDOWN_DOC })
-      const validLevels = ['elementary', 'middle_school', 'high_school', 'college', 'graduate', 'professional']
+      const validLevels = [
+        'elementary',
+        'middle_school',
+        'high_school',
+        'college',
+        'graduate',
+        'professional',
+      ]
       expect(validLevels).toContain(result.readability.level)
     })
   })
@@ -362,7 +369,9 @@ describe('DocumentAnalyzer', () => {
     it('includes TypeScript-related keywords for TS doc', () => {
       const result = analyzer.analyze({ content: MARKDOWN_DOC })
       const kwWords = result.keywords.map(k => k.word.toLowerCase())
-      expect(kwWords.some(w => w.includes('typescript') || w.includes('type') || w.includes('function'))).toBe(true)
+      expect(
+        kwWords.some(w => w.includes('typescript') || w.includes('type') || w.includes('function')),
+      ).toBe(true)
     })
   })
 

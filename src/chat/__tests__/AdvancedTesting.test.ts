@@ -16,21 +16,33 @@ describe('AdvancedTesting', () => {
 
   describe('KB entry tests', () => {
     it('should match property-based and mutation testing keywords', async () => {
-      const r = await brain.chat('explain property based testing quickcheck hypothesis fast check shrinking mutation testing pit stryker mutant killing mutation score')
+      const r = await brain.chat(
+        'explain property based testing quickcheck hypothesis fast check shrinking mutation testing pit stryker mutant killing mutation score',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/property.based|quickcheck|hypothesis|mutation\s+testing|pit|stryker/)
+      expect(r.text.toLowerCase()).toMatch(
+        /property.based|quickcheck|hypothesis|mutation\s+testing|pit|stryker/,
+      )
     })
 
     it('should match fuzz testing and contract testing keywords', async () => {
-      const r = await brain.chat('explain fuzz testing afl libfuzzer coverage guided fuzzing corpus contract testing pact spring cloud contract consumer driven')
+      const r = await brain.chat(
+        'explain fuzz testing afl libfuzzer coverage guided fuzzing corpus contract testing pact spring cloud contract consumer driven',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/fuzz|afl|libfuzzer|contract\s+testing|pact|consumer.driven/)
+      expect(r.text.toLowerCase()).toMatch(
+        /fuzz|afl|libfuzzer|contract\s+testing|pact|consumer.driven/,
+      )
     })
 
     it('should match formal specification and chaos testing keywords', async () => {
-      const r = await brain.chat('explain formal specification tla+ alloy z notation model checking chaos testing integration fault injection test toxiproxy resilience testing')
+      const r = await brain.chat(
+        'explain formal specification tla+ alloy z notation model checking chaos testing integration fault injection test toxiproxy resilience testing',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/property.based|mutation\s+testing|fuzz|quickcheck|hypothesis|stryker|afl/)
+      expect(r.text.toLowerCase()).toMatch(
+        /property.based|mutation\s+testing|fuzz|quickcheck|hypothesis|stryker|afl/,
+      )
     })
   })
 

@@ -149,13 +149,59 @@ interface IntentKeyword {
 }
 
 const INTENT_KEYWORDS: IntentKeyword[] = [
-  { intent: 'new-feature', keywords: ['add', 'create', 'implement', 'build', 'new', 'develop', 'scaffold', 'generate'], weight: 1.0 },
-  { intent: 'fix-bug', keywords: ['fix', 'bug', 'error', 'crash', 'broken', 'issue', 'wrong', 'fail', 'not working'], weight: 1.2 },
-  { intent: 'refactor', keywords: ['refactor', 'restructure', 'reorganize', 'clean', 'simplify', 'extract', 'rename', 'move'], weight: 1.0 },
-  { intent: 'optimize', keywords: ['optimize', 'performance', 'speed', 'fast', 'slow', 'memory', 'cache', 'efficient'], weight: 1.0 },
-  { intent: 'add-tests', keywords: ['test', 'testing', 'unit test', 'spec', 'coverage', 'mock', 'assert'], weight: 1.0 },
-  { intent: 'documentation', keywords: ['document', 'docs', 'readme', 'comment', 'explain', 'describe', 'jsdoc'], weight: 0.8 },
-  { intent: 'security', keywords: ['security', 'vulnerability', 'auth', 'permission', 'encrypt', 'sanitize', 'xss', 'injection'], weight: 1.1 },
+  {
+    intent: 'new-feature',
+    keywords: ['add', 'create', 'implement', 'build', 'new', 'develop', 'scaffold', 'generate'],
+    weight: 1.0,
+  },
+  {
+    intent: 'fix-bug',
+    keywords: ['fix', 'bug', 'error', 'crash', 'broken', 'issue', 'wrong', 'fail', 'not working'],
+    weight: 1.2,
+  },
+  {
+    intent: 'refactor',
+    keywords: [
+      'refactor',
+      'restructure',
+      'reorganize',
+      'clean',
+      'simplify',
+      'extract',
+      'rename',
+      'move',
+    ],
+    weight: 1.0,
+  },
+  {
+    intent: 'optimize',
+    keywords: ['optimize', 'performance', 'speed', 'fast', 'slow', 'memory', 'cache', 'efficient'],
+    weight: 1.0,
+  },
+  {
+    intent: 'add-tests',
+    keywords: ['test', 'testing', 'unit test', 'spec', 'coverage', 'mock', 'assert'],
+    weight: 1.0,
+  },
+  {
+    intent: 'documentation',
+    keywords: ['document', 'docs', 'readme', 'comment', 'explain', 'describe', 'jsdoc'],
+    weight: 0.8,
+  },
+  {
+    intent: 'security',
+    keywords: [
+      'security',
+      'vulnerability',
+      'auth',
+      'permission',
+      'encrypt',
+      'sanitize',
+      'xss',
+      'injection',
+    ],
+    weight: 1.1,
+  },
 ]
 
 const TOPIC_KEYWORDS: Record<string, string[]> = {
@@ -168,7 +214,16 @@ const TOPIC_KEYWORDS: Record<string, string[]> = {
   debugging: ['debug', 'breakpoint', 'stack trace', 'log', 'error', 'exception'],
   performance: ['performance', 'optimize', 'cache', 'latency', 'throughput', 'benchmark', 'profil'],
   documentation: ['document', 'readme', 'jsdoc', 'comment', 'api doc', 'wiki'],
-  devops: ['devops', 'terraform', 'ansible', 'jenkins', 'github actions', 'ci', 'cd', 'infrastructure'],
+  devops: [
+    'devops',
+    'terraform',
+    'ansible',
+    'jenkins',
+    'github actions',
+    'ci',
+    'cd',
+    'infrastructure',
+  ],
   'ai/ml': ['machine learning', 'neural', 'model', 'training', 'tensor', 'nlp'],
   networking: ['network', 'http', 'tcp', 'websocket', 'dns', 'proxy', 'load balancer'],
   mobile: ['mobile', 'ios', 'android', 'react native', 'flutter'],
@@ -178,7 +233,16 @@ const TOPIC_KEYWORDS: Record<string, string[]> = {
   'design-patterns': ['singleton', 'factory', 'observer', 'strategy', 'decorator', 'adapter'],
   algorithms: ['algorithm', 'sort', 'search', 'graph', 'tree', 'dynamic programming', 'recursion'],
   'data-structures': ['array', 'linked list', 'hash map', 'stack', 'queue', 'heap', 'trie'],
-  concurrency: ['async', 'await', 'thread', 'mutex', 'concurrent', 'parallel', 'race condition', 'promise'],
+  concurrency: [
+    'async',
+    'await',
+    'thread',
+    'mutex',
+    'concurrent',
+    'parallel',
+    'race condition',
+    'promise',
+  ],
 }
 
 const EXPERTISE_PATTERNS: Record<string, Record<string, string[]>> = {
@@ -408,7 +472,8 @@ export class ConversationEngine {
     const seen = new Set<string>()
 
     // File path patterns: src/path/file.ts, ./path/file.js, path/to/file.py
-    const filePattern = /(?:^|\s|`)((?:\.\/|src\/|lib\/|app\/)?[\w./-]+\.(?:ts|tsx|js|jsx|py|rs|go|java|c|cpp|cs|rb|php|html|css|sql|sh|kt|swift|dart|scala))\b/gi
+    const filePattern =
+      /(?:^|\s|`)((?:\.\/|src\/|lib\/|app\/)?[\w./-]+\.(?:ts|tsx|js|jsx|py|rs|go|java|c|cpp|cs|rb|php|html|css|sql|sh|kt|swift|dart|scala))\b/gi
     let match: RegExpExecArray | null
     while ((match = filePattern.exec(content)) !== null) {
       const filePath = match[1]
@@ -416,8 +481,14 @@ export class ConversationEngine {
         seen.add(filePath)
         const ext = filePath.substring(filePath.lastIndexOf('.'))
         const langMap: Record<string, AnalysisLanguage> = {
-          '.ts': 'typescript', '.tsx': 'typescript', '.js': 'javascript', '.jsx': 'javascript',
-          '.py': 'python', '.rs': 'rust', '.go': 'go', '.java': 'java',
+          '.ts': 'typescript',
+          '.tsx': 'typescript',
+          '.js': 'javascript',
+          '.jsx': 'javascript',
+          '.py': 'python',
+          '.rs': 'rust',
+          '.go': 'go',
+          '.java': 'java',
         }
         refs.push({ filePath, language: langMap[ext] ?? 'unknown' })
       }
@@ -440,7 +511,9 @@ export class ConversationEngine {
       if (symbolName.length > 2 && !seen.has(`sym:${symbolName}`)) {
         seen.add(`sym:${symbolName}`)
         // Try to find which file this symbol belongs to
-        const ref = refs.find(r => content.includes(`${r.filePath}`) && content.includes(symbolName))
+        const ref = refs.find(
+          r => content.includes(`${r.filePath}`) && content.includes(symbolName),
+        )
         if (ref) {
           ref.symbolName = symbolName
         }
@@ -454,7 +527,12 @@ export class ConversationEngine {
    * Get the current conversation state.
    */
   getState(): ConversationState {
-    return { ...this.state, mentionedFiles: new Set(this.state.mentionedFiles), mentionedSymbols: new Set(this.state.mentionedSymbols), topics: new Set(this.state.topics) }
+    return {
+      ...this.state,
+      mentionedFiles: new Set(this.state.mentionedFiles),
+      mentionedSymbols: new Set(this.state.mentionedSymbols),
+      topics: new Set(this.state.topics),
+    }
   }
 
   /**
@@ -501,11 +579,12 @@ export class ConversationEngine {
     // Task state
     const completed = this.state.completedTasks.length
     const pending = this.state.pendingTasks.length
-    const taskState = pending > 0
-      ? `${completed} tasks completed, ${pending} pending`
-      : completed > 0
-        ? `${completed} tasks completed`
-        : 'No tasks tracked'
+    const taskState =
+      pending > 0
+        ? `${completed} tasks completed, ${pending} pending`
+        : completed > 0
+          ? `${completed} tasks completed`
+          : 'No tasks tracked'
 
     // Summary text
     const turns = userMessages.length
@@ -545,17 +624,49 @@ export class ConversationEngine {
 
     // Intent-based suggestions
     if (intent === 'new-feature') {
-      suggestions.push({ text: 'Should we add tests for this new feature?', category: 'next-step', relevance: 0.9 })
-      suggestions.push({ text: 'Should we update the documentation?', category: 'next-step', relevance: 0.6 })
+      suggestions.push({
+        text: 'Should we add tests for this new feature?',
+        category: 'next-step',
+        relevance: 0.9,
+      })
+      suggestions.push({
+        text: 'Should we update the documentation?',
+        category: 'next-step',
+        relevance: 0.6,
+      })
     } else if (intent === 'fix-bug') {
-      suggestions.push({ text: 'Can you add a regression test for this bug?', category: 'next-step', relevance: 0.9 })
-      suggestions.push({ text: 'Are there similar bugs elsewhere in the code?', category: 'alternative', relevance: 0.7 })
+      suggestions.push({
+        text: 'Can you add a regression test for this bug?',
+        category: 'next-step',
+        relevance: 0.9,
+      })
+      suggestions.push({
+        text: 'Are there similar bugs elsewhere in the code?',
+        category: 'alternative',
+        relevance: 0.7,
+      })
     } else if (intent === 'refactor') {
-      suggestions.push({ text: 'Should we run the test suite to verify nothing broke?', category: 'next-step', relevance: 0.9 })
-      suggestions.push({ text: 'Are there other files that need the same refactoring?', category: 'alternative', relevance: 0.7 })
+      suggestions.push({
+        text: 'Should we run the test suite to verify nothing broke?',
+        category: 'next-step',
+        relevance: 0.9,
+      })
+      suggestions.push({
+        text: 'Are there other files that need the same refactoring?',
+        category: 'alternative',
+        relevance: 0.7,
+      })
     } else if (intent === 'add-tests') {
-      suggestions.push({ text: 'Should we add edge case tests too?', category: 'next-step', relevance: 0.8 })
-      suggestions.push({ text: 'What is the current test coverage?', category: 'clarify', relevance: 0.6 })
+      suggestions.push({
+        text: 'Should we add edge case tests too?',
+        category: 'next-step',
+        relevance: 0.8,
+      })
+      suggestions.push({
+        text: 'What is the current test coverage?',
+        category: 'clarify',
+        relevance: 0.6,
+      })
     }
 
     // Pending tasks
@@ -734,10 +845,18 @@ export class ConversationEngine {
     let curiousScore = 0
     let confusedScore = 0
 
-    for (const kw of SENTIMENT_KEYWORDS.frustrated) { if (lower.includes(kw)) frustratedScore++ }
-    for (const kw of SENTIMENT_KEYWORDS.positive) { if (lower.includes(kw)) positiveScore++ }
-    for (const kw of SENTIMENT_KEYWORDS.curious) { if (lower.includes(kw)) curiousScore++ }
-    for (const kw of SENTIMENT_KEYWORDS.confused) { if (lower.includes(kw)) confusedScore++ }
+    for (const kw of SENTIMENT_KEYWORDS.frustrated) {
+      if (lower.includes(kw)) frustratedScore++
+    }
+    for (const kw of SENTIMENT_KEYWORDS.positive) {
+      if (lower.includes(kw)) positiveScore++
+    }
+    for (const kw of SENTIMENT_KEYWORDS.curious) {
+      if (lower.includes(kw)) curiousScore++
+    }
+    for (const kw of SENTIMENT_KEYWORDS.confused) {
+      if (lower.includes(kw)) confusedScore++
+    }
 
     if (frustratedScore > 0 && frustratedScore >= confusedScore) return 'frustrated'
     if (confusedScore > 0) return 'confused'
@@ -870,22 +989,30 @@ export class ConversationEngine {
     const msgs = this.state.messages
     const userMsgs = msgs.filter(m => m.role === 'user')
 
-    const intentClarity = userMsgs.length > 0
-      ? Math.round((userMsgs.filter(m => m.intent).length / userMsgs.length) * 100)
-      : 0
+    const intentClarity =
+      userMsgs.length > 0
+        ? Math.round((userMsgs.filter(m => m.intent).length / userMsgs.length) * 100)
+        : 0
 
-    const codeRefDensity = msgs.length > 0
-      ? Math.round((msgs.filter(m => m.codeRefs.length > 0).length / msgs.length) * 100)
-      : 0
+    const codeRefDensity =
+      msgs.length > 0
+        ? Math.round((msgs.filter(m => m.codeRefs.length > 0).length / msgs.length) * 100)
+        : 0
 
-    const topicConsistency = userMsgs.length > 0
-      ? Math.round(Math.min(this.state.topics.size / Math.max(userMsgs.length * TOPIC_TO_MESSAGE_RATIO, 1), 1) * 100)
-      : 0
+    const topicConsistency =
+      userMsgs.length > 0
+        ? Math.round(
+            Math.min(
+              this.state.topics.size / Math.max(userMsgs.length * TOPIC_TO_MESSAGE_RATIO, 1),
+              1,
+            ) * 100,
+          )
+        : 0
 
     let sentimentTracking = 0
     if (userMsgs.length > 0) {
-      const withSentiment = userMsgs.filter(m =>
-        m.metadata?.sentiment && m.metadata.sentiment !== 'neutral',
+      const withSentiment = userMsgs.filter(
+        m => m.metadata?.sentiment && m.metadata.sentiment !== 'neutral',
       )
       sentimentTracking = Math.round((withSentiment.length / userMsgs.length) * 100)
     }
@@ -899,9 +1026,9 @@ export class ConversationEngine {
 
     const score = Math.round(
       intentClarity * UNDERSTANDING_WEIGHTS.intentClarity +
-      codeRefDensity * UNDERSTANDING_WEIGHTS.codeRefDensity +
-      topicConsistency * UNDERSTANDING_WEIGHTS.topicConsistency +
-      sentimentTracking * UNDERSTANDING_WEIGHTS.sentimentTracking,
+        codeRefDensity * UNDERSTANDING_WEIGHTS.codeRefDensity +
+        topicConsistency * UNDERSTANDING_WEIGHTS.topicConsistency +
+        sentimentTracking * UNDERSTANDING_WEIGHTS.sentimentTracking,
     )
 
     return { score: Math.min(score, 100), breakdown }
@@ -913,7 +1040,10 @@ export class ConversationEngine {
    * Detect languages, frameworks, and tools discussed in the conversation.
    */
   getDetectedExpertise(): { languages: string[]; frameworks: string[]; tools: string[] } {
-    const allContent = this.state.messages.map(m => m.content).join(' ').toLowerCase()
+    const allContent = this.state.messages
+      .map(m => m.content)
+      .join(' ')
+      .toLowerCase()
 
     const detected: { languages: string[]; frameworks: string[]; tools: string[] } = {
       languages: [],
@@ -965,7 +1095,10 @@ export class ConversationEngine {
     }
 
     // Context management: summarize old messages if over limit
-    if (this.state.messages.length > this.maxMessages || this.state.tokenEstimate > this.maxTokens) {
+    if (
+      this.state.messages.length > this.maxMessages ||
+      this.state.tokenEstimate > this.maxTokens
+    ) {
       this.compressContext()
     }
   }

@@ -81,7 +81,13 @@ function descToFunctionName(desc: string): string {
 
   if (words.length === 0) return 'myFunction'
 
-  return words[0] + words.slice(1).map(w => w[0].toUpperCase() + w.slice(1)).join('')
+  return (
+    words[0] +
+    words
+      .slice(1)
+      .map(w => w[0].toUpperCase() + w.slice(1))
+      .join('')
+  )
 }
 
 /** Convert a description to a PascalCase class name. */
@@ -119,11 +125,48 @@ function extractReturnHint(desc: string): string | null {
 /** Map a hint to a TypeScript type. */
 function hintToTsType(hint: string): string {
   const lower = hint.toLowerCase()
-  if (lower.includes('string') || lower.includes('name') || lower.includes('text') || lower.includes('message') || lower.includes('path') || lower.includes('url')) return 'string'
-  if (lower.includes('number') || lower.includes('count') || lower.includes('index') || lower.includes('size') || lower.includes('length') || lower.includes('age') || lower.includes('amount')) return 'number'
-  if (lower.includes('boolean') || lower.includes('flag') || lower.includes('is') || lower.includes('has') || lower.includes('should')) return 'boolean'
-  if (lower.includes('array') || lower.includes('list') || lower.includes('items') || lower.includes('elements')) return 'unknown[]'
-  if (lower.includes('object') || lower.includes('map') || lower.includes('record') || lower.includes('config') || lower.includes('options')) return 'Record<string, unknown>'
+  if (
+    lower.includes('string') ||
+    lower.includes('name') ||
+    lower.includes('text') ||
+    lower.includes('message') ||
+    lower.includes('path') ||
+    lower.includes('url')
+  )
+    return 'string'
+  if (
+    lower.includes('number') ||
+    lower.includes('count') ||
+    lower.includes('index') ||
+    lower.includes('size') ||
+    lower.includes('length') ||
+    lower.includes('age') ||
+    lower.includes('amount')
+  )
+    return 'number'
+  if (
+    lower.includes('boolean') ||
+    lower.includes('flag') ||
+    lower.includes('is') ||
+    lower.includes('has') ||
+    lower.includes('should')
+  )
+    return 'boolean'
+  if (
+    lower.includes('array') ||
+    lower.includes('list') ||
+    lower.includes('items') ||
+    lower.includes('elements')
+  )
+    return 'unknown[]'
+  if (
+    lower.includes('object') ||
+    lower.includes('map') ||
+    lower.includes('record') ||
+    lower.includes('config') ||
+    lower.includes('options')
+  )
+    return 'Record<string, unknown>'
   if (lower.includes('promise') || lower.includes('async')) return 'Promise<unknown>'
   return 'unknown'
 }
@@ -151,7 +194,6 @@ function hintToPyType(hint: string): string {
  * with proper error handling, documentation, and type safety.
  */
 export class CodeGenerator {
-
   /**
    * Generate code from a request.
    */
@@ -191,15 +233,52 @@ export class CodeGenerator {
     let code: string
 
     if (language === 'typescript' || language === 'javascript') {
-      code = this.genTsFunction(funcName, description, paramHints, returnHint, includeDocs, includeErrorHandling, language === 'typescript')
+      code = this.genTsFunction(
+        funcName,
+        description,
+        paramHints,
+        returnHint,
+        includeDocs,
+        includeErrorHandling,
+        language === 'typescript',
+      )
     } else if (language === 'python') {
-      code = this.genPyFunction(funcName, description, paramHints, returnHint, includeDocs, includeErrorHandling)
+      code = this.genPyFunction(
+        funcName,
+        description,
+        paramHints,
+        returnHint,
+        includeDocs,
+        includeErrorHandling,
+      )
     } else if (language === 'go') {
-      code = this.genGoFunction(funcName, description, paramHints, returnHint, includeDocs, includeErrorHandling)
+      code = this.genGoFunction(
+        funcName,
+        description,
+        paramHints,
+        returnHint,
+        includeDocs,
+        includeErrorHandling,
+      )
     } else if (language === 'rust') {
-      code = this.genRustFunction(funcName, description, paramHints, returnHint, includeDocs, includeErrorHandling)
+      code = this.genRustFunction(
+        funcName,
+        description,
+        paramHints,
+        returnHint,
+        includeDocs,
+        includeErrorHandling,
+      )
     } else {
-      code = this.genTsFunction(funcName, description, paramHints, returnHint, includeDocs, includeErrorHandling, true)
+      code = this.genTsFunction(
+        funcName,
+        description,
+        paramHints,
+        returnHint,
+        includeDocs,
+        includeErrorHandling,
+        true,
+      )
     }
 
     return {
@@ -238,7 +317,11 @@ export class CodeGenerator {
       lineCount: code.split('\n').length,
       description: `Generated class '${className}'`,
       requiredImports,
-      suggestions: [`Add tests for ${className}`, `Create interface for ${className}`, `Add to barrel exports`],
+      suggestions: [
+        `Add tests for ${className}`,
+        `Create interface for ${className}`,
+        `Add to barrel exports`,
+      ],
     }
   }
 
@@ -521,7 +604,11 @@ export class CodeGenerator {
       lineCount: code.split('\n').length,
       description: `Generated data model '${modelName}'`,
       requiredImports: [],
-      suggestions: ['Add domain-specific fields', 'Add validation rules', 'Add serialization methods'],
+      suggestions: [
+        'Add domain-specific fields',
+        'Add validation rules',
+        'Add serialization methods',
+      ],
     }
   }
 
@@ -541,7 +628,16 @@ export class CodeGenerator {
    * Get available generation kinds.
    */
   getAvailableKinds(): GenerationKind[] {
-    return ['function', 'class', 'interface', 'test', 'error-handler', 'api-endpoint', 'data-model', 'utility']
+    return [
+      'function',
+      'class',
+      'interface',
+      'test',
+      'error-handler',
+      'api-endpoint',
+      'data-model',
+      'utility',
+    ]
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -549,8 +645,13 @@ export class CodeGenerator {
   // ══════════════════════════════════════════════════════════════════════════
 
   private genTsFunction(
-    name: string, desc: string, paramHints: string[], returnHint: string | null,
-    docs: boolean, errorHandling: boolean, isTs: boolean,
+    name: string,
+    desc: string,
+    paramHints: string[],
+    returnHint: string | null,
+    docs: boolean,
+    errorHandling: boolean,
+    isTs: boolean,
   ): string {
     const params = paramHints.map((h, i) => {
       const pName = h.split(' ').pop() ?? `param${i}`
@@ -560,13 +661,25 @@ export class CodeGenerator {
     const lines: string[] = []
 
     if (docs) {
-      lines.push(`/**`, ` * ${desc}`, ...params.map(p => ` * @param ${p.split(':')[0].trim()} -`), ` */`)
+      lines.push(
+        `/**`,
+        ` * ${desc}`,
+        ...params.map(p => ` * @param ${p.split(':')[0].trim()} -`),
+        ` */`,
+      )
     }
 
     lines.push(`export function ${name}(${params.join(', ')})${retType} {`)
 
     if (errorHandling) {
-      lines.push(`  try {`, `    // TODO: Implement ${desc}`, `    throw new Error('Not implemented')`, `  } catch (error) {`, `    throw error instanceof Error ? error : new Error(String(error))`, `  }`)
+      lines.push(
+        `  try {`,
+        `    // TODO: Implement ${desc}`,
+        `    throw new Error('Not implemented')`,
+        `  } catch (error) {`,
+        `    throw error instanceof Error ? error : new Error(String(error))`,
+        `  }`,
+      )
     } else {
       lines.push(`  // TODO: Implement ${desc}`, `  throw new Error('Not implemented')`)
     }
@@ -576,8 +689,12 @@ export class CodeGenerator {
   }
 
   private genPyFunction(
-    name: string, desc: string, paramHints: string[], returnHint: string | null,
-    docs: boolean, errorHandling: boolean,
+    name: string,
+    desc: string,
+    paramHints: string[],
+    returnHint: string | null,
+    docs: boolean,
+    errorHandling: boolean,
   ): string {
     const params = paramHints.map(h => {
       const pName = h.split(' ').pop() ?? 'param'
@@ -590,7 +707,13 @@ export class CodeGenerator {
     if (docs) lines.push(`    """${desc}"""`)
 
     if (errorHandling) {
-      lines.push(`    try:`, `        # TODO: Implement ${desc}`, `        raise NotImplementedError()`, `    except Exception as e:`, `        raise RuntimeError(f"Error in ${name}: {e}") from e`)
+      lines.push(
+        `    try:`,
+        `        # TODO: Implement ${desc}`,
+        `        raise NotImplementedError()`,
+        `    except Exception as e:`,
+        `        raise RuntimeError(f"Error in ${name}: {e}") from e`,
+      )
     } else {
       lines.push(`    # TODO: Implement ${desc}`, `    raise NotImplementedError()`)
     }
@@ -599,8 +722,12 @@ export class CodeGenerator {
   }
 
   private genGoFunction(
-    name: string, desc: string, paramHints: string[], returnHint: string | null,
-    docs: boolean, errorHandling: boolean,
+    name: string,
+    desc: string,
+    paramHints: string[],
+    returnHint: string | null,
+    docs: boolean,
+    errorHandling: boolean,
   ): string {
     const goName = name[0].toUpperCase() + name.slice(1) // Go public
     const params = paramHints.map(h => {
@@ -632,8 +759,12 @@ export class CodeGenerator {
   }
 
   private genRustFunction(
-    name: string, desc: string, paramHints: string[], _returnHint: string | null,
-    docs: boolean, errorHandling: boolean,
+    name: string,
+    desc: string,
+    paramHints: string[],
+    _returnHint: string | null,
+    docs: boolean,
+    errorHandling: boolean,
   ): string {
     const params = paramHints.map(h => {
       const pName = h.split(' ').pop() ?? 'param'
@@ -695,12 +826,7 @@ export class CodeGenerator {
     )
 
     if (docs) lines.push(`  /** Reset to initial state. */`)
-    lines.push(
-      `  reset(): void {`,
-      `    this.initialized = false`,
-      `  }`,
-      `}`,
-    )
+    lines.push(`  reset(): void {`, `    this.initialized = false`, `  }`, `}`)
 
     return lines.join('\n')
   }
@@ -733,7 +859,11 @@ export class CodeGenerator {
     return lines.join('\n')
   }
 
-  private genInterfaceFromContext(name: string, context: string, language: AnalysisLanguage): string {
+  private genInterfaceFromContext(
+    name: string,
+    context: string,
+    language: AnalysisLanguage,
+  ): string {
     // Extract property patterns from context
     const propPattern = /(\w+)\s*[:=]\s*(.+?)(?:[;,}\n])/g
     const props: Array<{ name: string; type: string }> = []
@@ -760,7 +890,11 @@ export class CodeGenerator {
     return lines.join('\n')
   }
 
-  private genInterfaceFromDescription(name: string, desc: string, language: AnalysisLanguage): string {
+  private genInterfaceFromDescription(
+    name: string,
+    desc: string,
+    language: AnalysisLanguage,
+  ): string {
     const lower = desc.toLowerCase()
 
     // Common property patterns from keywords
@@ -892,9 +1026,14 @@ export class CodeGenerator {
 
   private tsToPyType(tsType: string): string {
     const map: Record<string, string> = {
-      'string': 'str', 'number': 'int', 'boolean': 'bool',
-      'unknown[]': 'list', 'Record<string, unknown>': 'dict',
-      'null': 'None', 'undefined': 'None', 'unknown': 'Any',
+      string: 'str',
+      number: 'int',
+      boolean: 'bool',
+      'unknown[]': 'list',
+      'Record<string, unknown>': 'dict',
+      null: 'None',
+      undefined: 'None',
+      unknown: 'Any',
     }
     return map[tsType] ?? 'Any'
   }

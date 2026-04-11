@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  KnowledgeSynthesizer,
-  type KnowledgeSource,
-} from '../KnowledgeSynthesizer'
+import { KnowledgeSynthesizer, type KnowledgeSource } from '../KnowledgeSynthesizer'
 
 // ── Helpers ──
 
@@ -16,9 +13,24 @@ function makeSource(
 }
 
 const softwareSources: KnowledgeSource[] = [
-  makeSource('s1', 'software-architecture', ['Microservices improve scalability', 'Caching reduces latency'], 0.9),
-  makeSource('s2', 'software-performance', ['Database indexing speeds up queries', 'Connection pooling improves throughput'], 0.85),
-  makeSource('s3', 'machine-learning', ['Gradient descent optimizes neural networks', 'Regularization prevents overfitting'], 0.8),
+  makeSource(
+    's1',
+    'software-architecture',
+    ['Microservices improve scalability', 'Caching reduces latency'],
+    0.9,
+  ),
+  makeSource(
+    's2',
+    'software-performance',
+    ['Database indexing speeds up queries', 'Connection pooling improves throughput'],
+    0.85,
+  ),
+  makeSource(
+    's3',
+    'machine-learning',
+    ['Gradient descent optimizes neural networks', 'Regularization prevents overfitting'],
+    0.8,
+  ),
 ]
 
 const contradictingSources: KnowledgeSource[] = [
@@ -150,19 +162,20 @@ describe('KnowledgeSynthesizer', () => {
 
   describe('analyzeKnowledgeGaps', () => {
     it('identifies gaps in knowledge', () => {
-      const result = synth.analyzeKnowledgeGaps(
-        softwareSources,
-        ['software-architecture', 'data-science', 'cybersecurity'],
-      )
+      const result = synth.analyzeKnowledgeGaps(softwareSources, [
+        'software-architecture',
+        'data-science',
+        'cybersecurity',
+      ])
       expect(result).toBeDefined()
       expect(result.missingAreas.length).toBeGreaterThanOrEqual(0)
     })
 
     it('returns coverage metric', () => {
-      const result = synth.analyzeKnowledgeGaps(
-        softwareSources,
-        ['software-architecture', 'software-performance'],
-      )
+      const result = synth.analyzeKnowledgeGaps(softwareSources, [
+        'software-architecture',
+        'software-performance',
+      ])
       expect(result.coverage).toBeGreaterThanOrEqual(0)
       expect(result.coverage).toBeLessThanOrEqual(1)
     })

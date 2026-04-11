@@ -117,23 +117,17 @@ describe('parseReferences', () => {
 
   it('parses a single pasted text reference', () => {
     const result = parseReferences('before [Pasted text #1] after')
-    expect(result).toEqual([
-      { id: 1, match: '[Pasted text #1]', index: 7 },
-    ])
+    expect(result).toEqual([{ id: 1, match: '[Pasted text #1]', index: 7 }])
   })
 
   it('parses a pasted text reference with line count', () => {
     const result = parseReferences('[Pasted text #3 +10 lines]')
-    expect(result).toEqual([
-      { id: 3, match: '[Pasted text #3 +10 lines]', index: 0 },
-    ])
+    expect(result).toEqual([{ id: 3, match: '[Pasted text #3 +10 lines]', index: 0 }])
   })
 
   it('parses an image reference', () => {
     const result = parseReferences('see [Image #2] here')
-    expect(result).toEqual([
-      { id: 2, match: '[Image #2]', index: 4 },
-    ])
+    expect(result).toEqual([{ id: 2, match: '[Image #2]', index: 4 }])
   })
 
   it('parses multiple references in text', () => {
@@ -147,9 +141,7 @@ describe('parseReferences', () => {
 
   it('parses truncated text reference', () => {
     const result = parseReferences('[...Truncated text #4]')
-    expect(result).toEqual([
-      { id: 4, match: '[...Truncated text #4]', index: 0 },
-    ])
+    expect(result).toEqual([{ id: 4, match: '[...Truncated text #4]', index: 0 }])
   })
 
   it('filters out references with id 0', () => {
@@ -159,16 +151,12 @@ describe('parseReferences', () => {
 
   it('handles reference at end of string', () => {
     const result = parseReferences('text [Image #5]')
-    expect(result).toEqual([
-      { id: 5, match: '[Image #5]', index: 5 },
-    ])
+    expect(result).toEqual([{ id: 5, match: '[Image #5]', index: 5 }])
   })
 
   it('handles reference at start of string', () => {
     const result = parseReferences('[Image #1] text')
-    expect(result).toEqual([
-      { id: 1, match: '[Image #1]', index: 0 },
-    ])
+    expect(result).toEqual([{ id: 1, match: '[Image #1]', index: 0 }])
   })
 
   it('does not match malformed references', () => {

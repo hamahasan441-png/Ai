@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  CurriculumOptimizer,
-  type Skill,
-} from '../CurriculumOptimizer'
+import { CurriculumOptimizer, type Skill } from '../CurriculumOptimizer'
 
 // ── Helpers ──
 

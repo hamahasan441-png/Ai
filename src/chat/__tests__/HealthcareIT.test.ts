@@ -11,15 +11,21 @@ describe('HealthcareIT', () => {
 
   describe('KB entry tests', () => {
     it('should respond to EHR FHIR and HIPAA queries', async () => {
-      const response = await brain.chat('explain electronic health record ehr emr fhir hl7 interoperability hipaa compliance protected health information phi')
+      const response = await brain.chat(
+        'explain electronic health record ehr emr fhir hl7 interoperability hipaa compliance protected health information phi',
+      )
       expect(response.text.length).toBeGreaterThan(50)
       expect(response.text.toLowerCase()).toMatch(/ehr|fhir|hl7|hipaa|phi|interoperability/)
     })
 
     it('should respond to telemedicine and imaging queries', async () => {
-      const response = await brain.chat('explain telemedicine telehealth remote patient monitoring clinical decision support medical imaging pacs radiology dicom')
+      const response = await brain.chat(
+        'explain telemedicine telehealth remote patient monitoring clinical decision support medical imaging pacs radiology dicom',
+      )
       expect(response.text.length).toBeGreaterThan(50)
-      expect(response.text.toLowerCase()).toMatch(/telemedicine|remote\s+patient|clinical\s+decision|pacs|dicom|radiology/)
+      expect(response.text.toLowerCase()).toMatch(
+        /telemedicine|remote\s+patient|clinical\s+decision|pacs|dicom|radiology/,
+      )
     })
   })
 

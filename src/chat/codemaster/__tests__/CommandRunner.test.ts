@@ -216,7 +216,8 @@ describe('CommandRunner', () => {
 
   describe('parseOutput', () => {
     it('should parse TypeScript errors', () => {
-      const output = 'src/index.ts(10,5): error TS2322: Type string is not assignable to type number'
+      const output =
+        'src/index.ts(10,5): error TS2322: Type string is not assignable to type number'
       const result = runner.parseOutput(output, 1)
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
@@ -289,7 +290,11 @@ describe('CommandRunner', () => {
 
   describe('detectProjectConfig', () => {
     it('should detect npm projects', () => {
-      const config = runner.detectProjectConfig(['package.json', 'package-lock.json', 'src/index.ts'])
+      const config = runner.detectProjectConfig([
+        'package.json',
+        'package-lock.json',
+        'src/index.ts',
+      ])
       expect(config.packageManager).toBe('npm')
     })
 
@@ -373,7 +378,9 @@ describe('CommandRunner', () => {
     it('should generate deploy sequence', () => {
       const seq = runner.generateSequence('deploy to production')
       expect(seq.steps.length).toBeGreaterThanOrEqual(3)
-      expect(seq.steps.some(s => s.description.includes('Test') || s.description.includes('test'))).toBe(true)
+      expect(
+        seq.steps.some(s => s.description.includes('Test') || s.description.includes('test')),
+      ).toBe(true)
     })
 
     it('should generate CI pipeline sequence', () => {

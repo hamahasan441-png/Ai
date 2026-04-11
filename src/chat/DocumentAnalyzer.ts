@@ -20,14 +20,23 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { STOP_WORDS, POSITIVE_WORDS, NEGATIVE_WORDS, TECHNICAL_WORDS, splitSentences, tokenize as nlpTokenize } from './nlpUtils.js'
+import {
+  STOP_WORDS,
+  POSITIVE_WORDS,
+  NEGATIVE_WORDS,
+  TECHNICAL_WORDS,
+  splitSentences,
+  tokenize as nlpTokenize,
+} from './nlpUtils.js'
 
 // ─── PDF Extraction (optional) ─────────────────────────────────────────────────
 
 /** Attempt to extract plain text from a raw PDF binary buffer using pdf-parse. */
 async function tryExtractPdfText(buffer: Buffer): Promise<string> {
   try {
-    const pdfParse = (await import('pdf-parse')).default as (data: Buffer) => Promise<{ text: string }>
+    const pdfParse = (await import('pdf-parse')).default as (
+      data: Buffer,
+    ) => Promise<{ text: string }>
     const result = await pdfParse(buffer)
     return result.text
   } catch {
@@ -116,7 +125,16 @@ export interface DocumentMetadata {
   readonly hasLinks: boolean
 }
 
-export type DocumentFormat = 'pdf' | 'markdown' | 'plaintext' | 'html' | 'code' | 'csv' | 'json' | 'xml' | 'unknown'
+export type DocumentFormat =
+  | 'pdf'
+  | 'markdown'
+  | 'plaintext'
+  | 'html'
+  | 'code'
+  | 'csv'
+  | 'json'
+  | 'xml'
+  | 'unknown'
 
 export interface DocumentStructure {
   readonly sections: readonly DocumentSection[]
@@ -161,7 +179,15 @@ export interface ContentAnalysis {
 
 export interface NamedEntity {
   readonly text: string
-  readonly type: 'person' | 'organization' | 'technology' | 'date' | 'number' | 'url' | 'email' | 'version'
+  readonly type:
+    | 'person'
+    | 'organization'
+    | 'technology'
+    | 'date'
+    | 'number'
+    | 'url'
+    | 'email'
+    | 'version'
   readonly count: number
 }
 
@@ -175,7 +201,13 @@ export interface ReadabilityMetrics {
   /** Coleman-Liau Index. */
   readonly colemanLiau: number
   /** Overall difficulty level. */
-  readonly level: 'elementary' | 'middle_school' | 'high_school' | 'college' | 'graduate' | 'professional'
+  readonly level:
+    | 'elementary'
+    | 'middle_school'
+    | 'high_school'
+    | 'college'
+    | 'graduate'
+    | 'professional'
   /** Estimated reading time in minutes. */
   readonly readingTimeMinutes: number
 }
@@ -279,8 +311,6 @@ export const DEFAULT_DOC_ANALYZER_CONFIG: DocumentAnalyzerConfig = {
   wordsPerPage: 250,
 }
 
-
-
 // ─── DocumentAnalyzer ──────────────────────────────────────────────────────────
 
 export class DocumentAnalyzer {
@@ -326,7 +356,8 @@ export class DocumentAnalyzer {
 
     // 5. Classification
     const classification = this.classifyDocument(content, metadata, structure, contentAnalysis)
-    this.classCounts[classification.primaryType] = (this.classCounts[classification.primaryType] ?? 0) + 1
+    this.classCounts[classification.primaryType] =
+      (this.classCounts[classification.primaryType] ?? 0) + 1
 
     // 6. Keywords
     const keywords = this.extractKeywords(content, metadata)
@@ -347,10 +378,20 @@ export class DocumentAnalyzer {
     const sentiment = this.analyzeSentiment(content)
 
     // 12. Answer question
-    const answer = request.question ? this.answerQuestion(request.question, content, structure, keywords) : null
+    const answer = request.question
+      ? this.answerQuestion(request.question, content, structure, keywords)
+      : null
 
     // 13. Build description
-    const description = this.buildDescription(metadata, structure, classification, readability, keywords, sentiment, request.question)
+    const description = this.buildDescription(
+      metadata,
+      structure,
+      classification,
+      readability,
+      keywords,
+      sentiment,
+      request.question,
+    )
 
     const processingMs = Date.now() - start
     this.totalProcessingMs += processingMs
@@ -465,17 +506,24 @@ export class DocumentAnalyzer {
       if (ext === 'csv') return 'csv'
       if (ext === 'json') return 'json'
       if (ext === 'xml') return 'xml'
-      if (['ts', 'js', 'py', 'rs', 'go', 'java', 'c', 'cpp', 'rb', 'php'].includes(ext ?? '')) return 'code'
+      if (['ts', 'js', 'py', 'rs', 'go', 'java', 'c', 'cpp', 'rb', 'php'].includes(ext ?? ''))
+        return 'code'
     }
 
     // Content analysis
     if (content.startsWith('%PDF')) return 'pdf'
     if (/^#{1,6}\s/m.test(content) || /\[.*?\]\(.*?\)/.test(content)) return 'markdown'
     if (/<html/i.test(content) || /<!DOCTYPE/i.test(content)) return 'html'
-    try { JSON.parse(content); return 'json' } catch { /* not JSON */ }
+    try {
+      JSON.parse(content)
+      return 'json'
+    } catch {
+      /* not JSON */
+    }
     if (/^<\?xml/i.test(content)) return 'xml'
     if (/^[\w"]+[,\t][\w"]+/m.test(content) && content.includes('\n')) return 'csv'
-    if (/^(import|export|const|let|var|function|class|def|fn|pub|package)\s/m.test(content)) return 'code'
+    if (/^(import|export|const|let|var|function|class|def|fn|pub|package)\s/m.test(content))
+      return 'code'
 
     return 'plaintext'
   }
@@ -483,7 +531,18 @@ export class DocumentAnalyzer {
   private detectLanguage(content: string): string {
     // Simple heuristic — check for common English words
     const words = content.toLowerCase().split(/\s+/).slice(0, 200)
-    const englishWords = new Set(['the', 'is', 'and', 'to', 'of', 'in', 'for', 'this', 'that', 'with'])
+    const englishWords = new Set([
+      'the',
+      'is',
+      'and',
+      'to',
+      'of',
+      'in',
+      'for',
+      'this',
+      'that',
+      'with',
+    ])
     const englishCount = words.filter(w => englishWords.has(w)).length
     const total = words.length
 
@@ -503,16 +562,25 @@ export class DocumentAnalyzer {
     const hasToc = /table\s+of\s+contents/i.test(content) || /\btoc\b/i.test(content.slice(0, 500))
 
     const structureType: DocumentStructure['structureType'] =
-      maxDepth >= 3 ? 'hierarchical' :
-      /\|.*\|.*\|/.test(content) ? 'tabular' :
-      maxDepth >= 1 ? 'mixed' : 'flat'
+      maxDepth >= 3
+        ? 'hierarchical'
+        : /\|.*\|.*\|/.test(content)
+          ? 'tabular'
+          : maxDepth >= 1
+            ? 'mixed'
+            : 'flat'
 
     return { sections, outline, depth: maxDepth, hasTableOfContents: hasToc, structureType }
   }
 
   private extractSections(lines: string[]): DocumentSection[] {
     const sections: DocumentSection[] = []
-    let currentSection: { level: number; title: string; startLine: number; content: string[] } | null = null
+    let currentSection: {
+      level: number
+      title: string
+      startLine: number
+      content: string[]
+    } | null = null
     let sectionId = 0
 
     for (let i = 0; i < lines.length; i++) {
@@ -582,7 +650,12 @@ export class DocumentAnalyzer {
     // We'd need to check the NEXT line but we keep it simple here
 
     // ALL CAPS short lines (common in plaintext documents)
-    if (trimmed.length > 3 && trimmed.length < 80 && trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed)) {
+    if (
+      trimmed.length > 3 &&
+      trimmed.length < 80 &&
+      trimmed === trimmed.toUpperCase() &&
+      /[A-Z]/.test(trimmed)
+    ) {
       return { level: 1, title: trimmed }
     }
 
@@ -623,7 +696,7 @@ export class DocumentAnalyzer {
       }
 
       if (stack.length > 0) {
-        (stack[stack.length - 1]!.entry.children as OutlineEntry[]).push(entry)
+        ;(stack[stack.length - 1]!.entry.children as OutlineEntry[]).push(entry)
       } else {
         outline.push(entry)
       }
@@ -647,26 +720,25 @@ export class DocumentAnalyzer {
     const uniqueWords = new Set(words.map(w => w.toLowerCase()))
 
     // Avg sentence length
-    const avgSentenceLength = sentences.length > 0
-      ? Math.round(words.length / sentences.length * 10) / 10
-      : 0
+    const avgSentenceLength =
+      sentences.length > 0 ? Math.round((words.length / sentences.length) * 10) / 10 : 0
 
     // Avg word length
-    const avgWordLength = words.length > 0
-      ? Math.round(words.reduce((sum, w) => sum + w.length, 0) / words.length * 10) / 10
-      : 0
+    const avgWordLength =
+      words.length > 0
+        ? Math.round((words.reduce((sum, w) => sum + w.length, 0) / words.length) * 10) / 10
+        : 0
 
     // Complex words (3+ syllables)
     const complexWords = words.filter(w => this.countSyllables(w) >= 3)
-    const complexWordPercentage = words.length > 0
-      ? Math.round((complexWords.length / words.length) * 100) / 100
-      : 0
+    const complexWordPercentage =
+      words.length > 0 ? Math.round((complexWords.length / words.length) * 100) / 100 : 0
 
     // Named entities
     const entities = this.extractEntities(content)
 
     // Acronyms
-    const acronyms = [...new Set((content.match(/\b[A-Z]{2,6}\b/g) ?? []))]
+    const acronyms = [...new Set(content.match(/\b[A-Z]{2,6}\b/g) ?? [])]
       .filter(a => !STOP_WORDS.has(a.toLowerCase()))
       .slice(0, 20)
 
@@ -758,16 +830,22 @@ export class DocumentAnalyzer {
       entities.set(key, { type: 'technology', count: (entities.get(key)?.count ?? 0) + 1 })
     }
 
-    return [...entities.entries()].map(([key, val]) => ({
-      text: key.split(':').slice(1).join(':'),
-      type: val.type,
-      count: val.count,
-    })).sort((a, b) => b.count - a.count).slice(0, 30)
+    return [...entities.entries()]
+      .map(([key, val]) => ({
+        text: key.split(':').slice(1).join(':'),
+        type: val.type,
+        count: val.count,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 30)
   }
 
   // ── Readability ────────────────────────────────────────────────────────────
 
-  private computeReadability(metadata: DocumentMetadata, content: ContentAnalysis): ReadabilityMetrics {
+  private computeReadability(
+    metadata: DocumentMetadata,
+    content: ContentAnalysis,
+  ): ReadabilityMetrics {
     const words = metadata.wordCount
     const sentences = metadata.sentenceCount || 1
     const syllables = words * 1.5 // Approximate
@@ -777,39 +855,62 @@ export class DocumentAnalyzer {
 
     // Flesch-Kincaid Reading Ease
     const fleschKincaid = Math.round(
-      Math.max(0, Math.min(100,
-        206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / Math.max(1, words))
-      ))
+      Math.max(
+        0,
+        Math.min(
+          100,
+          206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / Math.max(1, words)),
+        ),
+      ),
     )
 
     // Gunning Fog
-    const gunningFog = Math.round(
-      Math.max(0, 0.4 * ((words / sentences) + 100 * complexPercentage)) * 10
-    ) / 10
+    const gunningFog =
+      Math.round(Math.max(0, 0.4 * (words / sentences + 100 * complexPercentage)) * 10) / 10
 
     // Automated Readability Index
-    const automatedReadability = Math.round(
-      Math.max(0, 4.71 * (chars / Math.max(1, words)) + 0.5 * (words / sentences) - 21.43) * 10
-    ) / 10
+    const automatedReadability =
+      Math.round(
+        Math.max(0, 4.71 * (chars / Math.max(1, words)) + 0.5 * (words / sentences) - 21.43) * 10,
+      ) / 10
 
     // Coleman-Liau Index
-    const colemanLiau = Math.round(
-      Math.max(0, 0.0588 * (chars / Math.max(1, words) * 100) - 0.296 * (sentences / Math.max(1, words) * 100) - 15.8) * 10
-    ) / 10
+    const colemanLiau =
+      Math.round(
+        Math.max(
+          0,
+          0.0588 * ((chars / Math.max(1, words)) * 100) -
+            0.296 * ((sentences / Math.max(1, words)) * 100) -
+            15.8,
+        ) * 10,
+      ) / 10
 
     // Level
     const avgGrade = (gunningFog + automatedReadability + colemanLiau) / 3
     const level: ReadabilityMetrics['level'] =
-      avgGrade < 6 ? 'elementary' :
-      avgGrade < 9 ? 'middle_school' :
-      avgGrade < 12 ? 'high_school' :
-      avgGrade < 16 ? 'college' :
-      avgGrade < 20 ? 'graduate' : 'professional'
+      avgGrade < 6
+        ? 'elementary'
+        : avgGrade < 9
+          ? 'middle_school'
+          : avgGrade < 12
+            ? 'high_school'
+            : avgGrade < 16
+              ? 'college'
+              : avgGrade < 20
+                ? 'graduate'
+                : 'professional'
 
     // Reading time (average ~250 WPM)
     const readingTimeMinutes = Math.max(1, Math.round(words / 250))
 
-    return { fleschKincaid, gunningFog, automatedReadability, colemanLiau, level, readingTimeMinutes }
+    return {
+      fleschKincaid,
+      gunningFog,
+      automatedReadability,
+      colemanLiau,
+      level,
+      readingTimeMinutes,
+    }
   }
 
   // ── Classification ─────────────────────────────────────────────────────────
@@ -822,31 +923,58 @@ export class DocumentAnalyzer {
   ): DocumentClassification {
     const lower = content.toLowerCase()
     const scores: Record<DocumentType, number> = {
-      technical: 0, academic: 0, legal: 0, business: 0, tutorial: 0,
-      reference: 0, narrative: 0, news: 0, email: 0, code_documentation: 0,
-      readme: 0, api_docs: 0, specification: 0, report: 0, general: 1,
+      technical: 0,
+      academic: 0,
+      legal: 0,
+      business: 0,
+      tutorial: 0,
+      reference: 0,
+      narrative: 0,
+      news: 0,
+      email: 0,
+      code_documentation: 0,
+      readme: 0,
+      api_docs: 0,
+      specification: 0,
+      report: 0,
+      general: 1,
     }
 
     // Technical indicators
-    const techWordCount = this.tokenize(content).filter(w => TECHNICAL_WORDS.has(w.toLowerCase())).length
+    const techWordCount = this.tokenize(content).filter(w =>
+      TECHNICAL_WORDS.has(w.toLowerCase()),
+    ).length
     scores.technical += techWordCount * 0.5
 
     // Code documentation
-    if (metadata.hasCode) { scores.code_documentation += 3; scores.technical += 2 }
-    if (lower.includes('```')) { scores.code_documentation += 2 }
+    if (metadata.hasCode) {
+      scores.code_documentation += 3
+      scores.technical += 2
+    }
+    if (lower.includes('```')) {
+      scores.code_documentation += 2
+    }
 
     // README
-    if (metadata.title?.toLowerCase().includes('readme') || lower.slice(0, 200).includes('readme')) {
+    if (
+      metadata.title?.toLowerCase().includes('readme') ||
+      lower.slice(0, 200).includes('readme')
+    ) {
       scores.readme += 5
     }
 
     // API docs
-    if (lower.includes('endpoint') || lower.includes('api') && lower.includes('parameter')) {
+    if (lower.includes('endpoint') || (lower.includes('api') && lower.includes('parameter'))) {
       scores.api_docs += 3
     }
 
     // Tutorial
-    if (lower.includes('step 1') || lower.includes('how to') || lower.includes('tutorial') || lower.includes('getting started')) {
+    if (
+      lower.includes('step 1') ||
+      lower.includes('how to') ||
+      lower.includes('tutorial') ||
+      lower.includes('getting started')
+    ) {
       scores.tutorial += 3
     }
 
@@ -856,7 +984,12 @@ export class DocumentAnalyzer {
     if (contentAnalysis.acronyms.length > 5) scores.academic += 1
 
     // Legal
-    if (lower.includes('hereby') || lower.includes('pursuant') || lower.includes('liability') || lower.includes('license')) {
+    if (
+      lower.includes('hereby') ||
+      lower.includes('pursuant') ||
+      lower.includes('liability') ||
+      lower.includes('license')
+    ) {
       scores.legal += 3
     }
 
@@ -871,12 +1004,19 @@ export class DocumentAnalyzer {
     }
 
     // Report
-    if (structure.sections.length > 3 && (lower.includes('conclusion') || lower.includes('summary'))) {
+    if (
+      structure.sections.length > 3 &&
+      (lower.includes('conclusion') || lower.includes('summary'))
+    ) {
       scores.report += 2
     }
 
     // Specification
-    if (lower.includes('requirement') || lower.includes('specification') || lower.includes('shall')) {
+    if (
+      lower.includes('requirement') ||
+      lower.includes('specification') ||
+      lower.includes('shall')
+    ) {
       scores.specification += 3
     }
 
@@ -888,7 +1028,8 @@ export class DocumentAnalyzer {
     const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1])
     const primaryType = sorted[0]![0] as DocumentType
     const maxScore = sorted[0]![1]
-    const secondaryTypes = sorted.slice(1, 3)
+    const secondaryTypes = sorted
+      .slice(1, 3)
       .filter(([_, s]) => s > 0)
       .map(([t]) => t as DocumentType)
 
@@ -905,12 +1046,31 @@ export class DocumentAnalyzer {
 
   private detectDomain(content: string, type: DocumentType): string {
     const lower = content.toLowerCase()
-    if (lower.includes('machine learning') || lower.includes('neural network') || lower.includes('deep learning')) return 'AI/ML'
-    if (lower.includes('kubernetes') || lower.includes('docker') || lower.includes('deployment')) return 'DevOps'
-    if (lower.includes('react') || lower.includes('angular') || lower.includes('vue') || lower.includes('css')) return 'Frontend'
-    if (lower.includes('database') || lower.includes('sql') || lower.includes('mongodb')) return 'Backend/Database'
-    if (lower.includes('security') || lower.includes('vulnerability') || lower.includes('authentication')) return 'Security'
-    if (lower.includes('finance') || lower.includes('trading') || lower.includes('investment')) return 'Finance'
+    if (
+      lower.includes('machine learning') ||
+      lower.includes('neural network') ||
+      lower.includes('deep learning')
+    )
+      return 'AI/ML'
+    if (lower.includes('kubernetes') || lower.includes('docker') || lower.includes('deployment'))
+      return 'DevOps'
+    if (
+      lower.includes('react') ||
+      lower.includes('angular') ||
+      lower.includes('vue') ||
+      lower.includes('css')
+    )
+      return 'Frontend'
+    if (lower.includes('database') || lower.includes('sql') || lower.includes('mongodb'))
+      return 'Backend/Database'
+    if (
+      lower.includes('security') ||
+      lower.includes('vulnerability') ||
+      lower.includes('authentication')
+    )
+      return 'Security'
+    if (lower.includes('finance') || lower.includes('trading') || lower.includes('investment'))
+      return 'Finance'
     if (type === 'legal') return 'Legal'
     if (type === 'academic') return 'Academic'
     return 'General'
@@ -997,13 +1157,18 @@ export class DocumentAnalyzer {
       // Check if this is a markdown table
       const nextLine = lines[i + 1]
       if (nextLine && /^\s*\|?\s*[-:]+/.test(nextLine)) {
-        const headers = line.split('|').map(h => h.trim()).filter(Boolean)
+        const headers = line
+          .split('|')
+          .map(h => h.trim())
+          .filter(Boolean)
         const rows: string[][] = []
 
         // Skip separator line
         let j = i + 2
         while (j < lines.length && lines[j]!.includes('|')) {
-          const cells = lines[j]!.split('|').map(c => c.trim()).filter(Boolean)
+          const cells = lines[j]!.split('|')
+            .map(c => c.trim())
+            .filter(Boolean)
           if (cells.length > 0) rows.push(cells)
           j++
         }
@@ -1127,14 +1292,19 @@ export class DocumentAnalyzer {
     const score = Math.round(((posCount - negCount) / total) * 100) / 100
 
     const overall: DocumentSentiment['overall'] =
-      posCount > negCount * 1.5 ? 'positive' :
-      negCount > posCount * 1.5 ? 'negative' :
-      posCount > 0 && negCount > 0 ? 'mixed' : 'neutral'
+      posCount > negCount * 1.5
+        ? 'positive'
+        : negCount > posCount * 1.5
+          ? 'negative'
+          : posCount > 0 && negCount > 0
+            ? 'mixed'
+            : 'neutral'
 
     // Objectivity: ratio of factual/technical words vs sentiment words
-    const objectivity = Math.round(
-      Math.min(1, factualCount / Math.max(1, posCount + negCount + factualCount)) * 100
-    ) / 100
+    const objectivity =
+      Math.round(
+        Math.min(1, factualCount / Math.max(1, posCount + negCount + factualCount)) * 100,
+      ) / 100
 
     return { overall, score, objectivity }
   }
@@ -1148,7 +1318,9 @@ export class DocumentAnalyzer {
     keywords: readonly KeywordResult[],
   ): string {
     const _qLower = question.toLowerCase()
-    const qWords = this.tokenize(question).map(w => w.toLowerCase()).filter(w => !STOP_WORDS.has(w))
+    const qWords = this.tokenize(question)
+      .map(w => w.toLowerCase())
+      .filter(w => !STOP_WORDS.has(w))
 
     // Find most relevant section
     let bestSection: DocumentSection | null = null
@@ -1170,21 +1342,29 @@ export class DocumentAnalyzer {
     }
 
     if (!bestSection || bestScore === 0) {
-      return `Based on the document analysis, I couldn't find a specific answer to "${question}". The document covers: ${keywords.slice(0, 5).map(k => k.word).join(', ')}.`
+      return `Based on the document analysis, I couldn't find a specific answer to "${question}". The document covers: ${keywords
+        .slice(0, 5)
+        .map(k => k.word)
+        .join(', ')}.`
     }
 
     // Extract relevant sentences
     const sentences = this.splitSentences(bestSection.content)
-    const relevantSentences = sentences.filter(s => {
-      const sLower = s.toLowerCase()
-      return qWords.some(w => sLower.includes(w))
-    }).slice(0, 3)
+    const relevantSentences = sentences
+      .filter(s => {
+        const sLower = s.toLowerCase()
+        return qWords.some(w => sLower.includes(w))
+      })
+      .slice(0, 3)
 
     if (relevantSentences.length > 0) {
       return `Based on the section "${bestSection.title}": ${relevantSentences.join(' ')}`
     }
 
-    return `The section "${bestSection.title}" appears most relevant, but a specific answer could not be extracted. Key topics: ${keywords.slice(0, 5).map(k => k.word).join(', ')}.`
+    return `The section "${bestSection.title}" appears most relevant, but a specific answer could not be extracted. Key topics: ${keywords
+      .slice(0, 5)
+      .map(k => k.word)
+      .join(', ')}.`
   }
 
   // ── Description Builder ────────────────────────────────────────────────────
@@ -1204,7 +1384,9 @@ export class DocumentAnalyzer {
     parts.push(`${classification.primaryType.replace(/_/g, ' ')} document (${metadata.format}).`)
 
     // Size
-    parts.push(`${metadata.wordCount} words, ~${metadata.estimatedPages} page(s), ${metadata.sentenceCount} sentences.`)
+    parts.push(
+      `${metadata.wordCount} words, ~${metadata.estimatedPages} page(s), ${metadata.sentenceCount} sentences.`,
+    )
 
     // Title
     if (metadata.title) {
@@ -1212,14 +1394,21 @@ export class DocumentAnalyzer {
     }
 
     // Structure
-    parts.push(`Structure: ${structure.structureType}, ${structure.sections.length} section(s), depth ${structure.depth}.`)
+    parts.push(
+      `Structure: ${structure.structureType}, ${structure.sections.length} section(s), depth ${structure.depth}.`,
+    )
 
     // Readability
-    parts.push(`Readability: ${readability.level.replace(/_/g, ' ')} level, ~${readability.readingTimeMinutes} min read.`)
+    parts.push(
+      `Readability: ${readability.level.replace(/_/g, ' ')} level, ~${readability.readingTimeMinutes} min read.`,
+    )
 
     // Topics
     if (keywords.length > 0) {
-      const topKeywords = keywords.slice(0, 5).map(k => k.word).join(', ')
+      const topKeywords = keywords
+        .slice(0, 5)
+        .map(k => k.word)
+        .join(', ')
       parts.push(`Key topics: ${topKeywords}.`)
     }
 
@@ -1227,7 +1416,9 @@ export class DocumentAnalyzer {
     parts.push(`Domain: ${classification.domain}.`)
 
     // Sentiment
-    parts.push(`Tone: ${sentiment.overall}, objectivity ${(sentiment.objectivity * 100).toFixed(0)}%.`)
+    parts.push(
+      `Tone: ${sentiment.overall}, objectivity ${(sentiment.objectivity * 100).toFixed(0)}%.`,
+    )
 
     // Features
     const features: string[] = []
@@ -1290,7 +1481,8 @@ export class DocumentAnalyzer {
   getStats(): DocumentAnalyzerStats {
     return {
       totalAnalyses: this.analysisCount,
-      averageProcessingMs: this.analysisCount > 0 ? Math.round(this.totalProcessingMs / this.analysisCount) : 0,
+      averageProcessingMs:
+        this.analysisCount > 0 ? Math.round(this.totalProcessingMs / this.analysisCount) : 0,
       totalWordsProcessed: this.totalWords,
       formatDistribution: { ...this.formatCounts },
       classificationDistribution: { ...this.classCounts },

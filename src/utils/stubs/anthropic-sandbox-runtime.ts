@@ -20,7 +20,9 @@ export class SandboxManager {
   constructor(_config?: unknown) {}
   async initialize(): Promise<void> {}
   async cleanup(): Promise<void> {}
-  isEnabled(): boolean { return false }
+  isEnabled(): boolean {
+    return false
+  }
 }
 
 export const SandboxRuntimeConfigSchema = {
@@ -31,5 +33,7 @@ export const SandboxRuntimeConfigSchema = {
 export class SandboxViolationStore {
   constructor() {}
   record(_event: unknown): void {}
-  getAll(): unknown[] { return [] }
+  getAll(): unknown[] {
+    return []
+  }
 }

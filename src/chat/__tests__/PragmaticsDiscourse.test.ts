@@ -11,21 +11,33 @@ describe('Pragmatics & Discourse Analysis Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about pragmatics and speech acts', async () => {
-      const r = await brain.chat('explain pragmatics discourse analysis conversation analysis speech act grice maxims cooperative principle implicature')
+      const r = await brain.chat(
+        'explain pragmatics discourse analysis conversation analysis speech act grice maxims cooperative principle implicature',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/pragmatics|speech\s*act|grice|maxim|implicature|cooperative|discourse/)
+      expect(r.text.toLowerCase()).toMatch(
+        /pragmatics|speech\s*act|grice|maxim|implicature|cooperative|discourse/,
+      )
     })
 
     it('answers about presupposition and politeness', async () => {
-      const r = await brain.chat('explain presupposition entailment inference politeness theory face positive negative context disambiguation reference deixis')
+      const r = await brain.chat(
+        'explain presupposition entailment inference politeness theory face positive negative context disambiguation reference deixis',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/presupposition|entailment|politeness|face|context|deixis|reference/)
+      expect(r.text.toLowerCase()).toMatch(
+        /presupposition|entailment|politeness|face|context|deixis|reference/,
+      )
     })
 
     it('answers about coherence and argumentation', async () => {
-      const r = await brain.chat('explain coherence cohesion discourse markers narrative structure story grammar argumentation claim evidence warrant rebuttal')
+      const r = await brain.chat(
+        'explain coherence cohesion discourse markers narrative structure story grammar argumentation claim evidence warrant rebuttal',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/coherence|cohesion|discourse|narrative|argumentation|claim|evidence|warrant/)
+      expect(r.text.toLowerCase()).toMatch(
+        /coherence|cohesion|discourse|narrative|argumentation|claim|evidence|warrant/,
+      )
     })
   })
 

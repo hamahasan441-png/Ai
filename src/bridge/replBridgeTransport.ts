@@ -75,9 +75,7 @@ export type ReplBridgeTransport = {
  * no-op wrapper that exists only so replBridge's `transport` variable
  * has a single type.
  */
-export function createV1ReplTransport(
-  hybrid: HybridTransport,
-): ReplBridgeTransport {
+export function createV1ReplTransport(hybrid: HybridTransport): ReplBridgeTransport {
   return {
     write: msg => hybrid.write(msg),
     writeBatch: msgs => hybrid.writeBatch(msgs),
@@ -154,13 +152,7 @@ export async function createV2ReplTransport(opts: {
    */
   getAuthToken?: () => string | undefined
 }): Promise<ReplBridgeTransport> {
-  const {
-    sessionUrl,
-    ingressToken,
-    sessionId,
-    initialSequenceNum,
-    getAuthToken,
-  } = opts
+  const { sessionUrl, ingressToken, sessionId, initialSequenceNum, getAuthToken } = opts
 
   // Auth header builder. If getAuthToken is provided, read from it
   // (per-instance, multi-session safe). Otherwise write ingressToken to
@@ -190,14 +182,7 @@ export async function createV2ReplTransport(opts: {
   const sseUrl = new URL(sessionUrl)
   sseUrl.pathname = sseUrl.pathname.replace(/\/$/, '') + '/worker/events/stream'
 
-  const sse = new SSETransport(
-    sseUrl,
-    {},
-    sessionId,
-    undefined,
-    initialSequenceNum,
-    getAuthHeaders,
-  )
+  const sse = new SSETransport(sseUrl, {}, sessionId, undefined, initialSequenceNum, getAuthHeaders)
   let onCloseCb: ((closeCode?: number) => void) | undefined
   const ccr = new CCRClient(sse, new URL(sessionUrl), {
     getAuthHeaders,
@@ -352,10 +337,9 @@ export async function createV2ReplTransport(opts: {
           onConnectCb?.()
         },
         (err: unknown) => {
-          logForDebugging(
-            `[bridge:repl] CCR v2 initialize failed: ${errorMessage(err)}`,
-            { level: 'error' },
-          )
+          logForDebugging(`[bridge:repl] CCR v2 initialize failed: ${errorMessage(err)}`, {
+            level: 'error',
+          })
           // Close transport resources and notify replBridge via onClose
           // so the poll loop can retry on the next work dispatch.
           // Without this callback, replBridge never learns the transport

@@ -11,13 +11,17 @@ describe('Cryptography', () => {
 
   describe('KB entry tests', () => {
     it('should match symmetric/public-key/hash keywords', async () => {
-      const r = await brain.chat('explain symmetric encryption aes des public key cryptography rsa elliptic curve hash function sha256 hmac')
+      const r = await brain.chat(
+        'explain symmetric encryption aes des public key cryptography rsa elliptic curve hash function sha256 hmac',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/aes|rsa|elliptic|sha|hmac|encryption/)
     })
 
     it('should match tls/post-quantum/zkp keywords', async () => {
-      const r = await brain.chat('explain tls ssl https certificate post quantum cryptography lattice kyber zero knowledge proof zkp zk snark')
+      const r = await brain.chat(
+        'explain tls ssl https certificate post quantum cryptography lattice kyber zero knowledge proof zkp zk snark',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/tls|post.quantum|lattice|zero.knowledge|zkp/)
     })

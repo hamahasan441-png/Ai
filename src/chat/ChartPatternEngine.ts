@@ -147,29 +147,120 @@ const DEFAULT_CONFIG: ChartPatternEngineConfig = {
 
 // ── Candlestick Pattern Descriptions ─────────────────────────────────────────
 
-const PATTERN_INFO: Record<CandlestickPatternType, { direction: SignalDirection; reliability: number; description: string }> = {
-  'doji': { direction: 'neutral', reliability: 50, description: 'Indecision candle — open ≈ close. Reversal signal when found after trend.' },
-  'hammer': { direction: 'buy', reliability: 70, description: 'Long lower wick, small body at top. Bullish reversal at support.' },
-  'inverted-hammer': { direction: 'buy', reliability: 60, description: 'Long upper wick, small body at bottom. Bullish reversal signal.' },
-  'hanging-man': { direction: 'sell', reliability: 65, description: 'Same shape as hammer but at resistance. Bearish reversal.' },
-  'shooting-star': { direction: 'sell', reliability: 70, description: 'Long upper wick at resistance. Strong bearish reversal.' },
-  'bullish-engulfing': { direction: 'buy', reliability: 75, description: 'Green candle fully engulfs previous red candle. Strong bullish reversal.' },
-  'bearish-engulfing': { direction: 'sell', reliability: 75, description: 'Red candle fully engulfs previous green candle. Strong bearish reversal.' },
-  'morning-star': { direction: 'buy', reliability: 80, description: '3-candle bullish reversal: big red → small body → big green.' },
-  'evening-star': { direction: 'sell', reliability: 80, description: '3-candle bearish reversal: big green → small body → big red.' },
-  'three-white-soldiers': { direction: 'buy', reliability: 80, description: 'Three consecutive long green candles. Strong bullish continuation.' },
-  'three-black-crows': { direction: 'sell', reliability: 80, description: 'Three consecutive long red candles. Strong bearish continuation.' },
-  'bullish-harami': { direction: 'buy', reliability: 55, description: 'Small green inside previous large red. Potential reversal.' },
-  'bearish-harami': { direction: 'sell', reliability: 55, description: 'Small red inside previous large green. Potential reversal.' },
-  'piercing-line': { direction: 'buy', reliability: 65, description: 'Green candle opens below previous low, closes above midpoint. Bullish.' },
-  'dark-cloud-cover': { direction: 'sell', reliability: 65, description: 'Red candle opens above previous high, closes below midpoint. Bearish.' },
-  'tweezer-top': { direction: 'sell', reliability: 60, description: 'Two candles with equal highs at resistance. Bearish reversal.' },
-  'tweezer-bottom': { direction: 'buy', reliability: 60, description: 'Two candles with equal lows at support. Bullish reversal.' },
-  'spinning-top': { direction: 'neutral', reliability: 40, description: 'Small body with equal wicks. Indecision — wait for confirmation.' },
-  'marubozu-bullish': { direction: 'buy', reliability: 70, description: 'Full body candle with no wicks. Strong bullish momentum.' },
-  'marubozu-bearish': { direction: 'sell', reliability: 70, description: 'Full body candle with no wicks. Strong bearish momentum.' },
-  'dragonfly-doji': { direction: 'buy', reliability: 65, description: 'Doji with long lower wick. Bullish at support levels.' },
-  'gravestone-doji': { direction: 'sell', reliability: 65, description: 'Doji with long upper wick. Bearish at resistance levels.' },
+const PATTERN_INFO: Record<
+  CandlestickPatternType,
+  { direction: SignalDirection; reliability: number; description: string }
+> = {
+  doji: {
+    direction: 'neutral',
+    reliability: 50,
+    description: 'Indecision candle — open ≈ close. Reversal signal when found after trend.',
+  },
+  hammer: {
+    direction: 'buy',
+    reliability: 70,
+    description: 'Long lower wick, small body at top. Bullish reversal at support.',
+  },
+  'inverted-hammer': {
+    direction: 'buy',
+    reliability: 60,
+    description: 'Long upper wick, small body at bottom. Bullish reversal signal.',
+  },
+  'hanging-man': {
+    direction: 'sell',
+    reliability: 65,
+    description: 'Same shape as hammer but at resistance. Bearish reversal.',
+  },
+  'shooting-star': {
+    direction: 'sell',
+    reliability: 70,
+    description: 'Long upper wick at resistance. Strong bearish reversal.',
+  },
+  'bullish-engulfing': {
+    direction: 'buy',
+    reliability: 75,
+    description: 'Green candle fully engulfs previous red candle. Strong bullish reversal.',
+  },
+  'bearish-engulfing': {
+    direction: 'sell',
+    reliability: 75,
+    description: 'Red candle fully engulfs previous green candle. Strong bearish reversal.',
+  },
+  'morning-star': {
+    direction: 'buy',
+    reliability: 80,
+    description: '3-candle bullish reversal: big red → small body → big green.',
+  },
+  'evening-star': {
+    direction: 'sell',
+    reliability: 80,
+    description: '3-candle bearish reversal: big green → small body → big red.',
+  },
+  'three-white-soldiers': {
+    direction: 'buy',
+    reliability: 80,
+    description: 'Three consecutive long green candles. Strong bullish continuation.',
+  },
+  'three-black-crows': {
+    direction: 'sell',
+    reliability: 80,
+    description: 'Three consecutive long red candles. Strong bearish continuation.',
+  },
+  'bullish-harami': {
+    direction: 'buy',
+    reliability: 55,
+    description: 'Small green inside previous large red. Potential reversal.',
+  },
+  'bearish-harami': {
+    direction: 'sell',
+    reliability: 55,
+    description: 'Small red inside previous large green. Potential reversal.',
+  },
+  'piercing-line': {
+    direction: 'buy',
+    reliability: 65,
+    description: 'Green candle opens below previous low, closes above midpoint. Bullish.',
+  },
+  'dark-cloud-cover': {
+    direction: 'sell',
+    reliability: 65,
+    description: 'Red candle opens above previous high, closes below midpoint. Bearish.',
+  },
+  'tweezer-top': {
+    direction: 'sell',
+    reliability: 60,
+    description: 'Two candles with equal highs at resistance. Bearish reversal.',
+  },
+  'tweezer-bottom': {
+    direction: 'buy',
+    reliability: 60,
+    description: 'Two candles with equal lows at support. Bullish reversal.',
+  },
+  'spinning-top': {
+    direction: 'neutral',
+    reliability: 40,
+    description: 'Small body with equal wicks. Indecision — wait for confirmation.',
+  },
+  'marubozu-bullish': {
+    direction: 'buy',
+    reliability: 70,
+    description: 'Full body candle with no wicks. Strong bullish momentum.',
+  },
+  'marubozu-bearish': {
+    direction: 'sell',
+    reliability: 70,
+    description: 'Full body candle with no wicks. Strong bearish momentum.',
+  },
+  'dragonfly-doji': {
+    direction: 'buy',
+    reliability: 65,
+    description: 'Doji with long lower wick. Bullish at support levels.',
+  },
+  'gravestone-doji': {
+    direction: 'sell',
+    reliability: 65,
+    description: 'Doji with long upper wick. Bearish at resistance levels.',
+  },
 }
 
 // ── Fibonacci Levels ─────────────────────────────────────────────────────────
@@ -275,32 +366,66 @@ export class ChartPatternEngine {
         const prevBearish = prev.close < prev.open
 
         // Bullish engulfing
-        if (isBullish && prevBearish && c.open <= prev.close && c.close >= prev.open && body > prevBody) {
+        if (
+          isBullish &&
+          prevBearish &&
+          c.open <= prev.close &&
+          c.close >= prev.open &&
+          body > prevBody
+        ) {
           this.addPattern(patterns, 'bullish-engulfing', i)
         }
 
         // Bearish engulfing
-        if (isBearish && prevBullish && c.open >= prev.close && c.close <= prev.open && body > prevBody) {
+        if (
+          isBearish &&
+          prevBullish &&
+          c.open >= prev.close &&
+          c.close <= prev.open &&
+          body > prevBody
+        ) {
           this.addPattern(patterns, 'bearish-engulfing', i)
         }
 
         // Bullish harami
-        if (isBullish && prevBearish && c.open > prev.close && c.close < prev.open && body < prevBody * 0.5) {
+        if (
+          isBullish &&
+          prevBearish &&
+          c.open > prev.close &&
+          c.close < prev.open &&
+          body < prevBody * 0.5
+        ) {
           this.addPattern(patterns, 'bullish-harami', i)
         }
 
         // Bearish harami
-        if (isBearish && prevBullish && c.open < prev.close && c.close > prev.open && body < prevBody * 0.5) {
+        if (
+          isBearish &&
+          prevBullish &&
+          c.open < prev.close &&
+          c.close > prev.open &&
+          body < prevBody * 0.5
+        ) {
           this.addPattern(patterns, 'bearish-harami', i)
         }
 
         // Piercing line
-        if (isBullish && prevBearish && c.open < prev.low && c.close > (prev.open + prev.close) / 2) {
+        if (
+          isBullish &&
+          prevBearish &&
+          c.open < prev.low &&
+          c.close > (prev.open + prev.close) / 2
+        ) {
           this.addPattern(patterns, 'piercing-line', i)
         }
 
         // Dark cloud cover
-        if (isBearish && prevBullish && c.open > prev.high && c.close < (prev.open + prev.close) / 2) {
+        if (
+          isBearish &&
+          prevBullish &&
+          c.open > prev.high &&
+          c.close < (prev.open + prev.close) / 2
+        ) {
           this.addPattern(patterns, 'dark-cloud-cover', i)
         }
 
@@ -324,26 +449,50 @@ export class ChartPatternEngine {
         const prev2Bullish = prev2.close > prev2.open
 
         // Morning star
-        if (prev2Bearish && prevBody < prev2Body * 0.3 && prevRange < prev2Body * 0.5 && isBullish && body > prev2Body * 0.5) {
+        if (
+          prev2Bearish &&
+          prevBody < prev2Body * 0.3 &&
+          prevRange < prev2Body * 0.5 &&
+          isBullish &&
+          body > prev2Body * 0.5
+        ) {
           this.addPattern(patterns, 'morning-star', i)
         }
 
         // Evening star
-        if (prev2Bullish && prevBody < prev2Body * 0.3 && prevRange < prev2Body * 0.5 && isBearish && body > prev2Body * 0.5) {
+        if (
+          prev2Bullish &&
+          prevBody < prev2Body * 0.3 &&
+          prevRange < prev2Body * 0.5 &&
+          isBearish &&
+          body > prev2Body * 0.5
+        ) {
           this.addPattern(patterns, 'evening-star', i)
         }
 
         // Three white soldiers
-        if (prev2Bullish && (prev.close > prev.open) && isBullish &&
-            prev.close > prev2.close && c.close > prev.close &&
-            prevBody > prev2Body * 0.5 && body > prevBody * 0.5) {
+        if (
+          prev2Bullish &&
+          prev.close > prev.open &&
+          isBullish &&
+          prev.close > prev2.close &&
+          c.close > prev.close &&
+          prevBody > prev2Body * 0.5 &&
+          body > prevBody * 0.5
+        ) {
           this.addPattern(patterns, 'three-white-soldiers', i)
         }
 
         // Three black crows
-        if (prev2Bearish && (prev.close < prev.open) && isBearish &&
-            prev.close < prev2.close && c.close < prev.close &&
-            prevBody > prev2Body * 0.5 && body > prevBody * 0.5) {
+        if (
+          prev2Bearish &&
+          prev.close < prev.open &&
+          isBearish &&
+          prev.close < prev2.close &&
+          c.close < prev.close &&
+          prevBody > prev2Body * 0.5 &&
+          body > prevBody * 0.5
+        ) {
           this.addPattern(patterns, 'three-black-crows', i)
         }
       }
@@ -353,15 +502,30 @@ export class ChartPatternEngine {
   }
 
   /** Get info about a candlestick pattern type. */
-  getCandlestickPatternInfo(type: CandlestickPatternType): { direction: SignalDirection; reliability: number; description: string } {
+  getCandlestickPatternInfo(type: CandlestickPatternType): {
+    direction: SignalDirection
+    reliability: number
+    description: string
+  } {
     return PATTERN_INFO[type]
   }
 
   /** Get all known candlestick pattern types with info. */
-  getAllCandlestickPatterns(): Array<{ type: CandlestickPatternType } & { direction: SignalDirection; reliability: number; description: string }> {
-    return (Object.entries(PATTERN_INFO) as Array<[CandlestickPatternType, { direction: SignalDirection; reliability: number; description: string }]>).map(
-      ([type, info]) => ({ type, ...info }),
-    )
+  getAllCandlestickPatterns(): Array<
+    { type: CandlestickPatternType } & {
+      direction: SignalDirection
+      reliability: number
+      description: string
+    }
+  > {
+    return (
+      Object.entries(PATTERN_INFO) as Array<
+        [
+          CandlestickPatternType,
+          { direction: SignalDirection; reliability: number; description: string },
+        ]
+      >
+    ).map(([type, info]) => ({ type, ...info }))
   }
 
   // ── Support / Resistance Detection ─────────────────────────────────────
@@ -377,13 +541,21 @@ export class ChartPatternEngine {
     // Find local highs and lows (swing points)
     for (let i = 2; i < data.length - 2; i++) {
       // Local high
-      if (data[i].high > data[i - 1].high && data[i].high > data[i + 1].high &&
-          data[i].high > data[i - 2].high && data[i].high > data[i + 2].high) {
+      if (
+        data[i].high > data[i - 1].high &&
+        data[i].high > data[i + 1].high &&
+        data[i].high > data[i - 2].high &&
+        data[i].high > data[i + 2].high
+      ) {
         pivots.push({ price: data[i].high, type: 'high' })
       }
       // Local low
-      if (data[i].low < data[i - 1].low && data[i].low < data[i + 1].low &&
-          data[i].low < data[i - 2].low && data[i].low < data[i + 2].low) {
+      if (
+        data[i].low < data[i - 1].low &&
+        data[i].low < data[i + 1].low &&
+        data[i].low < data[i - 2].low &&
+        data[i].low < data[i + 2].low
+      ) {
         pivots.push({ price: data[i].low, type: 'low' })
       }
     }
@@ -393,9 +565,7 @@ export class ChartPatternEngine {
     const levels: SupportResistanceLevel[] = []
 
     for (const pivot of pivots) {
-      const existing = levels.find(l =>
-        Math.abs(l.price - pivot.price) / pivot.price < tolerance,
-      )
+      const existing = levels.find(l => Math.abs(l.price - pivot.price) / pivot.price < tolerance)
 
       if (existing) {
         existing.touches++
@@ -419,14 +589,17 @@ export class ChartPatternEngine {
   // ── Fibonacci Levels ───────────────────────────────────────────────────
 
   /** Calculate Fibonacci retracement levels between a swing high and swing low. */
-  calculateFibonacci(swingHigh: number, swingLow: number, direction: 'up' | 'down' = 'up'): FibonacciLevel[] {
+  calculateFibonacci(
+    swingHigh: number,
+    swingLow: number,
+    direction: 'up' | 'down' = 'up',
+  ): FibonacciLevel[] {
     const range = swingHigh - swingLow
     if (range <= 0) return []
 
     return FIB_LEVELS.map(fib => {
-      const price = direction === 'up'
-        ? swingHigh - range * fib.ratio
-        : swingLow + range * fib.ratio
+      const price =
+        direction === 'up' ? swingHigh - range * fib.ratio : swingLow + range * fib.ratio
       return {
         level: fib.ratio,
         price: Math.round(price * 100000) / 100000, // 5 decimal places
@@ -436,7 +609,10 @@ export class ChartPatternEngine {
   }
 
   /** Find swing high and swing low in candle data and calculate Fibonacci. */
-  autoFibonacci(candles: Candle[], lookback?: number): { swingHigh: number; swingLow: number; levels: FibonacciLevel[] } {
+  autoFibonacci(
+    candles: Candle[],
+    lookback?: number,
+  ): { swingHigh: number; swingLow: number; levels: FibonacciLevel[] } {
     const lb = lookback ?? this.config.srLookback
     const data = candles.slice(-lb)
     if (data.length < 3) return { swingHigh: 0, swingLow: 0, levels: [] }
@@ -486,12 +662,20 @@ export class ChartPatternEngine {
 
     // Find swing highs and lows
     for (let i = 2; i < candles.length - 2; i++) {
-      if (candles[i].high > candles[i - 1].high && candles[i].high > candles[i + 1].high &&
-          candles[i].high > candles[i - 2].high && candles[i].high > candles[i + 2].high) {
+      if (
+        candles[i].high > candles[i - 1].high &&
+        candles[i].high > candles[i + 1].high &&
+        candles[i].high > candles[i - 2].high &&
+        candles[i].high > candles[i + 2].high
+      ) {
         highs.push({ price: candles[i].high, index: i })
       }
-      if (candles[i].low < candles[i - 1].low && candles[i].low < candles[i + 1].low &&
-          candles[i].low < candles[i - 2].low && candles[i].low < candles[i + 2].low) {
+      if (
+        candles[i].low < candles[i - 1].low &&
+        candles[i].low < candles[i + 1].low &&
+        candles[i].low < candles[i - 2].low &&
+        candles[i].low < candles[i + 2].low
+      ) {
         lows.push({ price: candles[i].low, index: i })
       }
     }
@@ -501,9 +685,13 @@ export class ChartPatternEngine {
     // Double top: two similar highs
     for (let i = 0; i < highs.length - 1; i++) {
       for (let j = i + 1; j < highs.length; j++) {
-        if (Math.abs(highs[i].price - highs[j].price) / highs[i].price < tolerance &&
-            highs[j].index - highs[i].index >= 5) {
-          const neckline = Math.min(...candles.slice(highs[i].index, highs[j].index + 1).map(c => c.low))
+        if (
+          Math.abs(highs[i].price - highs[j].price) / highs[i].price < tolerance &&
+          highs[j].index - highs[i].index >= 5
+        ) {
+          const neckline = Math.min(
+            ...candles.slice(highs[i].index, highs[j].index + 1).map(c => c.low),
+          )
           const target = neckline - (highs[i].price - neckline)
           patterns.push({
             type: 'double-top',
@@ -522,9 +710,13 @@ export class ChartPatternEngine {
     // Double bottom: two similar lows
     for (let i = 0; i < lows.length - 1; i++) {
       for (let j = i + 1; j < lows.length; j++) {
-        if (Math.abs(lows[i].price - lows[j].price) / lows[i].price < tolerance &&
-            lows[j].index - lows[i].index >= 5) {
-          const neckline = Math.max(...candles.slice(lows[i].index, lows[j].index + 1).map(c => c.high))
+        if (
+          Math.abs(lows[i].price - lows[j].price) / lows[i].price < tolerance &&
+          lows[j].index - lows[i].index >= 5
+        ) {
+          const neckline = Math.max(
+            ...candles.slice(lows[i].index, lows[j].index + 1).map(c => c.high),
+          )
           const target = neckline + (neckline - lows[i].price)
           patterns.push({
             type: 'double-bottom',
@@ -562,11 +754,12 @@ export class ChartPatternEngine {
       const head = highs[i + 1]
       const right = highs[i + 2]
 
-      if (head.price > left.price && head.price > right.price &&
-          Math.abs(left.price - right.price) / left.price < tolerance) {
-        const neckline = (
-          Math.min(...candles.slice(left.index, right.index + 1).map(c => c.low))
-        )
+      if (
+        head.price > left.price &&
+        head.price > right.price &&
+        Math.abs(left.price - right.price) / left.price < tolerance
+      ) {
+        const neckline = Math.min(...candles.slice(left.index, right.index + 1).map(c => c.low))
         const target = neckline - (head.price - neckline)
         patterns.push({
           type: 'head-and-shoulders',
@@ -587,11 +780,12 @@ export class ChartPatternEngine {
       const head = lows[i + 1]
       const right = lows[i + 2]
 
-      if (head.price < left.price && head.price < right.price &&
-          Math.abs(left.price - right.price) / left.price < tolerance) {
-        const neckline = (
-          Math.max(...candles.slice(left.index, right.index + 1).map(c => c.high))
-        )
+      if (
+        head.price < left.price &&
+        head.price < right.price &&
+        Math.abs(left.price - right.price) / left.price < tolerance
+      ) {
+        const neckline = Math.max(...candles.slice(left.index, right.index + 1).map(c => c.high))
         const target = neckline + (neckline - head.price)
         patterns.push({
           type: 'inverse-head-and-shoulders',
@@ -713,27 +907,34 @@ export class ChartPatternEngine {
     }
 
     // Check S/R context
-    const nearSupport = sr.find(l => l.type === 'support' && Math.abs(l.price - lastCandle.low) / lastCandle.low < 0.01)
-    const nearResistance = sr.find(l => l.type === 'resistance' && Math.abs(l.price - lastCandle.high) / lastCandle.high < 0.01)
+    const nearSupport = sr.find(
+      l => l.type === 'support' && Math.abs(l.price - lastCandle.low) / lastCandle.low < 0.01,
+    )
+    const nearResistance = sr.find(
+      l => l.type === 'resistance' && Math.abs(l.price - lastCandle.high) / lastCandle.high < 0.01,
+    )
 
-    if (nearSupport) { buyScore += 20 * nearSupport.strength; reasons.push('Near support level') }
-    if (nearResistance) { sellScore += 20 * nearResistance.strength; reasons.push('Near resistance level') }
+    if (nearSupport) {
+      buyScore += 20 * nearSupport.strength
+      reasons.push('Near support level')
+    }
+    if (nearResistance) {
+      sellScore += 20 * nearResistance.strength
+      reasons.push('Near resistance level')
+    }
 
     const maxScore = Math.max(buyScore, sellScore)
     const confidence = Math.min(100, Math.round(maxScore / 2))
 
     if (confidence < this.config.signalMinConfidence) return null
 
-    const direction: SignalDirection = buyScore > sellScore ? 'buy' : sellScore > buyScore ? 'sell' : 'neutral'
+    const direction: SignalDirection =
+      buyScore > sellScore ? 'buy' : sellScore > buyScore ? 'sell' : 'neutral'
     if (direction === 'neutral') return null
 
     const entry = direction === 'buy' ? lastCandle.close : lastCandle.close
-    const stopLoss = direction === 'buy'
-      ? entry - atr * 1.5
-      : entry + atr * 1.5
-    const takeProfit = direction === 'buy'
-      ? entry + atr * 3
-      : entry - atr * 3
+    const stopLoss = direction === 'buy' ? entry - atr * 1.5 : entry + atr * 1.5
+    const takeProfit = direction === 'buy' ? entry + atr * 3 : entry - atr * 3
     const riskReward = Math.abs(takeProfit - entry) / Math.abs(entry - stopLoss)
 
     if (candlePatterns.length > 0) {
@@ -756,7 +957,10 @@ export class ChartPatternEngine {
 
   /** Calculate Average True Range (ATR). */
   calculateATR(candles: Candle[], period: number = 14): number {
-    if (candles.length < period + 1) return candles.length > 0 ? candles[candles.length - 1].high - candles[candles.length - 1].low : 0
+    if (candles.length < period + 1)
+      return candles.length > 0
+        ? candles[candles.length - 1].high - candles[candles.length - 1].low
+        : 0
 
     let atr = 0
     for (let i = candles.length - period; i < candles.length; i++) {
@@ -773,7 +977,10 @@ export class ChartPatternEngine {
   private calculateSlope(values: number[]): number {
     if (values.length < 2) return 0
     const n = values.length
-    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0
+    let sumX = 0,
+      sumY = 0,
+      sumXY = 0,
+      sumX2 = 0
     for (let i = 0; i < n; i++) {
       sumX += i
       sumY += values[i]
@@ -785,9 +992,19 @@ export class ChartPatternEngine {
     return (n * sumXY - sumX * sumY) / denom
   }
 
-  private addPattern(patterns: CandlestickPattern[], type: CandlestickPatternType, index: number): void {
+  private addPattern(
+    patterns: CandlestickPattern[],
+    type: CandlestickPatternType,
+    index: number,
+  ): void {
     const info = PATTERN_INFO[type]
-    patterns.push({ type, direction: info.direction, reliability: info.reliability, description: info.description, index })
+    patterns.push({
+      type,
+      direction: info.direction,
+      reliability: info.reliability,
+      description: info.description,
+      index,
+    })
     this.stats.patternsFound[type] = (this.stats.patternsFound[type] ?? 0) + 1
   }
 

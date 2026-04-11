@@ -11,13 +11,7 @@
  * Works fully offline with heuristic-based decomposition.
  */
 
-import type {
-  TaskPlan,
-  TaskStep,
-  TaskIntent,
-  StepStatus,
-  AnalysisLanguage,
-} from './types.js'
+import type { TaskPlan, TaskStep, TaskIntent, StepStatus, AnalysisLanguage } from './types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // INTENT CLASSIFICATION
@@ -37,17 +31,46 @@ const INTENT_PATTERNS: IntentPattern[] = [
   },
   {
     intent: 'refactor',
-    keywords: ['refactor', 'restructure', 'reorganize', 'clean up', 'simplify', 'extract', 'rename', 'move'],
+    keywords: [
+      'refactor',
+      'restructure',
+      'reorganize',
+      'clean up',
+      'simplify',
+      'extract',
+      'rename',
+      'move',
+    ],
     weight: 1.0,
   },
   {
     intent: 'fix-bug',
-    keywords: ['fix', 'bug', 'error', 'crash', 'broken', 'issue', 'problem', 'wrong', 'fail', 'not working'],
+    keywords: [
+      'fix',
+      'bug',
+      'error',
+      'crash',
+      'broken',
+      'issue',
+      'problem',
+      'wrong',
+      'fail',
+      'not working',
+    ],
     weight: 1.2,
   },
   {
     intent: 'optimize',
-    keywords: ['optimize', 'performance', 'speed', 'faster', 'slow', 'memory', 'cache', 'efficient'],
+    keywords: [
+      'optimize',
+      'performance',
+      'speed',
+      'faster',
+      'slow',
+      'memory',
+      'cache',
+      'efficient',
+    ],
     weight: 1.0,
   },
   {
@@ -62,7 +85,17 @@ const INTENT_PATTERNS: IntentPattern[] = [
   },
   {
     intent: 'security',
-    keywords: ['security', 'vulnerability', 'auth', 'permission', 'encrypt', 'sanitize', 'validate', 'xss', 'injection'],
+    keywords: [
+      'security',
+      'vulnerability',
+      'auth',
+      'permission',
+      'encrypt',
+      'sanitize',
+      'validate',
+      'xss',
+      'injection',
+    ],
     weight: 1.1,
   },
 ]
@@ -108,14 +141,16 @@ export function extractContextFiles(description: string): string[] {
   const files: string[] = []
 
   // Match file paths (e.g., src/foo/bar.ts, ./utils.js, package.json)
-  const filePattern = /(?:^|\s)((?:\.\/|\.\.\/|src\/|lib\/|test\/|tests\/)?[\w./-]+\.(?:ts|js|tsx|jsx|py|java|go|rs|rb|php|c|cpp|h|css|html|json|yaml|yml|toml|md))/g
+  const filePattern =
+    /(?:^|\s)((?:\.\/|\.\.\/|src\/|lib\/|test\/|tests\/)?[\w./-]+\.(?:ts|js|tsx|jsx|py|java|go|rs|rb|php|c|cpp|h|css|html|json|yaml|yml|toml|md))/g
   let match
   while ((match = filePattern.exec(description)) !== null) {
     files.push(match[1])
   }
 
   // Match module references (e.g., "the auth module", "UserService")
-  const modulePattern = /(?:the\s+)?(\w+)(?:\s+module|\s+service|\s+controller|\s+model|\s+component)/gi
+  const modulePattern =
+    /(?:the\s+)?(\w+)(?:\s+module|\s+service|\s+controller|\s+model|\s+component)/gi
   while ((match = modulePattern.exec(description)) !== null) {
     files.push(`src/${match[1].toLowerCase()}/`)
   }
@@ -190,67 +225,284 @@ const TEMPLATES: DecompositionTemplate[] = [
   {
     intent: 'new-feature',
     generateSteps: (desc, ctx) => [
-      { id: 'step-1', description: 'Define interfaces/types for the new feature', dependencies: [], filesToModify: ctx.filter(f => f.endsWith('.ts') || f.endsWith('.js')), estimatedLines: 30, status: 'pending' as StepStatus },
-      { id: 'step-2', description: 'Implement core logic', dependencies: ['step-1'], filesToModify: [], estimatedLines: 100, status: 'pending' as StepStatus },
-      { id: 'step-3', description: 'Add integration with existing modules', dependencies: ['step-2'], filesToModify: ctx, estimatedLines: 50, status: 'pending' as StepStatus },
-      { id: 'step-4', description: 'Add error handling and validation', dependencies: ['step-2'], filesToModify: [], estimatedLines: 30, status: 'pending' as StepStatus },
-      { id: 'step-5', description: 'Write unit tests', dependencies: ['step-2', 'step-3', 'step-4'], filesToModify: [], estimatedLines: 80, status: 'pending' as StepStatus },
-      { id: 'step-6', description: 'Update exports and documentation', dependencies: ['step-5'], filesToModify: [], estimatedLines: 20, status: 'pending' as StepStatus },
+      {
+        id: 'step-1',
+        description: 'Define interfaces/types for the new feature',
+        dependencies: [],
+        filesToModify: ctx.filter(f => f.endsWith('.ts') || f.endsWith('.js')),
+        estimatedLines: 30,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-2',
+        description: 'Implement core logic',
+        dependencies: ['step-1'],
+        filesToModify: [],
+        estimatedLines: 100,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-3',
+        description: 'Add integration with existing modules',
+        dependencies: ['step-2'],
+        filesToModify: ctx,
+        estimatedLines: 50,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-4',
+        description: 'Add error handling and validation',
+        dependencies: ['step-2'],
+        filesToModify: [],
+        estimatedLines: 30,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-5',
+        description: 'Write unit tests',
+        dependencies: ['step-2', 'step-3', 'step-4'],
+        filesToModify: [],
+        estimatedLines: 80,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-6',
+        description: 'Update exports and documentation',
+        dependencies: ['step-5'],
+        filesToModify: [],
+        estimatedLines: 20,
+        status: 'pending' as StepStatus,
+      },
     ],
   },
   {
     intent: 'fix-bug',
     generateSteps: (desc, ctx) => [
-      { id: 'step-1', description: 'Reproduce and understand the bug', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' as StepStatus },
-      { id: 'step-2', description: 'Identify root cause in source code', dependencies: ['step-1'], filesToModify: ctx, estimatedLines: 5, status: 'pending' as StepStatus },
-      { id: 'step-3', description: 'Implement the fix', dependencies: ['step-2'], filesToModify: ctx, estimatedLines: 20, status: 'pending' as StepStatus },
-      { id: 'step-4', description: 'Add regression test', dependencies: ['step-3'], filesToModify: [], estimatedLines: 30, status: 'pending' as StepStatus },
-      { id: 'step-5', description: 'Verify fix doesn\'t break existing tests', dependencies: ['step-3', 'step-4'], filesToModify: [], estimatedLines: 0, status: 'pending' as StepStatus },
+      {
+        id: 'step-1',
+        description: 'Reproduce and understand the bug',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-2',
+        description: 'Identify root cause in source code',
+        dependencies: ['step-1'],
+        filesToModify: ctx,
+        estimatedLines: 5,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-3',
+        description: 'Implement the fix',
+        dependencies: ['step-2'],
+        filesToModify: ctx,
+        estimatedLines: 20,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-4',
+        description: 'Add regression test',
+        dependencies: ['step-3'],
+        filesToModify: [],
+        estimatedLines: 30,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-5',
+        description: "Verify fix doesn't break existing tests",
+        dependencies: ['step-3', 'step-4'],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending' as StepStatus,
+      },
     ],
   },
   {
     intent: 'refactor',
     generateSteps: (desc, ctx) => [
-      { id: 'step-1', description: 'Analyze current code structure', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' as StepStatus },
-      { id: 'step-2', description: 'Plan refactoring approach', dependencies: ['step-1'], filesToModify: [], estimatedLines: 0, status: 'pending' as StepStatus },
-      { id: 'step-3', description: 'Extract/reorganize code', dependencies: ['step-2'], filesToModify: ctx, estimatedLines: 60, status: 'pending' as StepStatus },
-      { id: 'step-4', description: 'Update all references and imports', dependencies: ['step-3'], filesToModify: [], estimatedLines: 20, status: 'pending' as StepStatus },
-      { id: 'step-5', description: 'Run and fix tests', dependencies: ['step-3', 'step-4'], filesToModify: [], estimatedLines: 15, status: 'pending' as StepStatus },
+      {
+        id: 'step-1',
+        description: 'Analyze current code structure',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-2',
+        description: 'Plan refactoring approach',
+        dependencies: ['step-1'],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-3',
+        description: 'Extract/reorganize code',
+        dependencies: ['step-2'],
+        filesToModify: ctx,
+        estimatedLines: 60,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-4',
+        description: 'Update all references and imports',
+        dependencies: ['step-3'],
+        filesToModify: [],
+        estimatedLines: 20,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-5',
+        description: 'Run and fix tests',
+        dependencies: ['step-3', 'step-4'],
+        filesToModify: [],
+        estimatedLines: 15,
+        status: 'pending' as StepStatus,
+      },
     ],
   },
   {
     intent: 'optimize',
     generateSteps: (desc, ctx) => [
-      { id: 'step-1', description: 'Profile and identify bottlenecks', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' as StepStatus },
-      { id: 'step-2', description: 'Implement optimization', dependencies: ['step-1'], filesToModify: ctx, estimatedLines: 40, status: 'pending' as StepStatus },
-      { id: 'step-3', description: 'Add benchmarks', dependencies: ['step-2'], filesToModify: [], estimatedLines: 25, status: 'pending' as StepStatus },
-      { id: 'step-4', description: 'Verify correctness after optimization', dependencies: ['step-2', 'step-3'], filesToModify: [], estimatedLines: 10, status: 'pending' as StepStatus },
+      {
+        id: 'step-1',
+        description: 'Profile and identify bottlenecks',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-2',
+        description: 'Implement optimization',
+        dependencies: ['step-1'],
+        filesToModify: ctx,
+        estimatedLines: 40,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-3',
+        description: 'Add benchmarks',
+        dependencies: ['step-2'],
+        filesToModify: [],
+        estimatedLines: 25,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-4',
+        description: 'Verify correctness after optimization',
+        dependencies: ['step-2', 'step-3'],
+        filesToModify: [],
+        estimatedLines: 10,
+        status: 'pending' as StepStatus,
+      },
     ],
   },
   {
     intent: 'add-tests',
     generateSteps: (desc, ctx) => [
-      { id: 'step-1', description: 'Identify untested code paths', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' as StepStatus },
-      { id: 'step-2', description: 'Write unit tests for core functions', dependencies: ['step-1'], filesToModify: [], estimatedLines: 100, status: 'pending' as StepStatus },
-      { id: 'step-3', description: 'Write edge case tests', dependencies: ['step-2'], filesToModify: [], estimatedLines: 50, status: 'pending' as StepStatus },
-      { id: 'step-4', description: 'Add integration tests', dependencies: ['step-2'], filesToModify: [], estimatedLines: 60, status: 'pending' as StepStatus },
+      {
+        id: 'step-1',
+        description: 'Identify untested code paths',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-2',
+        description: 'Write unit tests for core functions',
+        dependencies: ['step-1'],
+        filesToModify: [],
+        estimatedLines: 100,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-3',
+        description: 'Write edge case tests',
+        dependencies: ['step-2'],
+        filesToModify: [],
+        estimatedLines: 50,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-4',
+        description: 'Add integration tests',
+        dependencies: ['step-2'],
+        filesToModify: [],
+        estimatedLines: 60,
+        status: 'pending' as StepStatus,
+      },
     ],
   },
   {
     intent: 'security',
     generateSteps: (desc, ctx) => [
-      { id: 'step-1', description: 'Security audit of current code', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' as StepStatus },
-      { id: 'step-2', description: 'Fix critical vulnerabilities', dependencies: ['step-1'], filesToModify: ctx, estimatedLines: 30, status: 'pending' as StepStatus },
-      { id: 'step-3', description: 'Add input validation and sanitization', dependencies: ['step-2'], filesToModify: ctx, estimatedLines: 40, status: 'pending' as StepStatus },
-      { id: 'step-4', description: 'Add security tests', dependencies: ['step-2', 'step-3'], filesToModify: [], estimatedLines: 50, status: 'pending' as StepStatus },
+      {
+        id: 'step-1',
+        description: 'Security audit of current code',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-2',
+        description: 'Fix critical vulnerabilities',
+        dependencies: ['step-1'],
+        filesToModify: ctx,
+        estimatedLines: 30,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-3',
+        description: 'Add input validation and sanitization',
+        dependencies: ['step-2'],
+        filesToModify: ctx,
+        estimatedLines: 40,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-4',
+        description: 'Add security tests',
+        dependencies: ['step-2', 'step-3'],
+        filesToModify: [],
+        estimatedLines: 50,
+        status: 'pending' as StepStatus,
+      },
     ],
   },
   {
     intent: 'documentation',
     generateSteps: (desc, ctx) => [
-      { id: 'step-1', description: 'Review existing documentation gaps', dependencies: [], filesToModify: [], estimatedLines: 0, status: 'pending' as StepStatus },
-      { id: 'step-2', description: 'Write/update JSDoc comments', dependencies: ['step-1'], filesToModify: ctx, estimatedLines: 40, status: 'pending' as StepStatus },
-      { id: 'step-3', description: 'Update README and guides', dependencies: ['step-2'], filesToModify: ['README.md'], estimatedLines: 30, status: 'pending' as StepStatus },
+      {
+        id: 'step-1',
+        description: 'Review existing documentation gaps',
+        dependencies: [],
+        filesToModify: [],
+        estimatedLines: 0,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-2',
+        description: 'Write/update JSDoc comments',
+        dependencies: ['step-1'],
+        filesToModify: ctx,
+        estimatedLines: 40,
+        status: 'pending' as StepStatus,
+      },
+      {
+        id: 'step-3',
+        description: 'Update README and guides',
+        dependencies: ['step-2'],
+        filesToModify: ['README.md'],
+        estimatedLines: 30,
+        status: 'pending' as StepStatus,
+      },
     ],
   },
 ]
@@ -322,7 +574,7 @@ export class ProblemDecomposer {
   updateStepStatus(plan: TaskPlan, stepId: string, status: StepStatus): TaskPlan {
     return {
       ...plan,
-      steps: plan.steps.map(s => s.id === stepId ? { ...s, status } : s),
+      steps: plan.steps.map(s => (s.id === stepId ? { ...s, status } : s)),
     }
   }
 
@@ -330,13 +582,10 @@ export class ProblemDecomposer {
    * Get the next pending steps that have all dependencies satisfied.
    */
   getNextSteps(plan: TaskPlan): TaskStep[] {
-    const completed = new Set(
-      plan.steps.filter(s => s.status === 'completed').map(s => s.id),
-    )
+    const completed = new Set(plan.steps.filter(s => s.status === 'completed').map(s => s.id))
 
-    return plan.steps.filter(s =>
-      s.status === 'pending' &&
-      s.dependencies.every(dep => completed.has(dep)),
+    return plan.steps.filter(
+      s => s.status === 'pending' && s.dependencies.every(dep => completed.has(dep)),
     )
   }
 
@@ -344,8 +593,8 @@ export class ProblemDecomposer {
    * Check if the plan is complete (all steps done or failed/skipped).
    */
   isPlanComplete(plan: TaskPlan): boolean {
-    return plan.steps.every(s =>
-      s.status === 'completed' || s.status === 'failed' || s.status === 'skipped',
+    return plan.steps.every(
+      s => s.status === 'completed' || s.status === 'failed' || s.status === 'skipped',
     )
   }
 }

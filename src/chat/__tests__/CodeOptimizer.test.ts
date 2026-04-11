@@ -4,7 +4,9 @@ import { CodeOptimizer, DEFAULT_CODE_OPTIMIZER_CONFIG } from '../CodeOptimizer.j
 describe('CodeOptimizer', () => {
   let opt: CodeOptimizer
 
-  beforeEach(() => { opt = new CodeOptimizer() })
+  beforeEach(() => {
+    opt = new CodeOptimizer()
+  })
 
   describe('constructor & config', () => {
     it('uses default config', () => {
@@ -99,7 +101,9 @@ describe('CodeOptimizer', () => {
       expect(opps.some(o => o.reason.includes('JSON'))).toBe(true)
     })
     it('finds HTTP caching opportunities', () => {
-      const opps = opt.findCachingOpportunities('const res = await fetch("https://api.example.com/data");')
+      const opps = opt.findCachingOpportunities(
+        'const res = await fetch("https://api.example.com/data");',
+      )
       expect(opps.some(o => o.strategy === 'ttl_cache')).toBe(true)
     })
     it('respects config disable', () => {

@@ -43,7 +43,13 @@ function makeRule(
   params: Record<string, number> = {},
   weight = 1.0,
 ): StrategyRule {
-  return { id: `test-rule-${Math.random().toString(36).slice(2, 8)}`, condition, action, parameters: params, weight }
+  return {
+    id: `test-rule-${Math.random().toString(36).slice(2, 8)}`,
+    condition,
+    action,
+    parameters: params,
+    weight,
+  }
 }
 
 /** Create a flat price series. */
@@ -484,11 +490,11 @@ describe('StrategyEngine risk management', () => {
   })
 
   it('accepts custom stop-loss and take-profit values', () => {
-    const rules = engine.createRiskRules(0.05, 0.10)
+    const rules = engine.createRiskRules(0.05, 0.1)
     const sl = rules.find(r => r.type === 'stop-loss')
     const tp = rules.find(r => r.type === 'take-profit')
     expect(sl?.value).toBe(0.05)
-    expect(tp?.value).toBe(0.10)
+    expect(tp?.value).toBe(0.1)
   })
 
   it('trailing rule is active only when explicit trailing pct is provided', () => {
@@ -683,9 +689,18 @@ describe('StrategyEngine monteCarloSimulation', () => {
   it('returns zeroes for a backtest with no trades', () => {
     const strategy = engine.createFromTemplate('momentum')
     const fakeResult: BacktestResult = {
-      strategy, trades: [], totalReturn: 0, annualizedReturn: 0,
-      sharpe: 0, sortino: 0, maxDrawdown: 0, winRate: 0, profitFactor: 0,
-      avgTrade: 0, totalFees: 0, metrics: {},
+      strategy,
+      trades: [],
+      totalReturn: 0,
+      annualizedReturn: 0,
+      sharpe: 0,
+      sortino: 0,
+      maxDrawdown: 0,
+      winRate: 0,
+      profitFactor: 0,
+      avgTrade: 0,
+      totalFees: 0,
+      metrics: {},
     }
     const mc = engine.monteCarloSimulation(fakeResult)
     expect(mc.simulations).toBe(0)
@@ -748,7 +763,9 @@ describe('StrategyEngine serialize / deserialize', () => {
     const json = engine.serialize()
     const restored = StrategyEngine.deserialize(json)
 
-    expect(restored.getStats().totalStrategiesCreated).toBe(engine.getStats().totalStrategiesCreated)
+    expect(restored.getStats().totalStrategiesCreated).toBe(
+      engine.getStats().totalStrategiesCreated,
+    )
     expect(restored.getStats().totalBacktests).toBe(engine.getStats().totalBacktests)
     expect(restored.getStats().totalSignals).toBe(engine.getStats().totalSignals)
     expect(restored.getJournal().length).toBe(engine.getJournal().length)

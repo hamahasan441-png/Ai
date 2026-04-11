@@ -113,10 +113,27 @@ const DEFAULT_CONFIG: CodeIntentPredictorConfig = {
 // ── Intent Keywords ─────────────────────────────────────────────────────────────
 
 const INTENT_KEYWORDS: Record<CodingIntentType, string[]> = {
-  create_function: ['function', 'method', 'helper', 'utility', 'create function', 'add function', 'write function', 'implement function'],
+  create_function: [
+    'function',
+    'method',
+    'helper',
+    'utility',
+    'create function',
+    'add function',
+    'write function',
+    'implement function',
+  ],
   create_class: ['class', 'model', 'entity', 'create class', 'new class', 'define class'],
   create_interface: ['interface', 'type', 'contract', 'schema', 'define interface', 'create type'],
-  create_test: ['test', 'spec', 'unit test', 'integration test', 'write test', 'add test', 'testing'],
+  create_test: [
+    'test',
+    'spec',
+    'unit test',
+    'integration test',
+    'write test',
+    'add test',
+    'testing',
+  ],
   add_feature: ['feature', 'add', 'implement', 'build', 'create', 'new', 'support'],
   fix_bug: ['fix', 'bug', 'error', 'issue', 'broken', 'wrong', 'incorrect', 'patch', 'repair'],
   refactor: ['refactor', 'clean', 'restructure', 'reorganize', 'improve', 'simplify', 'extract'],
@@ -247,7 +264,9 @@ export class CodeIntentPredictor {
     const lower = input.toLowerCase()
     const scores: Array<{ intent: CodingIntentType; score: number }> = []
 
-    for (const [intent, keywords] of Object.entries(INTENT_KEYWORDS) as Array<[CodingIntentType, string[]]>) {
+    for (const [intent, keywords] of Object.entries(INTENT_KEYWORDS) as Array<
+      [CodingIntentType, string[]]
+    >) {
       let score = 0
       for (const kw of keywords) {
         if (lower.includes(kw)) {
@@ -260,10 +279,10 @@ export class CodeIntentPredictor {
 
       // Boost from recent context
       if (this.config.enableContextPrediction) {
-        const recentContextBoost = this.contextHistory
-          .slice(-10)
-          .filter(s => s.content.toLowerCase().includes(intent.replace(/_/g, ' ')))
-          .length * 0.2
+        const recentContextBoost =
+          this.contextHistory
+            .slice(-10)
+            .filter(s => s.content.toLowerCase().includes(intent.replace(/_/g, ' '))).length * 0.2
         score += recentContextBoost
         if (recentContextBoost > 0) this.stats.totalContextPredictions++
       }
@@ -309,9 +328,10 @@ export class CodeIntentPredictor {
     }
 
     const nextPhases = PHASE_TRANSITIONS[currentPhase] ?? ['create_test', 'add_feature']
-    const pattern = actions.length >= 2
-      ? `${actions.slice(-2).join(' → ')} → ${nextPhases[0]}`
-      : `${lastAction} → ${nextPhases[0]}`
+    const pattern =
+      actions.length >= 2
+        ? `${actions.slice(-2).join(' → ')} → ${nextPhases[0]}`
+        : `${lastAction} → ${nextPhases[0]}`
 
     return {
       currentPhase,
@@ -333,13 +353,13 @@ export class CodeIntentPredictor {
     // Common coding completions
     const completionMap: Record<string, string[]> = {
       'create a': ['function', 'class', 'interface', 'test', 'component', 'module'],
-      'add': ['error handling', 'validation', 'logging', 'tests', 'documentation', 'type checking'],
-      'fix': ['the bug', 'the error', 'the issue', 'the failing test', 'the type error'],
-      'implement': ['the interface', 'the feature', 'error handling', 'caching', 'validation'],
-      'write': ['a test', 'documentation', 'a helper function', 'an API endpoint'],
-      'refactor': ['the function', 'the class', 'to use async/await', 'for readability'],
-      'optimize': ['the query', 'the algorithm', 'performance', 'memory usage'],
-      'test': ['the function', 'the endpoint', 'the component', 'edge cases'],
+      add: ['error handling', 'validation', 'logging', 'tests', 'documentation', 'type checking'],
+      fix: ['the bug', 'the error', 'the issue', 'the failing test', 'the type error'],
+      implement: ['the interface', 'the feature', 'error handling', 'caching', 'validation'],
+      write: ['a test', 'documentation', 'a helper function', 'an API endpoint'],
+      refactor: ['the function', 'the class', 'to use async/await', 'for readability'],
+      optimize: ['the query', 'the algorithm', 'performance', 'memory usage'],
+      test: ['the function', 'the endpoint', 'the component', 'edge cases'],
     }
 
     for (const [prefix, suffixes] of Object.entries(completionMap)) {
@@ -365,7 +385,9 @@ export class CodeIntentPredictor {
     return {
       partial,
       completions: completions.slice(0, this.config.maxPredictions),
-      confidence: round2(completions.length > 0 ? Math.min(0.8, 0.3 + completions.length * 0.05) : 0.1),
+      confidence: round2(
+        completions.length > 0 ? Math.min(0.8, 0.3 + completions.length * 0.05) : 0.1,
+      ),
       context: context ?? '',
     }
   }
@@ -405,14 +427,17 @@ export class CodeIntentPredictor {
       this.intentWeights.set(feedback.actualIntent, aw * 1.1)
     }
 
-    this.stats.predictionAccuracy = this.stats.totalPredictions > 0
-      ? round2(this.stats.totalCorrectPredictions / this.stats.totalPredictions)
-      : 0
+    this.stats.predictionAccuracy =
+      this.stats.totalPredictions > 0
+        ? round2(this.stats.totalCorrectPredictions / this.stats.totalPredictions)
+        : 0
   }
 
   // ── Accessors ───────────────────────────────────────────────────────────────
 
-  getContextHistory(): readonly ContextSignal[] { return [...this.contextHistory] }
+  getContextHistory(): readonly ContextSignal[] {
+    return [...this.contextHistory]
+  }
 
   clearHistory(): void {
     this.contextHistory = []
@@ -430,8 +455,12 @@ export class CodeIntentPredictor {
       .map(([pattern]) => pattern)
   }
 
-  getStats(): Readonly<CodeIntentPredictorStats> { return { ...this.stats } }
-  getConfig(): Readonly<CodeIntentPredictorConfig> { return { ...this.config } }
+  getStats(): Readonly<CodeIntentPredictorStats> {
+    return { ...this.stats }
+  }
+  getConfig(): Readonly<CodeIntentPredictorConfig> {
+    return { ...this.config }
+  }
 
   // ── Persistence ─────────────────────────────────────────────────────────────
 
@@ -470,21 +499,71 @@ export class CodeIntentPredictor {
 
   private getNextSteps(intent: CodingIntentType): string[] {
     const steps: Record<CodingIntentType, string[]> = {
-      create_function: ['Define parameters and return type', 'Implement core logic', 'Add error handling', 'Write tests'],
+      create_function: [
+        'Define parameters and return type',
+        'Implement core logic',
+        'Add error handling',
+        'Write tests',
+      ],
       create_class: ['Define properties', 'Implement constructor', 'Add methods', 'Write tests'],
       create_interface: ['Define required properties', 'Add optional fields', 'Export type'],
-      create_test: ['Setup test fixtures', 'Write happy path tests', 'Add edge case tests', 'Test error conditions'],
-      add_feature: ['Plan the feature scope', 'Implement core logic', 'Add tests', 'Update documentation'],
-      fix_bug: ['Reproduce the issue', 'Identify root cause', 'Implement fix', 'Add regression test'],
-      refactor: ['Identify code smells', 'Plan refactoring steps', 'Apply changes', 'Verify tests pass'],
-      optimize: ['Profile current performance', 'Identify bottlenecks', 'Apply optimization', 'Benchmark results'],
+      create_test: [
+        'Setup test fixtures',
+        'Write happy path tests',
+        'Add edge case tests',
+        'Test error conditions',
+      ],
+      add_feature: [
+        'Plan the feature scope',
+        'Implement core logic',
+        'Add tests',
+        'Update documentation',
+      ],
+      fix_bug: [
+        'Reproduce the issue',
+        'Identify root cause',
+        'Implement fix',
+        'Add regression test',
+      ],
+      refactor: [
+        'Identify code smells',
+        'Plan refactoring steps',
+        'Apply changes',
+        'Verify tests pass',
+      ],
+      optimize: [
+        'Profile current performance',
+        'Identify bottlenecks',
+        'Apply optimization',
+        'Benchmark results',
+      ],
       add_documentation: ['Add JSDoc comments', 'Write README section', 'Add usage examples'],
-      add_error_handling: ['Identify failure points', 'Add try/catch blocks', 'Create error types', 'Add error logging'],
-      add_validation: ['Define validation rules', 'Implement validators', 'Add error messages', 'Test edge cases'],
+      add_error_handling: [
+        'Identify failure points',
+        'Add try/catch blocks',
+        'Create error types',
+        'Add error logging',
+      ],
+      add_validation: [
+        'Define validation rules',
+        'Implement validators',
+        'Add error messages',
+        'Test edge cases',
+      ],
       add_logging: ['Choose log levels', 'Add structured logging', 'Configure log output'],
-      integrate_api: ['Define API endpoints', 'Create request handlers', 'Add authentication', 'Write integration tests'],
+      integrate_api: [
+        'Define API endpoints',
+        'Create request handlers',
+        'Add authentication',
+        'Write integration tests',
+      ],
       setup_project: ['Initialize package', 'Configure TypeScript', 'Setup testing', 'Add linting'],
-      configure: ['Define configuration schema', 'Add defaults', 'Validate config', 'Document options'],
+      configure: [
+        'Define configuration schema',
+        'Add defaults',
+        'Validate config',
+        'Document options',
+      ],
       debug: ['Add breakpoints', 'Check variable state', 'Trace execution flow', 'Fix the issue'],
       deploy: ['Run tests', 'Build for production', 'Configure deployment', 'Monitor after deploy'],
     }

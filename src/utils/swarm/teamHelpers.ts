@@ -134,9 +134,7 @@ export function readTeamFile(teamName: string): TeamFile | null {
     return jsonParse(content) as TeamFile
   } catch (e) {
     if (getErrnoCode(e) === 'ENOENT') return null
-    logForDebugging(
-      `[TeammateTool] Failed to read team file for ${teamName}: ${errorMessage(e)}`,
-    )
+    logForDebugging(`[TeammateTool] Failed to read team file for ${teamName}: ${errorMessage(e)}`)
     return null
   }
 }
@@ -144,17 +142,13 @@ export function readTeamFile(teamName: string): TeamFile | null {
 /**
  * Reads a team file by name (async — for tool handlers and other async contexts)
  */
-export async function readTeamFileAsync(
-  teamName: string,
-): Promise<TeamFile | null> {
+export async function readTeamFileAsync(teamName: string): Promise<TeamFile | null> {
   try {
     const content = await readFile(getTeamFilePath(teamName), 'utf-8')
     return jsonParse(content) as TeamFile
   } catch (e) {
     if (getErrnoCode(e) === 'ENOENT') return null
-    logForDebugging(
-      `[TeammateTool] Failed to read team file for ${teamName}: ${errorMessage(e)}`,
-    )
+    logForDebugging(`[TeammateTool] Failed to read team file for ${teamName}: ${errorMessage(e)}`)
     return null
   }
 }
@@ -172,10 +166,7 @@ function writeTeamFile(teamName: string, teamFile: TeamFile): void {
 /**
  * Writes a team file (async — for tool handlers)
  */
-export async function writeTeamFileAsync(
-  teamName: string,
-  teamFile: TeamFile,
-): Promise<void> {
+export async function writeTeamFileAsync(teamName: string, teamFile: TeamFile): Promise<void> {
   const teamDir = getTeamDir(teamName)
   await mkdir(teamDir, { recursive: true })
   await writeFile(getTeamFilePath(teamName), jsonStringify(teamFile, null, 2))
@@ -191,9 +182,7 @@ export function removeTeammateFromTeamFile(
 ): boolean {
   const identifierStr = identifier.agentId || identifier.name
   if (!identifierStr) {
-    logForDebugging(
-      '[TeammateTool] removeTeammateFromTeamFile called with no identifier',
-    )
+    logForDebugging('[TeammateTool] removeTeammateFromTeamFile called with no identifier')
     return false
   }
 
@@ -220,9 +209,7 @@ export function removeTeammateFromTeamFile(
   }
 
   writeTeamFile(teamName, teamFile)
-  logForDebugging(
-    `[TeammateTool] Removed teammate from team file: ${identifierStr}`,
-  )
+  logForDebugging(`[TeammateTool] Removed teammate from team file: ${identifierStr}`)
   return true
 }
 
@@ -243,9 +230,7 @@ export function addHiddenPaneId(teamName: string, paneId: string): boolean {
     hiddenPaneIds.push(paneId)
     teamFile.hiddenPaneIds = hiddenPaneIds
     writeTeamFile(teamName, teamFile)
-    logForDebugging(
-      `[TeammateTool] Added ${paneId} to hidden panes for team ${teamName}`,
-    )
+    logForDebugging(`[TeammateTool] Added ${paneId} to hidden panes for team ${teamName}`)
   }
   return true
 }
@@ -268,9 +253,7 @@ export function removeHiddenPaneId(teamName: string, paneId: string): boolean {
     hiddenPaneIds.splice(index, 1)
     teamFile.hiddenPaneIds = hiddenPaneIds
     writeTeamFile(teamName, teamFile)
-    logForDebugging(
-      `[TeammateTool] Removed ${paneId} from hidden panes for team ${teamName}`,
-    )
+    logForDebugging(`[TeammateTool] Removed ${paneId} from hidden panes for team ${teamName}`)
   }
   return true
 }
@@ -282,18 +265,13 @@ export function removeHiddenPaneId(teamName: string, paneId: string): boolean {
  * @param tmuxPaneId - The pane ID of the teammate to remove
  * @returns true if the member was removed, false if team or member doesn't exist
  */
-export function removeMemberFromTeam(
-  teamName: string,
-  tmuxPaneId: string,
-): boolean {
+export function removeMemberFromTeam(teamName: string, tmuxPaneId: string): boolean {
   const teamFile = readTeamFile(teamName)
   if (!teamFile) {
     return false
   }
 
-  const memberIndex = teamFile.members.findIndex(
-    m => m.tmuxPaneId === tmuxPaneId,
-  )
+  const memberIndex = teamFile.members.findIndex(m => m.tmuxPaneId === tmuxPaneId)
   if (memberIndex === -1) {
     return false
   }
@@ -310,9 +288,7 @@ export function removeMemberFromTeam(
   }
 
   writeTeamFile(teamName, teamFile)
-  logForDebugging(
-    `[TeammateTool] Removed member with pane ${tmuxPaneId} from team ${teamName}`,
-  )
+  logForDebugging(`[TeammateTool] Removed member with pane ${tmuxPaneId} from team ${teamName}`)
   return true
 }
 
@@ -323,10 +299,7 @@ export function removeMemberFromTeam(
  * @param agentId - The agent ID of the teammate to remove (e.g., "researcher@my-team")
  * @returns true if the member was removed, false if team or member doesn't exist
  */
-export function removeMemberByAgentId(
-  teamName: string,
-  agentId: string,
-): boolean {
+export function removeMemberByAgentId(teamName: string, agentId: string): boolean {
   const teamFile = readTeamFile(teamName)
   if (!teamFile) {
     return false
@@ -341,9 +314,7 @@ export function removeMemberByAgentId(
   teamFile.members.splice(memberIndex, 1)
 
   writeTeamFile(teamName, teamFile)
-  logForDebugging(
-    `[TeammateTool] Removed member ${agentId} from team ${teamName}`,
-  )
+  logForDebugging(`[TeammateTool] Removed member ${agentId} from team ${teamName}`)
   return true
 }
 
@@ -354,11 +325,7 @@ export function removeMemberByAgentId(
  * @param memberName - The name of the member to update
  * @param mode - The new permission mode
  */
-export function setMemberMode(
-  teamName: string,
-  memberName: string,
-  mode: PermissionMode,
-): boolean {
+export function setMemberMode(teamName: string, memberName: string, mode: PermissionMode): boolean {
   const teamFile = readTeamFile(teamName)
   if (!teamFile) {
     return false
@@ -378,13 +345,9 @@ export function setMemberMode(
   }
 
   // Create updated members array immutably
-  const updatedMembers = teamFile.members.map(m =>
-    m.name === memberName ? { ...m, mode } : m,
-  )
+  const updatedMembers = teamFile.members.map(m => (m.name === memberName ? { ...m, mode } : m))
   writeTeamFile(teamName, { ...teamFile, members: updatedMembers })
-  logForDebugging(
-    `[TeammateTool] Set member ${memberName} in team ${teamName} to mode: ${mode}`,
-  )
+  logForDebugging(`[TeammateTool] Set member ${memberName} in team ${teamName} to mode: ${mode}`)
   return true
 }
 
@@ -394,10 +357,7 @@ export function setMemberMode(
  * @param mode - The permission mode to sync
  * @param teamNameOverride - Optional team name override (uses env var if not provided)
  */
-export function syncTeammateMode(
-  mode: PermissionMode,
-  teamNameOverride?: string,
-): void {
+export function syncTeammateMode(mode: PermissionMode, teamNameOverride?: string): void {
   if (!isTeammate()) return
   const teamName = teamNameOverride ?? getTeamName()
   const agentName = getAgentName()
@@ -437,9 +397,7 @@ export function setMultipleMemberModes(
 
   if (anyChanged) {
     writeTeamFile(teamName, { ...teamFile, members: updatedMembers })
-    logForDebugging(
-      `[TeammateTool] Set ${modeUpdates.length} member modes in team ${teamName}`,
-    )
+    logForDebugging(`[TeammateTool] Set ${modeUpdates.length} member modes in team ${teamName}`)
   }
   return true
 }
@@ -458,9 +416,7 @@ export async function setMemberActive(
 ): Promise<void> {
   const teamFile = await readTeamFileAsync(teamName)
   if (!teamFile) {
-    logForDebugging(
-      `[TeammateTool] Cannot set member active: team ${teamName} not found`,
-    )
+    logForDebugging(`[TeammateTool] Cannot set member active: team ${teamName} not found`)
     return
   }
 
@@ -518,17 +474,13 @@ async function destroyWorktree(worktreePath: string): Promise<void> {
     )
 
     if (result.code === 0) {
-      logForDebugging(
-        `[TeammateTool] Removed worktree via git: ${worktreePath}`,
-      )
+      logForDebugging(`[TeammateTool] Removed worktree via git: ${worktreePath}`)
       return
     }
 
     // Check if the error is "not a working tree" (already removed)
     if (result.stderr?.includes('not a working tree')) {
-      logForDebugging(
-        `[TeammateTool] Worktree already removed: ${worktreePath}`,
-      )
+      logForDebugging(`[TeammateTool] Worktree already removed: ${worktreePath}`)
       return
     }
 
@@ -540,9 +492,7 @@ async function destroyWorktree(worktreePath: string): Promise<void> {
   // Fallback: manually remove the directory
   try {
     await rm(worktreePath, { recursive: true, force: true })
-    logForDebugging(
-      `[TeammateTool] Removed worktree directory manually: ${worktreePath}`,
-    )
+    logForDebugging(`[TeammateTool] Removed worktree directory manually: ${worktreePath}`)
   } catch (error) {
     logForDebugging(
       `[TeammateTool] Failed to remove worktree ${worktreePath}: ${errorMessage(error)}`,
@@ -600,19 +550,14 @@ async function killOrphanedTeammatePanes(teamName: string): Promise<void> {
   if (!teamFile) return
 
   const paneMembers = teamFile.members.filter(
-    m =>
-      m.name !== TEAM_LEAD_NAME &&
-      m.tmuxPaneId &&
-      m.backendType &&
-      isPaneBackend(m.backendType),
+    m => m.name !== TEAM_LEAD_NAME && m.tmuxPaneId && m.backendType && isPaneBackend(m.backendType),
   )
   if (paneMembers.length === 0) return
 
-  const [{ ensureBackendsRegistered, getBackendByType }, { isInsideTmux }] =
-    await Promise.all([
-      import('./backends/registry.js'),
-      import('./backends/detection.js'),
-    ])
+  const [{ ensureBackendsRegistered, getBackendByType }, { isInsideTmux }] = await Promise.all([
+    import('./backends/registry.js'),
+    import('./backends/detection.js'),
+  ])
   await ensureBackendsRegistered()
   const useExternalSession = !(await isInsideTmux())
 
@@ -622,10 +567,7 @@ async function killOrphanedTeammatePanes(teamName: string): Promise<void> {
       if (!m.tmuxPaneId || !m.backendType || !isPaneBackend(m.backendType)) {
         return
       }
-      const ok = await getBackendByType(m.backendType).killPane(
-        m.tmuxPaneId,
-        useExternalSession,
-      )
+      const ok = await getBackendByType(m.backendType).killPane(m.tmuxPaneId, useExternalSession)
       logForDebugging(
         `cleanupSessionTeams: killPane ${m.name} (${m.backendType} ${m.tmuxPaneId}) → ${ok}`,
       )

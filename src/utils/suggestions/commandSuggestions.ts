@@ -247,10 +247,7 @@ function getCommandId(cmd: Command): string {
  * Checks if a query matches any of the command's aliases.
  * Returns the matched alias if found, otherwise undefined.
  */
-function findMatchedAlias(
-  query: string,
-  aliases?: string[],
-): string | undefined {
+function findMatchedAlias(query: string, aliases?: string[]): string | undefined {
   if (!aliases || aliases.length === 0 || query === '') {
     return undefined
   }
@@ -262,10 +259,7 @@ function findMatchedAlias(
  * Creates a suggestion item from a command.
  * Only shows the matched alias in parentheses if the user typed an alias.
  */
-function createCommandSuggestionItem(
-  cmd: Command,
-  matchedAlias?: string,
-): SuggestionItem {
+function createCommandSuggestionItem(cmd: Command, matchedAlias?: string): SuggestionItem {
   const commandName = getCommandName(cmd)
   // Only show the alias if the user typed it
   const aliasText = matchedAlias ? ` (${matchedAlias})` : ''
@@ -289,10 +283,7 @@ function createCommandSuggestionItem(
 /**
  * Generate command suggestions based on input
  */
-export function generateCommandSuggestions(
-  input: string,
-  commands: Command[],
-): SuggestionItem[] {
+export function generateCommandSuggestions(input: string, commands: Command[]): SuggestionItem[] {
   // Only process command input
   if (!isCommandInput(input)) {
     return []
@@ -393,9 +384,7 @@ export function generateCommandSuggestions(
   )
   if (
     hiddenExact &&
-    commands.some(
-      cmd => !cmd.isHidden && getCommandName(cmd).toLowerCase() === query,
-    )
+    commands.some(cmd => !cmd.isHidden && getCommandName(cmd).toLowerCase() === query)
   ) {
     hiddenExact = undefined
   }
@@ -415,9 +404,7 @@ export function generateCommandSuggestions(
     const name = r.item.commandName.toLowerCase()
     const aliases = r.item.aliasKey?.map(alias => alias.toLowerCase()) ?? []
     const usage =
-      r.item.command.type === 'prompt'
-        ? getSkillUsageScore(getCommandName(r.item.command))
-        : 0
+      r.item.command.type === 'prompt' ? getSkillUsageScore(getCommandName(r.item.command)) : 0
     return { r, name, aliases, usage }
   })
 
@@ -455,11 +442,7 @@ export function generateCommandSuggestions(
     if (aPrefixAlias && !bPrefixAlias) return -1
     if (bPrefixAlias && !aPrefixAlias) return 1
     // Among prefix alias matches, prefer the shorter alias
-    if (
-      aPrefixAlias &&
-      bPrefixAlias &&
-      aPrefixAlias.length !== bPrefixAlias.length
-    ) {
+    if (aPrefixAlias && bPrefixAlias && aPrefixAlias.length !== bPrefixAlias.length) {
       return aPrefixAlias.length - bPrefixAlias.length
     }
 
@@ -529,10 +512,7 @@ export function applyCommandSuggestion(
 
   // Execute command if requested and it takes no arguments
   if (shouldExecute && commandObj) {
-    if (
-      commandObj.type !== 'prompt' ||
-      (commandObj.argNames ?? []).length === 0
-    ) {
+    if (commandObj.type !== 'prompt' || (commandObj.argNames ?? []).length === 0) {
       onSubmit(newInput, /* isSubmittingSlashCommand */ true)
     }
   }
@@ -549,9 +529,7 @@ function cleanWord(word: string) {
  * Requires whitespace or start-of-string before the slash to avoid
  * matching paths like /usr/bin.
  */
-export function findSlashCommandPositions(
-  text: string,
-): Array<{ start: number; end: number }> {
+export function findSlashCommandPositions(text: string): Array<{ start: number; end: number }> {
   const positions: Array<{ start: number; end: number }> = []
   // Match /command patterns preceded by whitespace or start-of-string
   const regex = /(^|[\s])(\/[a-zA-Z][a-zA-Z0-9:\-_]*)/g

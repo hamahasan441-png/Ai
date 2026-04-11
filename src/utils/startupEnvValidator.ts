@@ -162,7 +162,7 @@ function isValidUrl(value: string): boolean {
     'mysql://',
     'sqlite:///',
   ]
-  return protocols.some((p) => value.startsWith(p))
+  return protocols.some(p => value.startsWith(p))
 }
 
 /** Checks if value is a valid boolean string */

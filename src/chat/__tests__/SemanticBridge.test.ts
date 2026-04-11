@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  SemanticBridge,
-} from '../SemanticBridge.js'
+import { SemanticBridge } from '../SemanticBridge.js'
 
 describe('SemanticBridge', () => {
   let bridge: SemanticBridge
@@ -101,7 +99,9 @@ describe('SemanticBridge', () => {
     })
 
     it('should explain a function', () => {
-      const result = bridge.codeToNl('async function fetchData(url: string) { return await fetch(url) }')
+      const result = bridge.codeToNl(
+        'async function fetchData(url: string) { return await fetch(url) }',
+      )
       expect(result.explanation).toContain('function')
       expect(result.explanation).toContain('fetchData')
       expect(result.concepts).toContain('async/await')
@@ -112,7 +112,9 @@ describe('SemanticBridge', () => {
       expect(simple.complexity).toBe('simple')
 
       const complex = bridge.codeToNl(
-        Array.from({ length: 10 }, (_, i) => `if (x${i}) { for (let i = 0; i < 10; i++) {} }`).join('\n'),
+        Array.from({ length: 10 }, (_, i) => `if (x${i}) { for (let i = 0; i < 10; i++) {} }`).join(
+          '\n',
+        ),
       )
       expect(['complex', 'very_complex']).toContain(complex.complexity)
     })
@@ -172,7 +174,10 @@ describe('SemanticBridge', () => {
     })
 
     it('should map code concepts to NL', () => {
-      const mappings = bridge.mapConcepts('if (condition) { variable = array.filter(x => x) }', true)
+      const mappings = bridge.mapConcepts(
+        'if (condition) { variable = array.filter(x => x) }',
+        true,
+      )
       expect(mappings.length).toBeGreaterThan(0)
     })
 
@@ -187,7 +192,9 @@ describe('SemanticBridge', () => {
     it('should include relationship type', () => {
       const mappings = bridge.mapConcepts('store data', false)
       for (const m of mappings) {
-        expect(['equivalent', 'similar', 'partial', 'abstract', 'concrete']).toContain(m.relationship)
+        expect(['equivalent', 'similar', 'partial', 'abstract', 'concrete']).toContain(
+          m.relationship,
+        )
       }
     })
 

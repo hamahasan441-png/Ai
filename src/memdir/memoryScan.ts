@@ -38,9 +38,7 @@ export async function scanMemoryFiles(
 ): Promise<MemoryHeader[]> {
   try {
     const entries = await readdir(memoryDir, { recursive: true })
-    const mdFiles = entries.filter(
-      f => f.endsWith('.md') && basename(f) !== 'MEMORY.md',
-    )
+    const mdFiles = entries.filter(f => f.endsWith('.md') && basename(f) !== 'MEMORY.md')
 
     const headerResults = await Promise.allSettled(
       mdFiles.map(async (relativePath): Promise<MemoryHeader> => {
@@ -64,10 +62,7 @@ export async function scanMemoryFiles(
     )
 
     return headerResults
-      .filter(
-        (r): r is PromiseFulfilledResult<MemoryHeader> =>
-          r.status === 'fulfilled',
-      )
+      .filter((r): r is PromiseFulfilledResult<MemoryHeader> => r.status === 'fulfilled')
       .map(r => r.value)
       .sort((a, b) => b.mtimeMs - a.mtimeMs)
       .slice(0, MAX_MEMORY_FILES)

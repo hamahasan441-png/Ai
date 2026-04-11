@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  PluginSDK,
-  definePlugin,
-  type PluginDefinition,
-} from '../../plugins/PluginSDK.js'
+import { PluginSDK, definePlugin, type PluginDefinition } from '../../plugins/PluginSDK.js'
 
 function createTestPlugin(overrides?: Partial<PluginDefinition>): PluginDefinition {
   return definePlugin({
@@ -398,7 +394,7 @@ describe('PluginSDK', () => {
       sdk.register(
         createTestPlugin({
           lifecycle: {
-            onActivate: (ctx) => {
+            onActivate: ctx => {
               ctx.storage.set('key', 'value')
               storedValue = ctx.storage.get('key')
             },

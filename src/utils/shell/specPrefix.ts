@@ -68,10 +68,7 @@ function flagTakesArg(
 }
 
 // Find the first subcommand by skipping flags and their values
-function findFirstSubcommand(
-  args: string[],
-  spec: CommandSpec | null,
-): string | undefined {
+function findFirstSubcommand(args: string[], spec: CommandSpec | null): string | undefined {
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]
     if (!arg) continue
@@ -101,18 +98,14 @@ export async function buildPrefix(
 
     if (arg.startsWith('-')) {
       // Special case: python -c should stop after -c
-      if (arg === '-c' && ['python', 'python3'].includes(command.toLowerCase()))
-        break
+      if (arg === '-c' && ['python', 'python3'].includes(command.toLowerCase())) break
 
       // Check for isCommand/isModule flags that should be included in prefix
       if (spec?.options) {
         const option = spec.options.find(opt =>
           Array.isArray(opt.name) ? opt.name.includes(arg) : opt.name === arg,
         )
-        if (
-          option?.args &&
-          toArray(option.args).some(a => a?.isCommand || a?.isModule)
-        ) {
+        if (option?.args && toArray(option.args).some(a => a?.isCommand || a?.isModule)) {
           parts.push(arg)
           continue
         }
@@ -144,9 +137,7 @@ async function calculateDepth(
   // Find first subcommand by skipping flags and their values
   const firstSubcommand = findFirstSubcommand(args, spec)
   const commandLower = command.toLowerCase()
-  const key = firstSubcommand
-    ? `${commandLower} ${firstSubcommand.toLowerCase()}`
-    : commandLower
+  const key = firstSubcommand ? `${commandLower} ${firstSubcommand.toLowerCase()}` : commandLower
   if (DEPTH_RULES[key]) return DEPTH_RULES[key]
   if (DEPTH_RULES[commandLower]) return DEPTH_RULES[commandLower]
   if (!spec) return 2
@@ -157,10 +148,7 @@ async function calculateDepth(
       const option = spec.options.find(opt =>
         Array.isArray(opt.name) ? opt.name.includes(arg) : opt.name === arg,
       )
-      if (
-        option?.args &&
-        toArray(option.args).some(arg => arg?.isCommand || arg?.isModule)
-      )
+      if (option?.args && toArray(option.args).some(arg => arg?.isCommand || arg?.isModule))
         return 3
     }
   }
@@ -217,9 +205,7 @@ async function shouldStopAtArg(
 
   const dotIndex = arg.lastIndexOf('.')
   const hasExtension =
-    dotIndex > 0 &&
-    dotIndex < arg.length - 1 &&
-    !arg.substring(dotIndex + 1).includes(':')
+    dotIndex > 0 && dotIndex < arg.length - 1 && !arg.substring(dotIndex + 1).includes(':')
 
   const hasFile = arg.includes('/') || hasExtension
   const hasUrl = URL_PROTOCOLS.some(proto => arg.startsWith(proto))

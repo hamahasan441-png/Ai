@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  TopicModeler,
-} from '../TopicModeler'
+import { TopicModeler } from '../TopicModeler'
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -17,14 +15,20 @@ function seedCorpus(modeler: TopicModeler): void {
   modeler.addDocument('js2', 'javascript typescript webpack bundler module react hooks state')
   modeler.addDocument('js3', 'react component props state hooks rendering lifecycle effects')
   modeler.addDocument('js4', 'javascript browser dom events handler callback promise async await')
-  modeler.addDocument('js5', 'react redux state management middleware dispatch actions reducer store')
+  modeler.addDocument(
+    'js5',
+    'react redux state management middleware dispatch actions reducer store',
+  )
 
   // Python / ML cluster
   modeler.addDocument('py1', 'python machine learning model training dataset neural network layers')
   modeler.addDocument('py2', 'python pandas dataframe analysis statistics visualization matplotlib')
   modeler.addDocument('py3', 'machine learning gradient descent optimization loss function epochs')
   modeler.addDocument('py4', 'python scikit learn classification regression clustering features')
-  modeler.addDocument('py5', 'neural network deep learning convolutional recurrent transformer attention')
+  modeler.addDocument(
+    'py5',
+    'neural network deep learning convolutional recurrent transformer attention',
+  )
 }
 
 // ── Constructor Tests ────────────────────────────────────────────────────
@@ -303,9 +307,7 @@ describe('detectTopicDrift', () => {
     modeler.addDocument('drift2', 'python machine learning optimization gradient neural')
     modeler.addDocument('drift3', 'python machine learning dataset training neural')
 
-    const drifts = modeler.detectTopicDrift(
-      ['drift1', 'drift2', 'drift3'],
-    )
+    const drifts = modeler.detectTopicDrift(['drift1', 'drift2', 'drift3'])
     // Drift may or may not be detected depending on distribution;
     // just verify the return type
     expect(Array.isArray(drifts)).toBe(true)

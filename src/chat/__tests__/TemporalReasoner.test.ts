@@ -533,7 +533,7 @@ describe('TemporalReasoner', () => {
     describe('between', () => {
       it('returns events fully within the range', () => {
         addEvent(tr, 'Inside', 50, 60)
-        addEvent(tr, 'Partial', 0, 55)   // starts outside range
+        addEvent(tr, 'Partial', 0, 55) // starts outside range
         addEvent(tr, 'Outside', 200, 300)
         const result = tr.query({ type: 'between', rangeStart: 40, rangeEnd: 100 })
         expect(result.count).toBe(1)
@@ -734,8 +734,8 @@ describe('TemporalReasoner', () => {
 
     it('computes mean, median, stddev for multiple events', () => {
       addEvent(tr, 'A', 0, 100)
-      addEvent(tr, 'B', 200, 500)  // duration 300
-      addEvent(tr, 'C', 600, 700)  // duration 100
+      addEvent(tr, 'B', 200, 500) // duration 300
+      addEvent(tr, 'C', 600, 700) // duration 100
       const d = tr.analyzeDurations()
       expect(d.count).toBe(3)
       expect(d.meanMs).toBeCloseTo((100 + 300 + 100) / 3, 0)

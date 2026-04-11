@@ -9,7 +9,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-1',
       title: 'Introduction to JavaScript',
-      content: 'JavaScript is a high-level, interpreted programming language used for web development. It supports event-driven, functional, and imperative programming styles.',
+      content:
+        'JavaScript is a high-level, interpreted programming language used for web development. It supports event-driven, functional, and imperative programming styles.',
       keywords: ['javascript', 'js', 'programming', 'web', 'frontend'],
       domain: 'javascript',
       weight: 1.0,
@@ -17,7 +18,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-2',
       title: 'TypeScript Fundamentals',
-      content: 'TypeScript is a strongly typed programming language that builds on JavaScript. It adds optional static typing and class-based object-oriented programming.',
+      content:
+        'TypeScript is a strongly typed programming language that builds on JavaScript. It adds optional static typing and class-based object-oriented programming.',
       keywords: ['typescript', 'ts', 'programming', 'types', 'javascript'],
       domain: 'typescript',
       weight: 1.0,
@@ -25,7 +27,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-3',
       title: 'React Framework Guide',
-      content: 'React is a JavaScript library for building user interfaces. It uses a virtual DOM and component-based architecture for efficient UI rendering.',
+      content:
+        'React is a JavaScript library for building user interfaces. It uses a virtual DOM and component-based architecture for efficient UI rendering.',
       keywords: ['react', 'javascript', 'ui', 'components', 'frontend', 'virtual-dom'],
       domain: 'javascript',
       weight: 1.0,
@@ -33,7 +36,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-4',
       title: 'Python for Data Science',
-      content: 'Python is a versatile programming language widely used in data science, machine learning, and artificial intelligence. Libraries like pandas, numpy, and scikit-learn make it powerful.',
+      content:
+        'Python is a versatile programming language widely used in data science, machine learning, and artificial intelligence. Libraries like pandas, numpy, and scikit-learn make it powerful.',
       keywords: ['python', 'data-science', 'machine-learning', 'pandas', 'numpy'],
       domain: 'python',
       weight: 1.0,
@@ -41,7 +45,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-5',
       title: 'SQL Database Queries',
-      content: 'SQL is a domain-specific language for managing and querying relational databases. Common operations include SELECT, INSERT, UPDATE, and DELETE.',
+      content:
+        'SQL is a domain-specific language for managing and querying relational databases. Common operations include SELECT, INSERT, UPDATE, and DELETE.',
       keywords: ['sql', 'database', 'query', 'relational', 'table'],
       domain: 'database',
       weight: 1.0,
@@ -49,7 +54,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-6',
       title: 'Docker Container Basics',
-      content: 'Docker is a platform for developing, shipping, and running applications in containers. Containers package code and dependencies together for consistent deployment.',
+      content:
+        'Docker is a platform for developing, shipping, and running applications in containers. Containers package code and dependencies together for consistent deployment.',
       keywords: ['docker', 'container', 'deployment', 'devops', 'infrastructure'],
       domain: 'devops',
       weight: 1.0,
@@ -57,7 +63,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-7',
       title: 'REST API Design',
-      content: 'REST is an architectural style for designing networked applications. RESTful APIs use HTTP methods and follow resource-oriented URL patterns.',
+      content:
+        'REST is an architectural style for designing networked applications. RESTful APIs use HTTP methods and follow resource-oriented URL patterns.',
       keywords: ['rest', 'api', 'http', 'endpoint', 'web', 'backend'],
       domain: 'web-development',
       weight: 1.0,
@@ -65,7 +72,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-8',
       title: 'Git Version Control',
-      content: 'Git is a distributed version control system for tracking changes in source code. It supports branching, merging, and collaborative development workflows.',
+      content:
+        'Git is a distributed version control system for tracking changes in source code. It supports branching, merging, and collaborative development workflows.',
       keywords: ['git', 'version-control', 'branch', 'merge', 'repository'],
       domain: 'programming',
       weight: 1.0,
@@ -73,7 +81,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-9',
       title: 'Machine Learning Algorithms',
-      content: 'Machine learning algorithms learn patterns from data. Common types include supervised learning (classification, regression), unsupervised learning (clustering), and reinforcement learning.',
+      content:
+        'Machine learning algorithms learn patterns from data. Common types include supervised learning (classification, regression), unsupervised learning (clustering), and reinforcement learning.',
       keywords: ['machine-learning', 'algorithm', 'classification', 'regression', 'clustering'],
       domain: 'machine-learning',
       weight: 1.0,
@@ -81,7 +90,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-10',
       title: 'Cybersecurity Fundamentals',
-      content: 'Cybersecurity involves protecting systems and data from digital attacks. Key areas include network security, encryption, authentication, and vulnerability assessment.',
+      content:
+        'Cybersecurity involves protecting systems and data from digital attacks. Key areas include network security, encryption, authentication, and vulnerability assessment.',
       keywords: ['security', 'cybersecurity', 'encryption', 'authentication', 'vulnerability'],
       domain: 'security',
       weight: 1.0,
@@ -89,7 +99,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-11',
       title: 'Kubernetes Orchestration',
-      content: 'Kubernetes is an open-source container orchestration platform for automating deployment, scaling, and management of containerized applications.',
+      content:
+        'Kubernetes is an open-source container orchestration platform for automating deployment, scaling, and management of containerized applications.',
       keywords: ['kubernetes', 'k8s', 'orchestration', 'container', 'scaling', 'devops'],
       domain: 'devops',
       weight: 1.0,
@@ -97,7 +108,8 @@ function buildTestCorpus(): SearchDocument[] {
     {
       id: 'doc-12',
       title: 'Sorting Algorithms',
-      content: 'Sorting algorithms order elements in a collection. Common algorithms include quicksort, mergesort, heapsort, and bubble sort with different time complexities.',
+      content:
+        'Sorting algorithms order elements in a collection. Common algorithms include quicksort, mergesort, heapsort, and bubble sort with different time complexities.',
       keywords: ['sorting', 'algorithm', 'quicksort', 'mergesort', 'complexity', 'big-o'],
       domain: 'algorithms',
       weight: 1.0,
@@ -146,12 +158,14 @@ describe('AdvancedSearchEngine', () => {
     })
 
     it('updates existing documents on re-index', () => {
-      engine.indexDocuments([{
-        id: 'doc-1',
-        title: 'Updated JavaScript',
-        content: 'Updated content.',
-        keywords: ['javascript', 'updated'],
-      }])
+      engine.indexDocuments([
+        {
+          id: 'doc-1',
+          title: 'Updated JavaScript',
+          content: 'Updated content.',
+          keywords: ['javascript', 'updated'],
+        },
+      ])
       expect(engine.getDocumentCount()).toBe(12) // no duplicates
     })
 
@@ -288,7 +302,9 @@ describe('AdvancedSearchEngine', () => {
     })
 
     it('uses decomposition for complex queries', () => {
-      const result = engine.searchWithThinking('Compare JavaScript vs Python for web development and data science applications')
+      const result = engine.searchWithThinking(
+        'Compare JavaScript vs Python for web development and data science applications',
+      )
       const decompStep = result.thinkingSteps.find(s => s.strategy === 'decomposition')
       expect(decompStep).toBeDefined()
       expect(result.strategiesUsed).toContain('decomposition')
@@ -444,7 +460,9 @@ describe('AdvancedSearchEngine', () => {
     })
 
     it('generates decomposition suggestions for complex queries', () => {
-      const suggestions = engine.suggestRelatedQueries('Compare React vs Vue for large applications')
+      const suggestions = engine.suggestRelatedQueries(
+        'Compare React vs Vue for large applications',
+      )
       expect(suggestions.length).toBeGreaterThan(0)
     })
 
@@ -622,7 +640,9 @@ describe('AdvancedSearchEngine', () => {
     })
 
     it('decomposes "compare X vs Y" queries', () => {
-      const result = engine.searchWithThinking('Compare Docker vs Kubernetes for container orchestration')
+      const result = engine.searchWithThinking(
+        'Compare Docker vs Kubernetes for container orchestration',
+      )
       expect(result.strategiesUsed).toContain('decomposition')
       const decompStep = result.thinkingSteps.find(s => s.strategy === 'decomposition')
       expect(decompStep).toBeDefined()

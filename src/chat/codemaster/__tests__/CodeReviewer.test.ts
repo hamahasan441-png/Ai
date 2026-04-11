@@ -134,8 +134,8 @@ export function doWork() { return 1 }
     const result = reviewer.review(code, 'javascript', ['documentation'])
     const nonDocFindings = result.findings.filter(f => f.category !== 'documentation')
     // Rule-based findings outside the focus should not appear
-    const bugRuleFindings = nonDocFindings.filter(f =>
-      f.title === 'Loose equality comparison' || f.title === 'Empty catch block',
+    const bugRuleFindings = nonDocFindings.filter(
+      f => f.title === 'Loose equality comparison' || f.title === 'Empty catch block',
     )
     expect(bugRuleFindings.length).toBe(0)
   })
@@ -177,7 +177,11 @@ try {
     `
     const result = reviewer.review(code, 'typescript')
     const severityOrder: Record<string, number> = {
-      critical: 0, high: 1, medium: 2, low: 3, info: 4,
+      critical: 0,
+      high: 1,
+      medium: 2,
+      low: 3,
+      info: 4,
     }
     for (let i = 1; i < result.findings.length; i++) {
       const prev = severityOrder[result.findings[i - 1].severity]

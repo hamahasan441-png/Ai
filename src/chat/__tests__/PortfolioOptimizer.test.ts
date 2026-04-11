@@ -1,18 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  PortfolioOptimizer,
-  type Asset,
-  type Portfolio,
-} from '../PortfolioOptimizer'
+import { PortfolioOptimizer, type Asset, type Portfolio } from '../PortfolioOptimizer'
 
 // ── Helpers: generate sample asset data ──
 
 let assetCounter = 0
 
 function makeAsset(
-  id: string, name: string,
-  expectedReturn: number, volatility: number,
-  weight: number, returnSeries?: number[],
+  id: string,
+  name: string,
+  expectedReturn: number,
+  volatility: number,
+  weight: number,
+  returnSeries?: number[],
 ): Asset {
   const returns = returnSeries ?? generateReturns(expectedReturn, volatility, 60)
   return { id, name, returns, expectedReturn, volatility, weight }
@@ -20,7 +19,7 @@ function makeAsset(
 
 function generateReturns(mu: number, sigma: number, n: number): number[] {
   // Deterministic pseudo-returns with per-asset phase offset for varied correlations
-  const phase = (assetCounter++) * 1.3
+  const phase = assetCounter++ * 1.3
   const results: number[] = []
   for (let i = 0; i < n; i++) {
     const t = (i / (n - 1)) * 2 * Math.PI
@@ -31,14 +30,14 @@ function generateReturns(mu: number, sigma: number, n: number): number[] {
 
 function makeTwoAssets(): Asset[] {
   return [
-    makeAsset('stocks', 'US Stocks', 0.10, 0.18, 0.6),
+    makeAsset('stocks', 'US Stocks', 0.1, 0.18, 0.6),
     makeAsset('bonds', 'US Bonds', 0.04, 0.05, 0.4),
   ]
 }
 
 function makeThreeAssets(): Asset[] {
   return [
-    makeAsset('stocks', 'US Stocks', 0.10, 0.18, 0.5),
+    makeAsset('stocks', 'US Stocks', 0.1, 0.18, 0.5),
     makeAsset('bonds', 'US Bonds', 0.04, 0.05, 0.3),
     makeAsset('gold', 'Gold', 0.06, 0.12, 0.2),
   ]
@@ -46,9 +45,9 @@ function makeThreeAssets(): Asset[] {
 
 function makeFiveAssets(): Asset[] {
   return [
-    makeAsset('us_eq', 'US Equity', 0.10, 0.18, 0.30),
-    makeAsset('intl_eq', 'Intl Equity', 0.08, 0.20, 0.20),
-    makeAsset('bonds', 'Bonds', 0.04, 0.05, 0.20),
+    makeAsset('us_eq', 'US Equity', 0.1, 0.18, 0.3),
+    makeAsset('intl_eq', 'Intl Equity', 0.08, 0.2, 0.2),
+    makeAsset('bonds', 'Bonds', 0.04, 0.05, 0.2),
     makeAsset('reit', 'REITs', 0.07, 0.15, 0.15),
     makeAsset('gold', 'Gold', 0.05, 0.12, 0.15),
   ]
@@ -74,14 +73,14 @@ describe('PortfolioOptimizer constructor', () => {
   it('accepts a full custom config', () => {
     const opt = new PortfolioOptimizer({
       riskFreeRate: 0.03,
-      maxPositionSize: 0.50,
+      maxPositionSize: 0.5,
       minPositionSize: 0.01,
-      rebalanceThreshold: 0.10,
+      rebalanceThreshold: 0.1,
       minAssets: 3,
       maxAssets: 20,
-      targetReturn: 0.10,
+      targetReturn: 0.1,
       confidenceLevel: 0.99,
-      maxDrawdownLimit: 0.30,
+      maxDrawdownLimit: 0.3,
       enableLearning: false,
       frontierPoints: 30,
       gradientStepSize: 0.002,
@@ -136,7 +135,7 @@ describe('PortfolioOptimizer optimize', () => {
   })
 
   it('keeps weights bounded by maxPositionSize before normalization', () => {
-    const customOpt = new PortfolioOptimizer({ maxPositionSize: 0.60 })
+    const customOpt = new PortfolioOptimizer({ maxPositionSize: 0.6 })
     const result = customOpt.optimize(makeFiveAssets())
     for (const asset of result.portfolio.assets) {
       expect(asset.weight).toBeLessThanOrEqual(1.0)
@@ -153,7 +152,7 @@ describe('PortfolioOptimizer optimize', () => {
   it('truncates assets exceeding maxAssets', () => {
     const manyAssets: Asset[] = []
     for (let i = 0; i < 35; i++) {
-      manyAssets.push(makeAsset(`a${i}`, `Asset ${i}`, 0.05 + i * 0.001, 0.10 + i * 0.005, 1 / 35))
+      manyAssets.push(makeAsset(`a${i}`, `Asset ${i}`, 0.05 + i * 0.001, 0.1 + i * 0.005, 1 / 35))
     }
     const result = opt.optimize(manyAssets)
     expect(result.portfolio.assets.length).toBeLessThanOrEqual(30)
@@ -451,7 +450,10 @@ describe('PortfolioOptimizer rebalancing', () => {
 
   it('increments totalRebalances stat', () => {
     const portfolio = makePortfolio(opt, makeTwoAssets())
-    const targets = new Map<string, number>([['stocks', 0.5], ['bonds', 0.5]])
+    const targets = new Map<string, number>([
+      ['stocks', 0.5],
+      ['bonds', 0.5],
+    ])
     opt.rebalance(portfolio, targets)
     opt.rebalance(portfolio, targets)
     expect(opt.getStats().totalRebalances).toBe(2)
@@ -484,12 +486,12 @@ describe('PortfolioOptimizer position sizing', () => {
   it('Kelly criterion returns a size between 0 and maxPositionSize', () => {
     const result = opt.kellyCriterion(0.6, 0.02, 0.01)
     expect(result.size).toBeGreaterThanOrEqual(0)
-    expect(result.size).toBeLessThanOrEqual(0.40)
+    expect(result.size).toBeLessThanOrEqual(0.4)
   })
 
   it('Kelly criterion with zero avgLoss returns max size', () => {
     const result = opt.kellyCriterion(0.6, 0.02, 0)
-    expect(result.size).toBe(0.40)
+    expect(result.size).toBe(0.4)
     expect(result.confidence).toBe(0.5)
   })
 
@@ -514,7 +516,7 @@ describe('PortfolioOptimizer position sizing', () => {
   it('fixed fractional returns a valid size', () => {
     const result = opt.fixedFractional(100000, 0.02, 0.05)
     expect(result.size).toBeGreaterThan(0)
-    expect(result.size).toBeLessThanOrEqual(0.40)
+    expect(result.size).toBeLessThanOrEqual(0.4)
   })
 
   it('fixed fractional returns zero for zero account size', () => {
@@ -572,7 +574,7 @@ describe('PortfolioOptimizer analyzeDrawdown', () => {
   })
 
   it('identifies recovery periods', () => {
-    const returns = [0.05, -0.10, -0.05, 0.08, 0.12]
+    const returns = [0.05, -0.1, -0.05, 0.08, 0.12]
     const dd = opt.analyzeDrawdown(returns)
     expect(dd.recoveryPeriods.length).toBeGreaterThanOrEqual(0)
     for (const rp of dd.recoveryPeriods) {
@@ -582,7 +584,7 @@ describe('PortfolioOptimizer analyzeDrawdown', () => {
   })
 
   it('computes underwater percentage', () => {
-    const returns = [0.05, -0.10, -0.05, 0.08, 0.12]
+    const returns = [0.05, -0.1, -0.05, 0.08, 0.12]
     const dd = opt.analyzeDrawdown(returns)
     expect(dd.underwaterPercentage).toBeGreaterThanOrEqual(0)
     expect(dd.underwaterPercentage).toBeLessThanOrEqual(1)
@@ -603,7 +605,7 @@ describe('PortfolioOptimizer attributePerformance', () => {
       [0.5, 0.3, 0.2],
       [0.4, 0.4, 0.2],
       [0.12, 0.06, 0.04],
-      [0.10, 0.05, 0.03],
+      [0.1, 0.05, 0.03],
     )
     expect(typeof attr.totalReturn).toBe('number')
     expect(typeof attr.assetSelection).toBe('number')
@@ -624,7 +626,7 @@ describe('PortfolioOptimizer attributePerformance', () => {
   it('totalReturn equals active return (portfolio minus benchmark)', () => {
     const pw = [0.6, 0.4]
     const bw = [0.5, 0.5]
-    const pr = [0.10, 0.04]
+    const pr = [0.1, 0.04]
     const br = [0.08, 0.03]
     const attr = opt.attributePerformance(pw, bw, pr, br)
     const portfolioTotal = pw[0] * pr[0] + pw[1] * pr[1]
@@ -633,7 +635,7 @@ describe('PortfolioOptimizer attributePerformance', () => {
   })
 
   it('handles single-asset case', () => {
-    const attr = opt.attributePerformance([1.0], [1.0], [0.12], [0.10])
+    const attr = opt.attributePerformance([1.0], [1.0], [0.12], [0.1])
     expect(attr.assetSelection).toBeCloseTo(0.02, 3)
   })
 })
@@ -671,7 +673,7 @@ describe('PortfolioOptimizer efficient frontier', () => {
   })
 
   it('frontier is empty for equal-weight fallback', () => {
-    const result = opt.optimize([makeAsset('x', 'X', 0.05, 0.10, 1.0)])
+    const result = opt.optimize([makeAsset('x', 'X', 0.05, 0.1, 1.0)])
     expect(result.efficientFrontier).toEqual([])
   })
 })
@@ -714,7 +716,14 @@ describe('PortfolioOptimizer getStats', () => {
     const portfolio = makePortfolio(opt, makeThreeAssets())
     opt.assessRisk(portfolio)
     opt.recommendAllocation(makeFiveAssets(), 'moderate')
-    opt.rebalance(portfolio, new Map([['stocks', 0.5], ['bonds', 0.3], ['gold', 0.2]]))
+    opt.rebalance(
+      portfolio,
+      new Map([
+        ['stocks', 0.5],
+        ['bonds', 0.3],
+        ['gold', 0.2],
+      ]),
+    )
 
     const stats = opt.getStats()
     expect(stats.totalOptimizations).toBe(1)
@@ -730,12 +739,12 @@ describe('PortfolioOptimizer serialize / deserialize', () => {
   it('round-trip preserves config', () => {
     const original = new PortfolioOptimizer({
       riskFreeRate: 0.05,
-      maxPositionSize: 0.50,
+      maxPositionSize: 0.5,
     })
     const json = original.serialize()
     const data = JSON.parse(json)
     expect(data.config.riskFreeRate).toBe(0.05)
-    expect(data.config.maxPositionSize).toBe(0.50)
+    expect(data.config.maxPositionSize).toBe(0.5)
   })
 
   it('round-trip preserves stats', () => {
@@ -838,7 +847,7 @@ describe('PortfolioOptimizer edge cases', () => {
   it('handles an asset with empty returns array', () => {
     const assets = [
       makeAsset('a', 'A', 0.08, 0.15, 0.5, []),
-      makeAsset('b', 'B', 0.06, 0.10, 0.5, []),
+      makeAsset('b', 'B', 0.06, 0.1, 0.5, []),
     ]
     const result = opt.optimize(assets)
     expect(result.portfolio.assets).toHaveLength(2)
@@ -847,17 +856,14 @@ describe('PortfolioOptimizer edge cases', () => {
   it('handles an asset with a single return', () => {
     const assets = [
       makeAsset('a', 'A', 0.08, 0.15, 0.5, [0.01]),
-      makeAsset('b', 'B', 0.06, 0.10, 0.5, [0.02]),
+      makeAsset('b', 'B', 0.06, 0.1, 0.5, [0.02]),
     ]
     const result = opt.optimize(assets)
     expect(result.portfolio.assets).toHaveLength(2)
   })
 
   it('handles all assets with zero expected return', () => {
-    const assets = [
-      makeAsset('a', 'A', 0, 0.10, 0.5),
-      makeAsset('b', 'B', 0, 0.10, 0.5),
-    ]
+    const assets = [makeAsset('a', 'A', 0, 0.1, 0.5), makeAsset('b', 'B', 0, 0.1, 0.5)]
     const result = opt.optimize(assets)
     expect(typeof result.portfolio.sharpeRatio).toBe('number')
   })
@@ -865,8 +871,8 @@ describe('PortfolioOptimizer edge cases', () => {
   it('handles assets with identical returns', () => {
     const returns = [0.01, 0.02, -0.01, 0.03, 0.01]
     const assets = [
-      makeAsset('a', 'A', 0.05, 0.10, 0.5, returns),
-      makeAsset('b', 'B', 0.05, 0.10, 0.5, [...returns]),
+      makeAsset('a', 'A', 0.05, 0.1, 0.5, returns),
+      makeAsset('b', 'B', 0.05, 0.1, 0.5, [...returns]),
     ]
     const result = opt.optimize(assets)
     expect(result.portfolio.assets).toHaveLength(2)
@@ -878,25 +884,19 @@ describe('PortfolioOptimizer edge cases', () => {
   })
 
   it('computeSortino returns 0 when no downside deviation', () => {
-    const result = opt.computeSortino([0.10, 0.12, 0.15, 0.20])
+    const result = opt.computeSortino([0.1, 0.12, 0.15, 0.2])
     expect(result).toBe(0)
   })
 
   it('buildPortfolio normalizes weights that do not sum to 1', () => {
-    const assets = [
-      makeAsset('a', 'A', 0.10, 0.15, 0.3),
-      makeAsset('b', 'B', 0.06, 0.10, 0.3),
-    ]
+    const assets = [makeAsset('a', 'A', 0.1, 0.15, 0.3), makeAsset('b', 'B', 0.06, 0.1, 0.3)]
     const portfolio = opt.buildPortfolio(assets)
     const totalWeight = portfolio.assets.reduce((s, a) => s + a.weight, 0)
     expect(totalWeight).toBeCloseTo(1, 4)
   })
 
   it('buildPortfolio assigns equal weights when all weights are zero', () => {
-    const assets = [
-      makeAsset('a', 'A', 0.10, 0.15, 0),
-      makeAsset('b', 'B', 0.06, 0.10, 0),
-    ]
+    const assets = [makeAsset('a', 'A', 0.1, 0.15, 0), makeAsset('b', 'B', 0.06, 0.1, 0)]
     const portfolio = opt.buildPortfolio(assets)
     expect(portfolio.assets[0].weight).toBeCloseTo(0.5, 4)
     expect(portfolio.assets[1].weight).toBeCloseTo(0.5, 4)

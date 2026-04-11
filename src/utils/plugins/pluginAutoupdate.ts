@@ -48,9 +48,7 @@ let pendingNotification: string[] | null = null
  * If plugins were already updated before the callback was registered,
  * the callback will be invoked immediately with the pending updates.
  */
-export function onPluginsAutoUpdated(
-  callback: PluginAutoUpdateCallback,
-): () => void {
+export function onPluginsAutoUpdated(callback: PluginAutoUpdateCallback): () => void {
   pluginUpdateCallback = callback
 
   // If there are pending updates that happened before registration, deliver them now
@@ -72,9 +70,7 @@ export function getAutoUpdatedPluginNames(): string[] {
   if (!hasPendingUpdates()) {
     return []
   }
-  return getPendingUpdatesDetails().map(
-    d => parsePluginIdentifier(d.pluginId).name,
-  )
+  return getPendingUpdatesDetails().map(d => parsePluginIdentifier(d.pluginId).name)
 }
 
 /**
@@ -90,9 +86,7 @@ async function getAutoUpdateEnabledMarketplaces(): Promise<Set<string>> {
     // Settings-declared autoUpdate takes precedence over JSON state
     const declaredAutoUpdate = declared[name]?.autoUpdate
     const autoUpdate =
-      declaredAutoUpdate !== undefined
-        ? declaredAutoUpdate
-        : isMarketplaceAutoUpdate(name, entry)
+      declaredAutoUpdate !== undefined ? declaredAutoUpdate : isMarketplaceAutoUpdate(name, entry)
     if (autoUpdate) {
       enabled.add(name.toLowerCase())
     }
@@ -121,16 +115,14 @@ async function updatePlugin(
           `Plugin autoupdate: updated ${pluginId} from ${result.oldVersion} to ${result.newVersion}`,
         )
       } else if (!result.alreadyUpToDate) {
-        logForDebugging(
-          `Plugin autoupdate: failed to update ${pluginId}: ${result.message}`,
-          { level: 'warn' },
-        )
+        logForDebugging(`Plugin autoupdate: failed to update ${pluginId}: ${result.message}`, {
+          level: 'warn',
+        })
       }
     } catch (error) {
-      logForDebugging(
-        `Plugin autoupdate: error updating ${pluginId}: ${errorMessage(error)}`,
-        { level: 'warn' },
-      )
+      logForDebugging(`Plugin autoupdate: error updating ${pluginId}: ${errorMessage(error)}`, {
+        level: 'warn',
+      })
     }
   }
 
@@ -180,9 +172,7 @@ export async function updatePluginsForMarketplaces(
         return null
       }
 
-      const relevantInstallations = allInstallations.filter(
-        isInstallationRelevantToCurrentProject,
-      )
+      const relevantInstallations = allInstallations.filter(isInstallationRelevantToCurrentProject)
       if (relevantInstallations.length === 0) {
         return null
       }
@@ -193,8 +183,7 @@ export async function updatePluginsForMarketplaces(
 
   return results
     .filter(
-      (r): r is PromiseFulfilledResult<string> =>
-        r.status === 'fulfilled' && r.value !== null,
+      (r): r is PromiseFulfilledResult<string> => r.status === 'fulfilled' && r.value !== null,
     )
     .map(r => r.value)
 }
@@ -203,9 +192,7 @@ export async function updatePluginsForMarketplaces(
  * Update plugins from marketplaces that have autoUpdate enabled.
  * Returns the list of plugin IDs that were updated.
  */
-async function updatePlugins(
-  autoUpdateEnabledMarketplaces: Set<string>,
-): Promise<string[]> {
+async function updatePlugins(autoUpdateEnabledMarketplaces: Set<string>): Promise<string[]> {
   return updatePluginsForMarketplaces(autoUpdateEnabledMarketplaces)
 }
 
@@ -233,8 +220,7 @@ export function autoUpdateMarketplacesAndPluginsInBackground(): void {
 
     try {
       // Get marketplaces with autoUpdate enabled
-      const autoUpdateEnabledMarketplaces =
-        await getAutoUpdateEnabledMarketplaces()
+      const autoUpdateEnabledMarketplaces = await getAutoUpdateEnabledMarketplaces()
 
       if (autoUpdateEnabledMarketplaces.size === 0) {
         return
@@ -259,10 +245,9 @@ export function autoUpdateMarketplacesAndPluginsInBackground(): void {
       // Log any refresh failures
       const failures = refreshResults.filter(r => r.status === 'rejected')
       if (failures.length > 0) {
-        logForDebugging(
-          `Plugin autoupdate: ${failures.length} marketplace refresh(es) failed`,
-          { level: 'warn' },
-        )
+        logForDebugging(`Plugin autoupdate: ${failures.length} marketplace refresh(es) failed`, {
+          level: 'warn',
+        })
       }
 
       logForDebugging('Plugin autoupdate: checking installed plugins')

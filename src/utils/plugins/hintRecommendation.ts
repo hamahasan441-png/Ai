@@ -16,19 +16,12 @@ import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
   logEvent,
 } from '../../services/analytics/index.js'
-import {
-  type ClaudeCodeHint,
-  hasShownHintThisSession,
-  setPendingHint,
-} from '../claudeCodeHints.js'
+import { type ClaudeCodeHint, hasShownHintThisSession, setPendingHint } from '../claudeCodeHints.js'
 import { getGlobalConfig, saveGlobalConfig } from '../config.js'
 import { logForDebugging } from '../debug.js'
 import { isPluginInstalled } from './installedPluginsManager.js'
 import { getPluginById } from './marketplaceManager.js'
-import {
-  isOfficialMarketplaceName,
-  parsePluginIdentifier,
-} from './pluginIdentifier.js'
+import { isOfficialMarketplaceName, parsePluginIdentifier } from './pluginIdentifier.js'
 import { isPluginBlockedByPolicy } from './pluginPolicy.js'
 
 /**
@@ -109,19 +102,15 @@ export async function resolvePluginHint(
   const pluginData = await getPluginById(pluginId)
 
   logEvent('tengu_plugin_hint_detected', {
-    _PROTO_plugin_name: (name ??
-      '') as AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
-    _PROTO_marketplace_name: (marketplace ??
-      '') as AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
+    _PROTO_plugin_name: (name ?? '') as AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
+    _PROTO_marketplace_name: (marketplace ?? '') as AnalyticsMetadata_I_VERIFIED_THIS_IS_PII_TAGGED,
     result: (pluginData
       ? 'passed'
       : 'not_in_cache') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
   })
 
   if (!pluginData) {
-    logForDebugging(
-      `[hintRecommendation] ${pluginId} not found in marketplace cache`,
-    )
+    logForDebugging(`[hintRecommendation] ${pluginId} not found in marketplace cache`)
     return null
   }
 

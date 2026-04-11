@@ -19,8 +19,15 @@ import type { AnalysisLanguage, Severity } from './types.js'
 
 /** Estimated algorithmic complexity class. */
 export type ComplexityClass =
-  | 'O(1)' | 'O(log n)' | 'O(n)' | 'O(n log n)'
-  | 'O(n²)' | 'O(n³)' | 'O(2ⁿ)' | 'O(n!)' | 'unknown'
+  | 'O(1)'
+  | 'O(log n)'
+  | 'O(n)'
+  | 'O(n log n)'
+  | 'O(n²)'
+  | 'O(n³)'
+  | 'O(2ⁿ)'
+  | 'O(n!)'
+  | 'unknown'
 
 /** A detected performance issue. */
 export interface PerformanceIssue {
@@ -186,10 +193,17 @@ export class PerformanceAnalyzer {
     hotspots: PerformanceHotspot[],
   ): void {
     const loopPatterns = [
-      /\bfor\s*\(/, /\bfor\s+\w+\s+(in|of)\b/, /\bwhile\s*\(/,
-      /\.forEach\s*\(/, /\.map\s*\(/, /\.filter\s*\(/,
-      /\.reduce\s*\(/, /\.some\s*\(/, /\.every\s*\(/,
-      /\bfor\s+\w+\s+in\s+/, /\bfor\s+\w+\s+range\s*\(/,
+      /\bfor\s*\(/,
+      /\bfor\s+\w+\s+(in|of)\b/,
+      /\bwhile\s*\(/,
+      /\.forEach\s*\(/,
+      /\.map\s*\(/,
+      /\.filter\s*\(/,
+      /\.reduce\s*\(/,
+      /\.some\s*\(/,
+      /\.every\s*\(/,
+      /\bfor\s+\w+\s+in\s+/,
+      /\bfor\s+\w+\s+range\s*\(/,
     ]
 
     let loopDepth = 0
@@ -217,9 +231,10 @@ export class PerformanceAnalyzer {
             line: i + 1,
             title: `Nested loop depth ${loopDepth}`,
             description: `Loop nesting level ${loopDepth} detected. This creates ${complexity} complexity which degrades rapidly with input size.`,
-            suggestion: loopDepth >= 3
-              ? 'Consider using a hash map, sorting, or divide-and-conquer to reduce complexity.'
-              : 'Consider using a Set/Map lookup instead of inner loop, or pre-index the data.',
+            suggestion:
+              loopDepth >= 3
+                ? 'Consider using a hash map, sorting, or divide-and-conquer to reduce complexity.'
+                : 'Consider using a Set/Map lookup instead of inner loop, or pre-index the data.',
             impact: loopDepth >= 3 ? 'critical' : 'high',
             estimatedComplexity: complexity,
           })
@@ -254,7 +269,8 @@ export class PerformanceAnalyzer {
     issues: PerformanceIssue[],
     hotspots: PerformanceHotspot[],
   ): void {
-    const funcPattern = /(?:function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?(?:\([^)]*\)|[^=])\s*=>|def\s+(\w+)\s*\(|fn\s+(\w+)\s*\()/
+    const funcPattern =
+      /(?:function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?(?:\([^)]*\)|[^=])\s*=>|def\s+(\w+)\s*\(|fn\s+(\w+)\s*\()/
     const memoPatterns = [/memo/, /cache/, /Map\s*\(\)/, /WeakMap/, /lru/, /@cache/, /@lru_cache/]
 
     for (let i = 0; i < lines.length; i++) {
@@ -382,7 +398,8 @@ export class PerformanceAnalyzer {
             line: i + 1,
             title: 'String concatenation in loop',
             description: `String concatenation inside a loop starting at line ${loopLine}. Creates new string objects on each iteration, leading to O(n²) memory behavior.`,
-            suggestion: 'Use an array and .join() (JS/TS), StringBuilder (Java), or list with "".join() (Python).',
+            suggestion:
+              'Use an array and .join() (JS/TS), StringBuilder (Java), or list with "".join() (Python).',
             impact: 'medium',
             estimatedComplexity: 'O(n²)',
           })
@@ -398,15 +415,18 @@ export class PerformanceAnalyzer {
   private detectArrayMethodChains(lines: string[], issues: PerformanceIssue[]): void {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim()
-      const chainPattern = /(\.\s*(?:map|filter|reduce|flatMap|sort|find|some|every)\s*\([^)]*\)\s*){3,}/
+      const chainPattern =
+        /(\.\s*(?:map|filter|reduce|flatMap|sort|find|some|every)\s*\([^)]*\)\s*){3,}/
       if (chainPattern.test(line)) {
         issues.push({
           type: 'array-method-chain',
           severity: 'low',
           line: i + 1,
           title: 'Long array method chain',
-          description: 'Multiple array operations chained together. Each creates an intermediate array, multiplying memory usage.',
-          suggestion: 'Consider combining operations into a single .reduce() or use a for loop for better performance.',
+          description:
+            'Multiple array operations chained together. Each creates an intermediate array, multiplying memory usage.',
+          suggestion:
+            'Consider combining operations into a single .reduce() or use a for loop for better performance.',
           impact: 'low',
         })
       }
@@ -436,8 +456,10 @@ export class PerformanceAnalyzer {
   private detectRecomputations(lines: string[], issues: PerformanceIssue[]): void {
     const expensiveCalls = new Map<string, number[]>()
     const expensivePatterns = [
-      /\.sort\s*\(/, /JSON\.(?:parse|stringify)\s*\(/,
-      /\.join\s*\(/, /\.reverse\s*\(/,
+      /\.sort\s*\(/,
+      /JSON\.(?:parse|stringify)\s*\(/,
+      /\.join\s*\(/,
+      /\.reverse\s*\(/,
       /Object\.(?:keys|values|entries)\s*\(/,
     ]
 
@@ -475,7 +497,15 @@ export class PerformanceAnalyzer {
       { pattern: /\.add\s*\(/, name: 'set add' },
       { pattern: /\[\w+\]\s*=/, name: 'object property assignment' },
     ]
-    const boundPatterns = [/\.length\s*[><=]/, /\.size\s*[><=]/, /\.slice\s*\(/, /\.splice\s*\(/, /delete\s/, /\.delete\s*\(/, /\.clear\s*\(/]
+    const boundPatterns = [
+      /\.length\s*[><=]/,
+      /\.size\s*[><=]/,
+      /\.slice\s*\(/,
+      /\.splice\s*\(/,
+      /delete\s/,
+      /\.delete\s*\(/,
+      /\.clear\s*\(/,
+    ]
 
     let inEventHandler = false
     let inInterval = false
@@ -494,7 +524,9 @@ export class PerformanceAnalyzer {
         for (const { pattern, name } of growthPatterns) {
           if (pattern.test(line)) {
             // Check if there's a bound check nearby
-            const context = lines.slice(Math.max(0, i - 3), Math.min(lines.length, i + 4)).join('\n')
+            const context = lines
+              .slice(Math.max(0, i - 3), Math.min(lines.length, i + 4))
+              .join('\n')
             const hasBound = boundPatterns.some(bp => bp.test(context))
 
             if (!hasBound) {
@@ -504,7 +536,8 @@ export class PerformanceAnalyzer {
                 line: i + 1,
                 title: `Unbounded ${name} in ${inInterval ? 'setInterval' : 'event handler'}`,
                 description: `Data structure grows via ${name} inside ${inInterval ? 'setInterval' : 'event handler'} (line ${handlerLine}) without bounds checking. This is a memory leak risk.`,
-                suggestion: 'Add size limits, use a bounded buffer (e.g., ring buffer), or clean up old entries.',
+                suggestion:
+                  'Add size limits, use a bounded buffer (e.g., ring buffer), or clean up old entries.',
                 impact: inInterval ? 'high' : 'medium',
               })
             }
@@ -523,9 +556,12 @@ export class PerformanceAnalyzer {
   private detectSyncIOInLoop(lines: string[], issues: PerformanceIssue[]): void {
     const loopPatterns = [/\bfor\s*\(/, /\bwhile\s*\(/, /\.forEach\s*\(/]
     const syncIOPatterns = [
-      /fs\.readFileSync\s*\(/, /fs\.writeFileSync\s*\(/,
-      /fs\.existsSync\s*\(/, /fs\.statSync\s*\(/,
-      /fs\.readdirSync\s*\(/, /child_process\.execSync\s*\(/,
+      /fs\.readFileSync\s*\(/,
+      /fs\.writeFileSync\s*\(/,
+      /fs\.existsSync\s*\(/,
+      /fs\.statSync\s*\(/,
+      /fs\.readdirSync\s*\(/,
+      /child_process\.execSync\s*\(/,
       /open\s*\([^)]*,\s*['"]r/, // Python file open
     ]
 
@@ -552,7 +588,8 @@ export class PerformanceAnalyzer {
             line: i + 1,
             title: 'Synchronous I/O in loop',
             description: `Synchronous I/O operation inside loop (line ${loopLine}). Each iteration blocks the event loop/thread.`,
-            suggestion: 'Use async alternatives (fs.promises, async/await) with Promise.all() for parallel I/O, or batch operations.',
+            suggestion:
+              'Use async alternatives (fs.promises, async/await) with Promise.all() for parallel I/O, or batch operations.',
             impact: 'high',
           })
         }
@@ -623,7 +660,8 @@ export class PerformanceAnalyzer {
             severity: 'medium',
             line: i + 1,
             title: 'Array.includes() in loop — O(n²)',
-            description: 'Using Array.includes() inside a loop creates O(n²) complexity. Set.has() is O(1).',
+            description:
+              'Using Array.includes() inside a loop creates O(n²) complexity. Set.has() is O(1).',
             suggestion: 'Convert the array to a Set before the loop and use Set.has() for lookups.',
             impact: 'high',
             estimatedComplexity: 'O(n²)',
@@ -646,7 +684,8 @@ export class PerformanceAnalyzer {
           severity: 'low',
           line: i + 1,
           title: 'Object.keys() lookup — consider Map',
-          description: 'Using Object.keys() then searching is O(n). Map or direct property check is O(1).',
+          description:
+            'Using Object.keys() then searching is O(n). Map or direct property check is O(1).',
           suggestion: 'Use `key in obj`, `obj.hasOwnProperty(key)`, or convert to Map.',
           impact: 'low',
         })
@@ -656,7 +695,8 @@ export class PerformanceAnalyzer {
       if (/\.indexOf\s*\([^)]+\)\s*!==?\s*-1/.test(line)) {
         suggestions.push({
           category: 'data-structure',
-          description: 'Replace .indexOf() !== -1 with .includes() for readability, or Set.has() for performance',
+          description:
+            'Replace .indexOf() !== -1 with .includes() for readability, or Set.has() for performance',
           expectedImprovement: 'Readability and potential O(n) → O(1) if in loop',
           difficulty: 'easy',
           relatedLines: [i + 1],
@@ -680,8 +720,10 @@ export class PerformanceAnalyzer {
           severity: 'low',
           line: i + 1,
           title: '.filter().length — use .some() or .every()',
-          description: '.filter() creates a full new array just to check length. Use .some() to short-circuit.',
-          suggestion: 'Replace .filter(fn).length > 0 with .some(fn), or .filter(fn).length === 0 with !.some(fn).',
+          description:
+            '.filter() creates a full new array just to check length. Use .some() to short-circuit.',
+          suggestion:
+            'Replace .filter(fn).length > 0 with .some(fn), or .filter(fn).length === 0 with !.some(fn).',
           impact: 'low',
         })
       }
@@ -690,7 +732,8 @@ export class PerformanceAnalyzer {
       if (/\.map\s*\([^)]+\)\s*\.filter\s*\(/.test(line)) {
         suggestions.push({
           category: 'algorithm',
-          description: 'Combine .map().filter() into a single .reduce() or .flatMap() to avoid intermediate array',
+          description:
+            'Combine .map().filter() into a single .reduce() or .flatMap() to avoid intermediate array',
           expectedImprovement: 'Single pass instead of two, less memory allocation',
           difficulty: 'easy',
           relatedLines: [i + 1],
@@ -735,9 +778,8 @@ export class PerformanceAnalyzer {
     if (maxDepth >= 1) return 'O(n)'
 
     // Check for binary search patterns
-    const hasBinarySearch = lines.some(l =>
-      /Math\.floor\s*\(\s*\(\s*\w+\s*\+\s*\w+\s*\)\s*\/\s*2\s*\)/.test(l) ||
-      />>?\s*1/.test(l),
+    const hasBinarySearch = lines.some(
+      l => /Math\.floor\s*\(\s*\(\s*\w+\s*\+\s*\w+\s*\)\s*\/\s*2\s*\)/.test(l) || />>?\s*1/.test(l),
     )
     if (hasBinarySearch) return 'O(log n)'
 
@@ -758,7 +800,8 @@ export class PerformanceAnalyzer {
     if (hasNestedLoops) {
       suggestions.push({
         category: 'algorithm',
-        description: 'Replace nested loops with hash-based lookups (Map/Set) to reduce O(n²) to O(n)',
+        description:
+          'Replace nested loops with hash-based lookups (Map/Set) to reduce O(n²) to O(n)',
         expectedImprovement: 'O(n²) → O(n)',
         difficulty: 'medium',
         relatedLines: issues.filter(i => i.type === 'nested-loop').map(i => i.line),
@@ -802,11 +845,21 @@ export class PerformanceAnalyzer {
     let score = 100
     for (const issue of issues) {
       switch (issue.severity) {
-        case 'critical': score -= 20; break
-        case 'high': score -= 12; break
-        case 'medium': score -= 6; break
-        case 'low': score -= 3; break
-        case 'info': score -= 1; break
+        case 'critical':
+          score -= 20
+          break
+        case 'high':
+          score -= 12
+          break
+        case 'medium':
+          score -= 6
+          break
+        case 'low':
+          score -= 3
+          break
+        case 'info':
+          score -= 1
+          break
       }
     }
     return Math.max(0, Math.min(100, score))

@@ -16,21 +16,31 @@ describe('DatabaseInternals', () => {
 
   describe('KB entry tests', () => {
     it('should match storage engines and query optimization keywords', async () => {
-      const r = await brain.chat('explain storage engines b-tree lsm tree page based log structured query optimization cost based optimizer join algorithms index selection')
+      const r = await brain.chat(
+        'explain storage engines b-tree lsm tree page based log structured query optimization cost based optimizer join algorithms index selection',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/b.tree|lsm|storage|query\s+optimization|cost.based|join/)
+      expect(r.text.toLowerCase()).toMatch(
+        /b.tree|lsm|storage|query\s+optimization|cost.based|join/,
+      )
     })
 
     it('should match transaction isolation and consensus algorithms keywords', async () => {
-      const r = await brain.chat('explain transaction isolation levels read committed repeatable read serializable mvcc consensus algorithms raft paxos pbft leader election')
+      const r = await brain.chat(
+        'explain transaction isolation levels read committed repeatable read serializable mvcc consensus algorithms raft paxos pbft leader election',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/transaction|isolation|mvcc|consensus|raft|paxos/)
     })
 
     it('should match WAL recovery and indexing strategies keywords', async () => {
-      const r = await brain.chat('explain write ahead logging wal checkpointing crash recovery aries indexing strategies b+ tree hash bitmap gin gist partial covering indexes')
+      const r = await brain.chat(
+        'explain write ahead logging wal checkpointing crash recovery aries indexing strategies b+ tree hash bitmap gin gist partial covering indexes',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/write.ahead|wal|checkpoint|recovery|aries|index|b\+|bitmap|gin/)
+      expect(r.text.toLowerCase()).toMatch(
+        /write.ahead|wal|checkpoint|recovery|aries|index|b\+|bitmap|gin/,
+      )
     })
   })
 

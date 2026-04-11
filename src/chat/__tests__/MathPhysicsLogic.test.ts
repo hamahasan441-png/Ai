@@ -149,8 +149,8 @@ describe('Math, Physics & Logic Knowledge', () => {
 
   describe('Physics', () => {
     // ── Mechanics ──
-    it('explains Newton\'s laws', async () => {
-      const r = await brain.chat('What are Newton\'s three laws of motion?')
+    it("explains Newton's laws", async () => {
+      const r = await brain.chat("What are Newton's three laws of motion?")
       expect(r.text.toLowerCase()).toMatch(/newton|force|acceleration|f\s*=\s*m\s*a|inertia/)
     })
 
@@ -175,7 +175,7 @@ describe('Math, Physics & Logic Knowledge', () => {
     })
 
     it('knows gravity and orbits', async () => {
-      const r = await brain.chat('How does gravity work? What are Kepler\'s laws?')
+      const r = await brain.chat("How does gravity work? What are Kepler's laws?")
       expect(r.text.toLowerCase()).toMatch(/grav|kepler|orbit|escape velocity/)
     })
 
@@ -191,23 +191,23 @@ describe('Math, Physics & Logic Knowledge', () => {
     })
 
     // ── Electromagnetism ──
-    it('explains electric fields and Coulomb\'s law', async () => {
-      const r = await brain.chat('What is Coulomb\'s law and electric fields?')
+    it("explains electric fields and Coulomb's law", async () => {
+      const r = await brain.chat("What is Coulomb's law and electric fields?")
       expect(r.text.toLowerCase()).toMatch(/coulomb|electric|charge|field/)
     })
 
     it('knows circuit analysis', async () => {
-      const r = await brain.chat('How do electrical circuits work? Ohm\'s law?')
+      const r = await brain.chat("How do electrical circuits work? Ohm's law?")
       expect(r.text.toLowerCase()).toMatch(/ohm|circuit|resistor|voltage|current/)
     })
 
-    it('explains magnetism and Faraday\'s law', async () => {
+    it("explains magnetism and Faraday's law", async () => {
       const r = await brain.chat('What is electromagnetic induction?')
       expect(r.text.toLowerCase()).toMatch(/magnet|faraday|induction|electromagnetic/)
     })
 
-    it('knows Maxwell\'s equations', async () => {
-      const r = await brain.chat('What are Maxwell\'s equations?')
+    it("knows Maxwell's equations", async () => {
+      const r = await brain.chat("What are Maxwell's equations?")
       expect(r.text.toLowerCase()).toMatch(/maxwell|electromagnetic|gauss|wave/)
     })
 
@@ -218,7 +218,7 @@ describe('Math, Physics & Logic Knowledge', () => {
     })
 
     it('knows optics and refraction', async () => {
-      const r = await brain.chat('What is Snell\'s law and how do lenses work?')
+      const r = await brain.chat("What is Snell's law and how do lenses work?")
       expect(r.text.toLowerCase()).toMatch(/optic|lens|refraction|snell/)
     })
 
@@ -229,7 +229,7 @@ describe('Math, Physics & Logic Knowledge', () => {
     })
 
     it('knows about relativity', async () => {
-      const r = await brain.chat('Explain Einstein\'s theory of relativity')
+      const r = await brain.chat("Explain Einstein's theory of relativity")
       expect(r.text.toLowerCase()).toMatch(/relativ|einstein|spacetime|e\s*=\s*mc/)
     })
 
@@ -244,7 +244,7 @@ describe('Math, Physics & Logic Knowledge', () => {
     })
 
     it('explains fluid mechanics', async () => {
-      const r = await brain.chat('What is Bernoulli\'s equation?')
+      const r = await brain.chat("What is Bernoulli's equation?")
       expect(r.text.toLowerCase()).toMatch(/fluid|bernoulli|pressure|buoyan/)
     })
   })
@@ -287,13 +287,15 @@ describe('Math, Physics & Logic Knowledge', () => {
     })
 
     it('explains types of reasoning', async () => {
-      const r = await brain.chat('What is the difference between deductive and inductive reasoning?')
+      const r = await brain.chat(
+        'What is the difference between deductive and inductive reasoning?',
+      )
       expect(r.text.toLowerCase()).toMatch(/deduct|induct|abduct|reason/)
     })
 
     // ── Formal Systems ──
-    it('knows about Gödel\'s incompleteness theorems', async () => {
-      const r = await brain.chat('What are Gödel\'s incompleteness theorems?')
+    it("knows about Gödel's incompleteness theorems", async () => {
+      const r = await brain.chat("What are Gödel's incompleteness theorems?")
       expect(r.text.toLowerCase()).toMatch(/gödel|godel|incomplet|formal|theorem/)
     })
 
@@ -351,7 +353,9 @@ describe('Math, Physics & Logic Knowledge', () => {
     })
 
     it('uses reasoning engine for complex math questions', async () => {
-      const r = await brain.chat('Why does the derivative of a constant equal zero and how does the chain rule work?')
+      const r = await brain.chat(
+        'Why does the derivative of a constant equal zero and how does the chain rule work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
     })
 

@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  GoalManager,
-  DEFAULT_GOAL_MANAGER_CONFIG,
-} from '../GoalManager'
+import { GoalManager, DEFAULT_GOAL_MANAGER_CONFIG } from '../GoalManager'
 
 describe('GoalManager', () => {
   let manager: GoalManager

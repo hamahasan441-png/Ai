@@ -78,7 +78,7 @@ describe('LocalBrain — Learn from Search', () => {
       expect(result.steps.length).toBeGreaterThan(0)
       // Check that the advanced search step exists
       const searchStep = result.steps.find(s =>
-        s.description.includes('Advanced search with thinking')
+        s.description.includes('Advanced search with thinking'),
       )
       // Should have a search step (if search engine found results)
       if (searchStep) {
@@ -171,7 +171,11 @@ describe('LocalBrain — Learn from Search', () => {
   describe('knowledge re-indexing into search engine', () => {
     it('newly learned knowledge is searchable in future', async () => {
       // Teach the brain something specific
-      brain.learn('What is Vitest?', 'Vitest is a blazing fast unit test framework powered by Vite.', 'learned')
+      brain.learn(
+        'What is Vitest?',
+        'Vitest is a blazing fast unit test framework powered by Vite.',
+        'learned',
+      )
 
       // Now search should be able to find it if the search engine re-indexes
       const result = await brain.searchWithThinking('Vitest test framework')

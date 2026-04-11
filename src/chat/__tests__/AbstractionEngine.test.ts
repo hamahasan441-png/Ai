@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  AbstractionEngine,
-  createProgrammingAbstractionEngine,
-} from '../AbstractionEngine'
+import { AbstractionEngine, createProgrammingAbstractionEngine } from '../AbstractionEngine'
 
 // ── Constructor Tests ──
 
@@ -90,10 +87,7 @@ describe('AbstractionEngine abstractFromExamples', () => {
 
   it('includes a domain prefix when domain is provided', () => {
     const result = engine.abstractFromExamples(
-      [
-        'binary search tree traversal',
-        'red-black tree traversal',
-      ],
+      ['binary search tree traversal', 'red-black tree traversal'],
       'data-structures',
     )
     expect(result).not.toBeNull()
@@ -101,10 +95,7 @@ describe('AbstractionEngine abstractFromExamples', () => {
   })
 
   it('has an abstractionLevel of at least 1', () => {
-    const result = engine.abstractFromExamples([
-      'unit test for login',
-      'unit test for logout',
-    ])
+    const result = engine.abstractFromExamples(['unit test for login', 'unit test for logout'])
     expect(result).not.toBeNull()
     expect(result!.abstractionLevel).toBeGreaterThanOrEqual(1)
   })
@@ -351,21 +342,14 @@ describe('AbstractionEngine extractPrototype', () => {
   })
 
   it('returns typicality between 0 and 1', () => {
-    const result = engine.extractPrototype([
-      'red car fast',
-      'blue car slow',
-      'green car medium',
-    ])
+    const result = engine.extractPrototype(['red car fast', 'blue car slow', 'green car medium'])
     expect(result).not.toBeNull()
     expect(result!.typicality).toBeGreaterThanOrEqual(0)
     expect(result!.typicality).toBeLessThanOrEqual(1)
   })
 
   it('stores the prototype for later retrieval', () => {
-    engine.extractPrototype([
-      'functional reactive programming',
-      'functional programming paradigm',
-    ])
+    engine.extractPrototype(['functional reactive programming', 'functional programming paradigm'])
     const prototypes = engine.getPrototypes()
     expect(prototypes.length).toBeGreaterThanOrEqual(1)
   })
@@ -418,10 +402,7 @@ describe('AbstractionEngine learnAbstraction', () => {
   })
 
   it('creates a new abstract concept from concrete examples', () => {
-    const concept = engine.learnAbstraction(
-      ['dog', 'cat', 'hamster'],
-      'pet',
-    )
+    const concept = engine.learnAbstraction(['dog', 'cat', 'hamster'], 'pet')
     expect(concept).toBeDefined()
     expect(concept.name).toBe('pet')
     expect(concept.examples).toContain('dog')
@@ -430,10 +411,7 @@ describe('AbstractionEngine learnAbstraction', () => {
   })
 
   it('sets the abstraction level above the concrete examples', () => {
-    const concept = engine.learnAbstraction(
-      ['binary', 'opcodes'],
-      'machine representation',
-    )
+    const concept = engine.learnAbstraction(['binary', 'opcodes'], 'machine representation')
     expect(concept.abstractionLevel).toBeGreaterThanOrEqual(1)
   })
 

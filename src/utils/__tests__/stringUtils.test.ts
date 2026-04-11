@@ -214,9 +214,7 @@ describe('safeJoinLines', () => {
 
   it('truncates when exceeding maxSize', () => {
     const result = safeJoinLines(['hello', 'world', 'more'], ',', 12)
-    expect(result.length).toBeLessThanOrEqual(
-      12 + '...[truncated]'.length + 1,
-    )
+    expect(result.length).toBeLessThanOrEqual(12 + '...[truncated]'.length + 1)
     expect(result).toContain('...[truncated]')
   })
 

@@ -38,19 +38,14 @@ function prefixMatchesModel(modelName: string, prefix: string): boolean {
  */
 function modelMatchesVersionPrefix(model: string, entry: string): boolean {
   // Resolve the input model to a full name if it's an alias
-  const resolvedModel = isModelAlias(model)
-    ? parseUserSpecifiedModel(model).toLowerCase()
-    : model
+  const resolvedModel = isModelAlias(model) ? parseUserSpecifiedModel(model).toLowerCase() : model
 
   // Try the entry as-is (e.g. "claude-opus-4-5")
   if (prefixMatchesModel(resolvedModel, entry)) {
     return true
   }
   // Try with "claude-" prefix (e.g. "opus-4-5" → "claude-opus-4-5")
-  if (
-    !entry.startsWith('claude-') &&
-    prefixMatchesModel(resolvedModel, `claude-${entry}`)
-  ) {
+  if (!entry.startsWith('claude-') && prefixMatchesModel(resolvedModel, `claude-${entry}`)) {
     return true
   }
   return false
@@ -62,10 +57,7 @@ function modelMatchesVersionPrefix(model: string, entry: string): boolean {
  * takes precedence — "opus" alone would be a wildcard, but "opus-4-5" narrows
  * it to only that version.
  */
-function familyHasSpecificEntries(
-  family: string,
-  allowlist: string[],
-): boolean {
+function familyHasSpecificEntries(family: string, allowlist: string[]): boolean {
   for (const entry of allowlist) {
     if (isModelFamilyAlias(entry)) {
       continue

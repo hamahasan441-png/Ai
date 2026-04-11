@@ -24,14 +24,34 @@
 
 export type ArgumentSide = 'pro' | 'con'
 export type ArgumentStrength = 'weak' | 'moderate' | 'strong' | 'compelling'
-export type EvidenceType = 'empirical' | 'statistical' | 'anecdotal' | 'expert_opinion' | 'logical_deduction' | 'historical'
+export type EvidenceType =
+  | 'empirical'
+  | 'statistical'
+  | 'anecdotal'
+  | 'expert_opinion'
+  | 'logical_deduction'
+  | 'historical'
 export type FallacyType =
-  | 'ad_hominem' | 'straw_man' | 'false_dilemma' | 'slippery_slope'
-  | 'appeal_to_authority' | 'appeal_to_emotion' | 'red_herring'
-  | 'circular_reasoning' | 'hasty_generalization' | 'false_cause'
-  | 'bandwagon' | 'appeal_to_nature' | 'tu_quoque' | 'no_true_scotsman'
-  | 'loaded_question' | 'equivocation' | 'composition_division'
-  | 'appeal_to_ignorance' | 'genetic_fallacy' | 'begging_the_question'
+  | 'ad_hominem'
+  | 'straw_man'
+  | 'false_dilemma'
+  | 'slippery_slope'
+  | 'appeal_to_authority'
+  | 'appeal_to_emotion'
+  | 'red_herring'
+  | 'circular_reasoning'
+  | 'hasty_generalization'
+  | 'false_cause'
+  | 'bandwagon'
+  | 'appeal_to_nature'
+  | 'tu_quoque'
+  | 'no_true_scotsman'
+  | 'loaded_question'
+  | 'equivocation'
+  | 'composition_division'
+  | 'appeal_to_ignorance'
+  | 'genetic_fallacy'
+  | 'begging_the_question'
 
 export interface Argument {
   readonly id: string
@@ -123,17 +143,65 @@ export const DEFAULT_DEBATE_ENGINE_CONFIG: DebateEngineConfig = {
 
 // ─── Fallacy patterns ──────────────────────────────────────────────────────────
 
-const FALLACY_PATTERNS: ReadonlyArray<{ type: FallacyType; patterns: readonly RegExp[]; description: string }> = [
-  { type: 'ad_hominem', patterns: [/\b(stupid|idiot|fool|incompetent)\b/i, /\battack(ing|s)?\s+the\s+person\b/i], description: 'Attacking the person rather than the argument' },
-  { type: 'straw_man', patterns: [/\bthey\s+(actually\s+)?think\b/i, /\bwhat\s+they\'?re?\s+really\s+saying\b/i], description: 'Misrepresenting the opposing argument' },
-  { type: 'false_dilemma', patterns: [/\beither\b.*\bor\b/i, /\bonly\s+(two|2)\s+(options|choices)\b/i], description: 'Presenting only two options when more exist' },
-  { type: 'slippery_slope', patterns: [/\bwill\s+lead\s+to\b/i, /\bnext\s+thing\b.*\b(know|happens)\b/i, /\bslippery\s+slope\b/i], description: 'Assuming one event will cause a chain of negative events' },
-  { type: 'appeal_to_authority', patterns: [/\bexperts?\s+(say|agree|believe)\b/i, /\bscientists?\s+say\b/i], description: 'Using authority as evidence without substance' },
-  { type: 'appeal_to_emotion', patterns: [/\bthink\s+of\s+the\s+(children|victims)\b/i, /\bhow\s+would\s+you\s+feel\b/i], description: 'Manipulating emotions instead of using logic' },
-  { type: 'circular_reasoning', patterns: [/\bbecause\s+it\s+is\b/i, /\btrue\s+because.*\btrue\b/i], description: 'Using the conclusion as a premise' },
-  { type: 'hasty_generalization', patterns: [/\ball\b.*\balways\b/i, /\beveryone\s+(knows|agrees)\b/i, /\bnever\b.*\bany\b/i], description: 'Drawing broad conclusions from limited evidence' },
-  { type: 'bandwagon', patterns: [/\beveryone\s+(is|does)\b/i, /\bmillions?\s+of\s+people\b/i], description: 'Arguing something is true because many believe it' },
-  { type: 'appeal_to_nature', patterns: [/\bnatural(ly)?\b.*\b(better|good|safe)\b/i, /\bunnatural\b.*\b(bad|harmful)\b/i], description: 'Assuming natural means better' },
+const FALLACY_PATTERNS: ReadonlyArray<{
+  type: FallacyType
+  patterns: readonly RegExp[]
+  description: string
+}> = [
+  {
+    type: 'ad_hominem',
+    patterns: [/\b(stupid|idiot|fool|incompetent)\b/i, /\battack(ing|s)?\s+the\s+person\b/i],
+    description: 'Attacking the person rather than the argument',
+  },
+  {
+    type: 'straw_man',
+    patterns: [/\bthey\s+(actually\s+)?think\b/i, /\bwhat\s+they\'?re?\s+really\s+saying\b/i],
+    description: 'Misrepresenting the opposing argument',
+  },
+  {
+    type: 'false_dilemma',
+    patterns: [/\beither\b.*\bor\b/i, /\bonly\s+(two|2)\s+(options|choices)\b/i],
+    description: 'Presenting only two options when more exist',
+  },
+  {
+    type: 'slippery_slope',
+    patterns: [
+      /\bwill\s+lead\s+to\b/i,
+      /\bnext\s+thing\b.*\b(know|happens)\b/i,
+      /\bslippery\s+slope\b/i,
+    ],
+    description: 'Assuming one event will cause a chain of negative events',
+  },
+  {
+    type: 'appeal_to_authority',
+    patterns: [/\bexperts?\s+(say|agree|believe)\b/i, /\bscientists?\s+say\b/i],
+    description: 'Using authority as evidence without substance',
+  },
+  {
+    type: 'appeal_to_emotion',
+    patterns: [/\bthink\s+of\s+the\s+(children|victims)\b/i, /\bhow\s+would\s+you\s+feel\b/i],
+    description: 'Manipulating emotions instead of using logic',
+  },
+  {
+    type: 'circular_reasoning',
+    patterns: [/\bbecause\s+it\s+is\b/i, /\btrue\s+because.*\btrue\b/i],
+    description: 'Using the conclusion as a premise',
+  },
+  {
+    type: 'hasty_generalization',
+    patterns: [/\ball\b.*\balways\b/i, /\beveryone\s+(knows|agrees)\b/i, /\bnever\b.*\bany\b/i],
+    description: 'Drawing broad conclusions from limited evidence',
+  },
+  {
+    type: 'bandwagon',
+    patterns: [/\beveryone\s+(is|does)\b/i, /\bmillions?\s+of\s+people\b/i],
+    description: 'Arguing something is true because many believe it',
+  },
+  {
+    type: 'appeal_to_nature',
+    patterns: [/\bnatural(ly)?\b.*\b(better|good|safe)\b/i, /\bunnatural\b.*\b(bad|harmful)\b/i],
+    description: 'Assuming natural means better',
+  },
 ]
 
 // ─── Builder helpers ───────────────────────────────────────────────────────────
@@ -148,9 +216,8 @@ function scoreArgument(claim: string, reasoning: string, evidence: Evidence[]): 
   if (reasoning.length > 50) score += 0.15
   if (reasoning.length > 150) score += 0.1
   if (evidence.length > 0) score += 0.15
-  const avgReliability = evidence.length > 0
-    ? evidence.reduce((s, e) => s + e.reliability, 0) / evidence.length
-    : 0
+  const avgReliability =
+    evidence.length > 0 ? evidence.reduce((s, e) => s + e.reliability, 0) / evidence.length : 0
   score += avgReliability * 0.2
   if (evidence.some(e => e.type === 'empirical' || e.type === 'statistical')) score += 0.1
   return Math.min(1, score)
@@ -205,18 +272,26 @@ export class DebateEngine {
 
   // ── Argument creation ────────────────────────────────────────────────
 
-  addArgument(debateId: string, side: ArgumentSide, claim: string, reasoning: string, evidence: Evidence[] = []): Argument | null {
+  addArgument(
+    debateId: string,
+    side: ArgumentSide,
+    claim: string,
+    reasoning: string,
+    evidence: Evidence[] = [],
+  ): Argument | null {
     const debate = this.debates.get(debateId)
     if (!debate) return null
 
-    const fallacies = this.config.fallacyDetectionEnabled ? this.detectFallacies(claim + ' ' + reasoning) : []
+    const fallacies = this.config.fallacyDetectionEnabled
+      ? this.detectFallacies(claim + ' ' + reasoning)
+      : []
     const rawScore = scoreArgument(claim, reasoning, evidence)
     // Penalize for fallacies
     const fallacyPenalty = fallacies.reduce((s, f) => s + f.severity * 0.15, 0)
     const finalScore = Math.max(0, rawScore - fallacyPenalty)
 
     const arg: Argument = {
-      id: debateId + '_arg_' + (++_debateIdCounter),
+      id: debateId + '_arg_' + ++_debateIdCounter,
       side,
       claim,
       reasoning,
@@ -233,10 +308,22 @@ export class DebateEngine {
 
     // Add to current or new round
     const mutableDebate = debate as { rounds: DebateRound[] }
-    if (mutableDebate.rounds.length === 0 || mutableDebate.rounds[mutableDebate.rounds.length - 1].proArguments.length >= this.config.maxArgumentsPerSide) {
-      mutableDebate.rounds.push({ roundNumber: mutableDebate.rounds.length + 1, proArguments: [], conArguments: [], rebuttals: [] })
+    if (
+      mutableDebate.rounds.length === 0 ||
+      mutableDebate.rounds[mutableDebate.rounds.length - 1].proArguments.length >=
+        this.config.maxArgumentsPerSide
+    ) {
+      mutableDebate.rounds.push({
+        roundNumber: mutableDebate.rounds.length + 1,
+        proArguments: [],
+        conArguments: [],
+        rebuttals: [],
+      })
     }
-    const currentRound = mutableDebate.rounds[mutableDebate.rounds.length - 1] as { proArguments: Argument[]; conArguments: Argument[] }
+    const currentRound = mutableDebate.rounds[mutableDebate.rounds.length - 1] as {
+      proArguments: Argument[]
+      conArguments: Argument[]
+    }
     if (side === 'pro') currentRound.proArguments.push(arg)
     else currentRound.conArguments.push(arg)
 
@@ -245,11 +332,18 @@ export class DebateEngine {
 
   // ── Rebuttal ─────────────────────────────────────────────────────────
 
-  addRebuttal(argumentId: string, content: string, counterEvidence: Evidence[] = []): Rebuttal | null {
+  addRebuttal(
+    argumentId: string,
+    content: string,
+    counterEvidence: Evidence[] = [],
+  ): Rebuttal | null {
     const targetArg = this.arguments.get(argumentId)
     if (!targetArg) return null
 
-    const effectiveness = Math.min(1, 0.4 + (content.length > 100 ? 0.2 : 0) + (counterEvidence.length * 0.15))
+    const effectiveness = Math.min(
+      1,
+      0.4 + (content.length > 100 ? 0.2 : 0) + counterEvidence.length * 0.15,
+    )
     const rebuttal: Rebuttal = {
       id: debateId('reb'),
       targetArgumentId: argumentId,
@@ -291,7 +385,10 @@ export class DebateEngine {
     const debate = this.debates.get(debateId)
     if (!debate || debate.rounds.length === 0) return null
 
-    let proTotal = 0, conTotal = 0, proCount = 0, conCount = 0
+    let proTotal = 0,
+      conTotal = 0,
+      proCount = 0,
+      conCount = 0
     const keyFactors: string[] = []
 
     for (const round of debate.rounds) {
@@ -314,12 +411,14 @@ export class DebateEngine {
     const proScore = proCount > 0 ? proTotal / proCount : 0
     const conScore = conCount > 0 ? conTotal / conCount : 0
     const diff = Math.abs(proScore - conScore)
-    const winningSide: ArgumentSide | 'draw' = diff < 0.05 ? 'draw' : proScore > conScore ? 'pro' : 'con'
+    const winningSide: ArgumentSide | 'draw' =
+      diff < 0.05 ? 'draw' : proScore > conScore ? 'pro' : 'con'
     const confidence = Math.min(1, diff * 2 + (proCount + conCount) * 0.02)
 
-    const reasoning = winningSide === 'draw'
-      ? `Both sides present roughly equal arguments (Pro: ${proScore.toFixed(2)}, Con: ${conScore.toFixed(2)})`
-      : `The ${winningSide} side prevails with a score of ${Math.max(proScore, conScore).toFixed(2)} vs ${Math.min(proScore, conScore).toFixed(2)}`
+    const reasoning =
+      winningSide === 'draw'
+        ? `Both sides present roughly equal arguments (Pro: ${proScore.toFixed(2)}, Con: ${conScore.toFixed(2)})`
+        : `The ${winningSide} side prevails with a score of ${Math.max(proScore, conScore).toFixed(2)} vs ${Math.min(proScore, conScore).toFixed(2)}`
 
     const verdict: DebateVerdict = {
       proposition: debate.proposition,
@@ -345,7 +444,8 @@ export class DebateEngine {
       totalArguments: this.stats.totalArguments,
       totalRebuttals: this.stats.totalRebuttals,
       totalFallaciesDetected: this.stats.totalFallacies,
-      avgVerdictConfidence: this.stats.verdictCount > 0 ? this.stats.verdictConfidenceSum / this.stats.verdictCount : 0,
+      avgVerdictConfidence:
+        this.stats.verdictCount > 0 ? this.stats.verdictConfidenceSum / this.stats.verdictCount : 0,
       feedbackCount: this.stats.feedbackCount,
     }
   }

@@ -124,10 +124,20 @@ describe('AttackChainEngine attack technique database', () => {
 
   it('covers all 14 MITRE ATT&CK tactics', () => {
     const allTactics: MitreAttackTactic[] = [
-      'initial_access', 'execution', 'persistence', 'privilege_escalation',
-      'defense_evasion', 'credential_access', 'discovery', 'lateral_movement',
-      'collection', 'exfiltration', 'command_and_control', 'impact',
-      'resource_development', 'reconnaissance',
+      'initial_access',
+      'execution',
+      'persistence',
+      'privilege_escalation',
+      'defense_evasion',
+      'credential_access',
+      'discovery',
+      'lateral_movement',
+      'collection',
+      'exfiltration',
+      'command_and_control',
+      'impact',
+      'resource_development',
+      'reconnaissance',
     ]
     for (const tactic of allTactics) {
       expect(engine.getTechniquesForTactic(tactic).length).toBeGreaterThan(0)
@@ -254,7 +264,15 @@ describe('AttackChainEngine attacker profiles', () => {
   })
 
   it('profiles have valid motivations', () => {
-    const validMotivations = ['financial', 'espionage', 'hacktivism', 'destruction', 'revenge', 'thrill', 'state_sponsored']
+    const validMotivations = [
+      'financial',
+      'espionage',
+      'hacktivism',
+      'destruction',
+      'revenge',
+      'thrill',
+      'state_sponsored',
+    ]
     for (const p of engine.getAttackerProfiles()) {
       expect(validMotivations).toContain(p.motivation)
     }
@@ -337,7 +355,7 @@ describe('AttackChainEngine persistence mechanisms', () => {
   it('most mechanisms survive reboot', () => {
     const survivesReboot = engine.getPersistenceMechanisms().filter(m => m.survivesReboot)
     expect(survivesReboot.length).toBeGreaterThan(
-      engine.getPersistenceMechanisms().filter(m => !m.survivesReboot).length
+      engine.getPersistenceMechanisms().filter(m => !m.survivesReboot).length,
     )
   })
 })
@@ -408,9 +426,7 @@ describe('AttackChainEngine evasion techniques', () => {
 
   it('selectEvasion prioritizes techniques that bypass specified capabilities', () => {
     const edrEvasion = engine.selectEvasion(['edr'])
-    const hasEdrBypass = edrEvasion.some(e =>
-      e.bypasses.some(b => b.toLowerCase().includes('edr'))
-    )
+    const hasEdrBypass = edrEvasion.some(e => e.bypasses.some(b => b.toLowerCase().includes('edr')))
     expect(hasEdrBypass).toBe(true)
   })
 })
@@ -664,11 +680,10 @@ describe('AttackChainEngine generateAttackChain', () => {
   })
 
   it('generates a valid attack chain result', () => {
-    const result = engine.generateAttackChain(
-      'corporate windows network',
-      'APT29',
-      ['data_theft', 'persistence']
-    )
+    const result = engine.generateAttackChain('corporate windows network', 'APT29', [
+      'data_theft',
+      'persistence',
+    ])
     expect(typeof result.id).toBe('string')
     expect(result.id.length).toBeGreaterThan(0)
     expect(typeof result.name).toBe('string')
@@ -1065,8 +1080,28 @@ describe('AttackChainEngine calculateChainRisk', () => {
 
   it('returns average risk for chain with steps', () => {
     const steps = [
-      { order: 1, phase: 'exploitation' as const, tactic: 'execution' as const, technique: 'test', objective: 'obj', expectedOutcome: 'out', estimatedDuration: '5m', riskLevel: 0.6, dependencies: [] },
-      { order: 2, phase: 'installation' as const, tactic: 'persistence' as const, technique: 'test2', objective: 'obj2', expectedOutcome: 'out2', estimatedDuration: '10m', riskLevel: 0.4, dependencies: [1] },
+      {
+        order: 1,
+        phase: 'exploitation' as const,
+        tactic: 'execution' as const,
+        technique: 'test',
+        objective: 'obj',
+        expectedOutcome: 'out',
+        estimatedDuration: '5m',
+        riskLevel: 0.6,
+        dependencies: [],
+      },
+      {
+        order: 2,
+        phase: 'installation' as const,
+        tactic: 'persistence' as const,
+        technique: 'test2',
+        objective: 'obj2',
+        expectedOutcome: 'out2',
+        estimatedDuration: '10m',
+        riskLevel: 0.4,
+        dependencies: [1],
+      },
     ]
     const risk = engine.calculateChainRisk(steps)
     expect(risk).toBe(0.5)
@@ -1074,16 +1109,56 @@ describe('AttackChainEngine calculateChainRisk', () => {
 
   it('returns the single step risk for chain of one', () => {
     const steps = [
-      { order: 1, phase: 'delivery' as const, tactic: 'initial_access' as const, technique: 'phish', objective: 'obj', expectedOutcome: 'out', estimatedDuration: '5m', riskLevel: 0.7, dependencies: [] },
+      {
+        order: 1,
+        phase: 'delivery' as const,
+        tactic: 'initial_access' as const,
+        technique: 'phish',
+        objective: 'obj',
+        expectedOutcome: 'out',
+        estimatedDuration: '5m',
+        riskLevel: 0.7,
+        dependencies: [],
+      },
     ]
     expect(engine.calculateChainRisk(steps)).toBe(0.7)
   })
 
   it('rounds to two decimal places', () => {
     const steps = [
-      { order: 1, phase: 'exploitation' as const, tactic: 'execution' as const, technique: 't1', objective: 'o', expectedOutcome: 'e', estimatedDuration: '5m', riskLevel: 0.33, dependencies: [] },
-      { order: 2, phase: 'exploitation' as const, tactic: 'execution' as const, technique: 't2', objective: 'o', expectedOutcome: 'e', estimatedDuration: '5m', riskLevel: 0.33, dependencies: [] },
-      { order: 3, phase: 'exploitation' as const, tactic: 'execution' as const, technique: 't3', objective: 'o', expectedOutcome: 'e', estimatedDuration: '5m', riskLevel: 0.34, dependencies: [] },
+      {
+        order: 1,
+        phase: 'exploitation' as const,
+        tactic: 'execution' as const,
+        technique: 't1',
+        objective: 'o',
+        expectedOutcome: 'e',
+        estimatedDuration: '5m',
+        riskLevel: 0.33,
+        dependencies: [],
+      },
+      {
+        order: 2,
+        phase: 'exploitation' as const,
+        tactic: 'execution' as const,
+        technique: 't2',
+        objective: 'o',
+        expectedOutcome: 'e',
+        estimatedDuration: '5m',
+        riskLevel: 0.33,
+        dependencies: [],
+      },
+      {
+        order: 3,
+        phase: 'exploitation' as const,
+        tactic: 'execution' as const,
+        technique: 't3',
+        objective: 'o',
+        expectedOutcome: 'e',
+        estimatedDuration: '5m',
+        riskLevel: 0.34,
+        dependencies: [],
+      },
     ]
     const risk = engine.calculateChainRisk(steps)
     const decimalPlaces = risk.toString().split('.')[1]?.length ?? 0
@@ -1333,7 +1408,11 @@ describe('AttackChainEngine selectPostExploitActions', () => {
 
   it('returns at most 6 actions', () => {
     const profile = engine.profileAttacker('APT29')
-    const actions = engine.selectPostExploitActions(profile, ['data_theft', 'persistence', 'stealth'])
+    const actions = engine.selectPostExploitActions(profile, [
+      'data_theft',
+      'persistence',
+      'stealth',
+    ])
     expect(actions.length).toBeLessThanOrEqual(6)
   })
 })

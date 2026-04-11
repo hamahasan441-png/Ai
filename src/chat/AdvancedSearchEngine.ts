@@ -140,91 +140,190 @@ const DEFAULT_CONFIG: SearchConfig = {
 // ─── Stop words ─────────────────────────────────────────────────────────────
 
 const STOP_WORDS = new Set([
-  'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-  'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
-  'should', 'may', 'might', 'can', 'shall', 'to', 'of', 'in', 'for',
-  'on', 'at', 'by', 'with', 'from', 'about', 'as', 'into', 'through',
-  'during', 'before', 'after', 'above', 'below', 'between', 'under',
-  'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where',
-  'why', 'how', 'all', 'both', 'each', 'few', 'more', 'most', 'other',
-  'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so',
-  'than', 'too', 'very', 'just', 'or', 'and', 'but', 'if', 'while',
-  'because', 'what', 'which', 'who', 'whom', 'this', 'that', 'these',
-  'those', 'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'you',
-  'your', 'he', 'him', 'his', 'she', 'her', 'it', 'its', 'they',
-  'them', 'their', 'please', 'make', 'write', 'create', 'tell',
+  'a',
+  'an',
+  'the',
+  'is',
+  'are',
+  'was',
+  'were',
+  'be',
+  'been',
+  'being',
+  'have',
+  'has',
+  'had',
+  'do',
+  'does',
+  'did',
+  'will',
+  'would',
+  'could',
+  'should',
+  'may',
+  'might',
+  'can',
+  'shall',
+  'to',
+  'of',
+  'in',
+  'for',
+  'on',
+  'at',
+  'by',
+  'with',
+  'from',
+  'about',
+  'as',
+  'into',
+  'through',
+  'during',
+  'before',
+  'after',
+  'above',
+  'below',
+  'between',
+  'under',
+  'again',
+  'further',
+  'then',
+  'once',
+  'here',
+  'there',
+  'when',
+  'where',
+  'why',
+  'how',
+  'all',
+  'both',
+  'each',
+  'few',
+  'more',
+  'most',
+  'other',
+  'some',
+  'such',
+  'no',
+  'nor',
+  'not',
+  'only',
+  'own',
+  'same',
+  'so',
+  'than',
+  'too',
+  'very',
+  'just',
+  'or',
+  'and',
+  'but',
+  'if',
+  'while',
+  'because',
+  'what',
+  'which',
+  'who',
+  'whom',
+  'this',
+  'that',
+  'these',
+  'those',
+  'i',
+  'me',
+  'my',
+  'myself',
+  'we',
+  'our',
+  'ours',
+  'you',
+  'your',
+  'he',
+  'him',
+  'his',
+  'she',
+  'her',
+  'it',
+  'its',
+  'they',
+  'them',
+  'their',
+  'please',
+  'make',
+  'write',
+  'create',
+  'tell',
 ])
 
 // ─── Synonym map (bidirectional) ────────────────────────────────────────────
 
 const SYNONYM_MAP: Record<string, string[]> = {
   // Programming
-  'function': ['method', 'procedure', 'routine', 'subroutine'],
-  'method': ['function', 'procedure'],
-  'class': ['type', 'object', 'struct'],
-  'variable': ['var', 'binding', 'identifier', 'symbol'],
-  'array': ['list', 'collection', 'vector'],
-  'list': ['array', 'collection'],
-  'object': ['instance', 'entity', 'class'],
-  'error': ['exception', 'fault', 'bug', 'failure'],
-  'exception': ['error', 'fault'],
-  'bug': ['defect', 'error', 'issue', 'flaw'],
-  'test': ['spec', 'check', 'verification', 'assertion'],
-  'database': ['db', 'datastore', 'store', 'repository'],
-  'api': ['endpoint', 'interface', 'service'],
-  'server': ['backend', 'service', 'host'],
-  'client': ['frontend', 'consumer', 'browser'],
-  'deploy': ['release', 'ship', 'publish', 'launch'],
-  'build': ['compile', 'bundle', 'assemble'],
-  'compile': ['build', 'transpile'],
-  'performance': ['speed', 'efficiency', 'optimization', 'perf'],
-  'security': ['protection', 'safety', 'auth', 'encryption'],
-  'authentication': ['auth', 'login', 'signin', 'identity'],
-  'authorization': ['permissions', 'access-control', 'rbac'],
-  'async': ['asynchronous', 'concurrent', 'non-blocking'],
-  'sync': ['synchronous', 'blocking', 'sequential'],
-  'loop': ['iteration', 'cycle', 'repeat'],
-  'recursion': ['recursive', 'self-referencing'],
-  'dependency': ['package', 'module', 'library', 'dep'],
-  'library': ['package', 'module', 'dependency', 'lib'],
-  'framework': ['platform', 'toolkit', 'sdk'],
-  'component': ['widget', 'element', 'module', 'part'],
-  'state': ['data', 'store', 'model'],
-  'cache': ['memoize', 'buffer', 'store'],
-  'algorithm': ['algo', 'procedure', 'heuristic'],
-  'pattern': ['design-pattern', 'paradigm', 'approach'],
-  'refactor': ['restructure', 'improve', 'cleanup', 'rewrite'],
-  'container': ['docker', 'pod', 'sandbox'],
-  'kubernetes': ['k8s', 'orchestration'],
+  function: ['method', 'procedure', 'routine', 'subroutine'],
+  method: ['function', 'procedure'],
+  class: ['type', 'object', 'struct'],
+  variable: ['var', 'binding', 'identifier', 'symbol'],
+  array: ['list', 'collection', 'vector'],
+  list: ['array', 'collection'],
+  object: ['instance', 'entity', 'class'],
+  error: ['exception', 'fault', 'bug', 'failure'],
+  exception: ['error', 'fault'],
+  bug: ['defect', 'error', 'issue', 'flaw'],
+  test: ['spec', 'check', 'verification', 'assertion'],
+  database: ['db', 'datastore', 'store', 'repository'],
+  api: ['endpoint', 'interface', 'service'],
+  server: ['backend', 'service', 'host'],
+  client: ['frontend', 'consumer', 'browser'],
+  deploy: ['release', 'ship', 'publish', 'launch'],
+  build: ['compile', 'bundle', 'assemble'],
+  compile: ['build', 'transpile'],
+  performance: ['speed', 'efficiency', 'optimization', 'perf'],
+  security: ['protection', 'safety', 'auth', 'encryption'],
+  authentication: ['auth', 'login', 'signin', 'identity'],
+  authorization: ['permissions', 'access-control', 'rbac'],
+  async: ['asynchronous', 'concurrent', 'non-blocking'],
+  sync: ['synchronous', 'blocking', 'sequential'],
+  loop: ['iteration', 'cycle', 'repeat'],
+  recursion: ['recursive', 'self-referencing'],
+  dependency: ['package', 'module', 'library', 'dep'],
+  library: ['package', 'module', 'dependency', 'lib'],
+  framework: ['platform', 'toolkit', 'sdk'],
+  component: ['widget', 'element', 'module', 'part'],
+  state: ['data', 'store', 'model'],
+  cache: ['memoize', 'buffer', 'store'],
+  algorithm: ['algo', 'procedure', 'heuristic'],
+  pattern: ['design-pattern', 'paradigm', 'approach'],
+  refactor: ['restructure', 'improve', 'cleanup', 'rewrite'],
+  container: ['docker', 'pod', 'sandbox'],
+  kubernetes: ['k8s', 'orchestration'],
   'machine-learning': ['ml', 'ai', 'deep-learning'],
   'artificial-intelligence': ['ai', 'ml', 'machine-learning'],
-  'typescript': ['ts'],
-  'javascript': ['js', 'ecmascript'],
+  typescript: ['ts'],
+  javascript: ['js', 'ecmascript'],
 }
 
 // ─── Domain relationship map for cross-domain search ────────────────────────
 
 const DOMAIN_RELATIONS: Record<string, string[]> = {
-  'programming': ['software-engineering', 'computer-science', 'algorithms', 'web-development'],
+  programming: ['software-engineering', 'computer-science', 'algorithms', 'web-development'],
   'web-development': ['programming', 'javascript', 'frontend', 'backend', 'css', 'html'],
-  'javascript': ['typescript', 'web-development', 'frontend', 'node.js'],
-  'typescript': ['javascript', 'web-development', 'programming'],
-  'python': ['programming', 'data-science', 'machine-learning', 'scripting'],
+  javascript: ['typescript', 'web-development', 'frontend', 'node.js'],
+  typescript: ['javascript', 'web-development', 'programming'],
+  python: ['programming', 'data-science', 'machine-learning', 'scripting'],
   'data-science': ['python', 'machine-learning', 'statistics', 'analytics'],
   'machine-learning': ['data-science', 'artificial-intelligence', 'python', 'statistics'],
   'artificial-intelligence': ['machine-learning', 'deep-learning', 'nlp', 'robotics'],
-  'database': ['sql', 'nosql', 'data-modeling', 'backend'],
-  'security': ['cybersecurity', 'cryptography', 'authentication', 'networking'],
-  'cybersecurity': ['security', 'networking', 'penetration-testing', 'forensics'],
-  'devops': ['ci-cd', 'deployment', 'infrastructure', 'containerization', 'cloud'],
-  'cloud': ['aws', 'azure', 'gcp', 'devops', 'infrastructure'],
-  'networking': ['protocols', 'security', 'infrastructure', 'tcp-ip'],
-  'algorithms': ['data-structures', 'programming', 'computer-science', 'optimization'],
+  database: ['sql', 'nosql', 'data-modeling', 'backend'],
+  security: ['cybersecurity', 'cryptography', 'authentication', 'networking'],
+  cybersecurity: ['security', 'networking', 'penetration-testing', 'forensics'],
+  devops: ['ci-cd', 'deployment', 'infrastructure', 'containerization', 'cloud'],
+  cloud: ['aws', 'azure', 'gcp', 'devops', 'infrastructure'],
+  networking: ['protocols', 'security', 'infrastructure', 'tcp-ip'],
+  algorithms: ['data-structures', 'programming', 'computer-science', 'optimization'],
   'data-structures': ['algorithms', 'programming', 'computer-science'],
-  'testing': ['quality-assurance', 'software-engineering', 'automation'],
-  'frontend': ['web-development', 'javascript', 'css', 'react', 'ui-ux'],
-  'backend': ['web-development', 'server', 'api', 'database'],
-  'mobile': ['android', 'ios', 'react-native', 'flutter'],
+  testing: ['quality-assurance', 'software-engineering', 'automation'],
+  frontend: ['web-development', 'javascript', 'css', 'react', 'ui-ux'],
+  backend: ['web-development', 'server', 'api', 'database'],
+  mobile: ['android', 'ios', 'react-native', 'flutter'],
 }
 
 // ─── Helper functions ───────────────────────────────────────────────────────
@@ -254,8 +353,8 @@ function levenshteinDistance(a: string, b: string): number {
     for (let j = 1; j <= n; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1
       curr[j] = Math.min(
-        prev[j]! + 1,        // deletion
-        curr[j - 1]! + 1,    // insertion
+        prev[j]! + 1, // deletion
+        curr[j - 1]! + 1, // insertion
         prev[j - 1]! + cost, // substitution
       )
     }
@@ -349,20 +448,97 @@ function detectQueryDomain(keywords: string[]): string[] {
   const keywordSet = new Set(keywords)
 
   const domainKeywords: Record<string, string[]> = {
-    'programming': ['code', 'program', 'function', 'variable', 'class', 'compile', 'debug', 'syntax'],
-    'web-development': ['html', 'css', 'dom', 'browser', 'web', 'http', 'rest', 'frontend', 'backend'],
-    'javascript': ['javascript', 'js', 'node', 'npm', 'react', 'vue', 'angular', 'express', 'typescript', 'ts'],
-    'python': ['python', 'pip', 'django', 'flask', 'pandas', 'numpy', 'pytorch'],
-    'database': ['sql', 'nosql', 'mongodb', 'postgres', 'mysql', 'database', 'query', 'table', 'schema'],
-    'security': ['security', 'vulnerability', 'encryption', 'auth', 'xss', 'csrf', 'injection', 'firewall'],
-    'devops': ['docker', 'kubernetes', 'k8s', 'ci', 'cd', 'pipeline', 'deploy', 'terraform', 'ansible'],
-    'machine-learning': ['ml', 'ai', 'neural', 'training', 'model', 'classification', 'regression', 'deep-learning'],
-    'algorithms': ['algorithm', 'sort', 'search', 'graph', 'tree', 'dynamic-programming', 'complexity', 'big-o'],
-    'data-structures': ['array', 'linked-list', 'stack', 'queue', 'heap', 'hash', 'trie', 'binary-tree'],
-    'networking': ['tcp', 'udp', 'ip', 'dns', 'http', 'protocol', 'socket', 'port', 'packet'],
-    'cloud': ['aws', 'azure', 'gcp', 'cloud', 'lambda', 's3', 'ec2', 'serverless'],
-    'testing': ['test', 'unit', 'integration', 'e2e', 'mock', 'assertion', 'coverage', 'tdd', 'bdd'],
-    'mobile': ['android', 'ios', 'swift', 'kotlin', 'react-native', 'flutter', 'mobile', 'app'],
+    programming: ['code', 'program', 'function', 'variable', 'class', 'compile', 'debug', 'syntax'],
+    'web-development': [
+      'html',
+      'css',
+      'dom',
+      'browser',
+      'web',
+      'http',
+      'rest',
+      'frontend',
+      'backend',
+    ],
+    javascript: [
+      'javascript',
+      'js',
+      'node',
+      'npm',
+      'react',
+      'vue',
+      'angular',
+      'express',
+      'typescript',
+      'ts',
+    ],
+    python: ['python', 'pip', 'django', 'flask', 'pandas', 'numpy', 'pytorch'],
+    database: [
+      'sql',
+      'nosql',
+      'mongodb',
+      'postgres',
+      'mysql',
+      'database',
+      'query',
+      'table',
+      'schema',
+    ],
+    security: [
+      'security',
+      'vulnerability',
+      'encryption',
+      'auth',
+      'xss',
+      'csrf',
+      'injection',
+      'firewall',
+    ],
+    devops: [
+      'docker',
+      'kubernetes',
+      'k8s',
+      'ci',
+      'cd',
+      'pipeline',
+      'deploy',
+      'terraform',
+      'ansible',
+    ],
+    'machine-learning': [
+      'ml',
+      'ai',
+      'neural',
+      'training',
+      'model',
+      'classification',
+      'regression',
+      'deep-learning',
+    ],
+    algorithms: [
+      'algorithm',
+      'sort',
+      'search',
+      'graph',
+      'tree',
+      'dynamic-programming',
+      'complexity',
+      'big-o',
+    ],
+    'data-structures': [
+      'array',
+      'linked-list',
+      'stack',
+      'queue',
+      'heap',
+      'hash',
+      'trie',
+      'binary-tree',
+    ],
+    networking: ['tcp', 'udp', 'ip', 'dns', 'http', 'protocol', 'socket', 'port', 'packet'],
+    cloud: ['aws', 'azure', 'gcp', 'cloud', 'lambda', 's3', 'ec2', 'serverless'],
+    testing: ['test', 'unit', 'integration', 'e2e', 'mock', 'assertion', 'coverage', 'tdd', 'bdd'],
+    mobile: ['android', 'ios', 'swift', 'kotlin', 'react-native', 'flutter', 'mobile', 'app'],
   }
 
   for (const [domain, dkw] of Object.entries(domainKeywords)) {
@@ -399,7 +575,8 @@ export class AdvancedSearchEngine {
 
   // ── Graph nodes for graph-based search ──
   private graphNodes: Map<string, { id: string; name: string; domain: string }> = new Map()
-  private graphEdges: Array<{ source: string; target: string; weight: number; relation: string }> = []
+  private graphEdges: Array<{ source: string; target: string; weight: number; relation: string }> =
+    []
 
   constructor(config?: Partial<SearchConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config }
@@ -485,12 +662,15 @@ export class AdvancedSearchEngine {
     const strategiesUsed: SearchStrategy[] = []
 
     // Score accumulator: docId → partial scores
-    const scoreMap = new Map<string, {
-      doc: SearchDocument
-      scores: Partial<Record<SearchStrategy, number>>
-      matchedTerms: Set<string>
-      matchedBy: Set<SearchStrategy>
-    }>()
+    const scoreMap = new Map<
+      string,
+      {
+        doc: SearchDocument
+        scores: Partial<Record<SearchStrategy, number>>
+        matchedTerms: Set<string>
+        matchedBy: Set<SearchStrategy>
+      }
+    >()
 
     const addScore = (
       doc: SearchDocument,
@@ -597,7 +777,8 @@ export class AdvancedSearchEngine {
       thinkingSteps.push({
         step: ++stepNum,
         strategy: 'fuzzy',
-        thought: 'Applying fuzzy matching (Levenshtein distance) to catch misspellings and close variants.',
+        thought:
+          'Applying fuzzy matching (Levenshtein distance) to catch misspellings and close variants.',
         detail: `Max edit distance: ${this.config.maxFuzzyDistance}. Found ${fuzzyHits} fuzzy matches.`,
         durationMs: Date.now() - s2Start,
       })
@@ -659,9 +840,12 @@ export class AdvancedSearchEngine {
         const docTerms = extractSearchKeywords(doc.content + ' ' + doc.title)
         const similarity = tfidfCosineSimilarity(keywords, docTerms)
         if (similarity > 0.05) {
-          addScore(doc, 'semantic', similarity, keywords.filter(kw =>
-            docTerms.includes(kw),
-          ))
+          addScore(
+            doc,
+            'semantic',
+            similarity,
+            keywords.filter(kw => docTerms.includes(kw)),
+          )
           semanticHits++
         }
       }
@@ -699,7 +883,9 @@ export class AdvancedSearchEngine {
           const nextAct = new Map<string, number>()
           for (const [nodeId, act] of activation) {
             if (act < 0.1) continue
-            const neighbors = this.graphEdges.filter(e => e.source === nodeId || e.target === nodeId)
+            const neighbors = this.graphEdges.filter(
+              e => e.source === nodeId || e.target === nodeId,
+            )
             for (const edge of neighbors) {
               const neighborId = edge.source === nodeId ? edge.target : edge.source
               const propagated = act * edge.weight * 0.8
@@ -729,11 +915,15 @@ export class AdvancedSearchEngine {
           let matchScore = 0
           const matched: string[] = []
           for (const name of activatedNames) {
-            if (docDomain.includes(name) || docTitle.includes(name) ||
-                doc.keywords.some(k => k.includes(name))) {
+            if (
+              docDomain.includes(name) ||
+              docTitle.includes(name) ||
+              doc.keywords.some(k => k.includes(name))
+            ) {
               // Look up the activation score for this concept name
-              const nodeEntry = [...this.graphNodes.entries()]
-                .find(([, n]) => n.name.toLowerCase() === name)
+              const nodeEntry = [...this.graphNodes.entries()].find(
+                ([, n]) => n.name.toLowerCase() === name,
+              )
               const activationScore = nodeEntry ? (activation.get(nodeEntry[0]) ?? 0.5) : 0.5
               matchScore += activationScore
               matched.push(name)
@@ -854,8 +1044,8 @@ export class AdvancedSearchEngine {
           const docDomain = (doc.domain ?? '').toLowerCase()
           if (relatedDomains.has(docDomain)) {
             // Check if there's at least some keyword overlap
-            const overlap = keywords.filter(kw =>
-              doc.keywords.includes(kw) || doc.content.toLowerCase().includes(kw),
+            const overlap = keywords.filter(
+              kw => doc.keywords.includes(kw) || doc.content.toLowerCase().includes(kw),
             )
             if (overlap.length > 0) {
               const score = Math.min(1, (overlap.length / keywords.length) * 0.6)
@@ -892,7 +1082,10 @@ export class AdvancedSearchEngine {
       // Multi-strategy bonus: reward docs matched by multiple strategies
       const strategyCount = entry.matchedBy.size
       const diversityBonus = strategyCount > 1 ? 0.1 * (strategyCount - 1) : 0
-      const finalScore = Math.min(1, compositeScore / (strategiesUsed.length * STRATEGY_NORMALIZATION_FACTOR) + diversityBonus)
+      const finalScore = Math.min(
+        1,
+        compositeScore / (strategiesUsed.length * STRATEGY_NORMALIZATION_FACTOR) + diversityBonus,
+      )
 
       if (finalScore >= this.config.minScore) {
         rankedResults.push({
@@ -925,12 +1118,17 @@ export class AdvancedSearchEngine {
     const STRATEGY_DIVERSITY_WEIGHT = 0.2
     const MAX_RESULT_COUNT_FOR_CONFIDENCE = 5
     const TOTAL_STRATEGIES = 8
-    const confidence = topResults.length > 0
-      ? Math.min(1,
-          (topResults[0]!.score * TOP_SCORE_WEIGHT) +
-          (Math.min(topResults.length, MAX_RESULT_COUNT_FOR_CONFIDENCE) / MAX_RESULT_COUNT_FOR_CONFIDENCE * RESULT_COUNT_WEIGHT) +
-          (strategiesUsed.length / TOTAL_STRATEGIES * STRATEGY_DIVERSITY_WEIGHT))
-      : 0
+    const confidence =
+      topResults.length > 0
+        ? Math.min(
+            1,
+            topResults[0]!.score * TOP_SCORE_WEIGHT +
+              (Math.min(topResults.length, MAX_RESULT_COUNT_FOR_CONFIDENCE) /
+                MAX_RESULT_COUNT_FOR_CONFIDENCE) *
+                RESULT_COUNT_WEIGHT +
+              (strategiesUsed.length / TOTAL_STRATEGIES) * STRATEGY_DIVERSITY_WEIGHT,
+          )
+        : 0
 
     thinkingSteps.push({
       step: ++stepNum,
@@ -945,7 +1143,9 @@ export class AdvancedSearchEngine {
     // Update stats
     this.stats.totalSearches++
     this.stats.totalResults += topResults.length
-    this.stats.avgDurationMs = (this.stats.avgDurationMs * (this.stats.totalSearches - 1) + totalDurationMs) / this.stats.totalSearches
+    this.stats.avgDurationMs =
+      (this.stats.avgDurationMs * (this.stats.totalSearches - 1) + totalDurationMs) /
+      this.stats.totalSearches
 
     // Track search history
     this.searchHistory.push({ query, resultCount: topResults.length, timestamp: Date.now() })

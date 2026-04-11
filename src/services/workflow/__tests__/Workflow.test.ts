@@ -162,19 +162,28 @@ describe('WorkflowRegistry', () => {
 
   it('should throw when registering definition without required fields', () => {
     expect(() =>
-      registry.register({ id: '', name: '', version: '1', steps: [makeStep({ id: 's', name: 's' })] }),
+      registry.register({
+        id: '',
+        name: '',
+        version: '1',
+        steps: [makeStep({ id: 's', name: 's' })],
+      }),
     ).toThrow('must have an id and name')
   })
 
   it('should throw when registering definition with no steps', () => {
-    expect(() =>
-      registry.register({ id: 'x', name: 'X', version: '1', steps: [] }),
-    ).toThrow('must have at least one step')
+    expect(() => registry.register({ id: 'x', name: 'X', version: '1', steps: [] })).toThrow(
+      'must have at least one step',
+    )
   })
 
   it('should throw when registering definition with duplicate step ids', () => {
     expect(() =>
-      registry.register(makeDefinition({ steps: [makeStep({ id: 'dup', name: 'A' }), makeStep({ id: 'dup', name: 'B' })] })),
+      registry.register(
+        makeDefinition({
+          steps: [makeStep({ id: 'dup', name: 'A' }), makeStep({ id: 'dup', name: 'B' })],
+        }),
+      ),
     ).toThrow('Duplicate step id "dup"')
   })
 })
@@ -233,7 +242,15 @@ describe('WorkflowExecutor', () => {
   it('should enforce step timeout', async () => {
     const def = makeDefinition({
       steps: [
-        makeStep({ id: 'slow', name: 'Slow', handler: async () => { await sleep(5000); return 1 }, timeout: 50 }),
+        makeStep({
+          id: 'slow',
+          name: 'Slow',
+          handler: async () => {
+            await sleep(5000)
+            return 1
+          },
+          timeout: 50,
+        }),
       ],
     })
 
@@ -247,9 +264,15 @@ describe('WorkflowExecutor', () => {
     const def = makeDefinition({
       steps: [
         makeStep({
-          id: 'flaky', name: 'Flaky',
-          handler: async () => { attempts++; if (attempts < 3) throw new Error('fail'); return 'ok' },
-          onError: 'retry', retries: 3,
+          id: 'flaky',
+          name: 'Flaky',
+          handler: async () => {
+            attempts++
+            if (attempts < 3) throw new Error('fail')
+            return 'ok'
+          },
+          onError: 'retry',
+          retries: 3,
         }),
       ],
     })
@@ -263,7 +286,14 @@ describe('WorkflowExecutor', () => {
   it('should skip step on error when onError is skip', async () => {
     const def = makeDefinition({
       steps: [
-        makeStep({ id: 'err', name: 'Err', handler: async () => { throw new Error('boom') }, onError: 'skip' }),
+        makeStep({
+          id: 'err',
+          name: 'Err',
+          handler: async () => {
+            throw new Error('boom')
+          },
+          onError: 'skip',
+        }),
         makeStep({ id: 'next', name: 'Next', handler: async () => 'after-skip' }),
       ],
     })
@@ -278,7 +308,13 @@ describe('WorkflowExecutor', () => {
   it('should fail workflow when step fails with onError fail (default)', async () => {
     const def = makeDefinition({
       steps: [
-        makeStep({ id: 'bad', name: 'Bad', handler: async () => { throw new Error('fatal') } }),
+        makeStep({
+          id: 'bad',
+          name: 'Bad',
+          handler: async () => {
+            throw new Error('fatal')
+          },
+        }),
         makeStep({ id: 'never', name: 'Never', handler: async () => 'unreachable' }),
       ],
     })
@@ -294,8 +330,9 @@ describe('WorkflowExecutor', () => {
       steps: [
         makeStep({ id: 'producer', name: 'Producer', handler: async () => ({ data: 123 }) }),
         makeStep({
-          id: 'consumer', name: 'Consumer',
-          handler: async (ctx) => {
+          id: 'consumer',
+          name: 'Consumer',
+          handler: async ctx => {
             const prev = ctx.getStepOutput<{ data: number }>('producer')
             return prev?.data
           },
@@ -310,8 +347,12 @@ describe('WorkflowExecutor', () => {
 
   it('should fire beforeStep and afterStep hooks', async () => {
     const hookCalls: string[] = []
-    executor.onHook('beforeStep', async (_id, detail) => { hookCalls.push(`before:${detail.stepId}`) })
-    executor.onHook('afterStep', async (_id, detail) => { hookCalls.push(`after:${(detail.result as Record<string, unknown>).stepId}`) })
+    executor.onHook('beforeStep', async (_id, detail) => {
+      hookCalls.push(`before:${detail.stepId}`)
+    })
+    executor.onHook('afterStep', async (_id, detail) => {
+      hookCalls.push(`after:${(detail.result as Record<string, unknown>).stepId}`)
+    })
 
     const def = makeDefinition({
       steps: [makeStep({ id: 'a', name: 'A', handler: async () => 1 })],
@@ -325,7 +366,9 @@ describe('WorkflowExecutor', () => {
     const started = vi.fn()
     executor.onHook('onStart', started)
 
-    const def = makeDefinition({ steps: [makeStep({ id: 's', name: 'S', handler: async () => 1 })] })
+    const def = makeDefinition({
+      steps: [makeStep({ id: 's', name: 'S', handler: async () => 1 })],
+    })
     await executor.execute(def, 'inst-10')
     expect(started).toHaveBeenCalledWith('inst-10', { definitionId: 'test-wf' })
   })
@@ -334,7 +377,9 @@ describe('WorkflowExecutor', () => {
     const completed = vi.fn()
     executor.onHook('onComplete', completed)
 
-    const def = makeDefinition({ steps: [makeStep({ id: 's', name: 'S', handler: async () => 1 })] })
+    const def = makeDefinition({
+      steps: [makeStep({ id: 's', name: 'S', handler: async () => 1 })],
+    })
     await executor.execute(def, 'inst-11')
     expect(completed).toHaveBeenCalledWith('inst-11', { definitionId: 'test-wf' })
   })
@@ -344,7 +389,15 @@ describe('WorkflowExecutor', () => {
     executor.onHook('onError', errHook)
 
     const def = makeDefinition({
-      steps: [makeStep({ id: 'bad', name: 'Bad', handler: async () => { throw new Error('nope') } })],
+      steps: [
+        makeStep({
+          id: 'bad',
+          name: 'Bad',
+          handler: async () => {
+            throw new Error('nope')
+          },
+        }),
+      ],
     })
 
     await executor.execute(def, 'inst-12')
@@ -355,8 +408,22 @@ describe('WorkflowExecutor', () => {
     const def = makeDefinition({
       timeout: 50,
       steps: [
-        makeStep({ id: 's1', name: 'S1', handler: async () => { await sleep(20); return 1 } }),
-        makeStep({ id: 's2', name: 'S2', handler: async () => { await sleep(200); return 2 } }),
+        makeStep({
+          id: 's1',
+          name: 'S1',
+          handler: async () => {
+            await sleep(20)
+            return 1
+          },
+        }),
+        makeStep({
+          id: 's2',
+          name: 'S2',
+          handler: async () => {
+            await sleep(200)
+            return 2
+          },
+        }),
       ],
     })
 
@@ -377,7 +444,14 @@ describe('WorkflowExecutor', () => {
     let cancelled = false
     const def = makeDefinition({
       steps: [
-        makeStep({ id: 's1', name: 'S1', handler: async () => { cancelled = true; return 1 } }),
+        makeStep({
+          id: 's1',
+          name: 'S1',
+          handler: async () => {
+            cancelled = true
+            return 1
+          },
+        }),
         makeStep({ id: 's2', name: 'S2', handler: async () => 2 }),
       ],
     })
@@ -391,7 +465,14 @@ describe('WorkflowExecutor', () => {
     let paused = false
     const def = makeDefinition({
       steps: [
-        makeStep({ id: 's1', name: 'S1', handler: async () => { paused = true; return 1 } }),
+        makeStep({
+          id: 's1',
+          name: 'S1',
+          handler: async () => {
+            paused = true
+            return 1
+          },
+        }),
         makeStep({ id: 's2', name: 'S2', handler: async () => 2 }),
       ],
     })
@@ -416,10 +497,12 @@ describe('WorkflowEngine', () => {
   })
 
   it('should define and start a workflow', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'my-wf',
-      steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 'done' })],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'my-wf',
+        steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 'done' })],
+      }),
+    )
 
     const id = engine.startWorkflow('my-wf')
     expect(id).toContain('wf_')
@@ -434,13 +517,29 @@ describe('WorkflowEngine', () => {
   })
 
   it('should pause a running workflow', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'pausable',
-      steps: [
-        makeStep({ id: 's1', name: 'S1', handler: async () => { await sleep(200); return 1 } }),
-        makeStep({ id: 's2', name: 'S2', handler: async () => { await sleep(200); return 2 } }),
-      ],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'pausable',
+        steps: [
+          makeStep({
+            id: 's1',
+            name: 'S1',
+            handler: async () => {
+              await sleep(200)
+              return 1
+            },
+          }),
+          makeStep({
+            id: 's2',
+            name: 'S2',
+            handler: async () => {
+              await sleep(200)
+              return 2
+            },
+          }),
+        ],
+      }),
+    )
 
     const id = engine.startWorkflow('pausable')
     await sleep(50)
@@ -453,13 +552,22 @@ describe('WorkflowEngine', () => {
   })
 
   it('should resume a paused workflow', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'resumable',
-      steps: [
-        makeStep({ id: 's1', name: 'S1', handler: async () => { await sleep(50); return 1 } }),
-        makeStep({ id: 's2', name: 'S2', handler: async () => 'done' }),
-      ],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'resumable',
+        steps: [
+          makeStep({
+            id: 's1',
+            name: 'S1',
+            handler: async () => {
+              await sleep(50)
+              return 1
+            },
+          }),
+          makeStep({ id: 's2', name: 'S2', handler: async () => 'done' }),
+        ],
+      }),
+    )
 
     const id = engine.startWorkflow('resumable')
     await sleep(20)
@@ -481,13 +589,22 @@ describe('WorkflowEngine', () => {
   })
 
   it('should cancel a running workflow', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'cancellable',
-      steps: [
-        makeStep({ id: 's1', name: 'S1', handler: async () => { await sleep(300); return 1 } }),
-        makeStep({ id: 's2', name: 'S2', handler: async () => 2 }),
-      ],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'cancellable',
+        steps: [
+          makeStep({
+            id: 's1',
+            name: 'S1',
+            handler: async () => {
+              await sleep(300)
+              return 1
+            },
+          }),
+          makeStep({ id: 's2', name: 'S2', handler: async () => 2 }),
+        ],
+      }),
+    )
 
     const id = engine.startWorkflow('cancellable')
     await sleep(50)
@@ -500,13 +617,22 @@ describe('WorkflowEngine', () => {
   })
 
   it('should cancel a paused workflow immediately', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'pause-cancel',
-      steps: [
-        makeStep({ id: 's1', name: 'S1', handler: async () => { await sleep(50); return 1 } }),
-        makeStep({ id: 's2', name: 'S2', handler: async () => 2 }),
-      ],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'pause-cancel',
+        steps: [
+          makeStep({
+            id: 's1',
+            name: 'S1',
+            handler: async () => {
+              await sleep(50)
+              return 1
+            },
+          }),
+          makeStep({ id: 's2', name: 'S2', handler: async () => 2 }),
+        ],
+      }),
+    )
 
     const id = engine.startWorkflow('pause-cancel')
     await sleep(20)
@@ -523,10 +649,21 @@ describe('WorkflowEngine', () => {
   })
 
   it('should get status of a running workflow', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'status-wf',
-      steps: [makeStep({ id: 's1', name: 'S1', handler: async () => { await sleep(200); return 1 } })],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'status-wf',
+        steps: [
+          makeStep({
+            id: 's1',
+            name: 'S1',
+            handler: async () => {
+              await sleep(200)
+              return 1
+            },
+          }),
+        ],
+      }),
+    )
 
     const id = engine.startWorkflow('status-wf')
     const status = engine.getStatus(id)
@@ -540,10 +677,12 @@ describe('WorkflowEngine', () => {
   })
 
   it('should list instances without filter', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'list-wf',
-      steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'list-wf',
+        steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
+      }),
+    )
 
     engine.startWorkflow('list-wf')
     engine.startWorkflow('list-wf')
@@ -553,10 +692,12 @@ describe('WorkflowEngine', () => {
   })
 
   it('should list instances with status filter', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'filter-wf',
-      steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'filter-wf',
+        steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
+      }),
+    )
 
     engine.startWorkflow('filter-wf')
     await sleep(100)
@@ -565,10 +706,12 @@ describe('WorkflowEngine', () => {
   })
 
   it('should list instances with definitionId filter', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'filter-def',
-      steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'filter-def',
+        steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
+      }),
+    )
 
     engine.startWorkflow('filter-def')
     await sleep(100)
@@ -578,10 +721,12 @@ describe('WorkflowEngine', () => {
   })
 
   it('should get aggregate stats', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'stats-wf',
-      steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'stats-wf',
+        steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
+      }),
+    )
 
     engine.startWorkflow('stats-wf')
     await sleep(100)
@@ -613,10 +758,12 @@ describe('WorkflowEngine', () => {
     const hookFn = vi.fn()
     engine.onHook('onStart', hookFn)
 
-    engine.defineWorkflow(makeDefinition({
-      id: 'hook-wf',
-      steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'hook-wf',
+        steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
+      }),
+    )
 
     engine.startWorkflow('hook-wf')
     await sleep(100)
@@ -624,10 +771,21 @@ describe('WorkflowEngine', () => {
   })
 
   it('should run multiple concurrent workflows', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'concurrent',
-      steps: [makeStep({ id: 's1', name: 'S1', handler: async () => { await sleep(50); return 1 } })],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'concurrent',
+        steps: [
+          makeStep({
+            id: 's1',
+            name: 'S1',
+            handler: async () => {
+              await sleep(50)
+              return 1
+            },
+          }),
+        ],
+      }),
+    )
 
     const ids = [
       engine.startWorkflow('concurrent'),
@@ -649,10 +807,12 @@ describe('WorkflowEngine', () => {
   })
 
   it('should clear all instances', async () => {
-    engine.defineWorkflow(makeDefinition({
-      id: 'clear-wf',
-      steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
-    }))
+    engine.defineWorkflow(
+      makeDefinition({
+        id: 'clear-wf',
+        steps: [makeStep({ id: 's1', name: 'S1', handler: async () => 1 })],
+      }),
+    )
 
     engine.startWorkflow('clear-wf')
     await sleep(100)

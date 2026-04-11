@@ -1,24 +1,12 @@
 import { execFileSync } from 'child_process'
 import { diffLines } from 'diff'
 import { constants as fsConstants } from 'fs'
-import {
-  copyFile,
-  mkdir,
-  mkdtemp,
-  readdir,
-  readFile,
-  rm,
-  unlink,
-  writeFile,
-} from 'fs/promises'
+import { copyFile, mkdir, mkdtemp, readdir, readFile, rm, unlink, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { extname, join } from 'path'
 import type { Command } from '../commands.js'
 import { queryWithModel } from '../services/api/claude.js'
-import {
-  AGENT_TOOL_NAME,
-  LEGACY_AGENT_TOOL_NAME,
-} from '../tools/AgentTool/constants.js'
+import { AGENT_TOOL_NAME, LEGACY_AGENT_TOOL_NAME } from '../tools/AgentTool/constants.js'
 import type { LogOption } from '../types/logs.js'
 import { getClaudeConfigHomeDir } from '../utils/envUtils.js'
 import { toError } from '../utils/errors.js'
@@ -60,20 +48,16 @@ type RemoteHostInfo = {
 const getRunningRemoteHosts: () => Promise<string[]> =
   process.env.USER_TYPE === 'ant'
     ? async () => {
-        const { stdout, code } = await execFileNoThrow(
-          'coder',
-          ['list', '-o', 'json'],
-          { timeout: 30000 },
-        )
+        const { stdout, code } = await execFileNoThrow('coder', ['list', '-o', 'json'], {
+          timeout: 30000,
+        })
         if (code !== 0) return []
         try {
           const workspaces = jsonParse(stdout) as Array<{
             name: string
             latest_build?: { status?: string }
           }>
-          return workspaces
-            .filter(w => w.latest_build?.status === 'running')
-            .map(w => w.name)
+          return workspaces.filter(w => w.latest_build?.status === 'running').map(w => w.name)
         } catch {
           return []
         }
@@ -85,10 +69,7 @@ const getRemoteHostSessionCount: (hs: string) => Promise<number> =
     ? async (homespace: string) => {
         const { stdout, code } = await execFileNoThrow(
           'ssh',
-          [
-            `${homespace}.coder`,
-            'find /root/.claude/projects -name "*.jsonl" 2>/dev/null | wc -l',
-          ],
+          [`${homespace}.coder`, 'find /root/.claude/projects -name "*.jsonl" 2>/dev/null | wc -l'],
           { timeout: 30000 },
         )
         if (code !== 0) return 0
@@ -200,10 +181,7 @@ const collectAllRemoteHostData: (destDir: string) => Promise<{
           rHosts.map(async hs => {
             const sessionCount = await getRemoteHostSessionCount(hs)
             if (sessionCount > 0) {
-              const { copied, skipped } = await collectFromRemoteHost(
-                hs,
-                destDir,
-              )
+              const { copied, skipped } = await collectFromRemoteHost(hs, destDir)
               return { name: hs, sessionCount, copied, skipped }
             }
             return { name: hs, sessionCount, copied: 0, skipped: 0 }
@@ -540,10 +518,7 @@ function extractToolStats(log: LogOption): {
             toolCounts[toolName] = (toolCounts[toolName] || 0) + 1
 
             // Check for special tool usage
-            if (
-              toolName === AGENT_TOOL_NAME ||
-              toolName === LEGACY_AGENT_TOOL_NAME
-            )
+            if (toolName === AGENT_TOOL_NAME || toolName === LEGACY_AGENT_TOOL_NAME)
               usesTaskAgent = true
             if (toolName.startsWith('mcp__')) usesMcp = true
             if (toolName === 'WebSearch') usesWebSearch = true
@@ -675,8 +650,7 @@ function extractToolStats(log: LogOption): {
                   category = 'File Not Found'
                 }
               }
-              toolErrorCategories[category] =
-                (toolErrorCategories[category] || 0) + 1
+              toolErrorCategories[category] = (toolErrorCategories[category] || 0) + 1
             }
           }
         }
@@ -728,19 +702,14 @@ function extractToolStats(log: LogOption): {
 }
 
 function hasValidDates(log: LogOption): boolean {
-  return (
-    !Number.isNaN(log.created.getTime()) &&
-    !Number.isNaN(log.modified.getTime())
-  )
+  return !Number.isNaN(log.created.getTime()) && !Number.isNaN(log.modified.getTime())
 }
 
 function logToSessionMeta(log: LogOption): SessionMeta {
   const stats = extractToolStats(log)
   const sessionId = getSessionIdFromLog(log) || 'unknown'
   const startTime = log.created.toISOString()
-  const durationMinutes = Math.round(
-    (log.modified.getTime() - log.created.getTime()) / 1000 / 60,
-  )
+  const durationMinutes = Math.round((log.modified.getTime() - log.created.getTime()) / 1000 / 60)
 
   let userMessageCount = 0
   let assistantMessageCount = 0
@@ -903,9 +872,7 @@ async function summarizeTranscriptChunk(chunk: string): Promise<string> {
   }
 }
 
-async function formatTranscriptWithSummarization(
-  log: LogOption,
-): Promise<string> {
+async function formatTranscriptWithSummarization(log: LogOption): Promise<string> {
   const fullTranscript = formatTranscriptForFacets(log)
 
   // If under 30k chars, use as-is
@@ -938,9 +905,7 @@ async function formatTranscriptWithSummarization(
   return header + summaries.join('\n\n---\n\n')
 }
 
-async function loadCachedFacets(
-  sessionId: string,
-): Promise<SessionFacets | null> {
+async function loadCachedFacets(sessionId: string): Promise<SessionFacets | null> {
   const facetPath = join(getFacetsDir(), `${sessionId}.json`)
   try {
     const content = await readFile(facetPath, { encoding: 'utf-8' })
@@ -977,9 +942,7 @@ async function saveFacets(facets: SessionFacets): Promise<void> {
   }
 }
 
-async function loadCachedSessionMeta(
-  sessionId: string,
-): Promise<SessionMeta | null> {
+async function loadCachedSessionMeta(sessionId: string): Promise<SessionMeta | null> {
   const metaPath = join(getSessionMetaDir(), `${sessionId}.json`)
   try {
     const content = await readFile(metaPath, { encoding: 'utf-8' })
@@ -1104,10 +1067,7 @@ export function detectMultiClauding(
     const msg = allSessionMessages[i]!
 
     // Shrink window from the left
-    while (
-      windowStart < i &&
-      msg.ts - allSessionMessages[windowStart]!.ts > OVERLAP_WINDOW_MS
-    ) {
+    while (windowStart < i && msg.ts - allSessionMessages[windowStart]!.ts > OVERLAP_WINDOW_MS) {
       const expiring = allSessionMessages[windowStart]!
       if (sessionLastIndex.get(expiring.sessionId) === windowStart) {
         sessionLastIndex.delete(expiring.sessionId)
@@ -1123,9 +1083,7 @@ export function detectMultiClauding(
         if (between.sessionId !== msg.sessionId) {
           const pair = [msg.sessionId, between.sessionId].sort().join(':')
           multiClaudeSessionPairs.add(pair)
-          messagesDuringMulticlaude.add(
-            `${allSessionMessages[prevIndex]!.ts}:${msg.sessionId}`,
-          )
+          messagesDuringMulticlaude.add(`${allSessionMessages[prevIndex]!.ts}:${msg.sessionId}`)
           messagesDuringMulticlaude.add(`${between.ts}:${between.sessionId}`)
           messagesDuringMulticlaude.add(`${msg.ts}:${msg.sessionId}`)
           break
@@ -1218,8 +1176,7 @@ function aggregateData(
     result.total_interruptions += session.user_interruptions
     result.total_tool_errors += session.tool_errors
     for (const [cat, count] of Object.entries(session.tool_error_categories)) {
-      result.tool_error_categories[cat] =
-        (result.tool_error_categories[cat] || 0) + count
+      result.tool_error_categories[cat] = (result.tool_error_categories[cat] || 0) + count
     }
     allResponseTimes.push(...session.user_response_times)
     if (session.uses_task_agent) result.sessions_using_task_agent++
@@ -1242,8 +1199,7 @@ function aggregateData(
     }
 
     if (session.project_path) {
-      result.projects[session.project_path] =
-        (result.projects[session.project_path] || 0) + 1
+      result.projects[session.project_path] = (result.projects[session.project_path] || 0) + 1
     }
 
     const sessionFacets = facets.get(session.session_id)
@@ -1251,19 +1207,15 @@ function aggregateData(
       // Goal categories
       for (const [cat, count] of safeEntries(sessionFacets.goal_categories)) {
         if (count > 0) {
-          result.goal_categories[cat] =
-            (result.goal_categories[cat] || 0) + count
+          result.goal_categories[cat] = (result.goal_categories[cat] || 0) + count
         }
       }
 
       // Outcomes
-      result.outcomes[sessionFacets.outcome] =
-        (result.outcomes[sessionFacets.outcome] || 0) + 1
+      result.outcomes[sessionFacets.outcome] = (result.outcomes[sessionFacets.outcome] || 0) + 1
 
       // Satisfaction counts
-      for (const [level, count] of safeEntries(
-        sessionFacets.user_satisfaction_counts,
-      )) {
+      for (const [level, count] of safeEntries(sessionFacets.user_satisfaction_counts)) {
         if (count > 0) {
           result.satisfaction[level] = (result.satisfaction[level] || 0) + count
         }
@@ -1310,17 +1262,14 @@ function aggregateData(
   if (allResponseTimes.length > 0) {
     const sorted = [...allResponseTimes].sort((a, b) => a - b)
     result.median_response_time = sorted[Math.floor(sorted.length / 2)] || 0
-    result.avg_response_time =
-      allResponseTimes.reduce((a, b) => a + b, 0) / allResponseTimes.length
+    result.avg_response_time = allResponseTimes.reduce((a, b) => a + b, 0) / allResponseTimes.length
   }
 
   // Calculate days active and messages per day
   const uniqueDays = new Set(dates.map(d => d.split('T')[0]))
   result.days_active = uniqueDays.size
   result.messages_per_day =
-    result.days_active > 0
-      ? Math.round((result.total_messages / result.days_active) * 10) / 10
-      : 0
+    result.days_active > 0 ? Math.round((result.total_messages / result.days_active) * 10) / 10 : 0
 
   // Store message hours for time-of-day chart
   result.message_hours = allMessageHours
@@ -1674,9 +1623,7 @@ async function generateParallelInsights(
 
   // Run sections in parallel first (excluding at_a_glance)
   const results = await Promise.all(
-    INSIGHT_SECTIONS.map(section =>
-      generateSectionInsight(section, fullContext),
-    ),
+    INSIGHT_SECTIONS.map(section => generateSectionInsight(section, fullContext)),
   )
 
   // Combine results
@@ -1857,8 +1804,7 @@ function generateBarChart(
       const pct = (count / maxVal) * 100
       // Use LABEL_MAP if available, otherwise clean up underscores and title case
       const cleanLabel =
-        LABEL_MAP[label] ||
-        label.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+        LABEL_MAP[label] || label.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
       return `<div class="bar-row">
         <div class="bar-label">${escapeHtml(cleanLabel)}</div>
         <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
@@ -1952,10 +1898,7 @@ function getHourCountsJson(messageHours: number[]): string {
   return jsonStringify(hourCounts)
 }
 
-function generateHtmlReport(
-  data: AggregatedData,
-  insights: InsightResults,
-): string {
+function generateHtmlReport(data: AggregatedData, insights: InsightResults): string {
   const markdownToHtml = (md: string): string => {
     if (!md) return ''
     return md
@@ -2072,8 +2015,7 @@ function generateHtmlReport(
   const suggestionsHtml = suggestions
     ? `
     ${
-      suggestions.claude_md_additions &&
-      suggestions.claude_md_additions.length > 0
+      suggestions.claude_md_additions && suggestions.claude_md_additions.length > 0
         ? `
     <h2 id="section-features">Existing CC Features to Try</h2>
     <div class="claude-md-section">
@@ -2197,13 +2139,9 @@ function generateHtmlReport(
 
   // Build Team Feedback section (collapsible, ant-only)
   const ccImprovements =
-    process.env.USER_TYPE === 'ant'
-      ? insights.cc_team_improvements?.improvements || []
-      : []
+    process.env.USER_TYPE === 'ant' ? insights.cc_team_improvements?.improvements || [] : []
   const modelImprovements =
-    process.env.USER_TYPE === 'ant'
-      ? insights.model_behavior_improvements?.improvements || []
-      : []
+    process.env.USER_TYPE === 'ant' ? insights.model_behavior_improvements?.improvements || [] : []
   const teamFeedbackHtml =
     ccImprovements.length > 0 || modelImprovements.length > 0
       ? `
@@ -2692,9 +2630,7 @@ export function buildExportData(
 ): InsightsExport {
   const version = typeof MACRO !== 'undefined' ? MACRO.VERSION : 'unknown'
 
-  const remote_hosts_collected = remoteStats?.hosts
-    .filter(h => h.sessionCount > 0)
-    .map(h => h.name)
+  const remote_hosts_collected = remoteStats?.hosts.filter(h => h.sessionCount > 0).map(h => h.name)
 
   const facets_summary = {
     total: facets.size,
@@ -2706,22 +2642,18 @@ export function buildExportData(
   for (const f of facets.values()) {
     for (const [cat, count] of safeEntries(f.goal_categories)) {
       if (count > 0) {
-        facets_summary.goal_categories[cat] =
-          (facets_summary.goal_categories[cat] || 0) + count
+        facets_summary.goal_categories[cat] = (facets_summary.goal_categories[cat] || 0) + count
       }
     }
-    facets_summary.outcomes[f.outcome] =
-      (facets_summary.outcomes[f.outcome] || 0) + 1
+    facets_summary.outcomes[f.outcome] = (facets_summary.outcomes[f.outcome] || 0) + 1
     for (const [level, count] of safeEntries(f.user_satisfaction_counts)) {
       if (count > 0) {
-        facets_summary.satisfaction[level] =
-          (facets_summary.satisfaction[level] || 0) + count
+        facets_summary.satisfaction[level] = (facets_summary.satisfaction[level] || 0) + count
       }
     }
     for (const [type, count] of safeEntries(f.friction_counts)) {
       if (count > 0) {
-        facets_summary.friction[type] =
-          (facets_summary.friction[type] || 0) + count
+        facets_summary.friction[type] = (facets_summary.friction[type] || 0) + count
       }
     }
   }
@@ -2801,9 +2733,7 @@ async function scanAllSessions(): Promise<LiteSessionInfo[]> {
 // Main Function
 // ============================================================================
 
-export async function generateUsageReport(options?: {
-  collectRemote?: boolean
-}): Promise<{
+export async function generateUsageReport(options?: { collectRemote?: boolean }): Promise<{
   insights: InsightResults
   htmlPath: string
   data: AggregatedData
@@ -2988,9 +2918,7 @@ export async function generateUsageReport(options?: {
     return catKeys.length === 1 && catKeys[0] === 'warmup_minimal'
   }
 
-  const substantiveSessions = substantiveMetas.filter(
-    s => !isMinimalSession(s.session_id),
-  )
+  const substantiveSessions = substantiveMetas.filter(s => !isMinimalSession(s.session_id))
 
   const substantiveFacets = new Map<string, SessionFacets>()
   for (const [sessionId, f] of facets) {
@@ -3034,9 +2962,7 @@ export async function generateUsageReport(options?: {
   }
 }
 
-function safeEntries<V>(
-  obj: Record<string, V> | undefined | null,
-): [string, V][] {
+function safeEntries<V>(obj: Record<string, V> | undefined | null): [string, V][] {
   return obj ? Object.entries(obj) : []
 }
 
@@ -3077,20 +3003,14 @@ const usageReport: Command = {
       }
     }
 
-    const { insights, htmlPath, data, remoteStats } = await generateUsageReport(
-      { collectRemote },
-    )
+    const { insights, htmlPath, data, remoteStats } = await generateUsageReport({ collectRemote })
 
     let reportUrl = `file://${htmlPath}`
     let uploadHint = ''
 
     if (process.env.USER_TYPE === 'ant') {
       // Try to upload to S3
-      const timestamp = new Date()
-        .toISOString()
-        .replace(/[-:]/g, '')
-        .replace('T', '_')
-        .slice(0, 15)
+      const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace('T', '_').slice(0, 15)
       const username = process.env.SAFEUSER || process.env.USER || 'unknown'
       const filename = `${username}_insights_${timestamp}.html`
       const s3Path = `s3://anthropic-serve/atamkin/cc-user-reports/${filename}`
@@ -3113,8 +3033,7 @@ Then access at: ${s3Url}`
 
     // Build header with stats
     const sessionLabel =
-      data.total_sessions_scanned &&
-      data.total_sessions_scanned > data.total_sessions
+      data.total_sessions_scanned && data.total_sessions_scanned > data.total_sessions
         ? `${data.total_sessions_scanned.toLocaleString()} sessions total · ${data.total_sessions} analyzed`
         : `${data.total_sessions} sessions`
     const stats = [

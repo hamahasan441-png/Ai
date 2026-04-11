@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  StrategicPlanner,
-  DEFAULT_STRATEGIC_PLANNER_CONFIG,
-} from '../StrategicPlanner'
+import { StrategicPlanner, DEFAULT_STRATEGIC_PLANNER_CONFIG } from '../StrategicPlanner'
 
 describe('StrategicPlanner', () => {
   let planner: StrategicPlanner

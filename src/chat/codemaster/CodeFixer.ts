@@ -11,13 +11,7 @@
  * Works fully offline with pattern-based fixes.
  */
 
-import type {
-  CodeFix,
-  FixResult,
-  ReviewFinding,
-  AnalysisLanguage,
-  Severity,
-} from './types.js'
+import type { CodeFix, FixResult, ReviewFinding, AnalysisLanguage, Severity } from './types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // FIX PATTERNS
@@ -66,10 +60,8 @@ const FIX_PATTERNS: FixPattern[] = [
     name: 'Add error logging to empty catch',
     description: 'Add console.error to empty catch blocks.',
     match: /catch\s*\((\w+)\)\s*\{\s*\}/,
-    fix: (line, m) => line.replace(
-      /catch\s*\((\w+)\)\s*\{\s*\}/,
-      `catch (${m[1]}) { console.error(${m[1]}) }`,
-    ),
+    fix: (line, m) =>
+      line.replace(/catch\s*\((\w+)\)\s*\{\s*\}/, `catch (${m[1]}) { console.error(${m[1]}) }`),
     languages: ['javascript', 'typescript'],
   },
   {
@@ -102,10 +94,7 @@ const FIX_PATTERNS: FixPattern[] = [
     name: 'Fix mutable default argument',
     description: 'Replace mutable default with None pattern.',
     match: /def\s+(\w+)\s*\(([^)]*?)(\w+)\s*=\s*\[\]/,
-    fix: (line, m) => line.replace(
-      /(\w+)\s*=\s*\[\]/,
-      `${m[3]}=None`,
-    ),
+    fix: (line, m) => line.replace(/(\w+)\s*=\s*\[\]/, `${m[3]}=None`),
     languages: ['python'],
   },
 ]
@@ -135,11 +124,7 @@ export class CodeFixer {
    * @param language Programming language.
    * @param findings Optional specific findings to fix (if provided, only matching fixes are applied).
    */
-  fixCode(
-    code: string,
-    language: AnalysisLanguage,
-    findings?: ReviewFinding[],
-  ): FixResult {
+  fixCode(code: string, language: AnalysisLanguage, findings?: ReviewFinding[]): FixResult {
     const lines = code.split('\n')
     const fixes: CodeFix[] = []
     const fixedLines = [...lines]
@@ -226,7 +211,10 @@ export class CodeFixer {
    * Apply multiple fixes to code (in order).
    * Detects and skips conflicting fixes.
    */
-  applyFixes(code: string, fixes: CodeFix[]): { code: string; applied: CodeFix[]; skipped: CodeFix[] } {
+  applyFixes(
+    code: string,
+    fixes: CodeFix[],
+  ): { code: string; applied: CodeFix[]; skipped: CodeFix[] } {
     this.rollbackState.set('__code__', code)
 
     let current = code
@@ -278,10 +266,7 @@ export class CodeFixer {
   generateUnifiedDiff(original: string, fixed: string, filePath = 'code'): string {
     const origLines = original.split('\n')
     const fixedLines = fixed.split('\n')
-    const diffLines: string[] = [
-      `--- a/${filePath}`,
-      `+++ b/${filePath}`,
-    ]
+    const diffLines: string[] = [`--- a/${filePath}`, `+++ b/${filePath}`]
 
     let i = 0
     let j = 0

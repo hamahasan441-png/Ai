@@ -76,12 +76,7 @@ describe('ScoringEngine', () => {
     })
 
     it('normalizes to 0-1 range', () => {
-      const result = engine.scoreKnowledgeEntry(
-        ['exact', 'exact', 'partial', 'content'],
-        2,
-        50,
-        4,
-      )
+      const result = engine.scoreKnowledgeEntry(['exact', 'exact', 'partial', 'content'], 2, 50, 4)
       expect(result.normalized).toBeGreaterThanOrEqual(0)
       expect(result.normalized).toBeLessThanOrEqual(1)
     })
@@ -311,12 +306,7 @@ describe('ScoringEngine', () => {
   describe('precision benchmarks', () => {
     it('strong knowledge match scores above 0.5 normalized', () => {
       // 3 exact matches with weight 1.2
-      const result = engine.scoreKnowledgeEntry(
-        ['exact', 'exact', 'exact'],
-        1.2,
-        3,
-        3,
-      )
+      const result = engine.scoreKnowledgeEntry(['exact', 'exact', 'exact'], 1.2, 3, 3)
       expect(result.normalized).toBeGreaterThan(0.5)
     })
 

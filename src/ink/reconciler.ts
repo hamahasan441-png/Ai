@@ -306,20 +306,13 @@ const reconciler = createReconciler<
       const renderMs = performance.now() - _tr
       if (renderMs > 10) {
         // eslint-disable-next-line custom-rules/no-sync-fs -- debug instrumentation
-        appendFileSync(
-          COMMIT_LOG,
-          `${_tr.toFixed(1)} SLOW_PAINT ${renderMs.toFixed(1)}ms\n`,
-        )
+        appendFileSync(COMMIT_LOG, `${_tr.toFixed(1)} SLOW_PAINT ${renderMs.toFixed(1)}ms\n`)
       }
     }
   },
-  getChildHostContext(
-    parentHostContext: HostContext,
-    type: ElementNames,
-  ): HostContext {
+  getChildHostContext(parentHostContext: HostContext, type: ElementNames): HostContext {
     const previousIsInsideText = parentHostContext.isInsideText
-    const isInsideText =
-      type === 'ink-text' || type === 'ink-virtual-text' || type === 'ink-link'
+    const isInsideText = type === 'ink-text' || type === 'ink-virtual-text' || type === 'ink-link'
 
     if (previousIsInsideText === isInsideText) {
       return parentHostContext
@@ -340,9 +333,7 @@ const reconciler = createReconciler<
     }
 
     const type =
-      originalType === 'ink-text' && hostContext.isInsideText
-        ? 'ink-virtual-text'
-        : originalType
+      originalType === 'ink-text' && hostContext.isInsideText ? 'ink-virtual-text' : originalType
 
     const node = createNode(type)
     if (COMMIT_LOG) _createCount++
@@ -357,15 +348,9 @@ const reconciler = createReconciler<
 
     return node
   },
-  createTextInstance(
-    text: string,
-    _root: DOMElement,
-    hostContext: HostContext,
-  ): TextNode {
+  createTextInstance(text: string, _root: DOMElement, hostContext: HostContext): TextNode {
     if (!hostContext.isInsideText) {
-      throw new Error(
-        `Text string "${text}" must be rendered inside <Text> component`,
-      )
+      throw new Error(`Text string "${text}" must be rendered inside <Text> component`)
     }
 
     return createTextNode(text)
@@ -391,11 +376,7 @@ const reconciler = createReconciler<
   appendInitialChild: appendChildNode,
   appendChild: appendChildNode,
   insertBefore: insertBeforeNode,
-  finalizeInitialChildren(
-    _node: DOMElement,
-    _type: ElementNames,
-    props: Props,
-  ): boolean {
+  finalizeInitialChildren(_node: DOMElement, _type: ElementNames, props: Props): boolean {
     return props['autoFocus'] === true
   },
   commitMount(node: DOMElement): void {
@@ -423,12 +404,7 @@ const reconciler = createReconciler<
     getFocusManager(node).handleNodeRemoved(removeNode, node)
   },
   // React 19 commitUpdate receives old and new props directly instead of an updatePayload
-  commitUpdate(
-    node: DOMElement,
-    _type: ElementNames,
-    oldProps: Props,
-    newProps: Props,
-  ): void {
+  commitUpdate(node: DOMElement, _type: ElementNames, oldProps: Props, newProps: Props): void {
     const props = diff(oldProps, newProps)
     const style = diff(oldProps['style'] as Styles, newProps['style'] as Styles)
 

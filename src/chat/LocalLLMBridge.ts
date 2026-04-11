@@ -173,10 +173,7 @@ const INTENT_PATTERNS: Array<{ intent: QueryIntent; patterns: RegExp[]; weight: 
   },
   {
     intent: 'general_question',
-    patterns: [
-      /\?$/,
-      /\b(help|assist|guide|suggest|recommend)\b/i,
-    ],
+    patterns: [/\?$/, /\b(help|assist|guide|suggest|recommend)\b/i],
     weight: 0.5,
   },
 ]
@@ -225,7 +222,7 @@ export class LocalLLMBridge {
     if (this.config.enableCache) {
       const cacheKey = this.llm.hashContent(query)
       const cached = this.cache.get(cacheKey)
-      if (cached && (Date.now() - cached.timestamp) < this.config.cacheTTLMs) {
+      if (cached && Date.now() - cached.timestamp < this.config.cacheTTLMs) {
         this.stats.cacheHits++
         cached.hitCount++
         return { ...cached.response, cached: true, durationMs: Date.now() - start }
@@ -259,7 +256,8 @@ export class LocalLLMBridge {
 
     response.durationMs = Date.now() - start
     this.stats.averageLatencyMs =
-      (this.stats.averageLatencyMs * (this.stats.totalQueries - 1) + response.durationMs) / this.stats.totalQueries
+      (this.stats.averageLatencyMs * (this.stats.totalQueries - 1) + response.durationMs) /
+      this.stats.totalQueries
 
     // 4. Cache the result
     if (this.config.enableCache) {
@@ -440,11 +438,16 @@ export class LocalLLMBridge {
   }
 
   /** Enhanced overflow debugging: combines BufferOverflowDebugger data + LLM analysis */
-  async debugOverflow(crashData: string, protections: string, kbResults?: string[]): Promise<BridgeResponse> {
+  async debugOverflow(
+    crashData: string,
+    protections: string,
+    kbResults?: string[],
+  ): Promise<BridgeResponse> {
     const context = kbResults ?? []
-    const enrichedCrash = this.config.enableContextEnrichment && context.length > 0
-      ? `${crashData}\n\n### Analysis from BufferOverflowDebugger:\n${context.join('\n')}`
-      : crashData
+    const enrichedCrash =
+      this.config.enableContextEnrichment && context.length > 0
+        ? `${crashData}\n\n### Analysis from BufferOverflowDebugger:\n${context.join('\n')}`
+        : crashData
 
     const result = await this.llm.debugOverflow(enrichedCrash, protections)
 
@@ -463,9 +466,8 @@ export class LocalLLMBridge {
 
   /** Code generation with context */
   async generateCode(task: string, language: string, context?: string[]): Promise<BridgeResponse> {
-    const enrichedTask = context && context.length > 0
-      ? `${task}\n\nContext:\n${context.join('\n')}`
-      : task
+    const enrichedTask =
+      context && context.length > 0 ? `${task}\n\nContext:\n${context.join('\n')}` : task
 
     const result = await this.llm.generateCode(enrichedTask, language)
 
@@ -660,7 +662,8 @@ export class LocalLLMBridge {
     if (kbContext.length > 0) {
       text = `Based on the knowledge base:\n\n${kbContext.join('\n\n')}`
     } else {
-      text = `No specific knowledge base entries found for: "${query}". ` +
+      text =
+        `No specific knowledge base entries found for: "${query}". ` +
         'Try starting the Qwen2.5-Coder LLM server for AI-powered answers.'
     }
 
@@ -710,15 +713,24 @@ export class LocalLLMBridge {
   /** Get optimal temperature for an intent */
   private _getTemperatureForIntent(intent: QueryIntent): number {
     switch (intent) {
-      case 'code_generation': return 0.3
-      case 'code_review': return 0.4
-      case 'debugging': return 0.3
-      case 'exploit_analysis': return 0.5
-      case 'vulnerability_search': return 0.4
-      case 'overflow_debug': return 0.3
-      case 'knowledge_lookup': return 0.6
-      case 'general_question': return 0.7
-      default: return 0.5
+      case 'code_generation':
+        return 0.3
+      case 'code_review':
+        return 0.4
+      case 'debugging':
+        return 0.3
+      case 'exploit_analysis':
+        return 0.5
+      case 'vulnerability_search':
+        return 0.4
+      case 'overflow_debug':
+        return 0.3
+      case 'knowledge_lookup':
+        return 0.6
+      case 'general_question':
+        return 0.7
+      default:
+        return 0.5
     }
   }
 

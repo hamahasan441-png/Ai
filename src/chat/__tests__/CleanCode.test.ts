@@ -16,21 +16,33 @@ describe('CleanCode', () => {
 
   describe('KB entry tests', () => {
     it('should match naming conventions and function design keywords', async () => {
-      const r = await brain.chat('explain naming conventions meaningful names avoid abbreviations domain language function design single responsibility small functions pure functions minimal parameters')
+      const r = await brain.chat(
+        'explain naming conventions meaningful names avoid abbreviations domain language function design single responsibility small functions pure functions minimal parameters',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/naming|meaningful|abbreviation|domain|function\s+design|single\s+responsibility|pure\s+function|parameter/)
+      expect(r.text.toLowerCase()).toMatch(
+        /naming|meaningful|abbreviation|domain|function\s+design|single\s+responsibility|pure\s+function|parameter/,
+      )
     })
 
     it('should match error handling and code organization keywords', async () => {
-      const r = await brain.chat('explain error handling patterns fail fast error types hierarchy result pattern code organization cohesion coupling package by feature layered screaming architecture')
+      const r = await brain.chat(
+        'explain error handling patterns fail fast error types hierarchy result pattern code organization cohesion coupling package by feature layered screaming architecture',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/error\s+handling|fail\s+fast|result\s+pattern|cohesion|coupling|package.by.feature|layered|screaming/)
+      expect(r.text.toLowerCase()).toMatch(
+        /error\s+handling|fail\s+fast|result\s+pattern|cohesion|coupling|package.by.feature|layered|screaming/,
+      )
     })
 
     it('should match comments documentation and testing pyramid keywords', async () => {
-      const r = await brain.chat('explain self documenting code when to comment jsdoc tsdoc readme driven development testing pyramid unit integration e2e contract acceptance testing trophy')
+      const r = await brain.chat(
+        'explain self documenting code when to comment jsdoc tsdoc readme driven development testing pyramid unit integration e2e contract acceptance testing trophy',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/self.documenting|comment|jsdoc|tsdoc|readme|testing\s+pyramid|unit|integration|e2e|trophy/)
+      expect(r.text.toLowerCase()).toMatch(
+        /self.documenting|comment|jsdoc|tsdoc|readme|testing\s+pyramid|unit|integration|e2e|trophy/,
+      )
     })
   })
 

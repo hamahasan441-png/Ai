@@ -199,9 +199,15 @@ export class ScoringEngine {
 
     for (const mt of matchType) {
       switch (mt) {
-        case 'exact': rawScore += w.exactMatch * weight; break
-        case 'partial': rawScore += w.partialMatch * weight; break
-        case 'content': rawScore += w.contentMatch * weight; break
+        case 'exact':
+          rawScore += w.exactMatch * weight
+          break
+        case 'partial':
+          rawScore += w.partialMatch * weight
+          break
+        case 'content':
+          rawScore += w.contentMatch * weight
+          break
       }
     }
 
@@ -210,9 +216,10 @@ export class ScoringEngine {
 
     // Normalize: theoretical max per keyword = exactMatch * weight + contentMatch * weight
     // With maxUseBoost. Cap to 1.0.
-    const theoreticalMax = totalKeywordCount > 0
-      ? totalKeywordCount * (w.exactMatch + w.contentMatch) * Math.max(weight, 1) + w.maxUseBoost
-      : 1
+    const theoreticalMax =
+      totalKeywordCount > 0
+        ? totalKeywordCount * (w.exactMatch + w.contentMatch) * Math.max(weight, 1) + w.maxUseBoost
+        : 1
     const normalized = Math.min(total / theoreticalMax, 1)
 
     this.track(normalized)
@@ -243,7 +250,8 @@ export class ScoringEngine {
     const w = this.config.pattern
 
     const rawScore = keywordHits * w.keywordHit + wordHits * w.wordOverlap
-    const reinforcementBonus = 1 + Math.min(reinforcements * w.reinforcementRate, w.maxReinforcementBonus)
+    const reinforcementBonus =
+      1 + Math.min(reinforcements * w.reinforcementRate, w.maxReinforcementBonus)
     const adjusted = rawScore * confidence * reinforcementBonus
     const isMatch = adjusted >= w.matchThreshold
 
@@ -268,9 +276,7 @@ export class ScoringEngine {
     const w = this.config.confidence
 
     const knowledgeComponent = Math.min(knowledgeRawScore / w.knowledgeNormalizer, w.knowledgeMax)
-    const patternComponent = patternConfidence !== null
-      ? patternConfidence * w.patternMax
-      : 0
+    const patternComponent = patternConfidence !== null ? patternConfidence * w.patternMax : 0
 
     let score = knowledgeComponent + patternComponent
 
@@ -310,9 +316,7 @@ export class ScoringEngine {
     const w = this.config.codeReview
 
     const totalPenalty =
-      errorCount * w.errorPenalty +
-      warningCount * w.warningPenalty +
-      infoCount * w.infoPenalty
+      errorCount * w.errorPenalty + warningCount * w.warningPenalty + infoCount * w.infoPenalty
 
     const score = Math.max(0, Math.min(w.maxScore, w.maxScore - totalPenalty))
     const normalized = score / w.maxScore

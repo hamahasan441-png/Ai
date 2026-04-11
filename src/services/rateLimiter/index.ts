@@ -106,7 +106,9 @@ export class TokenBucketLimiter {
         allowed: true,
         remaining: Math.floor(bucket.tokens),
         limit: this.opts.maxTokens,
-        resetAt: Date.now() + Math.ceil((this.opts.maxTokens - bucket.tokens) / this.opts.refillRate) * 1000,
+        resetAt:
+          Date.now() +
+          Math.ceil((this.opts.maxTokens - bucket.tokens) / this.opts.refillRate) * 1000,
       }
     }
 

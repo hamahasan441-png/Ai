@@ -12,7 +12,7 @@ interface CacheItem<T> {
   value: T
   createdAt: number
   lastAccessedAt: number
-  ttlMs: number | null  // null = no expiry
+  ttlMs: number | null // null = no expiry
 }
 
 /** Configuration for the memory cache. */
@@ -134,9 +134,7 @@ export class MemoryCache {
       maxEntries: this.config.maxEntries,
       hits: this.hits,
       misses: this.misses,
-      hitRate: this.hits + this.misses > 0
-        ? this.hits / (this.hits + this.misses)
-        : 0,
+      hitRate: this.hits + this.misses > 0 ? this.hits / (this.hits + this.misses) : 0,
     }
   }
 

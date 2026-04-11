@@ -1,11 +1,6 @@
 import { feature } from 'bun:bundle'
 import { useEffect, useRef } from 'react'
-import {
-  type AppState,
-  useAppState,
-  useAppStateStore,
-  useSetAppState,
-} from 'src/state/AppState.js'
+import { type AppState, useAppState, useAppStateStore, useSetAppState } from 'src/state/AppState.js'
 import type { ToolPermissionContext } from 'src/Tool.js'
 import { getIsRemoteMode } from '../../bootstrap/state.js'
 import {
@@ -39,9 +34,7 @@ export async function checkAndDisableBypassPermissionsIfNeeded(
   setAppState(prev => {
     return {
       ...prev,
-      toolPermissionContext: createDisabledBypassPermissionsContext(
-        prev.toolPermissionContext,
-      ),
+      toolPermissionContext: createDisabledBypassPermissionsContext(prev.toolPermissionContext),
     }
   })
 }
@@ -61,10 +54,7 @@ export function useKickOffCheckAndDisableBypassPermissionsIfNeeded(): void {
   // Run once, when the component mounts
   useEffect(() => {
     if (getIsRemoteMode()) return
-    void checkAndDisableBypassPermissionsIfNeeded(
-      toolPermissionContext,
-      setAppState,
-    )
+    void checkAndDisableBypassPermissionsIfNeeded(toolPermissionContext, setAppState)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 }
@@ -93,9 +83,7 @@ export async function checkAndDisableAutoModeIfNeeded(
       // would revert the user's mode change.
       const nextCtx = updateContext(prev.toolPermissionContext)
       const newState =
-        nextCtx === prev.toolPermissionContext
-          ? prev
-          : { ...prev, toolPermissionContext: nextCtx }
+        nextCtx === prev.toolPermissionContext ? prev : { ...prev, toolPermissionContext: nextCtx }
       if (!notification) return newState
       return {
         ...newState,

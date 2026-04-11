@@ -159,7 +159,7 @@ describe('CreativeProblemSolver', () => {
     it('should score a relevant solution higher', () => {
       const score = solver.scoreSolution(
         'Optimize page load with caching and CDN to reduce load time',
-        sampleProblem
+        sampleProblem,
       )
       expect(score.overall).toBeGreaterThan(0)
       expect(score.feasibility).toBeGreaterThan(0)
@@ -167,7 +167,10 @@ describe('CreativeProblemSolver', () => {
 
     it('should give higher novelty to unique solutions', () => {
       const conventional = solver.scoreSolution('Fix the slow page load times', sampleProblem)
-      const novel = solver.scoreSolution('Use quantum computing to teleport data instantly', sampleProblem)
+      const novel = solver.scoreSolution(
+        'Use quantum computing to teleport data instantly',
+        sampleProblem,
+      )
       expect(novel.novelty).toBeGreaterThan(conventional.novelty)
     })
 

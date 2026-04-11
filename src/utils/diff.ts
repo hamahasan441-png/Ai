@@ -46,10 +46,7 @@ function unescapeFromDiff(s: string): string {
  * @param patch Array of diff hunks
  * @param newFileContent Optional content string for new files
  */
-export function countLinesChanged(
-  patch: StructuredPatchHunk[],
-  newFileContent?: string,
-): void {
+export function countLinesChanged(patch: StructuredPatchHunk[], newFileContent?: string): void {
   let numAdditions = 0
   let numRemovals = 0
 
@@ -57,14 +54,8 @@ export function countLinesChanged(
     // For new files, count all lines as additions
     numAdditions = newFileContent.split(/\r?\n/).length
   } else {
-    numAdditions = patch.reduce(
-      (acc, hunk) => acc + count(hunk.lines, _ => _.startsWith('+')),
-      0,
-    )
-    numRemovals = patch.reduce(
-      (acc, hunk) => acc + count(hunk.lines, _ => _.startsWith('-')),
-      0,
-    )
+    numAdditions = patch.reduce((acc, hunk) => acc + count(hunk.lines, _ => _.startsWith('+')), 0)
+    numRemovals = patch.reduce((acc, hunk) => acc + count(hunk.lines, _ => _.startsWith('-')), 0)
   }
 
   addToTotalLinesChanged(numAdditions, numRemovals)
@@ -136,9 +127,7 @@ export function getPatchForDisplay({
   edits: FileEdit[]
   ignoreWhitespace?: boolean
 }): StructuredPatchHunk[] {
-  const preparedFileContents = escapeForDiff(
-    convertLeadingTabsToSpaces(fileContents),
-  )
+  const preparedFileContents = escapeForDiff(convertLeadingTabsToSpaces(fileContents))
   const result = structuredPatch(
     filePath,
     filePath,
@@ -146,12 +135,8 @@ export function getPatchForDisplay({
     edits.reduce((p, edit) => {
       const { old_string, new_string } = edit
       const replace_all = 'replace_all' in edit ? edit.replace_all : false
-      const escapedOldString = escapeForDiff(
-        convertLeadingTabsToSpaces(old_string),
-      )
-      const escapedNewString = escapeForDiff(
-        convertLeadingTabsToSpaces(new_string),
-      )
+      const escapedOldString = escapeForDiff(convertLeadingTabsToSpaces(old_string))
+      const escapedNewString = escapeForDiff(convertLeadingTabsToSpaces(new_string))
 
       if (replace_all) {
         return p.replaceAll(escapedOldString, () => escapedNewString)

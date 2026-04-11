@@ -67,13 +67,17 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('classifies policy claims containing should/must', () => {
-      const claims = analyzer.extractClaims('I believe the government should invest more in education for everyone.')
+      const claims = analyzer.extractClaims(
+        'I believe the government should invest more in education for everyone.',
+      )
       const policy = claims.filter(c => c.type === 'policy')
       expect(policy.length).toBeGreaterThan(0)
     })
 
     it('classifies causal claims', () => {
-      const claims = analyzer.extractClaims('Studies show that smoking causes lung cancer and leads to serious health problems.')
+      const claims = analyzer.extractClaims(
+        'Studies show that smoking causes lung cancer and leads to serious health problems.',
+      )
       const causal = claims.filter(c => c.type === 'causal')
       expect(causal.length).toBeGreaterThan(0)
     })
@@ -85,7 +89,9 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('classifies definitional claims', () => {
-      const claims = analyzer.extractClaims('Democracy is defined as a system of government by the people.')
+      const claims = analyzer.extractClaims(
+        'Democracy is defined as a system of government by the people.',
+      )
       const definitional = claims.filter(c => c.type === 'definitional')
       expect(definitional.length).toBeGreaterThan(0)
     })
@@ -116,7 +122,9 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('assigns confidence between 0 and 1', () => {
-      const claims = analyzer.extractClaims('Studies show that regular exercise is clearly beneficial for health.')
+      const claims = analyzer.extractClaims(
+        'Studies show that regular exercise is clearly beneficial for health.',
+      )
       for (const c of claims) {
         expect(c.confidence).toBeGreaterThanOrEqual(0)
         expect(c.confidence).toBeLessThanOrEqual(1)
@@ -204,17 +212,23 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('detects straw man fallacy', () => {
-      const fallacies = analyzer.detectFallacies("So you're saying that we should abandon all regulations?")
+      const fallacies = analyzer.detectFallacies(
+        "So you're saying that we should abandon all regulations?",
+      )
       expect(fallacies.some(f => f.type === 'straw_man')).toBe(true)
     })
 
     it('detects false dilemma fallacy', () => {
-      const fallacies = analyzer.detectFallacies("You're either with us or against us on this issue.")
+      const fallacies = analyzer.detectFallacies(
+        "You're either with us or against us on this issue.",
+      )
       expect(fallacies.some(f => f.type === 'false_dilemma')).toBe(true)
     })
 
     it('detects appeal to authority', () => {
-      const fallacies = analyzer.detectFallacies('Experts say this product is the best on the market.')
+      const fallacies = analyzer.detectFallacies(
+        'Experts say this product is the best on the market.',
+      )
       expect(fallacies.some(f => f.type === 'appeal_to_authority')).toBe(true)
     })
 
@@ -226,37 +240,51 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('detects circular reasoning', () => {
-      const fallacies = analyzer.detectFallacies("It's true because that's the case and the reason is because it's true.")
+      const fallacies = analyzer.detectFallacies(
+        "It's true because that's the case and the reason is because it's true.",
+      )
       expect(fallacies.some(f => f.type === 'circular_reasoning')).toBe(true)
     })
 
     it('detects red herring', () => {
-      const fallacies = analyzer.detectFallacies('But what about the economy? The real issue is something else entirely.')
+      const fallacies = analyzer.detectFallacies(
+        'But what about the economy? The real issue is something else entirely.',
+      )
       expect(fallacies.some(f => f.type === 'red_herring')).toBe(true)
     })
 
     it('detects hasty generalization', () => {
-      const fallacies = analyzer.detectFallacies('All politicians are corrupt and everyone knows it.')
+      const fallacies = analyzer.detectFallacies(
+        'All politicians are corrupt and everyone knows it.',
+      )
       expect(fallacies.some(f => f.type === 'hasty_generalization')).toBe(true)
     })
 
     it('detects appeal to emotion', () => {
-      const fallacies = analyzer.detectFallacies("Think of the children who will suffer if we don't act now!")
+      const fallacies = analyzer.detectFallacies(
+        "Think of the children who will suffer if we don't act now!",
+      )
       expect(fallacies.some(f => f.type === 'appeal_to_emotion')).toBe(true)
     })
 
     it('detects bandwagon fallacy', () => {
-      const fallacies = analyzer.detectFallacies('Everyone believes this is the right approach so it must be correct.')
+      const fallacies = analyzer.detectFallacies(
+        'Everyone believes this is the right approach so it must be correct.',
+      )
       expect(fallacies.some(f => f.type === 'bandwagon')).toBe(true)
     })
 
     it('detects tu quoque', () => {
-      const fallacies = analyzer.detectFallacies('You did the same thing too, so you cannot criticize me.')
+      const fallacies = analyzer.detectFallacies(
+        'You did the same thing too, so you cannot criticize me.',
+      )
       expect(fallacies.some(f => f.type === 'tu_quoque')).toBe(true)
     })
 
     it('detects appeal to ignorance', () => {
-      const fallacies = analyzer.detectFallacies("You can't prove that aliens don't exist, so they must be real.")
+      const fallacies = analyzer.detectFallacies(
+        "You can't prove that aliens don't exist, so they must be real.",
+      )
       expect(fallacies.some(f => f.type === 'appeal_to_ignorance')).toBe(true)
     })
 
@@ -279,7 +307,9 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('returns empty array for clean text', () => {
-      const fallacies = analyzer.detectFallacies('The data shows a 10% increase in sales over the quarter.')
+      const fallacies = analyzer.detectFallacies(
+        'The data shows a 10% increase in sales over the quarter.',
+      )
       expect(fallacies.length).toBe(0)
     })
 
@@ -456,8 +486,12 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('uses custom description when provided', () => {
-      const a1 = analyzer.parseArgument('Because data shows improvement. Therefore the policy works.')
-      const a2 = analyzer.parseArgument('Because alternative data disagrees. Therefore the policy is questionable.')
+      const a1 = analyzer.parseArgument(
+        'Because data shows improvement. Therefore the policy works.',
+      )
+      const a2 = analyzer.parseArgument(
+        'Because alternative data disagrees. Therefore the policy is questionable.',
+      )
       const rel = analyzer.addRelation(a1.id, a2.id, 'attacks', 'Policy effectiveness dispute')
       expect(rel!.description).toBe('Policy effectiveness dispute')
     })
@@ -543,8 +577,16 @@ describe('ArgumentAnalyzer', () => {
   describe('analyzeDebate', () => {
     it('analyzes a two-position debate', () => {
       const positions = analyzer.analyzeDebate([
-        { speaker: 'Alice', text: 'Because renewable energy is cheaper. Therefore we should switch to solar power.', stance: 'for' },
-        { speaker: 'Bob', text: 'Because initial costs are high. Therefore solar is not practical right now.', stance: 'against' },
+        {
+          speaker: 'Alice',
+          text: 'Because renewable energy is cheaper. Therefore we should switch to solar power.',
+          stance: 'for',
+        },
+        {
+          speaker: 'Bob',
+          text: 'Because initial costs are high. Therefore solar is not practical right now.',
+          stance: 'against',
+        },
       ])
       expect(positions.length).toBe(2)
       expect(positions[0].speaker).toBe('Alice')
@@ -553,7 +595,11 @@ describe('ArgumentAnalyzer', () => {
 
     it('returns debate positions with required fields', () => {
       const positions = analyzer.analyzeDebate([
-        { speaker: 'Alice', text: 'Because it is important. Therefore we should act.', stance: 'for' },
+        {
+          speaker: 'Alice',
+          text: 'Because it is important. Therefore we should act.',
+          stance: 'for',
+        },
       ])
       const pos = positions[0]
       expect(pos).toHaveProperty('id')
@@ -577,8 +623,16 @@ describe('ArgumentAnalyzer', () => {
 
     it('creates attack relations between opposing stances', () => {
       analyzer.analyzeDebate([
-        { speaker: 'Pro', text: 'Because benefits are clear. Therefore we should proceed.', stance: 'for' },
-        { speaker: 'Con', text: 'Because risks are high. Therefore we should not proceed.', stance: 'against' },
+        {
+          speaker: 'Pro',
+          text: 'Because benefits are clear. Therefore we should proceed.',
+          stance: 'for',
+        },
+        {
+          speaker: 'Con',
+          text: 'Because risks are high. Therefore we should not proceed.',
+          stance: 'against',
+        },
       ])
       const relations = analyzer.getRelations()
       const attacks = relations.filter(r => r.type === 'attacks')
@@ -597,8 +651,16 @@ describe('ArgumentAnalyzer', () => {
 
     it('handles neutral stances without creating attack relations', () => {
       analyzer.analyzeDebate([
-        { speaker: 'Neutral', text: 'Because the data is mixed. Therefore further research is needed.', stance: 'neutral' },
-        { speaker: 'For', text: 'Because benefits outweigh risks. Therefore we should act.', stance: 'for' },
+        {
+          speaker: 'Neutral',
+          text: 'Because the data is mixed. Therefore further research is needed.',
+          stance: 'neutral',
+        },
+        {
+          speaker: 'For',
+          text: 'Because benefits outweigh risks. Therefore we should act.',
+          stance: 'for',
+        },
       ])
       const attacks = analyzer.getRelations().filter(r => r.type === 'attacks')
       expect(attacks.length).toBe(0)
@@ -617,7 +679,9 @@ describe('ArgumentAnalyzer', () => {
 
   describe('assessEvidence', () => {
     it('returns high reliability for peer-reviewed evidence', () => {
-      const result = analyzer.assessEvidence('A peer-reviewed meta-analysis found significant results.')
+      const result = analyzer.assessEvidence(
+        'A peer-reviewed meta-analysis found significant results.',
+      )
       expect(result.reliability).toBeGreaterThanOrEqual(0.9)
     })
 
@@ -635,7 +699,9 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('scores between 0 and 1 for all fields', () => {
-      const result = analyzer.assessEvidence('Research indicates the data is statistically significant.')
+      const result = analyzer.assessEvidence(
+        'Research indicates the data is statistically significant.',
+      )
       expect(result.relevance).toBeGreaterThanOrEqual(0)
       expect(result.relevance).toBeLessThanOrEqual(1)
       expect(result.reliability).toBeGreaterThanOrEqual(0)
@@ -754,8 +820,12 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('reports null winner for equally strong arguments', () => {
-      const a1 = analyzer.parseArgument('Because data supports claim. Therefore the conclusion holds.')
-      const a2 = analyzer.parseArgument('Because data supports claim. Therefore the conclusion holds.')
+      const a1 = analyzer.parseArgument(
+        'Because data supports claim. Therefore the conclusion holds.',
+      )
+      const a2 = analyzer.parseArgument(
+        'Because data supports claim. Therefore the conclusion holds.',
+      )
       const result = analyzer.compareArguments(a1.id, a2.id)
       expect(result).not.toBeNull()
       // Same text should produce near-equal strength → null winner
@@ -768,12 +838,16 @@ describe('ArgumentAnalyzer', () => {
 
   describe('detectBias', () => {
     it('detects confirmation bias indicators', () => {
-      const biases = analyzer.detectBias('Obviously and clearly this is the right answer. Of course it is.')
+      const biases = analyzer.detectBias(
+        'Obviously and clearly this is the right answer. Of course it is.',
+      )
       expect(biases.some(b => b.type === 'confirmation')).toBe(true)
     })
 
     it('detects selection bias indicators', () => {
-      const biases = analyzer.detectBias('They cherry-pick only looking at the data that supports them.')
+      const biases = analyzer.detectBias(
+        'They cherry-pick only looking at the data that supports them.',
+      )
       expect(biases.some(b => b.type === 'selection')).toBe(true)
     })
 
@@ -783,7 +857,9 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('detects anchoring bias indicators', () => {
-      const biases = analyzer.detectBias('The first impression from the beginning was that the original claim was correct.')
+      const biases = analyzer.detectBias(
+        'The first impression from the beginning was that the original claim was correct.',
+      )
       expect(biases.some(b => b.type === 'anchoring')).toBe(true)
     })
 
@@ -897,7 +973,9 @@ describe('ArgumentAnalyzer', () => {
     })
 
     it('tracks claim count', () => {
-      analyzer.extractClaims('Studies show that exercise is important. Research indicates sleep matters.')
+      analyzer.extractClaims(
+        'Studies show that exercise is important. Research indicates sleep matters.',
+      )
       expect(analyzer.getStats().totalClaims).toBeGreaterThan(0)
     })
 

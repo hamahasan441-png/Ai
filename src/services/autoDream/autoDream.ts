@@ -11,14 +11,8 @@
 // (tests call initAutoDream() in beforeEach for a fresh closure).
 
 import type { REPLHookContext } from '../../utils/hooks/postSamplingHooks.js'
-import {
-  createCacheSafeParams,
-  runForkedAgent,
-} from '../../utils/forkedAgent.js'
-import {
-  createUserMessage,
-  createMemorySavedMessage,
-} from '../../utils/messages.js'
+import { createCacheSafeParams, runForkedAgent } from '../../utils/forkedAgent.js'
+import { createUserMessage, createMemorySavedMessage } from '../../utils/messages.js'
 import type { Message } from '../../types/message.js'
 import { logForDebugging } from '../../utils/debug.js'
 import type { ToolUseContext } from '../../Tool.js'
@@ -71,16 +65,13 @@ const DEFAULTS: AutoDreamConfig = {
  * per-field validation since GB cache can return stale wrong-type values.
  */
 function getConfig(): AutoDreamConfig {
-  const raw =
-    getFeatureValue_CACHED_MAY_BE_STALE<Partial<AutoDreamConfig> | null>(
-      'tengu_onyx_plover',
-      null,
-    )
+  const raw = getFeatureValue_CACHED_MAY_BE_STALE<Partial<AutoDreamConfig> | null>(
+    'tengu_onyx_plover',
+    null,
+  )
   return {
     minHours:
-      typeof raw?.minHours === 'number' &&
-      Number.isFinite(raw.minHours) &&
-      raw.minHours > 0
+      typeof raw?.minHours === 'number' && Number.isFinite(raw.minHours) && raw.minHours > 0
         ? raw.minHours
         : DEFAULTS.minHours,
     minSessions:
@@ -109,10 +100,7 @@ function isForced(): boolean {
 type AppendSystemMessageFn = NonNullable<ToolUseContext['appendSystemMessage']>
 
 let runner:
-  | ((
-      context: REPLHookContext,
-      appendSystemMessage?: AppendSystemMessageFn,
-    ) => Promise<void>)
+  | ((context: REPLHookContext, appendSystemMessage?: AppendSystemMessageFn) => Promise<void>)
   | null = null
 
 /**
@@ -132,9 +120,7 @@ export function initAutoDream(): void {
     try {
       lastAt = await readLastConsolidatedAt()
     } catch (e: unknown) {
-      logForDebugging(
-        `[autoDream] readLastConsolidatedAt failed: ${(e as Error).message}`,
-      )
+      logForDebugging(`[autoDream] readLastConsolidatedAt failed: ${(e as Error).message}`)
       return
     }
     const hoursSince = (Date.now() - lastAt) / 3_600_000
@@ -155,9 +141,7 @@ export function initAutoDream(): void {
     try {
       sessionIds = await listSessionsTouchedSince(lastAt)
     } catch (e: unknown) {
-      logForDebugging(
-        `[autoDream] listSessionsTouchedSince failed: ${(e as Error).message}`,
-      )
+      logForDebugging(`[autoDream] listSessionsTouchedSince failed: ${(e as Error).message}`)
       return
     }
     // Exclude the current session (its mtime is always recent).
@@ -181,9 +165,7 @@ export function initAutoDream(): void {
       try {
         priorMtime = await tryAcquireConsolidationLock()
       } catch (e: unknown) {
-        logForDebugging(
-          `[autoDream] lock acquire failed: ${(e as Error).message}`,
-        )
+        logForDebugging(`[autoDream] lock acquire failed: ${(e as Error).message}`)
         return
       }
       if (priorMtime === null) return
@@ -198,8 +180,7 @@ export function initAutoDream(): void {
     })
 
     const setAppState =
-      context.toolUseContext.setAppStateForTasks ??
-      context.toolUseContext.setAppState
+      context.toolUseContext.setAppStateForTasks ?? context.toolUseContext.setAppState
     const abortController = new AbortController()
     const taskId = registerDreamTask(setAppState, {
       sessionsReviewing: sessionIds.length,
@@ -236,11 +217,7 @@ ${sessionIds.map(id => `- ${id}`).join('\n')}`
       // Inline completion summary in the main transcript (same surface as
       // extractMemories's "Saved N memories" message).
       const dreamState = context.toolUseContext.getAppState().tasks?.[taskId]
-      if (
-        appendSystemMessage &&
-        isDreamTask(dreamState) &&
-        dreamState.filesTouched.length > 0
-      ) {
+      if (appendSystemMessage && isDreamTask(dreamState) && dreamState.filesTouched.length > 0) {
         appendSystemMessage({
           ...createMemorySavedMessage(dreamState.filesTouched),
           verb: 'Improved',
@@ -292,10 +269,7 @@ function makeDreamProgressWatcher(
         text += block.text
       } else if (block.type === 'tool_use') {
         toolUseCount++
-        if (
-          block.name === FILE_EDIT_TOOL_NAME ||
-          block.name === FILE_WRITE_TOOL_NAME
-        ) {
+        if (block.name === FILE_EDIT_TOOL_NAME || block.name === FILE_WRITE_TOOL_NAME) {
           const input = block.input as { file_path?: unknown }
           if (typeof input.file_path === 'string') {
             touchedPaths.push(input.file_path)
@@ -303,12 +277,7 @@ function makeDreamProgressWatcher(
         }
       }
     }
-    addDreamTurn(
-      taskId,
-      { text: text.trim(), toolUseCount },
-      touchedPaths,
-      setAppState,
-    )
+    addDreamTurn(taskId, { text: text.trim(), toolUseCount }, touchedPaths, setAppState)
   }
 }
 

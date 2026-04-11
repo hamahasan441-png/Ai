@@ -57,10 +57,7 @@ export function getMarketplaceSourceDisplay(source: MarketplaceSource): string {
 /**
  * Create a plugin ID from plugin name and marketplace name
  */
-export function createPluginId(
-  pluginName: string,
-  marketplaceName: string,
-): string {
+export function createPluginId(pluginName: string, marketplaceName: string): string {
   return `${pluginName}@${marketplaceName}`
 }
 
@@ -140,15 +137,11 @@ export function formatMarketplaceLoadingErrors(
   }
 }
 
-function formatFailureNames(
-  failures: Array<{ name: string; error: string }>,
-): string {
+function formatFailureNames(failures: Array<{ name: string; error: string }>): string {
   return failures.map(f => f.name).join(', ')
 }
 
-function formatFailureErrors(
-  failures: Array<{ name: string; error: string }>,
-): string {
+function formatFailureErrors(failures: Array<{ name: string; error: string }>): string {
   return failures.map(f => `${f.name}: ${f.error}`).join('; ')
 }
 
@@ -213,10 +206,7 @@ function areSourcesEqual(a: MarketplaceSource, b: MarketplaceSource): boolean {
     case 'directory':
       return a.path === (b as typeof a).path
     case 'settings':
-      return (
-        a.name === (b as typeof a).name &&
-        isEqual(a.plugins, (b as typeof a).plugins)
-      )
+      return a.name === (b as typeof a).name && isEqual(a.plugins, (b as typeof a).plugins)
     default:
       return false
   }
@@ -232,9 +222,7 @@ function areSourcesEqual(a: MarketplaceSource, b: MarketplaceSource): boolean {
  * @param source - The marketplace source to extract host from
  * @returns The hostname string, or null if extraction fails or source type not supported
  */
-export function extractHostFromSource(
-  source: MarketplaceSource,
-): string | null {
+export function extractHostFromSource(source: MarketplaceSource): string | null {
   switch (source.source) {
     case 'github':
       // GitHub shorthand always means github.com
@@ -353,9 +341,7 @@ function extractGitHubRepoFromGitUrl(url: string): string | null {
   }
 
   // HTTPS format: https://github.com/owner/repo.git or https://github.com/owner/repo
-  const httpsMatch = url.match(
-    /^https?:\/\/github\.com\/([^/]+\/[^/]+?)(?:\.git)?$/,
-  )
+  const httpsMatch = url.match(/^https?:\/\/github\.com\/([^/]+\/[^/]+?)(?:\.git)?$/)
   if (httpsMatch && httpsMatch[1]) {
     return httpsMatch[1]
   }
@@ -463,9 +449,7 @@ export function isSourceInBlocklist(source: MarketplaceSource): boolean {
   if (blocklist === null) {
     return false
   }
-  return blocklist.some(blocked =>
-    areSourcesEquivalentForBlocklist(source, blocked),
-  )
+  return blocklist.some(blocked => areSourcesEquivalentForBlocklist(source, blocked))
 }
 
 /**
@@ -579,10 +563,7 @@ export async function detectEmptyMarketplaceReason({
   }
 
   // Check if all configured marketplaces failed to load
-  if (
-    failedMarketplaceCount > 0 &&
-    failedMarketplaceCount === configuredMarketplaceCount
-  ) {
+  if (failedMarketplaceCount > 0 && failedMarketplaceCount === configuredMarketplaceCount) {
     return 'all-marketplaces-failed'
   }
 

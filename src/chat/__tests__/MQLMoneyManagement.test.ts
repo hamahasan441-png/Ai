@@ -17,11 +17,15 @@ describe('MQL Money Management Knowledge', () => {
 
     it('explains MQL5 position sizing', async () => {
       const r = await brain.chat('How to calculate lot size and risk per trade in MQL5?')
-      expect(r.text.toLowerCase()).toMatch(/lot|symbol_volume_min|symbolinfodouble|risk|ordercalcmargin/)
+      expect(r.text.toLowerCase()).toMatch(
+        /lot|symbol_volume_min|symbolinfodouble|risk|ordercalcmargin/,
+      )
     })
 
     it('covers drawdown and equity protection', async () => {
-      const r = await brain.chat('How to implement drawdown control and equity protection in MQL EA?')
+      const r = await brain.chat(
+        'How to implement drawdown control and equity protection in MQL EA?',
+      )
       expect(r.text.toLowerCase()).toMatch(/drawdown|equity|peak|daily\s+loss|protection/)
     })
   })

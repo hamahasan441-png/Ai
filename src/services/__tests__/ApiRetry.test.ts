@@ -256,7 +256,7 @@ describe('CircuitBreaker', () => {
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 150))
+      await new Promise(resolve => setTimeout(resolve, 150))
 
       const result = await breaker.execute(async () => 'recovered')
       expect(result).toBe('recovered')
@@ -275,7 +275,7 @@ describe('CircuitBreaker', () => {
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 150))
+      await new Promise(resolve => setTimeout(resolve, 150))
 
       await breaker.execute(async () => 'ok')
       await breaker.execute(async () => 'ok')
@@ -294,7 +294,7 @@ describe('CircuitBreaker', () => {
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 150))
+      await new Promise(resolve => setTimeout(resolve, 150))
 
       try {
         await breaker.execute(async () => {

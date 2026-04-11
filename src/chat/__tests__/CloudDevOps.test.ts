@@ -13,7 +13,9 @@ describe('Cloud & DevOps Knowledge', () => {
 
   describe('Docker Containerization', () => {
     it('explains Docker container and Dockerfile basics', async () => {
-      const r = await brain.chat('How do Docker containers and Dockerfiles work for containerization?')
+      const r = await brain.chat(
+        'How do Docker containers and Dockerfiles work for containerization?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/docker|container|dockerfile|image|build|run/)
     })
@@ -33,14 +35,18 @@ describe('Cloud & DevOps Knowledge', () => {
 
   describe('Kubernetes Orchestration', () => {
     it('explains Kubernetes pods and deployments', async () => {
-      const r = await brain.chat('How do Kubernetes pods and deployments work for container orchestration?')
+      const r = await brain.chat(
+        'How do Kubernetes pods and deployments work for container orchestration?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/kubernetes|k8s|pod|deployment|container|orchestrat/)
     })
 
     it('describes Kubernetes services and networking', async () => {
       const r = await brain.chat('How do Kubernetes services and ingress handle networking?')
-      expect(r.text.toLowerCase()).toMatch(/service|ingress|clusterip|nodeport|loadbalancer|network/)
+      expect(r.text.toLowerCase()).toMatch(
+        /service|ingress|clusterip|nodeport|loadbalancer|network/,
+      )
     })
 
     it('covers kubectl and Helm usage', async () => {
@@ -53,7 +59,9 @@ describe('Cloud & DevOps Knowledge', () => {
 
   describe('CI/CD Pipelines', () => {
     it('explains CI/CD pipeline concepts', async () => {
-      const r = await brain.chat('What is a CI/CD pipeline for continuous integration and deployment?')
+      const r = await brain.chat(
+        'What is a CI/CD pipeline for continuous integration and deployment?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/ci|cd|pipeline|continuous|integration|deploy/)
     })
@@ -64,7 +72,9 @@ describe('Cloud & DevOps Knowledge', () => {
     })
 
     it('covers deployment strategies', async () => {
-      const r = await brain.chat('What CI/CD pipeline deployment strategies exist like blue-green and canary?')
+      const r = await brain.chat(
+        'What CI/CD pipeline deployment strategies exist like blue-green and canary?',
+      )
       expect(r.text.toLowerCase()).toMatch(/blue-?green|canary|rolling|deploy|strateg|pipeline/)
     })
   })
@@ -73,13 +83,19 @@ describe('Cloud & DevOps Knowledge', () => {
 
   describe('Infrastructure as Code', () => {
     it('explains Terraform IaC fundamentals', async () => {
-      const r = await brain.chat('How does Terraform infrastructure as code provision cloud resources?')
+      const r = await brain.chat(
+        'How does Terraform infrastructure as code provision cloud resources?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/terraform|infrastructure|code|provider|plan|apply|state/)
+      expect(r.text.toLowerCase()).toMatch(
+        /terraform|infrastructure|code|provider|plan|apply|state/,
+      )
     })
 
     it('describes Ansible configuration management', async () => {
-      const r = await brain.chat('How does Ansible playbook configuration management automate infrastructure?')
+      const r = await brain.chat(
+        'How does Ansible playbook configuration management automate infrastructure?',
+      )
       expect(r.text.toLowerCase()).toMatch(/ansible|playbook|agentless|ssh|config|role/)
     })
   })
@@ -118,13 +134,17 @@ describe('Cloud & DevOps Knowledge', () => {
 
   describe('Microservices Architecture', () => {
     it('explains microservices patterns and API gateway', async () => {
-      const r = await brain.chat('How do microservices architecture patterns work with API gateways?')
+      const r = await brain.chat(
+        'How do microservices architecture patterns work with API gateways?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/microservice|api\s*gateway|service|circuit|pattern/)
     })
 
     it('describes service mesh and Istio', async () => {
-      const r = await brain.chat('How does a service mesh like Istio handle microservice communication?')
+      const r = await brain.chat(
+        'How does a service mesh like Istio handle microservice communication?',
+      )
       expect(r.text.toLowerCase()).toMatch(/service\s*mesh|istio|sidecar|envoy|mtls|traffic/)
     })
   })

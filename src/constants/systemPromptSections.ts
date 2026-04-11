@@ -17,10 +17,7 @@ type SystemPromptSection = {
  * Create a memoized system prompt section.
  * Computed once, cached until /clear or /compact.
  */
-export function systemPromptSection(
-  name: string,
-  compute: ComputeFn,
-): SystemPromptSection {
+export function systemPromptSection(name: string, compute: ComputeFn): SystemPromptSection {
   return { name, compute, cacheBreak: false }
 }
 

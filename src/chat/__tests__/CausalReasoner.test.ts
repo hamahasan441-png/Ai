@@ -12,8 +12,20 @@ function makeSimpleGraph(): CausalGraph {
   const nodeA: CausalNode = { id: 'a', label: 'cause a', type: 'cause', properties: {} }
   const nodeB: CausalNode = { id: 'b', label: 'mediator b', type: 'mediator', properties: {} }
   const nodeC: CausalNode = { id: 'c', label: 'effect c', type: 'effect', properties: {} }
-  const edgeAB: CausalEdge = { fromId: 'a', toId: 'b', strength: 0.9, mechanism: 'A causes B', confidence: 0.8 }
-  const edgeBC: CausalEdge = { fromId: 'b', toId: 'c', strength: 0.8, mechanism: 'B causes C', confidence: 0.7 }
+  const edgeAB: CausalEdge = {
+    fromId: 'a',
+    toId: 'b',
+    strength: 0.9,
+    mechanism: 'A causes B',
+    confidence: 0.8,
+  }
+  const edgeBC: CausalEdge = {
+    fromId: 'b',
+    toId: 'c',
+    strength: 0.8,
+    mechanism: 'B causes C',
+    confidence: 0.7,
+  }
   return { nodes: [nodeA, nodeB, nodeC], edges: [edgeAB, edgeBC] }
 }
 
@@ -103,7 +115,9 @@ describe('CausalReasoner buildCausalGraph', () => {
   })
 
   it('parses backward causal indicators like "caused by"', () => {
-    const graph = reasoner.buildCausalGraph(['application crash caused by null pointer dereference'])
+    const graph = reasoner.buildCausalGraph([
+      'application crash caused by null pointer dereference',
+    ])
     expect(graph.edges.length).toBeGreaterThanOrEqual(1)
     const causeNode = graph.nodes.find(n => n.type === 'cause')
     expect(causeNode).toBeDefined()
@@ -298,9 +312,7 @@ describe('CausalReasoner inferCausality', () => {
   })
 
   it('infers causality using the current graph after building it', () => {
-    reasoner.buildCausalGraph([
-      'null pointer dereference causes application crash',
-    ])
+    reasoner.buildCausalGraph(['null pointer dereference causes application crash'])
     const result = reasoner.inferCausality('null pointer dereference', 'application crash')
     expect(result.relationship).toBe('direct')
     expect(result.confidence).toBeGreaterThan(0)
@@ -631,9 +643,7 @@ describe('CausalReasoner serialize / deserialize', () => {
 
   it('deserialized reasoner works correctly', () => {
     const original = new CausalReasoner()
-    original.buildCausalGraph([
-      'null pointer dereference causes application crash',
-    ])
+    original.buildCausalGraph(['null pointer dereference causes application crash'])
 
     const json = original.serialize()
     const restored = CausalReasoner.deserialize(json)

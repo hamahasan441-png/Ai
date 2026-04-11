@@ -37,7 +37,9 @@ describe('PipelineContract', () => {
     })
 
     it('all phases have labels', () => {
-      const phases = Object.values(PipelinePhase).filter((v): v is PipelinePhase => typeof v === 'number')
+      const phases = Object.values(PipelinePhase).filter(
+        (v): v is PipelinePhase => typeof v === 'number',
+      )
       for (const phase of phases) {
         expect(PHASE_LABELS[phase]).toBeDefined()
         expect(typeof PHASE_LABELS[phase]).toBe('string')
@@ -237,11 +239,15 @@ describe('PhaseRunner', () => {
 
   describe('registration', () => {
     it('rejects unknown module names', () => {
-      expect(() => runner.registerFactory('FakeModule', () => ({}))).toThrow('not in MODULE_REGISTRY')
+      expect(() => runner.registerFactory('FakeModule', () => ({}))).toThrow(
+        'not in MODULE_REGISTRY',
+      )
     })
 
     it('accepts valid module names', () => {
-      expect(() => runner.registerFactory('SemanticEngine', () => ({ getStats: () => ({}) }))).not.toThrow()
+      expect(() =>
+        runner.registerFactory('SemanticEngine', () => ({ getStats: () => ({}) })),
+      ).not.toThrow()
     })
   })
 
@@ -265,7 +271,9 @@ describe('PhaseRunner', () => {
       runner.registerFactory('MetaCognition', () => {
         // Simulate some work
         const start = Date.now()
-        while (Date.now() - start < 5) { /* busy wait */ }
+        while (Date.now() - start < 5) {
+          /* busy wait */
+        }
         return { getStats: () => ({}) }
       })
 
@@ -274,7 +282,9 @@ describe('PhaseRunner', () => {
     })
 
     it('handles factory errors gracefully', () => {
-      runner.registerFactory('SemanticEngine', () => { throw new Error('init failed') })
+      runner.registerFactory('SemanticEngine', () => {
+        throw new Error('init failed')
+      })
 
       const report = runner.initializeAll()
       expect(report.failed).toBeGreaterThanOrEqual(1)
@@ -359,7 +369,9 @@ describe('PhaseRunner', () => {
       const module = {
         getStats: () => ({}),
         serialize: () => ({ data: 'test' }),
-        deserialize: (d: unknown) => { deserializedWith = d },
+        deserialize: (d: unknown) => {
+          deserializedWith = d
+        },
       }
       runner.registerFactory('SemanticEngine', () => module)
       runner.initializeAll()

@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  AdaptiveLearner,
-  type Example,
-  type PredictionRecord,
-} from '../AdaptiveLearner'
+import { AdaptiveLearner, type Example, type PredictionRecord } from '../AdaptiveLearner'
 
 // ── Constructor Tests ──
 
@@ -105,7 +101,9 @@ describe('AdaptiveLearner extractFacts', () => {
   })
 
   it('extracts multiple facts from multi-sentence text', () => {
-    const facts = learner.extractFacts('React uses JSX. Angular uses TypeScript. Vue supports templates')
+    const facts = learner.extractFacts(
+      'React uses JSX. Angular uses TypeScript. Vue supports templates',
+    )
     expect(facts.length).toBe(3)
   })
 
@@ -167,9 +165,19 @@ describe('AdaptiveLearner generalize', () => {
   let learner: AdaptiveLearner
 
   const frameworkExamples: Example[] = [
-    { input: 'React', output: 'uses component model', domain: 'frontend', tags: ['framework', 'ui'] },
+    {
+      input: 'React',
+      output: 'uses component model',
+      domain: 'frontend',
+      tags: ['framework', 'ui'],
+    },
     { input: 'Vue', output: 'uses component model', domain: 'frontend', tags: ['framework', 'ui'] },
-    { input: 'Angular', output: 'uses component model', domain: 'frontend', tags: ['framework', 'ui'] },
+    {
+      input: 'Angular',
+      output: 'uses component model',
+      domain: 'frontend',
+      tags: ['framework', 'ui'],
+    },
   ]
 
   beforeEach(() => {
@@ -367,8 +375,20 @@ describe('AdaptiveLearner calibration', () => {
 
   it('returns a CalibrationReport with required fields', () => {
     const predictions: PredictionRecord[] = [
-      { predicted: 'yes', actual: 'yes', confidence: 0.9, domain: 'frontend', timestamp: Date.now() },
-      { predicted: 'no', actual: 'yes', confidence: 0.8, domain: 'frontend', timestamp: Date.now() },
+      {
+        predicted: 'yes',
+        actual: 'yes',
+        confidence: 0.9,
+        domain: 'frontend',
+        timestamp: Date.now(),
+      },
+      {
+        predicted: 'no',
+        actual: 'yes',
+        confidence: 0.8,
+        domain: 'frontend',
+        timestamp: Date.now(),
+      },
     ]
     const report = learner.calibrate(predictions)
     expect(typeof report.brierScore).toBe('number')
@@ -397,8 +417,20 @@ describe('AdaptiveLearner calibration', () => {
 
   it('detects overconfidence when predictions are wrong with high confidence', () => {
     const predictions: PredictionRecord[] = [
-      { predicted: 'wrong', actual: 'right', confidence: 0.95, domain: 'frontend', timestamp: Date.now() },
-      { predicted: 'wrong', actual: 'right2', confidence: 0.9, domain: 'frontend', timestamp: Date.now() },
+      {
+        predicted: 'wrong',
+        actual: 'right',
+        confidence: 0.95,
+        domain: 'frontend',
+        timestamp: Date.now(),
+      },
+      {
+        predicted: 'wrong',
+        actual: 'right2',
+        confidence: 0.9,
+        domain: 'frontend',
+        timestamp: Date.now(),
+      },
     ]
     const report = learner.calibrate(predictions)
     expect(report.overconfidence).toBeGreaterThan(0)
@@ -410,7 +442,13 @@ describe('AdaptiveLearner calibration', () => {
 
   it('getCalibrationAdjustment returns adjustment after calibration', () => {
     const predictions: PredictionRecord[] = [
-      { predicted: 'wrong', actual: 'right', confidence: 0.9, domain: 'frontend', timestamp: Date.now() },
+      {
+        predicted: 'wrong',
+        actual: 'right',
+        confidence: 0.9,
+        domain: 'frontend',
+        timestamp: Date.now(),
+      },
     ]
     learner.calibrate(predictions)
     const adjustment = learner.getCalibrationAdjustment('frontend')

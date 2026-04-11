@@ -171,9 +171,7 @@ export class Logger {
     this._context = config?.context ?? {}
     this._correlationId = config?.correlationId
     this._timestamps = config?.timestamps !== false
-    this._transports = config?.transports ?? [
-      consoleTransport(config?.json ?? isProduction),
-    ]
+    this._transports = config?.transports ?? [consoleTransport(config?.json ?? isProduction)]
 
     if (config?.name) {
       this._context.name = config.name

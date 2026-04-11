@@ -11,15 +11,23 @@ describe('ChaosEngineering', () => {
 
   describe('KB entry tests', () => {
     it('should respond to chaos engineering and tools queries', async () => {
-      const response = await brain.chat('explain chaos engineering fault injection failure testing chaos monkey litmus gremlin toxiproxy gameday exercise disaster recovery')
+      const response = await brain.chat(
+        'explain chaos engineering fault injection failure testing chaos monkey litmus gremlin toxiproxy gameday exercise disaster recovery',
+      )
       expect(response.text.length).toBeGreaterThan(50)
-      expect(response.text.toLowerCase()).toMatch(/chaos|fault\s+injection|chaos\s+monkey|litmus|gremlin|gameday/)
+      expect(response.text.toLowerCase()).toMatch(
+        /chaos|fault\s+injection|chaos\s+monkey|litmus|gremlin|gameday/,
+      )
     })
 
     it('should respond to resilience and steady state queries', async () => {
-      const response = await brain.chat('explain resilience pattern circuit breaker bulkhead retry fallback steady state hypothesis error budget slo sli observability')
+      const response = await brain.chat(
+        'explain resilience pattern circuit breaker bulkhead retry fallback steady state hypothesis error budget slo sli observability',
+      )
       expect(response.text.length).toBeGreaterThan(50)
-      expect(response.text.toLowerCase()).toMatch(/circuit\s+breaker|bulkhead|resilience|steady.state|error\s+budget|slo/)
+      expect(response.text.toLowerCase()).toMatch(
+        /circuit\s+breaker|bulkhead|resilience|steady.state|error\s+budget|slo/,
+      )
     })
   })
 

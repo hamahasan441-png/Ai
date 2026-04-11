@@ -16,21 +16,31 @@ describe('ConcurrencyPatterns', () => {
 
   describe('KB entry tests', () => {
     it('should match actor model and CSP keywords', async () => {
-      const r = await brain.chat('explain actor model akka erlang message passing supervision tree csp channels go channel clojure core async')
+      const r = await brain.chat(
+        'explain actor model akka erlang message passing supervision tree csp channels go channel clojure core async',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/actor|akka|erlang|message\s+passing|csp|channel/)
     })
 
     it('should match lock-free and memory model keywords', async () => {
-      const r = await brain.chat('explain lock free algorithm cas atomic operation aba problem memory model java jmm happens before acquire release')
+      const r = await brain.chat(
+        'explain lock free algorithm cas atomic operation aba problem memory model java jmm happens before acquire release',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/lock.free|cas|compare.and.swap|memory\s+model|happens.before/)
+      expect(r.text.toLowerCase()).toMatch(
+        /lock.free|cas|compare.and.swap|memory\s+model|happens.before/,
+      )
     })
 
     it('should match STM and thread pool keywords', async () => {
-      const r = await brain.chat('explain software transactional memory stm mvcc clojure ref atom thread pool executor fork join work stealing structured concurrency')
+      const r = await brain.chat(
+        'explain software transactional memory stm mvcc clojure ref atom thread pool executor fork join work stealing structured concurrency',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/transactional\s+memory|stm|mvcc|fork.?join|work.stealing|structured\s+concurrency/)
+      expect(r.text.toLowerCase()).toMatch(
+        /transactional\s+memory|stm|mvcc|fork.?join|work.stealing|structured\s+concurrency/,
+      )
     })
   })
 

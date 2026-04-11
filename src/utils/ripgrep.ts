@@ -16,10 +16,7 @@ import { countCharInString } from './stringUtils.js'
 
 const __filename = fileURLToPath(import.meta.url)
 // we use node:path.join instead of node:url.resolve because the former doesn't encode spaces
-const __dirname = path.join(
-  __filename,
-  process.env.NODE_ENV === 'test' ? '../../../' : '../',
-)
+const __dirname = path.join(__filename, process.env.NODE_ENV === 'test' ? '../../../' : '../')
 
 type RipgrepConfig = {
   mode: 'system' | 'builtin' | 'embedded'
@@ -29,9 +26,7 @@ type RipgrepConfig = {
 }
 
 const getRipgrepConfig = memoize((): RipgrepConfig => {
-  const userWantsSystemRipgrep = isEnvDefinedFalsy(
-    process.env.USE_BUILTIN_RIPGREP,
-  )
+  const userWantsSystemRipgrep = isEnvDefinedFalsy(process.env.USE_BUILTIN_RIPGREP)
 
   // Try system ripgrep if user wants it
   if (userWantsSystemRipgrep) {
@@ -85,10 +80,7 @@ const MAX_BUFFER_SIZE = 20_000_000 // 20MB; large monorepos can have 200k+ files
  * ripgrep tries to spawn too many threads.
  */
 function isEagainError(stderr: string): boolean {
-  return (
-    stderr.includes('os error 11') ||
-    stderr.includes('Resource temporarily unavailable')
-  )
+  return stderr.includes('os error 11') || stderr.includes('Resource temporarily unavailable')
 }
 
 /**
@@ -109,11 +101,7 @@ function ripGrepRaw(
   args: string[],
   target: string,
   abortSignal: AbortSignal,
-  callback: (
-    error: ExecFileException | null,
-    stdout: string,
-    stderr: string,
-  ) => void,
+  callback: (error: ExecFileException | null, stdout: string, stderr: string) => void,
   singleThread = false,
 ): ChildProcess {
   // NB: When running interactively, ripgrep does not require a path as its last
@@ -128,8 +116,7 @@ function ripGrepRaw(
   // Allow timeout to be configured via env var (in seconds), otherwise use platform defaults
   // WSL has severe performance penalty for file reads (3-5x slower on WSL2)
   const defaultTimeout = getPlatform() === 'wsl' ? 60_000 : 20_000
-  const parsedSeconds =
-    parseInt(process.env.CLAUDE_CODE_GLOB_TIMEOUT_SECONDS || '', 10) || 0
+  const parsedSeconds = parseInt(process.env.CLAUDE_CODE_GLOB_TIMEOUT_SECONDS || '', 10) || 0
   const timeout = parsedSeconds > 0 ? parsedSeconds * 1000 : defaultTimeout
 
   // For embedded ripgrep, use spawn with argv0 (execFile doesn't support argv0 properly)
@@ -193,9 +180,7 @@ function ripGrepRaw(
         // 0 = matches found, 1 = no matches (both are success)
         callback(null, stdout, stderr)
       } else {
-        const error: ExecFileException = new Error(
-          `ripgrep exited with code ${code}`,
-        )
+        const error: ExecFileException = new Error(`ripgrep exited with code ${code}`)
         error.code = code ?? undefined
         error.signal = signal ?? undefined
         callback(error, stdout, stderr)
@@ -392,9 +377,7 @@ export async function ripGrep(
       // Persisting single-threaded mode globally caused timeouts on large repos
       // where EAGAIN was just a transient startup error.
       if (!isRetry && isEagainError(stderr)) {
-        logForDebugging(
-          `rg EAGAIN error detected, retrying with single-threaded mode (-j 1)`,
-        )
+        logForDebugging(`rg EAGAIN error detected, retrying with single-threaded mode (-j 1)`)
         logEvent('tengu_ripgrep_eagain_retry', {})
         ripGrepRaw(
           args,
@@ -411,11 +394,8 @@ export async function ripGrep(
       // For all other errors, try to return partial results if available
       const hasOutput = stdout && stdout.trim().length > 0
       const isTimeout =
-        error.signal === 'SIGTERM' ||
-        error.signal === 'SIGKILL' ||
-        error.code === 'ABORT_ERR'
-      const isBufferOverflow =
-        error.code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER'
+        error.signal === 'SIGTERM' || error.signal === 'SIGKILL' || error.code === 'ABORT_ERR'
+      const isBufferOverflow = error.code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER'
 
       let lines: string[] = []
       if (hasOutput) {
@@ -517,8 +497,7 @@ export const countFilesRoundedRg = memoize(
   // lodash memoize's default resolver only uses the first argument.
   // ignorePatterns affect the result, so include them in the cache key.
   // abortSignal is intentionally excluded — it doesn't affect the count.
-  (dirPath, _abortSignal, ignorePatterns = []) =>
-    `${dirPath}|${ignorePatterns.join(',')}`,
+  (dirPath, _abortSignal, ignorePatterns = []) => `${dirPath}|${ignorePatterns.join(',')}`,
 )
 
 // Singleton to store ripgrep availability status
@@ -579,17 +558,12 @@ const testRipgrepOnFirstUse = memoize(async (): Promise<void> => {
         stdout,
       }
     } else {
-      test = await execFileNoThrow(
-        config.command,
-        [...config.args, '--version'],
-        {
-          timeout: 5000,
-        },
-      )
+      test = await execFileNoThrow(config.command, [...config.args, '--version'], {
+        timeout: 5000,
+      })
     }
 
-    const working =
-      test.code === 0 && !!test.stdout && test.stdout.startsWith('ripgrep ')
+    const working = test.code === 0 && !!test.stdout && test.stdout.startsWith('ripgrep ')
 
     ripgrepStatus = {
       working,
@@ -653,11 +627,7 @@ async function codesignRipgrepIfNecessary() {
     ])
 
     if (signResult.code !== 0) {
-      logError(
-        new Error(
-          `Failed to sign ripgrep: ${signResult.stdout} ${signResult.stderr}`,
-        ),
-      )
+      logError(new Error(`Failed to sign ripgrep: ${signResult.stdout} ${signResult.stderr}`))
     }
 
     const quarantineResult = await execFileNoThrow('xattr', [

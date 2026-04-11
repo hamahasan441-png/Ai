@@ -20,10 +20,7 @@ import { registerBundledSkill } from '../bundledSkills.js'
 function generateContextsTable(): string {
   return markdownTable(
     ['Context', 'Description'],
-    KEYBINDING_CONTEXTS.map(ctx => [
-      `\`${ctx}\``,
-      KEYBINDING_CONTEXT_DESCRIPTIONS[ctx],
-    ]),
+    KEYBINDING_CONTEXTS.map(ctx => [`\`${ctx}\``, KEYBINDING_CONTEXT_DESCRIPTIONS[ctx]]),
   )
 }
 

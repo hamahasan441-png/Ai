@@ -24,7 +24,9 @@ describe('Network Security Python Knowledge (Black Hat Python 3)', () => {
     })
 
     it('explains Python TCP proxy for traffic interception', async () => {
-      const r = await brain.chat('How to build a Python TCP proxy for network traffic interception?')
+      const r = await brain.chat(
+        'How to build a Python TCP proxy for network traffic interception?',
+      )
       expect(r.text.toLowerCase()).toMatch(/proxy|intercept|forward|relay|hexdump/)
     })
 
@@ -89,7 +91,9 @@ describe('Network Security Python Knowledge (Black Hat Python 3)', () => {
     })
 
     it('covers image carving from network traffic', async () => {
-      const r = await brain.chat('How does Python image carving from network traffic work with OpenCV?')
+      const r = await brain.chat(
+        'How does Python image carving from network traffic work with OpenCV?',
+      )
       expect(r.text.toLowerCase()).toMatch(/image|carv|http|opencv|face|detect/)
     })
   })
@@ -159,7 +163,9 @@ describe('Network Security Python Knowledge (Black Hat Python 3)', () => {
     })
 
     it('covers virtual machine detection', async () => {
-      const r = await brain.chat('How to detect virtual machine environments in Python for sandbox evasion?')
+      const r = await brain.chat(
+        'How to detect virtual machine environments in Python for sandbox evasion?',
+      )
       expect(r.text.toLowerCase()).toMatch(/sandbox|detect|virtual|vm|registry|hardware/)
     })
   })
@@ -168,14 +174,18 @@ describe('Network Security Python Knowledge (Black Hat Python 3)', () => {
 
   describe('Data Exfiltration', () => {
     it('explains Python credential exfiltration with encryption', async () => {
-      const r = await brain.chat('How does Python credential exfiltration with data encryption work?')
+      const r = await brain.chat(
+        'How does Python credential exfiltration with data encryption work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/exfiltrat|credential|encrypt|aes|browser|data/)
     })
 
     it('describes man-in-the-browser attack in Python', async () => {
       const r = await brain.chat('How does a Python man in the browser attack work?')
-      expect(r.text.toLowerCase()).toMatch(/man.in.the.browser|mitb|browser|inject|intercept|credential/)
+      expect(r.text.toLowerCase()).toMatch(
+        /man.in.the.browser|mitb|browser|inject|intercept|credential/,
+      )
     })
   })
 
@@ -183,7 +193,9 @@ describe('Network Security Python Knowledge (Black Hat Python 3)', () => {
 
   describe('Process and File Monitoring', () => {
     it('explains Python WMI process monitoring', async () => {
-      const r = await brain.chat('How to monitor Windows processes with Python WMI process tracking?')
+      const r = await brain.chat(
+        'How to monitor Windows processes with Python WMI process tracking?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/process|monitor|wmi|win32|creation|pid/)
     })
@@ -205,7 +217,9 @@ describe('Network Security Python Knowledge (Black Hat Python 3)', () => {
 
     it('describes DLL injection with Python ctypes', async () => {
       const r = await brain.chat('How to perform DLL injection using Python ctypes?')
-      expect(r.text.toLowerCase()).toMatch(/dll|inject|ctypes|loadlibrary|createremotethread|process/)
+      expect(r.text.toLowerCase()).toMatch(
+        /dll|inject|ctypes|loadlibrary|createremotethread|process/,
+      )
     })
   })
 
@@ -213,13 +227,17 @@ describe('Network Security Python Knowledge (Black Hat Python 3)', () => {
 
   describe('Binary Protocol Handling', () => {
     it('explains Python struct for binary network protocols', async () => {
-      const r = await brain.chat('How to use Python struct for binary protocol parsing in network programming?')
+      const r = await brain.chat(
+        'How to use Python struct for binary protocol parsing in network programming?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/struct|pack|unpack|binary|byte|header/)
     })
 
     it('describes ctypes for network programming', async () => {
-      const r = await brain.chat('How to use Python ctypes for network programming with binary data?')
+      const r = await brain.chat(
+        'How to use Python ctypes for network programming with binary data?',
+      )
       expect(r.text.toLowerCase()).toMatch(/ctypes|struct|binary|_fields_|buffer|parse/)
     })
   })
@@ -234,7 +252,9 @@ describe('Network Security Python Knowledge (Black Hat Python 3)', () => {
     })
 
     it('covers select-based I/O multiplexing', async () => {
-      const r = await brain.chat('How does concurrent socket programming work in Python with select?')
+      const r = await brain.chat(
+        'How does concurrent socket programming work in Python with select?',
+      )
       expect(r.text.toLowerCase()).toMatch(/thread|select|concurrent|socket|queue|timeout/)
     })
   })
@@ -249,7 +269,9 @@ describe('Network Security Python Knowledge (Black Hat Python 3)', () => {
     })
 
     it('describes penetration testing with Python tools', async () => {
-      const r = await brain.chat('What Python tools are used for penetration testing and offensive security?')
+      const r = await brain.chat(
+        'What Python tools are used for penetration testing and offensive security?',
+      )
       expect(r.text.toLowerCase()).toMatch(/python|penetration|security|tool|socket|exploit|post/)
     })
   })

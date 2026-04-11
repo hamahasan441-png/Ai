@@ -107,9 +107,7 @@ export function useLogMessages(messages: Message[], ignore: boolean = false) {
       // pointing at a message that never reached disk. Pass full messages as
       // replId context — REPL tool_use and its tool_result land in separate
       // render cycles, so the slice alone can't pair them.
-      const last = cleanMessagesForLogging(slice, messages).findLast(
-        isChainParticipant,
-      )
+      const last = cleanMessagesForLogging(slice, messages).findLast(isChainParticipant)
       if (last) lastParentUuidRef.current = last.uuid as UUID
     }
 

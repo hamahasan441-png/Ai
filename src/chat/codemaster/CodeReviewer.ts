@@ -75,7 +75,7 @@ const REVIEW_RULES: ReviewRule[] = [
     severity: 'medium',
     pattern: /async\s+(?:function\s+\w+|\w+)\s*\([^)]*\)\s*(?::\s*\w+)?\s*\{(?:(?!await)[\s\S])*\}/,
     description: 'Async function that never uses await — may be unintentional.',
-    suggestion: 'If the function doesn\'t need to be async, remove the async keyword.',
+    suggestion: "If the function doesn't need to be async, remove the async keyword.",
     languages: ['typescript', 'javascript'],
   },
   // ── Performance ──
@@ -199,11 +199,7 @@ export class CodeReviewer {
    * @param language The programming language (auto-detected if not provided).
    * @param focus Review categories to focus on (all if not provided).
    */
-  review(
-    code: string,
-    language?: AnalysisLanguage,
-    focus?: ReviewCategory[],
-  ): CodeReviewOutput {
+  review(code: string, language?: AnalysisLanguage, focus?: ReviewCategory[]): CodeReviewOutput {
     // Step 1: Run structural analysis
     const analysis = this.analyzer.analyze(code, language)
     const lang = analysis.language
@@ -224,7 +220,9 @@ export class CodeReviewer {
         line: issue.line,
         title: `Security: ${issue.type}`,
         description: issue.description,
-        suggestion: issue.cwe ? `See ${issue.cwe} for remediation guidance.` : 'Review and fix the security issue.',
+        suggestion: issue.cwe
+          ? `See ${issue.cwe} for remediation guidance.`
+          : 'Review and fix the security issue.',
         fixAvailable: false,
         autoFixable: false,
         id: nextId(),
@@ -292,7 +290,11 @@ export class CodeReviewer {
 
     // Step 6: Sort by severity
     const severityOrder: Record<Severity, number> = {
-      critical: 0, high: 1, medium: 2, low: 3, info: 4,
+      critical: 0,
+      high: 1,
+      medium: 2,
+      low: 3,
+      info: 4,
     }
     deduped.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity])
 
@@ -360,12 +362,12 @@ export class CodeReviewer {
   private mapAntiPatternCategory(category: string): ReviewCategory {
     const mapping: Record<string, ReviewCategory> = {
       'type-safety': 'bug',
-      'readability': 'style',
+      readability: 'style',
       'best-practice': 'best-practice',
       'error-handling': 'bug',
       'bug-prone': 'bug',
-      'architecture': 'architecture',
-      'maintenance': 'best-practice',
+      architecture: 'architecture',
+      maintenance: 'best-practice',
     }
     return mapping[category] ?? 'style'
   }
@@ -395,7 +397,11 @@ export class CodeReviewer {
 
     // Additional penalties from review rules
     const penaltyMap: Record<Severity, number> = {
-      critical: 12, high: 8, medium: 4, low: 2, info: 0,
+      critical: 12,
+      high: 8,
+      medium: 4,
+      low: 2,
+      info: 0,
     }
 
     for (const f of findings) {

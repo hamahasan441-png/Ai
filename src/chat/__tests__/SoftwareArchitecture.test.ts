@@ -5,7 +5,9 @@ import { createProgrammingKnowledgeGraph } from '../SemanticMemory'
 describe('Software Architecture Patterns Knowledge', () => {
   let brain: LocalBrain
 
-  beforeAll(() => { brain = new LocalBrain({ enableIntelligence: true }) })
+  beforeAll(() => {
+    brain = new LocalBrain({ enableIntelligence: true })
+  })
 
   // ── KB entry tests ──────────────────────────────────────────────────
   it('knows about microservices architecture decomposition', async () => {
@@ -21,25 +23,33 @@ describe('Software Architecture Patterns Knowledge', () => {
   })
 
   it('knows about CQRS and event sourcing', async () => {
-    const r = await brain.chat('explain cqrs command query responsibility segregation event sourcing')
+    const r = await brain.chat(
+      'explain cqrs command query responsibility segregation event sourcing',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/cqrs|event\s+sourc|command|query|aggregate/)
   })
 
   it('knows about domain driven design DDD', async () => {
-    const r = await brain.chat('explain domain driven design aggregate entity value object bounded context')
+    const r = await brain.chat(
+      'explain domain driven design aggregate entity value object bounded context',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/domain|aggregate|entity|value\s+object|bounded/)
   })
 
   it('knows about modular monolith and SOA', async () => {
-    const r = await brain.chat('explain modular monolith module boundary cohesion service oriented architecture')
+    const r = await brain.chat(
+      'explain modular monolith module boundary cohesion service oriented architecture',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/modul|monolith|soa|serverless|boundary/)
   })
 
   it('knows about architecture decision records ADR', async () => {
-    const r = await brain.chat('explain architecture decision record adr documentation fitness function governance')
+    const r = await brain.chat(
+      'explain architecture decision record adr documentation fitness function governance',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/adr|decision|fitness|governance|architect/)
   })

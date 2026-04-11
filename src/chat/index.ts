@@ -153,7 +153,14 @@ export type {
 // ══════════════════════════════════════════════════════════════════════════════
 // AI TOOLKIT BRIDGE — Diffusion model image/video generation (src/chat/AIToolkitBridge.ts)
 // ══════════════════════════════════════════════════════════════════════════════
-export { AIToolkitBridge, SUPPORTED_MODELS, quickImageConfig, quickLoRAConfig, listModels, recommendModel } from './AIToolkitBridge.js'
+export {
+  AIToolkitBridge,
+  SUPPORTED_MODELS,
+  quickImageConfig,
+  quickLoRAConfig,
+  listModels,
+  recommendModel,
+} from './AIToolkitBridge.js'
 
 export type {
   ImageModel,
@@ -1054,25 +1061,52 @@ export type {
 // ── All Types ──
 export type {
   // Messages
-  ChatMessageId, ChatMessage, ChatRole, ContentBlock, ContentBlockType, TokenUsage,
+  ChatMessageId,
+  ChatMessage,
+  ChatRole,
+  ContentBlock,
+  ContentBlockType,
+  TokenUsage,
   // Conversation
-  Branch, BranchId, Conversation, ConversationMetadata,
+  Branch,
+  BranchId,
+  Conversation,
+  ConversationMetadata,
   // Search
-  SearchMode, ChatSearchOptions, ChatSearchResult, SearchHighlight,
+  SearchMode,
+  ChatSearchOptions,
+  ChatSearchResult,
+  SearchHighlight,
   // Analytics
-  ConversationAnalytics, ModelUsageBreakdown, CodeStats, ImageStats,
+  ConversationAnalytics,
+  ModelUsageBreakdown,
+  CodeStats,
+  ImageStats,
   // Export
-  ExportFormat, ExportOptions,
+  ExportFormat,
+  ExportOptions,
   // Context Window
-  MessagePriority, ContextWindowConfig, ContextWindowResult,
+  MessagePriority,
+  ContextWindowConfig,
+  ContextWindowResult,
   // Code Writer
-  ProgrammingLanguage, CodeRequest, CodeResult, CodeReviewRequest, CodeReviewResult, CodeIssue,
+  ProgrammingLanguage,
+  CodeRequest,
+  CodeResult,
+  CodeReviewRequest,
+  CodeReviewResult,
+  CodeIssue,
   // Image Analyzer
-  ImageAnalysisRequest, ImageAnalysisResult,
+  ImageAnalysisRequest,
+  ImageAnalysisResult,
   // AI Brain
-  AiBrainConfig, ApiMessage, ApiContentBlock, BrainInterface,
+  AiBrainConfig,
+  ApiMessage,
+  ApiContentBlock,
+  BrainInterface,
   // Document Analysis (lightweight types from BrainInterface)
-  DocumentAnalysisInput, DocumentAnalysisOutput,
+  DocumentAnalysisInput,
+  DocumentAnalysisOutput,
 } from './types.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1116,10 +1150,7 @@ export {
   ErrorAggregator,
 } from './pipeline/ErrorTaxonomy.js'
 
-export type {
-  EngineError,
-  RetryConfig,
-} from './pipeline/ErrorTaxonomy.js'
+export type { EngineError, RetryConfig } from './pipeline/ErrorTaxonomy.js'
 
 // ── Replay Engine — Deterministic replay for debugging ──
 export {
@@ -1140,11 +1171,7 @@ export type {
 // ── Prompt Registry — Versioned prompt templates & model configs ──
 export { PromptRegistry } from './pipeline/PromptRegistry.js'
 
-export type {
-  PromptTemplate,
-  ModelConfig,
-  RenderedPrompt,
-} from './pipeline/PromptRegistry.js'
+export type { PromptTemplate, ModelConfig, RenderedPrompt } from './pipeline/PromptRegistry.js'
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SCORING — Centralized scoring engine with normalized formulas
@@ -1213,12 +1240,7 @@ export type {
 // ══════════════════════════════════════════════════════════════════════════════
 // BRAIN CONTRACT — Input → Think → Tool → Verify → Output schema
 // ══════════════════════════════════════════════════════════════════════════════
-export {
-  BrainStep,
-  BRAIN_STEP_ORDER,
-  TraceBuilder,
-  validateTrace,
-} from './BrainContract.js'
+export { BrainStep, BRAIN_STEP_ORDER, TraceBuilder, validateTrace } from './BrainContract.js'
 
 export type {
   InputStepData,
@@ -1235,11 +1257,7 @@ export type {
 // ══════════════════════════════════════════════════════════════════════════════
 // BRAIN EVAL HARNESS — Objective evaluation tests for quality
 // ══════════════════════════════════════════════════════════════════════════════
-export {
-  BrainEvalHarness,
-  GOLDEN_CASES,
-  DEFAULT_EVAL_CONFIG,
-} from './BrainEvalHarness.js'
+export { BrainEvalHarness, GOLDEN_CASES, DEFAULT_EVAL_CONFIG } from './BrainEvalHarness.js'
 
 export type {
   EvalCase,
@@ -1289,7 +1307,12 @@ export type {
 // ══════════════════════════════════════════════════════════════════════════════
 // DOCUMENT ANALYZER — Deep offline document understanding (Phase 11)
 // ══════════════════════════════════════════════════════════════════════════════
-export { DocumentAnalyzer, DEFAULT_DOC_ANALYZER_CONFIG, isRawPdfContent, extractPdfText } from './DocumentAnalyzer.js'
+export {
+  DocumentAnalyzer,
+  DEFAULT_DOC_ANALYZER_CONFIG,
+  isRawPdfContent,
+  extractPdfText,
+} from './DocumentAnalyzer.js'
 
 export type {
   DocumentAnalysisRequest,
@@ -1316,7 +1339,14 @@ export type {
 
 // ── NLP Utilities (shared) ──
 
-export { STOP_WORDS, POSITIVE_WORDS, NEGATIVE_WORDS, TECHNICAL_WORDS, splitSentences, tokenize } from './nlpUtils.js'
+export {
+  STOP_WORDS,
+  POSITIVE_WORDS,
+  NEGATIVE_WORDS,
+  TECHNICAL_WORDS,
+  splitSentences,
+  tokenize,
+} from './nlpUtils.js'
 
 // ── PdfExpert (Phase 12 — Document-Grounded Q&A) ──
 
@@ -1338,24 +1368,20 @@ export type {
 
 export { TokenBudgetManager, DEFAULT_BUDGET_CONFIG } from './TokenBudgetManager.js'
 
-export type {
-  TokenBudgetConfig,
-  BudgetReport,
-  InteractionUsage,
-} from './TokenBudgetManager.js'
+export type { TokenBudgetConfig, BudgetReport, InteractionUsage } from './TokenBudgetManager.js'
 
 // ── Kurdish Translation Corpus (CKB-ENG Parallel Data) ──
 
 export { KurdishTranslationCorpus } from './KurdishTranslationCorpus.js'
 
-export type {
-  TranslationPair,
-  TranslationCategory,
-} from './KurdishTranslationCorpus.js'
+export type { TranslationPair, TranslationCategory } from './KurdishTranslationCorpus.js'
 
 // ── Kurdish Morphological Analyzer (Kurdish NLP) ──
 
-export { KurdishMorphologicalAnalyzer, DEFAULT_ANALYZER_CONFIG } from './KurdishMorphologicalAnalyzer.js'
+export {
+  KurdishMorphologicalAnalyzer,
+  DEFAULT_ANALYZER_CONFIG,
+} from './KurdishMorphologicalAnalyzer.js'
 
 export type {
   MorphemeAnalysis,
@@ -1426,7 +1452,10 @@ export type {
 
 // ── Cyber Threat Intelligence (APT tracking, MITRE ATT&CK, IOC, C2, malware) ──
 
-export { CyberThreatIntelligence, DEFAULT_CYBER_THREAT_INTEL_CONFIG } from './CyberThreatIntelligence.js'
+export {
+  CyberThreatIntelligence,
+  DEFAULT_CYBER_THREAT_INTEL_CONFIG,
+} from './CyberThreatIntelligence.js'
 
 export type {
   CyberThreatIntelConfig,
@@ -1591,7 +1620,10 @@ export type {
 } from './ToolReasoningEngine.js'
 
 // ── Fact Verification Engine — Claim verification & source reliability ──
-export { FactVerificationEngine, DEFAULT_FACT_VERIFICATION_CONFIG } from './FactVerificationEngine.js'
+export {
+  FactVerificationEngine,
+  DEFAULT_FACT_VERIFICATION_CONFIG,
+} from './FactVerificationEngine.js'
 
 export type {
   Claim,
@@ -1791,7 +1823,10 @@ export type {
 } from './AnalyticalReasoner.js'
 
 // ── ProblemDecomposer — Complex problem breakdown & solution synthesis ──
-export { ProblemDecomposer as ChatProblemDecomposer, DEFAULT_PROBLEM_DECOMPOSER_CONFIG } from './ProblemDecomposer.js'
+export {
+  ProblemDecomposer as ChatProblemDecomposer,
+  DEFAULT_PROBLEM_DECOMPOSER_CONFIG,
+} from './ProblemDecomposer.js'
 
 export type {
   ProblemType,
@@ -1978,10 +2013,7 @@ export {
 } from './ContextualMemoryEngine.js'
 
 // ── Conversation Summarizer — Conversation summarization ─────────────────────
-export {
-  ConversationSummarizer,
-  type ConversationSummary,
-} from './ConversationSummarizer.js'
+export { ConversationSummarizer, type ConversationSummary } from './ConversationSummarizer.js'
 
 // ── Coreference Resolver — Entity mention and coreference resolution ─────────
 export {
@@ -2009,10 +2041,7 @@ export {
 } from './CreativeProblemSolver.js'
 
 // ── Cross-Domain Transfer — Cross-domain knowledge transfer ──────────────────
-export {
-  CrossDomainTransfer,
-  type CrossDomainResult,
-} from './CrossDomainTransfer.js'
+export { CrossDomainTransfer, type CrossDomainResult } from './CrossDomainTransfer.js'
 
 // ── Dialogue Act Recognizer — Dialogue act classification ────────────────────
 export {
@@ -2032,10 +2061,7 @@ export {
 } from './EmotionalIntelligence.js'
 
 // ── Language Detector — Language detection and identification ─────────────────
-export {
-  LanguageDetector,
-  type LanguageDetectionResult,
-} from './LanguageDetector.js'
+export { LanguageDetector, type LanguageDetectionResult } from './LanguageDetector.js'
 
 // ── Logical Proof Engine — Formal logic, syllogisms, fallacy detection ───────
 export {
@@ -2157,13 +2183,21 @@ export {
 export { ModelSpark, DEFAULT_MODEL_SPARK_CONFIG } from './ModelSpark.js'
 
 // ── Spark Unified Orchestration — Brain + Agent + LLM working together ──
-export { SparkBrainConnector, SparkAgent, UnifiedOrchestrator, DEFAULT_AGENT_CONFIG } from './ModelSpark.js'
+export {
+  SparkBrainConnector,
+  SparkAgent,
+  UnifiedOrchestrator,
+  DEFAULT_AGENT_CONFIG,
+} from './ModelSpark.js'
 
 // ── Spark Search Engine + Memory + Circuit Breaker + Adaptive Selection + Parallel + Dynamic Planning ──
 export {
-  SparkSearchEngine, DEFAULT_SEARCH_CONFIG,
-  MemoryManager, DEFAULT_MEMORY_CONFIG,
-  ToolCircuitBreaker, DEFAULT_CIRCUIT_BREAKER_CONFIG,
+  SparkSearchEngine,
+  DEFAULT_SEARCH_CONFIG,
+  MemoryManager,
+  DEFAULT_MEMORY_CONFIG,
+  ToolCircuitBreaker,
+  DEFAULT_CIRCUIT_BREAKER_CONFIG,
   AdaptiveToolSelector,
   ParallelExecutor,
   DynamicPlanner,

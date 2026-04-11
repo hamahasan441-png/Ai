@@ -637,7 +637,10 @@ describe('PdfExpert', () => {
     })
 
     it('handles document with only a title', () => {
-      const id = expert.loadDocument('# Just a Title\n\nSingle paragraph content here.', 'minimal.md')
+      const id = expert.loadDocument(
+        '# Just a Title\n\nSingle paragraph content here.',
+        'minimal.md',
+      )
       expect(id).toBeTruthy()
     })
   })

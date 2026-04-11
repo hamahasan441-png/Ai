@@ -115,9 +115,7 @@ class TasksV2Store {
     // Task list ID can change mid-session (TeamCreateTool sets
     // leaderTeamName) — point the watcher at the current dir.
     this.#rewatch(getTasksDir(taskListId))
-    const current = (await listTasks(taskListId)).filter(
-      t => !t.metadata?._internal,
-    )
+    const current = (await listTasks(taskListId)).filter(t => !t.metadata?._internal)
     this.#tasks = current
 
     const hasIncomplete = current.some(t => t.status !== 'completed')
@@ -128,10 +126,7 @@ class TasksV2Store {
       this.#clearHideTimer()
     } else if (this.#hideTimer === null && !this.#hidden) {
       // All tasks just became completed — schedule clear
-      this.#hideTimer = setTimeout(
-        this.#onHideTimerFired.bind(this, taskListId),
-        HIDE_DELAY_MS,
-      )
+      this.#hideTimer = setTimeout(this.#onHideTimerFired.bind(this, taskListId), HIDE_DELAY_MS)
       this.#hideTimer.unref()
     }
 
@@ -160,8 +155,7 @@ class TasksV2Store {
     // Verify all tasks are still completed before clearing
     void listTasks(currentId).then(async tasksToCheck => {
       const allStillCompleted =
-        tasksToCheck.length > 0 &&
-        tasksToCheck.every(t => t.status === 'completed')
+        tasksToCheck.length > 0 && tasksToCheck.every(t => t.status === 'completed')
       if (allStillCompleted) {
         await resetTaskList(currentId)
         this.#tasks = []

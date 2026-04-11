@@ -5,28 +5,40 @@ import { createProgrammingKnowledgeGraph } from '../SemanticMemory'
 describe('Observability / Monitoring Knowledge', () => {
   let brain: LocalBrain
 
-  beforeAll(() => { brain = new LocalBrain({ enableIntelligence: true }) })
+  beforeAll(() => {
+    brain = new LocalBrain({ enableIntelligence: true })
+  })
 
   it('knows about Prometheus and Grafana', async () => {
-    const r = await brain.chat('explain prometheus metrics scraping alertmanager grafana dashboard time series promql')
+    const r = await brain.chat(
+      'explain prometheus metrics scraping alertmanager grafana dashboard time series promql',
+    )
     expect(r.text.length).toBeGreaterThan(50)
-    expect(r.text.toLowerCase()).toMatch(/prometheus|grafana|metric|alertmanager|promql|time.series/)
+    expect(r.text.toLowerCase()).toMatch(
+      /prometheus|grafana|metric|alertmanager|promql|time.series/,
+    )
   })
 
   it('knows about distributed tracing', async () => {
-    const r = await brain.chat('explain opentelemetry otlp traces spans distributed tracing jaeger zipkin instrumentation')
+    const r = await brain.chat(
+      'explain opentelemetry otlp traces spans distributed tracing jaeger zipkin instrumentation',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/opentelemetry|trace|span|jaeger|zipkin|instrumentation/)
   })
 
   it('knows about log aggregation', async () => {
-    const r = await brain.chat('explain log aggregation elk elasticsearch loki fluentd structured logging datadog apm')
+    const r = await brain.chat(
+      'explain log aggregation elk elasticsearch loki fluentd structured logging datadog apm',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/log|elk|elasticsearch|loki|structured|datadog|apm/)
   })
 
   it('knows about monitoring patterns', async () => {
-    const r = await brain.chat('explain synthetic monitoring uptime health check real user monitoring rum pagerduty alert')
+    const r = await brain.chat(
+      'explain synthetic monitoring uptime health check real user monitoring rum pagerduty alert',
+    )
     expect(r.text.length).toBeGreaterThan(50)
     expect(r.text.toLowerCase()).toMatch(/synthetic|monitoring|health|rum|pagerduty|alert|uptime/)
   })

@@ -26,9 +26,7 @@ export function useMainLoopModel(): ModelName {
   useEffect(() => onGrowthBookRefresh(forceRerender), [])
 
   const model = parseUserSpecifiedModel(
-    mainLoopModelForSession ??
-      mainLoopModel ??
-      getDefaultMainLoopModelSetting(),
+    mainLoopModelForSession ?? mainLoopModel ?? getDefaultMainLoopModelSetting(),
   )
   return model
 }

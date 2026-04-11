@@ -108,9 +108,7 @@ export function getAgentName(): string | undefined {
  *
  * @param teamContext - Optional team context from AppState (for leaders)
  */
-export function getTeamName(teamContext?: {
-  teamName: string
-}): string | undefined {
+export function getTeamName(teamContext?: { teamName: string }): string | undefined {
   const inProcessCtx = getTeammateContext()
   if (inProcessCtx) return inProcessCtx.teamName
   if (dynamicTeamContext?.teamName) return dynamicTeamContext.teamName
@@ -219,11 +217,7 @@ export function hasActiveInProcessTeammates(appState: AppState): boolean {
  */
 export function hasWorkingInProcessTeammates(appState: AppState): boolean {
   for (const task of Object.values(appState.tasks)) {
-    if (
-      task.type === 'in_process_teammate' &&
-      task.status === 'running' &&
-      !task.isIdle
-    ) {
+    if (task.type === 'in_process_teammate' && task.status === 'running' && !task.isIdle) {
       return true
     }
   }
@@ -242,11 +236,7 @@ export function waitForTeammatesToBecomeIdle(
   const workingTaskIds: string[] = []
 
   for (const [taskId, task] of Object.entries(appState.tasks)) {
-    if (
-      task.type === 'in_process_teammate' &&
-      task.status === 'running' &&
-      !task.isIdle
-    ) {
+    if (task.type === 'in_process_teammate' && task.status === 'running' && !task.isIdle) {
       workingTaskIds.push(taskId)
     }
   }

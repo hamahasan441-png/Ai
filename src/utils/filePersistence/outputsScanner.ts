@@ -30,9 +30,7 @@ export function getEnvironmentKind(): EnvironmentKind | null {
   return null
 }
 
-function hasParentPath(
-  entry: object,
-): entry is { parentPath: string; name: string } {
+function hasParentPath(entry: object): entry is { parentPath: string; name: string } {
   return 'parentPath' in entry && typeof entry.parentPath === 'string'
 }
 

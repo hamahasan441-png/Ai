@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  PatternRecognizer,
-  type DataPattern,
-} from '../PatternRecognizer'
+import { PatternRecognizer, type DataPattern } from '../PatternRecognizer'
 
 // ── Helper ──
 
@@ -84,7 +81,7 @@ describe('PatternRecognizer analyzeNumeric', () => {
   })
 
   it('handles periodic data', () => {
-    const data = Array.from({ length: 30 }, (_, i) => Math.sin(i * Math.PI / 5))
+    const data = Array.from({ length: 30 }, (_, i) => Math.sin((i * Math.PI) / 5))
     const result = pr.analyzeNumeric(data)
     expect(result).toBeDefined()
     expect(result.patterns).toBeInstanceOf(Array)
@@ -353,7 +350,7 @@ describe('PatternRecognizer detectAnomalies', () => {
     const anomalies = pr.detectAnomalies(data)
     for (let i = 1; i < anomalies.length; i++) {
       expect(Math.abs(anomalies[i - 1].deviation)).toBeGreaterThanOrEqual(
-        Math.abs(anomalies[i].deviation)
+        Math.abs(anomalies[i].deviation),
       )
     }
   })
@@ -427,9 +424,15 @@ describe('PatternRecognizer clusterData', () => {
 
   it('clusters clearly separated groups', () => {
     const points = [
-      [0, 0], [1, 0], [0, 1],
-      [10, 10], [11, 10], [10, 11],
-      [20, 20], [21, 20], [20, 21],
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [10, 10],
+      [11, 10],
+      [10, 11],
+      [20, 20],
+      [21, 20],
+      [20, 21],
     ]
     const clusters = pr.clusterData(points)
     expect(clusters.length).toBeGreaterThanOrEqual(2)
@@ -447,12 +450,20 @@ describe('PatternRecognizer clusterData', () => {
   })
 
   it('handles two points', () => {
-    const clusters = pr.clusterData([[0, 0], [10, 10]])
+    const clusters = pr.clusterData([
+      [0, 0],
+      [10, 10],
+    ])
     expect(clusters.length).toBeGreaterThanOrEqual(1)
   })
 
   it('cluster has required fields', () => {
-    const clusters = pr.clusterData([[1, 2], [3, 4], [5, 6], [100, 100]])
+    const clusters = pr.clusterData([
+      [1, 2],
+      [3, 4],
+      [5, 6],
+      [100, 100],
+    ])
     for (const c of clusters) {
       expect(c).toHaveProperty('id')
       expect(c).toHaveProperty('centroid')
@@ -463,10 +474,7 @@ describe('PatternRecognizer clusterData', () => {
   })
 
   it('handles many overlapping points', () => {
-    const points = Array.from({ length: 50 }, () => [
-      Math.random() * 2,
-      Math.random() * 2,
-    ])
+    const points = Array.from({ length: 50 }, () => [Math.random() * 2, Math.random() * 2])
     const clusters = pr.clusterData(points)
     expect(clusters.length).toBeGreaterThanOrEqual(1)
     const totalMembers = clusters.reduce((s, c) => s + c.size, 0)

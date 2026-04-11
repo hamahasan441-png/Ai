@@ -108,9 +108,7 @@ async function retryWithBackoff<T>(
     }
 
     lastError = result.error || `${operation} failed`
-    logDebug(
-      `${operation} attempt ${attempt}/${MAX_RETRIES} failed: ${lastError}`,
-    )
+    logDebug(`${operation} attempt ${attempt}/${MAX_RETRIES} failed: ${lastError}`)
 
     if (attempt < MAX_RETRIES) {
       const delayMs = BASE_DELAY_MS * Math.pow(2, attempt - 1)
@@ -129,10 +127,7 @@ async function retryWithBackoff<T>(
  * @param config - Files API configuration
  * @returns The file content as a Buffer
  */
-export async function downloadFile(
-  fileId: string,
-  config: FilesApiConfig,
-): Promise<Buffer> {
+export async function downloadFile(fileId: string, config: FilesApiConfig): Promise<Buffer> {
   const baseUrl = config.baseUrl || getDefaultApiBaseUrl()
   const url = `${baseUrl}/v1/files/${fileId}/content`
 
@@ -191,9 +186,7 @@ export function buildDownloadPath(
 ): string | null {
   const normalized = path.normalize(relativePath)
   if (normalized.startsWith('..')) {
-    logDebugError(
-      `Invalid file path: ${relativePath}. Path must not traverse above workspace`,
-    )
+    logDebugError(`Invalid file path: ${relativePath}. Path must not traverse above workspace`)
     return null
   }
 
@@ -203,9 +196,7 @@ export function buildDownloadPath(
     path.sep + 'uploads' + path.sep,
   ]
   const matchedPrefix = redundantPrefixes.find(p => normalized.startsWith(p))
-  const cleanPath = matchedPrefix
-    ? normalized.slice(matchedPrefix.length)
-    : normalized
+  const cleanPath = matchedPrefix ? normalized.slice(matchedPrefix.length) : normalized
   return path.join(uploadsBase, cleanPath)
 }
 
@@ -323,9 +314,7 @@ export async function downloadSessionFiles(
     return []
   }
 
-  logDebug(
-    `Downloading ${files.length} file(s) for session ${config.sessionId}`,
-  )
+  logDebug(`Downloading ${files.length} file(s) for session ${config.sessionId}`)
   const startTime = Date.now()
 
   // Download files in parallel with concurrency limit
@@ -337,9 +326,7 @@ export async function downloadSessionFiles(
 
   const elapsedMs = Date.now() - startTime
   const successCount = count(results, r => r.success)
-  logDebug(
-    `Downloaded ${successCount}/${files.length} file(s) in ${elapsedMs}ms`,
-  )
+  logDebug(`Downloaded ${successCount}/${files.length} file(s) in ${elapsedMs}ms`)
 
   return results
 }
@@ -398,8 +385,7 @@ export async function uploadFile(
     content = await fs.readFile(filePath)
   } catch (error) {
     logEvent('tengu_file_upload_failed', {
-      error_type:
-        'file_read' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_type: 'file_read' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
     return {
       path: relativePath,
@@ -412,8 +398,7 @@ export async function uploadFile(
 
   if (fileSize > MAX_FILE_SIZE_BYTES) {
     logEvent('tengu_file_upload_failed', {
-      error_type:
-        'file_too_large' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_type: 'file_too_large' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
     return {
       path: relativePath,
@@ -491,26 +476,21 @@ export async function uploadFile(
         // Non-retriable errors - throw to exit retry loop
         if (response.status === 401) {
           logEvent('tengu_file_upload_failed', {
-            error_type:
-              'auth' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+            error_type: 'auth' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           })
-          throw new UploadNonRetriableError(
-            'Authentication failed: invalid or missing API key',
-          )
+          throw new UploadNonRetriableError('Authentication failed: invalid or missing API key')
         }
 
         if (response.status === 403) {
           logEvent('tengu_file_upload_failed', {
-            error_type:
-              'forbidden' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+            error_type: 'forbidden' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           })
           throw new UploadNonRetriableError('Access denied for upload')
         }
 
         if (response.status === 413) {
           logEvent('tengu_file_upload_failed', {
-            error_type:
-              'size' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+            error_type: 'size' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
           })
           throw new UploadNonRetriableError('File too large for upload')
         }
@@ -540,8 +520,7 @@ export async function uploadFile(
       }
     }
     logEvent('tengu_file_upload_failed', {
-      error_type:
-        'network' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+      error_type: 'network' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     })
     return {
       path: relativePath,
@@ -639,49 +618,43 @@ export async function listFilesCreatedAfter(
       params.after_id = afterId
     }
 
-    const page = await retryWithBackoff(
-      `List files after ${afterCreatedAt}`,
-      async () => {
-        try {
-          const response = await axios.get(`${baseUrl}/v1/files`, {
-            headers,
-            params,
-            timeout: 60000,
-            validateStatus: status => status < 500,
-          })
+    const page = await retryWithBackoff(`List files after ${afterCreatedAt}`, async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/v1/files`, {
+          headers,
+          params,
+          timeout: 60000,
+          validateStatus: status => status < 500,
+        })
 
-          if (response.status === 200) {
-            return { done: true, value: response.data }
-          }
-
-          if (response.status === 401) {
-            logEvent('tengu_file_list_failed', {
-              error_type:
-                'auth' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-            })
-            throw new Error('Authentication failed: invalid or missing API key')
-          }
-          if (response.status === 403) {
-            logEvent('tengu_file_list_failed', {
-              error_type:
-                'forbidden' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-            })
-            throw new Error('Access denied to list files')
-          }
-
-          return { done: false, error: `status ${response.status}` }
-        } catch (error) {
-          if (!axios.isAxiosError(error)) {
-            throw error
-          }
-          logEvent('tengu_file_list_failed', {
-            error_type:
-              'network' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-          })
-          return { done: false, error: error.message }
+        if (response.status === 200) {
+          return { done: true, value: response.data }
         }
-      },
-    )
+
+        if (response.status === 401) {
+          logEvent('tengu_file_list_failed', {
+            error_type: 'auth' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          })
+          throw new Error('Authentication failed: invalid or missing API key')
+        }
+        if (response.status === 403) {
+          logEvent('tengu_file_list_failed', {
+            error_type: 'forbidden' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+          })
+          throw new Error('Access denied to list files')
+        }
+
+        return { done: false, error: `status ${response.status}` }
+      } catch (error) {
+        if (!axios.isAxiosError(error)) {
+          throw error
+        }
+        logEvent('tengu_file_list_failed', {
+          error_type: 'network' as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+        })
+        return { done: false, error: error.message }
+      }
+    })
 
     const files = page.data || []
     for (const f of files) {
@@ -735,9 +708,7 @@ export function parseFileSpecs(fileSpecs: string[]): File[] {
     const relativePath = spec.substring(colonIndex + 1)
 
     if (!fileId || !relativePath) {
-      logDebugError(
-        `Invalid file spec: ${spec}. Both file_id and path are required`,
-      )
+      logDebugError(`Invalid file spec: ${spec}. Both file_id and path are required`)
       continue
     }
 

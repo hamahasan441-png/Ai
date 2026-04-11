@@ -15,9 +15,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest'
 import { CodeAgent } from '../CodeAgent.js'
-import type {
-  ProjectTemplate,
-} from '../CodeAgent.js'
+import type { ProjectTemplate } from '../CodeAgent.js'
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
 // ║  §1  SCAFFOLD TESTS                                                         ║
@@ -167,9 +165,18 @@ describe('CodeAgent — Scaffold', () => {
 
   it('should handle all templates without errors', () => {
     const templates: ProjectTemplate[] = [
-      'rest-api', 'react-app', 'cli-tool', 'library', 'express-server',
-      'fullstack', 'microservice', 'monorepo', 'chrome-extension',
-      'discord-bot', 'next-app', 'electron-app',
+      'rest-api',
+      'react-app',
+      'cli-tool',
+      'library',
+      'express-server',
+      'fullstack',
+      'microservice',
+      'monorepo',
+      'chrome-extension',
+      'discord-bot',
+      'next-app',
+      'electron-app',
     ]
     for (const tmpl of templates) {
       const result = agent.scaffold(`test-${tmpl}`, tmpl)
@@ -702,7 +709,11 @@ describe('CodeAgent — Edge Cases', () => {
   })
 
   it('should generate Docker for Go', () => {
-    const agent2 = new CodeAgent({ includeDocker: true, includeConfigs: false, includeReadme: false })
+    const agent2 = new CodeAgent({
+      includeDocker: true,
+      includeConfigs: false,
+      includeReadme: false,
+    })
     const result = agent2.scaffold('my-svc', 'rest-api', 'go')
     const dockerfile = result.files.find(f => f.path === 'Dockerfile')
     expect(dockerfile).toBeDefined()
@@ -710,7 +721,11 @@ describe('CodeAgent — Edge Cases', () => {
   })
 
   it('should generate Docker for Python', () => {
-    const agent2 = new CodeAgent({ includeDocker: true, includeConfigs: false, includeReadme: false })
+    const agent2 = new CodeAgent({
+      includeDocker: true,
+      includeConfigs: false,
+      includeReadme: false,
+    })
     const result = agent2.scaffold('my-svc', 'rest-api', 'python')
     const dockerfile = result.files.find(f => f.path === 'Dockerfile')
     expect(dockerfile).toBeDefined()

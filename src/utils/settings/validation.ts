@@ -94,10 +94,7 @@ function extractReceivedFromMessage(msg: string): string | undefined {
   return match ? match[1] : undefined
 }
 
-export function formatZodError(
-  error: ZodError,
-  filePath: string,
-): ValidationError[] {
+export function formatZodError(error: ZodError, filePath: string): ValidationError[] {
   return error.issues.map((issue): ValidationError => {
     const path = issue.path.map(String).join('.')
     let message = issue.message
@@ -140,14 +137,8 @@ export function formatZodError(
       expected = enumValues?.map(v => `"${v}"`).join(', ')
       message = `Invalid value. Expected one of: ${expected}`
     } else if (isInvalidTypeIssue(issue)) {
-      const receivedType =
-        extractReceivedFromMessage(issue.message) ??
-        getReceivedType(issue.input)
-      if (
-        issue.expected === 'object' &&
-        receivedType === 'null' &&
-        path === ''
-      ) {
+      const receivedType = extractReceivedFromMessage(issue.message) ?? getReceivedType(issue.input)
+      if (issue.expected === 'object' && receivedType === 'null' && path === '') {
         message = 'Invalid or malformed JSON'
       } else {
         message = `Expected ${issue.expected}, but received ${receivedType}`
@@ -221,10 +212,7 @@ export function validateSettingsFileContent(content: string):
  * This prevents one bad rule from poisoning the entire settings file.
  * Returns warnings for each filtered rule.
  */
-export function filterInvalidPermissionRules(
-  data: unknown,
-  filePath: string,
-): ValidationError[] {
+export function filterInvalidPermissionRules(data: unknown, filePath: string): ValidationError[] {
   if (!data || typeof data !== 'object') return []
   const obj = data as Record<string, unknown>
   if (!obj.permissions || typeof obj.permissions !== 'object') return []

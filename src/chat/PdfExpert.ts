@@ -19,7 +19,6 @@ import {
   DocumentAnalyzer,
   type DocumentAnalysisResult,
   type DocumentSection,
-
   isRawPdfContent,
   extractPdfText,
 } from './DocumentAnalyzer.js'
@@ -214,9 +213,10 @@ export class PdfExpert {
       throw new Error(`Maximum number of documents (${this.config.maxDocuments}) reached`)
     }
 
-    const truncated = content.length > this.config.maxContentLength
-      ? content.slice(0, this.config.maxContentLength)
-      : content
+    const truncated =
+      content.length > this.config.maxContentLength
+        ? content.slice(0, this.config.maxContentLength)
+        : content
 
     const docNumber = this.nextDocId++
     const id = `doc-${docNumber}`
@@ -308,9 +308,8 @@ export class PdfExpert {
    */
   ask(query: PdfExpertQuery | string): PdfExpertAnswer {
     const start = Date.now()
-    const { question, documentIds } = typeof query === 'string'
-      ? { question: query, documentIds: undefined }
-      : query
+    const { question, documentIds } =
+      typeof query === 'string' ? { question: query, documentIds: undefined } : query
 
     if (!question || question.trim().length === 0) {
       throw new Error('Question is empty')
@@ -498,7 +497,12 @@ export class PdfExpert {
     connections.sort((a, b) => b.strength - a.strength)
 
     // Build summary
-    const summary = this.buildComparisonSummary(targetDocs, sharedTopicsSet, uniqueTopics, connections)
+    const summary = this.buildComparisonSummary(
+      targetDocs,
+      sharedTopicsSet,
+      uniqueTopics,
+      connections,
+    )
 
     return {
       documentIds: targetDocs.map(d => d.id),
@@ -568,8 +572,8 @@ export class PdfExpert {
       const relevance = this.computeSectionRelevance(section, queryKeywords, question)
 
       if (relevance >= this.config.relevanceThreshold) {
-        const quotedText = this.extractBestQuote(section.content, queryKeywords)
-          || section.title || '(no content)'
+        const quotedText =
+          this.extractBestQuote(section.content, queryKeywords) || section.title || '(no content)'
 
         citations.push({
           documentId: doc.id,
@@ -638,9 +642,7 @@ export class PdfExpert {
     if (sentences.length === 0) {
       // Fallback to raw content when no sentences detected
       const trimmed = content.trim()
-      return trimmed.length > 0
-        ? trimmed.slice(0, this.config.maxQuoteLength)
-        : ''
+      return trimmed.length > 0 ? trimmed.slice(0, this.config.maxQuoteLength) : ''
     }
 
     // Score each sentence by keyword matches
@@ -682,7 +684,10 @@ export class PdfExpert {
     return (quote.length > 0 ? quote : content.trim()).slice(0, 200)
   }
 
-  private buildAnswerFromCitations(question: string, citations: readonly DocumentCitation[]): string {
+  private buildAnswerFromCitations(
+    question: string,
+    citations: readonly DocumentCitation[],
+  ): string {
     const parts: string[] = []
 
     if (citations.length === 1) {
@@ -737,12 +742,16 @@ export class PdfExpert {
     parts.push(`Compared ${docs.length} documents:`)
 
     for (const doc of docs) {
-      parts.push(`  • "${doc.fileName}" — ${doc.analysis.metadata.wordCount} words, ${doc.analysis.classification.primaryType} document`)
+      parts.push(
+        `  • "${doc.fileName}" — ${doc.analysis.metadata.wordCount} words, ${doc.analysis.classification.primaryType} document`,
+      )
     }
 
     if (sharedTopics.size > 0) {
       const topShared = [...sharedTopics].slice(0, 10)
-      parts.push(`\nShared topics (${sharedTopics.size}): ${topShared.join(', ')}${sharedTopics.size > 10 ? '...' : ''}`)
+      parts.push(
+        `\nShared topics (${sharedTopics.size}): ${topShared.join(', ')}${sharedTopics.size > 10 ? '...' : ''}`,
+      )
     } else {
       parts.push('\nNo shared topics found between documents.')
     }
@@ -751,13 +760,17 @@ export class PdfExpert {
       const unique = uniqueTopics.get(doc.id)
       if (unique && unique.length > 0) {
         const topUnique = unique.slice(0, 5)
-        parts.push(`"${doc.fileName}" unique topics: ${topUnique.join(', ')}${unique.length > 5 ? '...' : ''}`)
+        parts.push(
+          `"${doc.fileName}" unique topics: ${topUnique.join(', ')}${unique.length > 5 ? '...' : ''}`,
+        )
       }
     }
 
     if (connections.length > 0) {
       const strongest = connections[0]!
-      parts.push(`\nStrongest connection: strength ${strongest.strength} — ${strongest.description}`)
+      parts.push(
+        `\nStrongest connection: strength ${strongest.strength} — ${strongest.description}`,
+      )
     } else {
       parts.push('\nNo direct connections found between documents.')
     }

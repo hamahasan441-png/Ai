@@ -35,13 +35,13 @@ export type SparkModelFamily = 'qwen2.5' | 'llama3'
 
 /** Inference strategy for combining models */
 export type InferenceStrategy =
-  | 'route'              // Route to best model for the task
-  | 'ensemble'           // Both models answer, best wins
-  | 'cascade'            // Small model first, escalate if needed
-  | 'speculative'        // Fast draft + strong verification
-  | 'fusion'             // Merge outputs from both models
-  | 'parallel_race'      // Both run in parallel, fastest wins
-  | 'chain_of_thought'   // One model reasons, other executes
+  | 'route' // Route to best model for the task
+  | 'ensemble' // Both models answer, best wins
+  | 'cascade' // Small model first, escalate if needed
+  | 'speculative' // Fast draft + strong verification
+  | 'fusion' // Merge outputs from both models
+  | 'parallel_race' // Both run in parallel, fastest wins
+  | 'chain_of_thought' // One model reasons, other executes
 
 /** Task domain for routing decisions */
 export type TaskDomain =
@@ -291,7 +291,13 @@ export interface CircuitBreakerStatus {
 }
 
 /** Model lifecycle state */
-export type ModelLifecycleState = 'not_installed' | 'downloading' | 'installed' | 'loading' | 'ready' | 'error'
+export type ModelLifecycleState =
+  | 'not_installed'
+  | 'downloading'
+  | 'installed'
+  | 'loading'
+  | 'ready'
+  | 'error'
 
 /** Model lifecycle info */
 export interface ModelLifecycleInfo {
@@ -428,15 +434,24 @@ const SPARK_MODEL_REGISTRY: SparkModel[] = [
     quantization: 'Q4_K_M',
     fileSizeGB: 4.4,
     contextWindow: 32768,
-    downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf',
+    downloadUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf',
     ollamaName: 'qwen2.5-coder:7b',
     llamaCppName: 'qwen2.5-coder-7b-instruct-q4_k_m.gguf',
-    strengths: ['code_generation', 'code_review', 'code_completion', 'debugging', 'security_analysis', 'exploit_research'],
+    strengths: [
+      'code_generation',
+      'code_review',
+      'code_completion',
+      'debugging',
+      'security_analysis',
+      'exploit_research',
+    ],
     weaknesses: ['creative_writing', 'conversation', 'general_reasoning'],
     minRAMGB: 6,
     recommendedRAMGB: 8,
     tokensPerSecondEstimate: 35,
-    description: 'Qwen2.5-Coder 7B — Best-in-class for code tasks. Q4 quantization for balanced quality/speed.',
+    description:
+      'Qwen2.5-Coder 7B — Best-in-class for code tasks. Q4 quantization for balanced quality/speed.',
   },
   {
     id: 'qwen2.5-coder-7b-q8',
@@ -446,10 +461,18 @@ const SPARK_MODEL_REGISTRY: SparkModel[] = [
     quantization: 'Q8_0',
     fileSizeGB: 7.7,
     contextWindow: 32768,
-    downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q8_0.gguf',
+    downloadUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q8_0.gguf',
     ollamaName: 'qwen2.5-coder:7b-instruct-q8_0',
     llamaCppName: 'qwen2.5-coder-7b-instruct-q8_0.gguf',
-    strengths: ['code_generation', 'code_review', 'code_completion', 'debugging', 'security_analysis', 'exploit_research'],
+    strengths: [
+      'code_generation',
+      'code_review',
+      'code_completion',
+      'debugging',
+      'security_analysis',
+      'exploit_research',
+    ],
     weaknesses: ['creative_writing', 'conversation', 'general_reasoning'],
     minRAMGB: 10,
     recommendedRAMGB: 12,
@@ -464,7 +487,8 @@ const SPARK_MODEL_REGISTRY: SparkModel[] = [
     quantization: 'Q4_K_M',
     fileSizeGB: 2.0,
     contextWindow: 32768,
-    downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/resolve/main/qwen2.5-coder-3b-instruct-q4_k_m.gguf',
+    downloadUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/resolve/main/qwen2.5-coder-3b-instruct-q4_k_m.gguf',
     ollamaName: 'qwen2.5-coder:3b',
     llamaCppName: 'qwen2.5-coder-3b-instruct-q4_k_m.gguf',
     strengths: ['code_completion', 'code_generation', 'debugging'],
@@ -472,7 +496,8 @@ const SPARK_MODEL_REGISTRY: SparkModel[] = [
     minRAMGB: 3,
     recommendedRAMGB: 4,
     tokensPerSecondEstimate: 60,
-    description: 'Qwen2.5-Coder 3B — Fast draft model for speculative decoding and cascade entry point.',
+    description:
+      'Qwen2.5-Coder 3B — Fast draft model for speculative decoding and cascade entry point.',
   },
   // ── LLaMA 3.1 Models ──
   {
@@ -483,15 +508,26 @@ const SPARK_MODEL_REGISTRY: SparkModel[] = [
     quantization: 'Q4_K_M',
     fileSizeGB: 4.9,
     contextWindow: 131072,
-    downloadUrl: 'https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf',
+    downloadUrl:
+      'https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf',
     ollamaName: 'llama3.1:8b',
     llamaCppName: 'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf',
-    strengths: ['general_reasoning', 'math_logic', 'creative_writing', 'summarization', 'translation', 'conversation', 'planning', 'data_analysis'],
+    strengths: [
+      'general_reasoning',
+      'math_logic',
+      'creative_writing',
+      'summarization',
+      'translation',
+      'conversation',
+      'planning',
+      'data_analysis',
+    ],
     weaknesses: ['code_generation', 'code_completion'],
     minRAMGB: 6,
     recommendedRAMGB: 8,
     tokensPerSecondEstimate: 30,
-    description: 'LLaMA 3.1 8B — Excellent reasoning, math, and general knowledge. Strong 128K context.',
+    description:
+      'LLaMA 3.1 8B — Excellent reasoning, math, and general knowledge. Strong 128K context.',
   },
   {
     id: 'llama-3.1-8b-q8',
@@ -501,10 +537,20 @@ const SPARK_MODEL_REGISTRY: SparkModel[] = [
     quantization: 'Q8_0',
     fileSizeGB: 8.5,
     contextWindow: 131072,
-    downloadUrl: 'https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q8_0.gguf',
+    downloadUrl:
+      'https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q8_0.gguf',
     ollamaName: 'llama3.1:8b-instruct-q8_0',
     llamaCppName: 'Meta-Llama-3.1-8B-Instruct-Q8_0.gguf',
-    strengths: ['general_reasoning', 'math_logic', 'creative_writing', 'summarization', 'translation', 'conversation', 'planning', 'data_analysis'],
+    strengths: [
+      'general_reasoning',
+      'math_logic',
+      'creative_writing',
+      'summarization',
+      'translation',
+      'conversation',
+      'planning',
+      'data_analysis',
+    ],
     weaknesses: ['code_generation', 'code_completion'],
     minRAMGB: 10,
     recommendedRAMGB: 14,
@@ -519,7 +565,8 @@ const SPARK_MODEL_REGISTRY: SparkModel[] = [
     quantization: 'Q4_K_M',
     fileSizeGB: 2.0,
     contextWindow: 131072,
-    downloadUrl: 'https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf',
+    downloadUrl:
+      'https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf',
     ollamaName: 'llama3.2:3b',
     llamaCppName: 'Llama-3.2-3B-Instruct-Q4_K_M.gguf',
     strengths: ['conversation', 'summarization', 'translation'],
@@ -533,20 +580,104 @@ const SPARK_MODEL_REGISTRY: SparkModel[] = [
 
 /** Routing rules: which model is best for which domain */
 const ROUTING_RULES: RoutingRule[] = [
-  { domain: 'code_generation',    preference: 'qwen',     qwenWeight: 0.90, llamaWeight: 0.10, reason: 'Qwen2.5-Coder excels at code generation with training on 5.5TB code data' },
-  { domain: 'code_review',        preference: 'qwen',     qwenWeight: 0.85, llamaWeight: 0.15, reason: 'Qwen2.5-Coder has deep understanding of code patterns and anti-patterns' },
-  { domain: 'code_completion',    preference: 'qwen',     qwenWeight: 0.95, llamaWeight: 0.05, reason: 'Qwen2.5-Coder fill-in-the-middle (FIM) capability is superior' },
-  { domain: 'debugging',          preference: 'qwen',     qwenWeight: 0.80, llamaWeight: 0.20, reason: 'Qwen2.5-Coder understands error patterns; LLaMA helps with logical reasoning' },
-  { domain: 'security_analysis',  preference: 'qwen',     qwenWeight: 0.75, llamaWeight: 0.25, reason: 'Qwen2.5-Coder knows vulnerability patterns; LLaMA adds analytical reasoning' },
-  { domain: 'exploit_research',   preference: 'qwen',     qwenWeight: 0.80, llamaWeight: 0.20, reason: 'Qwen2.5-Coder understands exploit code; LLaMA adds context reasoning' },
-  { domain: 'general_reasoning',  preference: 'llama',    qwenWeight: 0.20, llamaWeight: 0.80, reason: 'LLaMA 3.1 trained on broad knowledge with strong chain-of-thought' },
-  { domain: 'math_logic',         preference: 'llama',    qwenWeight: 0.30, llamaWeight: 0.70, reason: 'LLaMA 3.1 has superior mathematical and logical reasoning' },
-  { domain: 'creative_writing',   preference: 'llama',    qwenWeight: 0.10, llamaWeight: 0.90, reason: 'LLaMA 3.1 produces more creative and fluent natural language' },
-  { domain: 'summarization',      preference: 'llama',    qwenWeight: 0.25, llamaWeight: 0.75, reason: 'LLaMA 3.1 128K context handles long documents for summarization' },
-  { domain: 'translation',        preference: 'llama',    qwenWeight: 0.30, llamaWeight: 0.70, reason: 'LLaMA 3.1 multilingual training covers more languages' },
-  { domain: 'conversation',       preference: 'llama',    qwenWeight: 0.20, llamaWeight: 0.80, reason: 'LLaMA 3.1 produces more natural conversational responses' },
-  { domain: 'planning',           preference: 'ensemble', qwenWeight: 0.40, llamaWeight: 0.60, reason: 'Planning benefits from both code structure (Qwen) and reasoning (LLaMA)' },
-  { domain: 'data_analysis',      preference: 'ensemble', qwenWeight: 0.50, llamaWeight: 0.50, reason: 'Data analysis needs both code (Qwen) and interpretation (LLaMA)' },
+  {
+    domain: 'code_generation',
+    preference: 'qwen',
+    qwenWeight: 0.9,
+    llamaWeight: 0.1,
+    reason: 'Qwen2.5-Coder excels at code generation with training on 5.5TB code data',
+  },
+  {
+    domain: 'code_review',
+    preference: 'qwen',
+    qwenWeight: 0.85,
+    llamaWeight: 0.15,
+    reason: 'Qwen2.5-Coder has deep understanding of code patterns and anti-patterns',
+  },
+  {
+    domain: 'code_completion',
+    preference: 'qwen',
+    qwenWeight: 0.95,
+    llamaWeight: 0.05,
+    reason: 'Qwen2.5-Coder fill-in-the-middle (FIM) capability is superior',
+  },
+  {
+    domain: 'debugging',
+    preference: 'qwen',
+    qwenWeight: 0.8,
+    llamaWeight: 0.2,
+    reason: 'Qwen2.5-Coder understands error patterns; LLaMA helps with logical reasoning',
+  },
+  {
+    domain: 'security_analysis',
+    preference: 'qwen',
+    qwenWeight: 0.75,
+    llamaWeight: 0.25,
+    reason: 'Qwen2.5-Coder knows vulnerability patterns; LLaMA adds analytical reasoning',
+  },
+  {
+    domain: 'exploit_research',
+    preference: 'qwen',
+    qwenWeight: 0.8,
+    llamaWeight: 0.2,
+    reason: 'Qwen2.5-Coder understands exploit code; LLaMA adds context reasoning',
+  },
+  {
+    domain: 'general_reasoning',
+    preference: 'llama',
+    qwenWeight: 0.2,
+    llamaWeight: 0.8,
+    reason: 'LLaMA 3.1 trained on broad knowledge with strong chain-of-thought',
+  },
+  {
+    domain: 'math_logic',
+    preference: 'llama',
+    qwenWeight: 0.3,
+    llamaWeight: 0.7,
+    reason: 'LLaMA 3.1 has superior mathematical and logical reasoning',
+  },
+  {
+    domain: 'creative_writing',
+    preference: 'llama',
+    qwenWeight: 0.1,
+    llamaWeight: 0.9,
+    reason: 'LLaMA 3.1 produces more creative and fluent natural language',
+  },
+  {
+    domain: 'summarization',
+    preference: 'llama',
+    qwenWeight: 0.25,
+    llamaWeight: 0.75,
+    reason: 'LLaMA 3.1 128K context handles long documents for summarization',
+  },
+  {
+    domain: 'translation',
+    preference: 'llama',
+    qwenWeight: 0.3,
+    llamaWeight: 0.7,
+    reason: 'LLaMA 3.1 multilingual training covers more languages',
+  },
+  {
+    domain: 'conversation',
+    preference: 'llama',
+    qwenWeight: 0.2,
+    llamaWeight: 0.8,
+    reason: 'LLaMA 3.1 produces more natural conversational responses',
+  },
+  {
+    domain: 'planning',
+    preference: 'ensemble',
+    qwenWeight: 0.4,
+    llamaWeight: 0.6,
+    reason: 'Planning benefits from both code structure (Qwen) and reasoning (LLaMA)',
+  },
+  {
+    domain: 'data_analysis',
+    preference: 'ensemble',
+    qwenWeight: 0.5,
+    llamaWeight: 0.5,
+    reason: 'Data analysis needs both code (Qwen) and interpretation (LLaMA)',
+  },
 ]
 
 /** Domain detection patterns */
@@ -752,7 +883,11 @@ export class ModelSpark {
   private circuitBreakers: Map<string, CircuitBreakerStatus> = new Map()
   private modelLifecycle: Map<string, ModelLifecycleInfo> = new Map()
   private retryConfig = { maxRetries: 3, baseDelayMs: 500, maxDelayMs: 5000 }
-  private circuitBreakerConfig: CircuitBreakerConfig = { failureThreshold: 5, resetTimeoutMs: 30000, halfOpenMaxRequests: 2 }
+  private circuitBreakerConfig: CircuitBreakerConfig = {
+    failureThreshold: 5,
+    resetTimeoutMs: 30000,
+    halfOpenMaxRequests: 2,
+  }
 
   constructor(config?: Partial<ModelSparkConfig>) {
     this.config = { ...DEFAULT_MODEL_SPARK_CONFIG, ...config }
@@ -783,18 +918,25 @@ export class ModelSpark {
 
   /** Get the active Qwen model */
   getQwenModel(): SparkModel {
-    return this.getModel(this.config.qwenModel) ?? SPARK_MODEL_REGISTRY.find(m => m.family === 'qwen2.5')!
+    return (
+      this.getModel(this.config.qwenModel) ??
+      SPARK_MODEL_REGISTRY.find(m => m.family === 'qwen2.5')!
+    )
   }
 
   /** Get the active LLaMA model */
   getLlamaModel(): SparkModel {
-    return this.getModel(this.config.llamaModel) ?? SPARK_MODEL_REGISTRY.find(m => m.family === 'llama3')!
+    return (
+      this.getModel(this.config.llamaModel) ??
+      SPARK_MODEL_REGISTRY.find(m => m.family === 'llama3')!
+    )
   }
 
   /** Get models that fit within a RAM budget */
   getModelsForRAM(availableRAMGB: number): SparkModel[] {
-    return SPARK_MODEL_REGISTRY.filter(m => m.minRAMGB <= availableRAMGB)
-      .sort((a, b) => b.fileSizeGB - a.fileSizeGB)
+    return SPARK_MODEL_REGISTRY.filter(m => m.minRAMGB <= availableRAMGB).sort(
+      (a, b) => b.fileSizeGB - a.fileSizeGB,
+    )
   }
 
   /** Get the best model pair for available RAM */
@@ -877,7 +1019,11 @@ export class ModelSpark {
   // ══════════════════════════════════════════════════════════════════════════
 
   /** Detect the task domain from a prompt */
-  detectDomain(prompt: string): { domain: TaskDomain; confidence: number; alternatives: Array<{ domain: TaskDomain; confidence: number }> } {
+  detectDomain(prompt: string): {
+    domain: TaskDomain
+    confidence: number
+    alternatives: Array<{ domain: TaskDomain; confidence: number }>
+  } {
     const scores: Array<{ domain: TaskDomain; score: number }> = []
 
     for (const rule of DOMAIN_PATTERNS) {
@@ -895,7 +1041,9 @@ export class ModelSpark {
     scores.sort((a, b) => b.score - a.score)
 
     const best = scores[0] ?? { domain: 'general_reasoning' as TaskDomain, score: 0.3 }
-    const alternatives = scores.slice(1, 4).map(s => ({ domain: s.domain, confidence: Math.min(s.score, 1.0) }))
+    const alternatives = scores
+      .slice(1, 4)
+      .map(s => ({ domain: s.domain, confidence: Math.min(s.score, 1.0) }))
 
     return {
       domain: best.domain,
@@ -910,13 +1058,15 @@ export class ModelSpark {
 
   /** Get the routing rule for a domain */
   getRoutingRule(domain: TaskDomain): RoutingRule {
-    return ROUTING_RULES.find(r => r.domain === domain) ?? {
-      domain,
-      preference: 'adaptive' as ModelPreference,
-      qwenWeight: 0.5,
-      llamaWeight: 0.5,
-      reason: 'No specific routing rule; using adaptive balancing',
-    }
+    return (
+      ROUTING_RULES.find(r => r.domain === domain) ?? {
+        domain,
+        preference: 'adaptive' as ModelPreference,
+        qwenWeight: 0.5,
+        llamaWeight: 0.5,
+        reason: 'No specific routing rule; using adaptive balancing',
+      }
+    )
   }
 
   /** Get all routing rules */
@@ -953,10 +1103,20 @@ export class ModelSpark {
 
       // If one model is unhealthy, route to the other
       if (qwenHealth && !qwenHealth.available && llamaHealth?.available) {
-        return { primary: 'llama3', secondary: null, strategy: 'route', reason: 'Qwen model unavailable, routing to LLaMA' }
+        return {
+          primary: 'llama3',
+          secondary: null,
+          strategy: 'route',
+          reason: 'Qwen model unavailable, routing to LLaMA',
+        }
       }
       if (llamaHealth && !llamaHealth.available && qwenHealth?.available) {
-        return { primary: 'qwen2.5', secondary: null, strategy: 'route', reason: 'LLaMA model unavailable, routing to Qwen' }
+        return {
+          primary: 'qwen2.5',
+          secondary: null,
+          strategy: 'route',
+          reason: 'LLaMA model unavailable, routing to Qwen',
+        }
       }
     }
 
@@ -1102,9 +1262,10 @@ export class ModelSpark {
 
     // Update stats
     response.totalDurationMs = Date.now() - start
-    response.effectiveTokensPerSecond = response.totalDurationMs > 0
-      ? (response.totalTokensGenerated / (response.totalDurationMs / 1000))
-      : 0
+    response.effectiveTokensPerSecond =
+      response.totalDurationMs > 0
+        ? response.totalTokensGenerated / (response.totalDurationMs / 1000)
+        : 0
     this._updateAverages(response)
 
     return response
@@ -1147,7 +1308,7 @@ export class ModelSpark {
     }
 
     const durationMs = Date.now() - start
-    const tokensPerSecond = durationMs > 0 ? (tokensGenerated / (durationMs / 1000)) : 0
+    const tokensPerSecond = durationMs > 0 ? tokensGenerated / (durationMs / 1000) : 0
     const qualityScore = this._scoreResponse(responseText, prompt, domain)
 
     // Update model health
@@ -1157,12 +1318,16 @@ export class ModelSpark {
     if (family === 'qwen2.5') {
       this.stats.qwenRequests++
       this.stats.qwenTokensPerSecond = this._rollingAverage(
-        this.stats.qwenTokensPerSecond, tokensPerSecond, this.stats.qwenRequests,
+        this.stats.qwenTokensPerSecond,
+        tokensPerSecond,
+        this.stats.qwenRequests,
       )
     } else {
       this.stats.llamaRequests++
       this.stats.llamaTokensPerSecond = this._rollingAverage(
-        this.stats.llamaTokensPerSecond, tokensPerSecond, this.stats.llamaRequests,
+        this.stats.llamaTokensPerSecond,
+        tokensPerSecond,
+        this.stats.llamaRequests,
       )
     }
 
@@ -1216,11 +1381,7 @@ export class ModelSpark {
   }
 
   /** Fuse two model responses into one */
-  fuseResponses(
-    qwenText: string,
-    llamaText: string,
-    domain: TaskDomain,
-  ): FusionResult {
+  fuseResponses(qwenText: string, llamaText: string, domain: TaskDomain): FusionResult {
     const qwenScore = this._scoreResponse(qwenText, '', domain)
     const llamaScore = this._scoreResponse(llamaText, '', domain)
     const rule = this.getRoutingRule(domain)
@@ -1233,7 +1394,8 @@ export class ModelSpark {
     if (similarity > 0.8) {
       // Very similar — pick the better one
       fusionMethod = 'select_best'
-      fusedText = qwenScore * rule.qwenWeight >= llamaScore * rule.llamaWeight ? qwenText : llamaText
+      fusedText =
+        qwenScore * rule.qwenWeight >= llamaScore * rule.llamaWeight ? qwenText : llamaText
     } else if (similarity > 0.4) {
       // Moderately similar — merge complementary parts
       fusionMethod = 'merge'
@@ -1285,7 +1447,7 @@ export class ModelSpark {
     const total = accepted + rejected
     const acceptanceRate = total > 0 ? accepted / total : 0
     // Speedup: if acceptance is high, we saved time by not regenerating those tokens
-    const speedupFactor = acceptanceRate > 0 ? 1 + (acceptanceRate * 0.5) : 1.0
+    const speedupFactor = acceptanceRate > 0 ? 1 + acceptanceRate * 0.5 : 1.0
 
     return {
       draftModel: draftFamily,
@@ -1309,18 +1471,23 @@ export class ModelSpark {
     const llamaResult = await this.inferOnModel(testPrompt, 'llama3', domain)
 
     const rule = this.getRoutingRule(domain)
-    const ensembleScore = (qwenResult.qualityScore * rule.qwenWeight) + (llamaResult.qualityScore * rule.llamaWeight)
+    const ensembleScore =
+      qwenResult.qualityScore * rule.qwenWeight + llamaResult.qualityScore * rule.llamaWeight
 
     // Determine best strategy
     let bestStrategy: InferenceStrategy = 'route'
     if (ensembleScore > Math.max(qwenResult.qualityScore, llamaResult.qualityScore)) {
       bestStrategy = 'ensemble'
     }
-    if (qwenResult.qualityScore > llamaResult.qualityScore && qwenResult.durationMs < llamaResult.durationMs) {
+    if (
+      qwenResult.qualityScore > llamaResult.qualityScore &&
+      qwenResult.durationMs < llamaResult.durationMs
+    ) {
       bestStrategy = 'route' // Qwen is both better and faster
     }
 
-    const winnerName = qwenResult.qualityScore >= llamaResult.qualityScore ? 'Qwen2.5-Coder' : 'LLaMA 3.1'
+    const winnerName =
+      qwenResult.qualityScore >= llamaResult.qualityScore ? 'Qwen2.5-Coder' : 'LLaMA 3.1'
 
     return {
       taskDomain: domain,
@@ -1489,7 +1656,8 @@ export class ModelSpark {
       domain,
     )
     const winner = votes[0]!
-    const winnerResponse = winner.modelFamily === primaryResp.modelFamily ? primaryResp : secondaryResp
+    const winnerResponse =
+      winner.modelFamily === primaryResp.modelFamily ? primaryResp : secondaryResp
 
     return {
       text: winnerResponse.text,
@@ -1540,9 +1708,15 @@ export class ModelSpark {
 
     // Step 2: Escalate to secondary model
     this.stats.cascadeEscalations++
-    const secondaryResp = await this.inferOnModel(request.prompt, routing.secondary!, domain, request)
+    const secondaryResp = await this.inferOnModel(
+      request.prompt,
+      routing.secondary!,
+      domain,
+      request,
+    )
 
-    const bestResponse = secondaryResp.qualityScore > primaryResp.qualityScore ? secondaryResp : primaryResp
+    const bestResponse =
+      secondaryResp.qualityScore > primaryResp.qualityScore ? secondaryResp : primaryResp
 
     return {
       text: bestResponse.text,
@@ -1574,7 +1748,12 @@ export class ModelSpark {
     // Verify with primary (strong) model
     const verifyResp = await this.inferOnModel(request.prompt, routing.primary, domain, request)
 
-    const spec = this.speculativeDecode(draftResp.text, verifyResp.text, routing.secondary!, routing.primary)
+    const spec = this.speculativeDecode(
+      draftResp.text,
+      verifyResp.text,
+      routing.secondary!,
+      routing.primary,
+    )
 
     if (spec.acceptanceRate >= this.config.speculativeAcceptanceRate) {
       this.stats.speculativeAcceptances++
@@ -1680,7 +1859,12 @@ export class ModelSpark {
 
     // Step 2: Executor (Qwen) implements using the reasoning
     const executorPrompt = `Based on this analysis:\n${reasonerResp.text}\n\nNow provide the final answer to:\n${request.prompt}`
-    const executorResp = await this.inferOnModel(executorPrompt, routing.secondary!, domain, request)
+    const executorResp = await this.inferOnModel(
+      executorPrompt,
+      routing.secondary!,
+      domain,
+      request,
+    )
 
     return {
       text: executorResp.text,
@@ -1720,7 +1904,8 @@ export class ModelSpark {
     const modelEmoji = model.family === 'qwen2.5' ? '🟢' : '🟣'
 
     const domainHints: Partial<Record<TaskDomain, string>> = {
-      code_generation: 'Use the built-in LocalBrain for template-based code generation while the models are loading.',
+      code_generation:
+        'Use the built-in LocalBrain for template-based code generation while the models are loading.',
       code_review: 'Use the built-in CodeReviewer and CodeAnalyzer for offline static analysis.',
       debugging: 'Use the built-in BufferOverflowDebugger for offline crash analysis.',
       security_analysis: 'Use ExploitSearchEngine for offline CVE/CWE lookups.',
@@ -1729,7 +1914,8 @@ export class ModelSpark {
       math_logic: 'Use BayesianNetwork and InferenceEngine for offline mathematical reasoning.',
     }
 
-    const hint = domainHints[domain] ?? 'Use the built-in knowledge modules while models are loading.'
+    const hint =
+      domainHints[domain] ?? 'Use the built-in knowledge modules while models are loading.'
 
     return [
       `[${modelEmoji} Model Spark — ${model.name} — Offline Mode]`,
@@ -1808,7 +1994,12 @@ export class ModelSpark {
 
     // Relevance: check for prompt keyword overlap
     if (prompt) {
-      const promptWords = new Set(prompt.toLowerCase().split(/\s+/).filter(w => w.length > 3))
+      const promptWords = new Set(
+        prompt
+          .toLowerCase()
+          .split(/\s+/)
+          .filter(w => w.length > 3),
+      )
       const responseWords = new Set(text.toLowerCase().split(/\s+/))
       let overlap = 0
       for (const word of promptWords) {
@@ -1828,8 +2019,18 @@ export class ModelSpark {
 
   /** Calculate text similarity (Jaccard on word sets) */
   private _textSimilarity(text1: string, text2: string): number {
-    const words1 = new Set(text1.toLowerCase().split(/\s+/).filter(w => w.length > 2))
-    const words2 = new Set(text2.toLowerCase().split(/\s+/).filter(w => w.length > 2))
+    const words1 = new Set(
+      text1
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 2),
+    )
+    const words2 = new Set(
+      text2
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 2),
+    )
 
     if (words1.size === 0 && words2.size === 0) return 1.0
     if (words1.size === 0 || words2.size === 0) return 0.0
@@ -1963,7 +2164,9 @@ export class ModelSpark {
     if (success) {
       health.successCount++
       health.averageTokensPerSecond = this._rollingAverage(
-        health.averageTokensPerSecond, tokensPerSecond, health.successCount,
+        health.averageTokensPerSecond,
+        tokensPerSecond,
+        health.successCount,
       )
     } else {
       health.errorCount++
@@ -1980,10 +2183,14 @@ export class ModelSpark {
   private _updateAverages(response: SparkResponse): void {
     this.stats.totalTokensGenerated += response.totalTokensGenerated
     this.stats.averageLatencyMs = this._rollingAverage(
-      this.stats.averageLatencyMs, response.totalDurationMs, this.stats.totalRequests,
+      this.stats.averageLatencyMs,
+      response.totalDurationMs,
+      this.stats.totalRequests,
     )
     this.stats.averageQualityScore = this._rollingAverage(
-      this.stats.averageQualityScore, response.qualityScore, this.stats.totalRequests,
+      this.stats.averageQualityScore,
+      response.qualityScore,
+      this.stats.totalRequests,
     )
   }
 
@@ -2072,7 +2279,11 @@ export class ModelSpark {
   }
 
   /** Multi-turn chat within a session */
-  async chat(sessionId: string, userMessage: string, options?: Partial<SparkRequest>): Promise<SparkResponse> {
+  async chat(
+    sessionId: string,
+    userMessage: string,
+    options?: Partial<SparkRequest>,
+  ): Promise<SparkResponse> {
     const session = this.sessions.get(sessionId)
     if (!session) {
       throw new Error(`Session not found: ${sessionId}`)
@@ -2099,11 +2310,14 @@ export class ModelSpark {
     })
 
     // Build a single prompt from conversation history
-    const conversationPrompt = contextMessages.map(m => {
-      if (m.role === 'system') return `System: ${m.content}`
-      if (m.role === 'user') return `User: ${m.content}`
-      return `Assistant: ${m.content}`
-    }).join('\n\n') + '\n\nAssistant:'
+    const conversationPrompt =
+      contextMessages
+        .map(m => {
+          if (m.role === 'system') return `System: ${m.content}`
+          if (m.role === 'user') return `User: ${m.content}`
+          return `Assistant: ${m.content}`
+        })
+        .join('\n\n') + '\n\nAssistant:'
 
     // Detect domain from latest message if not set
     const domain = session.domain ?? options?.domain ?? this.detectDomain(userMessage).domain
@@ -2181,7 +2395,9 @@ export class ModelSpark {
   }
 
   /** Collect all streaming tokens into a full response string */
-  async collectStream(request: SparkRequest): Promise<{ text: string; totalTokens: number; modelFamily: SparkModelFamily }> {
+  async collectStream(
+    request: SparkRequest,
+  ): Promise<{ text: string; totalTokens: number; modelFamily: SparkModelFamily }> {
     const tokens: string[] = []
     let totalTokens = 0
     let modelFamily: SparkModelFamily = 'qwen2.5'
@@ -2286,9 +2502,16 @@ export class ModelSpark {
       primaryModel: 'qwen2.5',
       secondaryModel: null,
       primaryResponse: {
-        text: '', modelId: '', modelFamily: 'qwen2.5', tokensGenerated: 0,
-        tokensPrompt: 0, durationMs: 0, tokensPerSecond: 0, qualityScore: 0,
-        finishReason: 'error', error: lastError?.message,
+        text: '',
+        modelId: '',
+        modelFamily: 'qwen2.5',
+        tokensGenerated: 0,
+        tokensPrompt: 0,
+        durationMs: 0,
+        tokensPerSecond: 0,
+        qualityScore: 0,
+        finishReason: 'error',
+        error: lastError?.message,
       },
       secondaryResponse: null,
       fusedResponse: null,
@@ -2406,8 +2629,10 @@ export class ModelSpark {
   areBothModelsReady(): boolean {
     const qwen = this.modelLifecycle.get(this.config.qwenModel)
     const llama = this.modelLifecycle.get(this.config.llamaModel)
-    return (qwen?.state === 'ready' || qwen?.state === 'installed') &&
-           (llama?.state === 'ready' || llama?.state === 'installed')
+    return (
+      (qwen?.state === 'ready' || qwen?.state === 'installed') &&
+      (llama?.state === 'ready' || llama?.state === 'installed')
+    )
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -2432,12 +2657,14 @@ export class ModelSpark {
       }
 
       // Detect domain and model
-      const domain: TaskDomain = step.domain === 'auto'
-        ? this.detectDomain(prompt).domain
-        : step.domain
-      const family: SparkModelFamily = step.model === 'auto'
-        ? (this.getRoutingRule(domain).preference === 'llama' ? 'llama3' : 'qwen2.5')
-        : step.model
+      const domain: TaskDomain =
+        step.domain === 'auto' ? this.detectDomain(prompt).domain : step.domain
+      const family: SparkModelFamily =
+        step.model === 'auto'
+          ? this.getRoutingRule(domain).preference === 'llama'
+            ? 'llama3'
+            : 'qwen2.5'
+          : step.model
 
       // Execute
       const resp = await this.inferOnModel(prompt, family, domain, { maxTokens: step.maxTokens })
@@ -2451,7 +2678,10 @@ export class ModelSpark {
             output = parsed.codeBlocks.map(b => b.code).join('\n\n') || resp.text
             break
           case 'extract_json':
-            output = parsed.jsonBlocks.length > 0 ? JSON.stringify(parsed.jsonBlocks[0], null, 2) : resp.text
+            output =
+              parsed.jsonBlocks.length > 0
+                ? JSON.stringify(parsed.jsonBlocks[0], null, 2)
+                : resp.text
             break
           case 'summarize':
             output = parsed.summary ?? resp.text
@@ -2634,9 +2864,15 @@ export class ModelSpark {
   // ══════════════════════════════════════════════════════════════════════════
 
   /** Manage context window by trimming messages to fit token budget */
-  manageContextWindow(messages: SparkChatMessage[], options: ContextWindowOptions): SparkChatMessage[] {
+  manageContextWindow(
+    messages: SparkChatMessage[],
+    options: ContextWindowOptions,
+  ): SparkChatMessage[] {
     const maxBudget = options.maxTokens - options.reserveForResponse
-    let totalTokens = messages.reduce((sum, m) => sum + (m.tokensEstimate ?? Math.ceil(m.content.length / 4)), 0)
+    let totalTokens = messages.reduce(
+      (sum, m) => sum + (m.tokensEstimate ?? Math.ceil(m.content.length / 4)),
+      0,
+    )
 
     if (totalTokens <= maxBudget) return [...messages]
 
@@ -2712,7 +2948,10 @@ export class ModelSpark {
   }
 
   /** Check if a prompt fits within a model's context window */
-  fitsInContextWindow(prompt: string, modelId?: string): { fits: boolean; promptTokens: number; maxTokens: number; remainingTokens: number } {
+  fitsInContextWindow(
+    prompt: string,
+    modelId?: string,
+  ): { fits: boolean; promptTokens: number; maxTokens: number; remainingTokens: number } {
     const model = modelId ? this.getModel(modelId) : this.getQwenModel()
     const maxTokens = model?.contextWindow ?? 32768
     const promptTokens = this.estimateTokens(prompt)
@@ -2735,7 +2974,7 @@ export class ModelSpark {
     let cpuModel: string
 
     try {
-      totalRAMGB = Math.round(os.totalmem() / (1024 * 1024 * 1024) * 10) / 10
+      totalRAMGB = Math.round((os.totalmem() / (1024 * 1024 * 1024)) * 10) / 10
       cpuCores = os.cpus()?.length ?? 4
       cpuModel = os.cpus()?.[0]?.model ?? 'Unknown CPU'
     } catch {
@@ -2829,7 +3068,11 @@ export class ModelSpark {
   }
 
   /** Build Ollama API generate request body */
-  buildOllamaRequest(prompt: string, model: SparkModel, options?: Partial<SparkRequest>): OllamaGenerateRequest {
+  buildOllamaRequest(
+    prompt: string,
+    model: SparkModel,
+    options?: Partial<SparkRequest>,
+  ): OllamaGenerateRequest {
     return {
       model: model.ollamaName,
       prompt,
@@ -2844,7 +3087,11 @@ export class ModelSpark {
   }
 
   /** Build Ollama chat API request body (for multi-turn) */
-  buildOllamaChatRequest(messages: SparkChatMessage[], model: SparkModel, options?: Partial<SparkRequest>): OllamaChatRequest {
+  buildOllamaChatRequest(
+    messages: SparkChatMessage[],
+    model: SparkModel,
+    options?: Partial<SparkRequest>,
+  ): OllamaChatRequest {
     return {
       model: model.ollamaName,
       messages: messages.map(m => ({
@@ -2861,7 +3108,11 @@ export class ModelSpark {
   }
 
   /** Build OpenAI-compatible API request (for llama.cpp server) */
-  buildOpenAICompatRequest(prompt: string, model: SparkModel, options?: Partial<SparkRequest>): OpenAICompatRequest {
+  buildOpenAICompatRequest(
+    prompt: string,
+    model: SparkModel,
+    options?: Partial<SparkRequest>,
+  ): OpenAICompatRequest {
     const messages: Array<{ role: string; content: string }> = []
     if (options?.systemPrompt) {
       messages.push({ role: 'system', content: options.systemPrompt })
@@ -3061,9 +3312,18 @@ export interface SparkAgentConfig {
 /** Brain connector interface — what LocalBrain provides to Spark */
 export interface BrainCapabilities {
   chat: (message: string) => Promise<{ response: string; confidence: number }>
-  searchKnowledge: (query: string, limit?: number) => Array<{ content: string; score: number; category: string }>
-  writeCode: (request: { description: string; language: string }) => Promise<{ code: string; explanation: string }>
-  reviewCode: (request: { code: string; language: string }) => Promise<{ issues: string[]; score: number }>
+  searchKnowledge: (
+    query: string,
+    limit?: number,
+  ) => Array<{ content: string; score: number; category: string }>
+  writeCode: (request: {
+    description: string
+    language: string
+  }) => Promise<{ code: string; explanation: string }>
+  reviewCode: (request: {
+    code: string
+    language: string
+  }) => Promise<{ issues: string[]; score: number }>
   reason: (question: string) => Promise<{ answer: string; confidence: number; reasoning: string }>
   learn: (input: string, response: string, category?: string) => void
   getStats: () => Record<string, unknown>
@@ -3072,7 +3332,10 @@ export interface BrainCapabilities {
 
 /** LLM Bridge interface — what LocalLLMBridge provides to Spark */
 export interface LLMBridgeCapabilities {
-  processQuery: (query: string, context?: string[]) => Promise<{ text: string; confidence: number; source: string }>
+  processQuery: (
+    query: string,
+    context?: string[],
+  ) => Promise<{ text: string; confidence: number; source: string }>
   classifyIntent: (query: string) => { intent: string; confidence: number; target: string }
   searchExploits: (query: string) => Promise<{ text: string; confidence: number }>
   debugOverflow: (crashData: string) => Promise<{ text: string; confidence: number }>
@@ -3145,7 +3408,10 @@ export class SparkBrainConnector {
   private spark: ModelSpark
   private brain: BrainCapabilities | null = null
   private bridge: LLMBridgeCapabilities | null = null
-  private knowledgeCache: Map<string, { results: Array<{ content: string; score: number; category: string }>; timestamp: number }> = new Map()
+  private knowledgeCache: Map<
+    string,
+    { results: Array<{ content: string; score: number; category: string }>; timestamp: number }
+  > = new Map()
   private cacheTTLMs = 5 * 60 * 1000 // 5 min
 
   constructor(spark: ModelSpark) {
@@ -3210,25 +3476,36 @@ export class SparkBrainConnector {
   }
 
   /** Get brain knowledge for a query */
-  getBrainKnowledge(query: string, limit = 5): Array<{ content: string; score: number; category: string }> {
+  getBrainKnowledge(
+    query: string,
+    limit = 5,
+  ): Array<{ content: string; score: number; category: string }> {
     if (!this.brain) return []
     return this.brain.searchKnowledge(query, limit)
   }
 
   /** Use brain's code generation */
-  async brainGenerateCode(description: string, language: string): Promise<{ code: string; explanation: string } | null> {
+  async brainGenerateCode(
+    description: string,
+    language: string,
+  ): Promise<{ code: string; explanation: string } | null> {
     if (!this.brain) return null
     return this.brain.writeCode({ description, language })
   }
 
   /** Use brain's code review */
-  async brainReviewCode(code: string, language: string): Promise<{ issues: string[]; score: number } | null> {
+  async brainReviewCode(
+    code: string,
+    language: string,
+  ): Promise<{ issues: string[]; score: number } | null> {
     if (!this.brain) return null
     return this.brain.reviewCode({ code, language })
   }
 
   /** Use brain's reasoning */
-  async brainReason(question: string): Promise<{ answer: string; confidence: number; reasoning: string } | null> {
+  async brainReason(
+    question: string,
+  ): Promise<{ answer: string; confidence: number; reasoning: string } | null> {
     if (!this.brain) return null
     return this.brain.reason(question)
   }
@@ -3290,7 +3567,11 @@ export class SparkAgent {
     averageDurationMs: 0,
   }
 
-  constructor(spark: ModelSpark, connector: SparkBrainConnector, config?: Partial<SparkAgentConfig>) {
+  constructor(
+    spark: ModelSpark,
+    connector: SparkBrainConnector,
+    config?: Partial<SparkAgentConfig>,
+  ) {
     this.spark = spark
     this.connector = connector
     this.config = { ...DEFAULT_AGENT_CONFIG, ...config }
@@ -3439,7 +3720,11 @@ export class SparkAgent {
         task.qualityScore = reflection.qualityScore
 
         // Self-correction if quality is too low
-        if (this.config.selfCorrectionEnabled && reflection.qualityScore < this.config.confidenceThreshold && task.retries < this.config.maxRetries) {
+        if (
+          this.config.selfCorrectionEnabled &&
+          reflection.qualityScore < this.config.confidenceThreshold &&
+          task.retries < this.config.maxRetries
+        ) {
           task.retries++
           const corrected = this._selfCorrect(query, task.finalAnswer, reflection.issues, domain)
           task.finalAnswer = corrected
@@ -3565,11 +3850,7 @@ export class SparkAgent {
         break
 
       case 'creative_writing':
-        plan.push(
-          `Understand the creative brief`,
-          `Generate initial draft`,
-          `Refine and polish`,
-        )
+        plan.push(`Understand the creative brief`, `Generate initial draft`, `Refine and polish`)
         break
 
       case 'data_analysis':
@@ -3594,11 +3875,17 @@ export class SparkAgent {
   // ── Private: Tool Selection ──────────────────────────────────────────────
 
   /** Select the best tool for a given step */
-  private _selectTool(step: string, domain: TaskDomain, _context: string): { toolName: string; confidence: number } {
+  private _selectTool(
+    step: string,
+    domain: TaskDomain,
+    _context: string,
+  ): { toolName: string; confidence: number } {
     const stepLower = step.toLowerCase()
 
     // Code-related tools
-    if (/\b(code|function|class|implement|program|script|write code|generate code)\b/i.test(stepLower)) {
+    if (
+      /\b(code|function|class|implement|program|script|write code|generate code)\b/i.test(stepLower)
+    ) {
       return { toolName: 'spark_code_generate', confidence: 0.9 }
     }
     if (/\b(review|audit|check|inspect|quality|bug)\b/i.test(stepLower)) {
@@ -3657,7 +3944,11 @@ export class SparkAgent {
   // ── Private: Tool Execution ──────────────────────────────────────────────
 
   /** Execute a tool by name */
-  private async _executeTool(toolName: string, input: string, context: string): Promise<AgentToolResult> {
+  private async _executeTool(
+    toolName: string,
+    input: string,
+    context: string,
+  ): Promise<AgentToolResult> {
     const startTime = Date.now()
     const tool = this.tools.get(toolName)
 
@@ -3700,7 +3991,12 @@ export class SparkAgent {
   // ── Private: Synthesis ───────────────────────────────────────────────────
 
   /** Synthesize final answer from all collected results */
-  private _synthesizeAnswer(query: string, domain: TaskDomain, thoughts: AgentThought[], context: string): string {
+  private _synthesizeAnswer(
+    query: string,
+    domain: TaskDomain,
+    thoughts: AgentThought[],
+    context: string,
+  ): string {
     // Collect all tool outputs
     const toolOutputs = thoughts
       .filter(t => t.type === 'observe' && t.toolOutput)
@@ -3738,7 +4034,11 @@ export class SparkAgent {
   // ── Private: Reflection ──────────────────────────────────────────────────
 
   /** Reflect on the quality of the answer */
-  private _reflect(query: string, answer: string, domain: TaskDomain): { qualityScore: number; assessment: string; issues: string[] } {
+  private _reflect(
+    query: string,
+    answer: string,
+    domain: TaskDomain,
+  ): { qualityScore: number; assessment: string; issues: string[] } {
     const issues: string[] = []
     let score = 0.7 // base score
 
@@ -3750,15 +4050,23 @@ export class SparkAgent {
     if (answer.length > 50) score += 0.05
 
     // Relevance: keyword overlap
-    const queryWords = new Set(query.toLowerCase().split(/\s+/).filter(w => w.length > 3))
+    const queryWords = new Set(
+      query
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 3),
+    )
     const answerWords = new Set(answer.toLowerCase().split(/\s+/))
     let overlap = 0
-    for (const w of queryWords) { if (answerWords.has(w)) overlap++ }
+    for (const w of queryWords) {
+      if (answerWords.has(w)) overlap++
+    }
     const relevance = queryWords.size > 0 ? overlap / queryWords.size : 0.5
     score += relevance * 0.1
 
     // Structure check
-    if (/```/.test(answer) && (domain === 'code_generation' || domain === 'debugging')) score += 0.05
+    if (/```/.test(answer) && (domain === 'code_generation' || domain === 'debugging'))
+      score += 0.05
     if (/\d+\./.test(answer)) score += 0.02
     if (/[-*]/.test(answer)) score += 0.02
 
@@ -3785,7 +4093,12 @@ export class SparkAgent {
   // ── Private: Self-Correction ─────────────────────────────────────────────
 
   /** Self-correct an answer based on identified issues */
-  private _selfCorrect(query: string, original: string, issues: string[], _domain: TaskDomain): string {
+  private _selfCorrect(
+    query: string,
+    original: string,
+    issues: string[],
+    _domain: TaskDomain,
+  ): string {
     let corrected = original
 
     for (const issue of issues) {
@@ -3857,7 +4170,10 @@ export class SparkAgent {
             durationMs: Date.now() - start,
           }
         }
-        const response = await this.spark.infer({ prompt: `Review this code:\n${input}`, domain: 'code_review' })
+        const response = await this.spark.infer({
+          prompt: `Review this code:\n${input}`,
+          domain: 'code_review',
+        })
         return {
           success: true,
           output: response.text,
@@ -3895,7 +4211,10 @@ export class SparkAgent {
       inputSchema: 'string: security analysis query',
       handler: async (input: string) => {
         const start = Date.now()
-        const response = await this.connector.enrichedInfer({ prompt: input, domain: 'security_analysis' })
+        const response = await this.connector.enrichedInfer({
+          prompt: input,
+          domain: 'security_analysis',
+        })
         return {
           success: true,
           output: response.text,
@@ -3916,7 +4235,9 @@ export class SparkAgent {
         const start = Date.now()
         const results = this.connector.getBrainKnowledge(input, 5)
         if (results.length > 0) {
-          const output = results.map((r, i) => `${i + 1}. [${r.category}] (score: ${r.score.toFixed(2)}) ${r.content}`).join('\n')
+          const output = results
+            .map((r, i) => `${i + 1}. [${r.category}] (score: ${r.score.toFixed(2)}) ${r.content}`)
+            .join('\n')
           return {
             success: true,
             output,
@@ -3955,7 +4276,10 @@ export class SparkAgent {
           }
         }
         // Fallback to Spark ensemble
-        const response = await this.connector.enrichedInfer({ prompt: input, domain: 'general_reasoning' })
+        const response = await this.connector.enrichedInfer({
+          prompt: input,
+          domain: 'general_reasoning',
+        })
         return {
           success: true,
           output: response.text,
@@ -3993,7 +4317,10 @@ export class SparkAgent {
       inputSchema: 'string: text to summarize',
       handler: async (input: string) => {
         const start = Date.now()
-        const response = await this.spark.infer({ prompt: `Summarize: ${input}`, domain: 'summarization' })
+        const response = await this.spark.infer({
+          prompt: `Summarize: ${input}`,
+          domain: 'summarization',
+        })
         return {
           success: true,
           output: response.text,
@@ -4031,7 +4358,10 @@ export class SparkAgent {
       inputSchema: 'string: message',
       handler: async (input: string) => {
         const start = Date.now()
-        const response = await this.connector.enrichedInfer({ prompt: input, domain: 'conversation' })
+        const response = await this.connector.enrichedInfer({
+          prompt: input,
+          domain: 'conversation',
+        })
         return {
           success: true,
           output: response.text,
@@ -4085,9 +4415,12 @@ export class UnifiedOrchestrator {
   private agent: SparkAgent
   private stats: OrchestrationStats
 
-  constructor(spark: ModelSpark, config?: {
-    agentConfig?: Partial<SparkAgentConfig>
-  }) {
+  constructor(
+    spark: ModelSpark,
+    config?: {
+      agentConfig?: Partial<SparkAgentConfig>
+    },
+  ) {
     this.spark = spark
     this.connector = new SparkBrainConnector(spark)
     this.agent = new SparkAgent(spark, this.connector, config?.agentConfig)
@@ -4114,7 +4447,10 @@ export class UnifiedOrchestrator {
   // ── Intelligent Routing ──────────────────────────────────────────────────
 
   /** Route a query to the optimal subsystem */
-  routeQuery(query: string, options?: { forceSystem?: OrchestrationDecision['primary'] }): OrchestrationDecision {
+  routeQuery(
+    query: string,
+    options?: { forceSystem?: OrchestrationDecision['primary'] },
+  ): OrchestrationDecision {
     if (options?.forceSystem) {
       return {
         primary: options.forceSystem,
@@ -4132,7 +4468,10 @@ export class UnifiedOrchestrator {
     const queryLower = query.toLowerCase()
 
     // Multi-step/complex tasks → Agent
-    const isComplex = /\b(step.by.step|analyze and|first.*then|create.*and.*test|build.*complete|plan.*implement)\b/i.test(queryLower)
+    const isComplex =
+      /\b(step.by.step|analyze and|first.*then|create.*and.*test|build.*complete|plan.*implement)\b/i.test(
+        queryLower,
+      )
     if (isComplex) {
       return {
         primary: 'agent',
@@ -4170,7 +4509,10 @@ export class UnifiedOrchestrator {
     }
 
     // Knowledge/factual queries → Brain first
-    if (this.connector.isBrainConnected() && /\b(what is|explain|describe|how does|tell me about|define)\b/i.test(queryLower)) {
+    if (
+      this.connector.isBrainConnected() &&
+      /\b(what is|explain|describe|how does|tell me about|define)\b/i.test(queryLower)
+    ) {
       const knowledge = this.connector.getBrainKnowledge(query, 3)
       if (knowledge.length > 0 && knowledge[0]!.score > 0.5) {
         return {
@@ -4210,16 +4552,20 @@ export class UnifiedOrchestrator {
   // ── Unified Query Execution ──────────────────────────────────────────────
 
   /** Execute a query through the unified orchestration system */
-  async query(input: string, options?: {
-    forceSystem?: OrchestrationDecision['primary']
-    strategy?: InferenceStrategy
-    maxTokens?: number
-  }): Promise<OrchestrationResponse> {
+  async query(
+    input: string,
+    options?: {
+      forceSystem?: OrchestrationDecision['primary']
+      strategy?: InferenceStrategy
+      maxTokens?: number
+    },
+  ): Promise<OrchestrationResponse> {
     const startTime = Date.now()
     this.stats.totalRequests++
 
     const routing = this.routeQuery(input, options)
-    this.stats.routingDistribution[routing.primary] = (this.stats.routingDistribution[routing.primary] ?? 0) + 1
+    this.stats.routingDistribution[routing.primary] =
+      (this.stats.routingDistribution[routing.primary] ?? 0) + 1
 
     let response: OrchestrationResponse
 
@@ -4251,8 +4597,10 @@ export class UnifiedOrchestrator {
     }
 
     // Update quality averages
-    this.stats.averageQuality += (response.qualityScore - this.stats.averageQuality) / this.stats.totalRequests
-    this.stats.averageLatencyMs += (response.durationMs - this.stats.averageLatencyMs) / this.stats.totalRequests
+    this.stats.averageQuality +=
+      (response.qualityScore - this.stats.averageQuality) / this.stats.totalRequests
+    this.stats.averageLatencyMs +=
+      (response.durationMs - this.stats.averageLatencyMs) / this.stats.totalRequests
 
     // Teach brain from good responses (feedback loop)
     if (response.qualityScore > 0.7 && response.sparkResponse) {
@@ -4265,19 +4613,29 @@ export class UnifiedOrchestrator {
   // ── Subsystem Access ─────────────────────────────────────────────────────
 
   /** Get the Spark instance */
-  getSpark(): ModelSpark { return this.spark }
+  getSpark(): ModelSpark {
+    return this.spark
+  }
 
   /** Get the Brain connector */
-  getConnector(): SparkBrainConnector { return this.connector }
+  getConnector(): SparkBrainConnector {
+    return this.connector
+  }
 
   /** Get the Agent */
-  getAgent(): SparkAgent { return this.agent }
+  getAgent(): SparkAgent {
+    return this.agent
+  }
 
   /** Get orchestration stats */
-  getStats(): OrchestrationStats { return { ...this.stats } }
+  getStats(): OrchestrationStats {
+    return { ...this.stats }
+  }
 
   /** Reset stats */
-  resetStats(): void { this.stats = this._initStats() }
+  resetStats(): void {
+    this.stats = this._initStats()
+  }
 
   /** Get comprehensive system status */
   getSystemStatus(): string {
@@ -4305,12 +4663,16 @@ export class UnifiedOrchestrator {
       `  Agent tool calls:   ${agentStats.totalToolCalls}`,
       '',
       '🔀 Routing Distribution:',
-      ...Object.entries(this.stats.routingDistribution).map(([k, v]) =>
-        `  ${k}: ${v} (${((v as number / Math.max(this.stats.totalRequests, 1)) * 100).toFixed(1)}%)`
+      ...Object.entries(this.stats.routingDistribution).map(
+        ([k, v]) =>
+          `  ${k}: ${v} (${(((v as number) / Math.max(this.stats.totalRequests, 1)) * 100).toFixed(1)}%)`,
       ),
       '',
       '🟢 Model Health:',
-      ...health.map(h => `  ${h.modelId}: ${h.available ? '✅' : '❌'} | ${h.successCount} ok / ${h.errorCount} err | ${h.averageTokensPerSecond.toFixed(1)} tok/s`),
+      ...health.map(
+        h =>
+          `  ${h.modelId}: ${h.available ? '✅' : '❌'} | ${h.successCount} ok / ${h.errorCount} err | ${h.averageTokensPerSecond.toFixed(1)} tok/s`,
+      ),
       '',
       '💾 Spark Stats:',
       `  Inferences: ${sparkStats.totalRequests} | Tokens: ${sparkStats.totalTokensGenerated}`,
@@ -4321,7 +4683,10 @@ export class UnifiedOrchestrator {
   // ── Private: Execution Methods ───────────────────────────────────────────
 
   /** Execute via Agent (autonomous multi-step) */
-  private async _executeAgent(input: string, routing: OrchestrationDecision): Promise<OrchestrationResponse> {
+  private async _executeAgent(
+    input: string,
+    routing: OrchestrationDecision,
+  ): Promise<OrchestrationResponse> {
     const start = Date.now()
     const task = await this.agent.executeTask(input)
     this.stats.agentTasksCompleted++
@@ -4343,7 +4708,10 @@ export class UnifiedOrchestrator {
   }
 
   /** Execute via Brain knowledge base */
-  private async _executeBrain(input: string, routing: OrchestrationDecision): Promise<OrchestrationResponse> {
+  private async _executeBrain(
+    input: string,
+    routing: OrchestrationDecision,
+  ): Promise<OrchestrationResponse> {
     const start = Date.now()
     const knowledge = this.connector.getBrainKnowledge(input, 5)
     this.stats.brainKnowledgeHits += knowledge.length
@@ -4370,7 +4738,10 @@ export class UnifiedOrchestrator {
   }
 
   /** Execute via LLM Bridge */
-  private async _executeBridge(input: string, routing: OrchestrationDecision): Promise<OrchestrationResponse> {
+  private async _executeBridge(
+    input: string,
+    routing: OrchestrationDecision,
+  ): Promise<OrchestrationResponse> {
     const start = Date.now()
 
     // Fallback to Spark since bridge isn't directly callable without the real instance
@@ -4392,7 +4763,11 @@ export class UnifiedOrchestrator {
   }
 
   /** Execute via Hybrid (Spark + Brain enrichment) */
-  private async _executeHybrid(input: string, routing: OrchestrationDecision, options?: { strategy?: InferenceStrategy; maxTokens?: number }): Promise<OrchestrationResponse> {
+  private async _executeHybrid(
+    input: string,
+    routing: OrchestrationDecision,
+    options?: { strategy?: InferenceStrategy; maxTokens?: number },
+  ): Promise<OrchestrationResponse> {
     const start = Date.now()
     const knowledge = this.connector.getBrainKnowledge(input, 3)
     this.stats.brainKnowledgeHits += knowledge.length
@@ -4422,7 +4797,11 @@ export class UnifiedOrchestrator {
   }
 
   /** Execute via Spark ensemble directly */
-  private async _executeSpark(input: string, routing: OrchestrationDecision, options?: { strategy?: InferenceStrategy; maxTokens?: number }): Promise<OrchestrationResponse> {
+  private async _executeSpark(
+    input: string,
+    routing: OrchestrationDecision,
+    options?: { strategy?: InferenceStrategy; maxTokens?: number },
+  ): Promise<OrchestrationResponse> {
     const start = Date.now()
     const response = await this.spark.infer({
       prompt: input,
@@ -4482,7 +4861,14 @@ export class UnifiedOrchestrator {
 
 // ─── Search Types ────────────────────────────────────────────────────────────
 
-export type SparkSearchStrategy = 'keyword' | 'fuzzy' | 'semantic' | 'synonym' | 'contextual' | 'graph' | 'combined'
+export type SparkSearchStrategy =
+  | 'keyword'
+  | 'fuzzy'
+  | 'semantic'
+  | 'synonym'
+  | 'contextual'
+  | 'graph'
+  | 'combined'
 
 export interface SearchDocument {
   id: string
@@ -4687,7 +5073,9 @@ export class SparkSearchEngine {
   // ── Document Management ────────────────────────────────────────────────────
 
   /** Index a document for searching */
-  indexDocument(doc: Omit<SearchDocument, 'indexedAt' | 'accessCount' | 'lastAccessedAt'>): SearchDocument {
+  indexDocument(
+    doc: Omit<SearchDocument, 'indexedAt' | 'accessCount' | 'lastAccessedAt'>,
+  ): SearchDocument {
     if (this.documents.size >= this.config.maxDocuments) {
       this._evictLeastUsed()
     }
@@ -4711,7 +5099,9 @@ export class SparkSearchEngine {
   }
 
   /** Bulk index multiple documents */
-  indexDocuments(docs: Array<Omit<SearchDocument, 'indexedAt' | 'accessCount' | 'lastAccessedAt'>>): number {
+  indexDocuments(
+    docs: Array<Omit<SearchDocument, 'indexedAt' | 'accessCount' | 'lastAccessedAt'>>,
+  ): number {
     let indexed = 0
     for (const doc of docs) {
       this.indexDocument(doc)
@@ -4730,7 +5120,10 @@ export class SparkSearchEngine {
     this.graph.delete(id)
     this._invalidateTfidfCache()
     this.stats.totalDocuments = this.documents.size
-    this.stats.categoryCounts[doc.category] = Math.max(0, (this.stats.categoryCounts[doc.category] ?? 1) - 1)
+    this.stats.categoryCounts[doc.category] = Math.max(
+      0,
+      (this.stats.categoryCounts[doc.category] ?? 1) - 1,
+    )
     return true
   }
 
@@ -4824,8 +5217,10 @@ export class SparkSearchEngine {
     }
 
     const duration = Date.now() - startTime
-    this.stats.averageLatencyMs += (duration - this.stats.averageLatencyMs) / this.stats.totalSearches
-    this.stats.averageResultCount += (results.length - this.stats.averageResultCount) / this.stats.totalSearches
+    this.stats.averageLatencyMs +=
+      (duration - this.stats.averageLatencyMs) / this.stats.totalSearches
+    this.stats.averageResultCount +=
+      (results.length - this.stats.averageResultCount) / this.stats.totalSearches
 
     return results
   }
@@ -4839,7 +5234,11 @@ export class SparkSearchEngine {
 
   /** Get search statistics */
   getStats(): SearchStats {
-    return { ...this.stats, categoryCounts: { ...this.stats.categoryCounts }, strategyUsage: { ...this.stats.strategyUsage } }
+    return {
+      ...this.stats,
+      categoryCounts: { ...this.stats.categoryCounts },
+      strategyUsage: { ...this.stats.strategyUsage },
+    }
   }
 
   /** Clear all documents and reset */
@@ -4949,16 +5348,19 @@ export class SparkSearchEngine {
     const now = Date.now()
     const decayMs = this.config.recencyDecayDays * 24 * 60 * 60 * 1000
 
-    return baseResults.map(r => {
-      const recencyBoost = Math.exp(-(now - r.document.indexedAt) / decayMs) * 0.2
-      const frequencyBoost = Math.min(r.document.accessCount / 100, 0.1)
-      return {
-        ...r,
-        score: r.score + recencyBoost + frequencyBoost,
-        matchedBy: ['contextual'] as SparkSearchStrategy[],
-        explanation: `${r.explanation} [recency: +${recencyBoost.toFixed(3)}, freq: +${frequencyBoost.toFixed(3)}]`,
-      }
-    }).sort((a, b) => b.score - a.score).slice(0, maxResults)
+    return baseResults
+      .map(r => {
+        const recencyBoost = Math.exp(-(now - r.document.indexedAt) / decayMs) * 0.2
+        const frequencyBoost = Math.min(r.document.accessCount / 100, 0.1)
+        return {
+          ...r,
+          score: r.score + recencyBoost + frequencyBoost,
+          matchedBy: ['contextual'] as SparkSearchStrategy[],
+          explanation: `${r.explanation} [recency: +${recencyBoost.toFixed(3)}, freq: +${frequencyBoost.toFixed(3)}]`,
+        }
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, maxResults)
   }
 
   /** Graph-based spreading activation search */
@@ -4995,7 +5397,10 @@ export class SparkSearchEngine {
 
   /** Combined multi-strategy search */
   private _combinedSearch(queryText: string, maxResults: number): SearchResult[] {
-    const allScores = new Map<string, { score: number; matchedTerms: string[]; strategies: SparkSearchStrategy[] }>()
+    const allScores = new Map<
+      string,
+      { score: number; matchedTerms: string[]; strategies: SparkSearchStrategy[] }
+    >()
 
     const strategyWeight: Record<string, number> = {
       keyword: 0.3,
@@ -5006,20 +5411,44 @@ export class SparkSearchEngine {
     }
 
     // Run keyword + semantic + fuzzy in parallel (conceptually)
-    const strategies: Array<{ name: SparkSearchStrategy; weight: number; results: SearchResult[] }> = [
-      { name: 'keyword', weight: strategyWeight.keyword!, results: this._keywordSearch(queryText, maxResults * 2) },
-      { name: 'semantic', weight: strategyWeight.semantic!, results: this._semanticSearch(queryText, maxResults * 2) },
-      { name: 'fuzzy', weight: strategyWeight.fuzzy!, results: this._fuzzySearch(queryText, maxResults) },
+    const strategies: Array<{
+      name: SparkSearchStrategy
+      weight: number
+      results: SearchResult[]
+    }> = [
+      {
+        name: 'keyword',
+        weight: strategyWeight.keyword!,
+        results: this._keywordSearch(queryText, maxResults * 2),
+      },
+      {
+        name: 'semantic',
+        weight: strategyWeight.semantic!,
+        results: this._semanticSearch(queryText, maxResults * 2),
+      },
+      {
+        name: 'fuzzy',
+        weight: strategyWeight.fuzzy!,
+        results: this._fuzzySearch(queryText, maxResults),
+      },
     ]
 
     if (this.config.enableSynonyms) {
-      strategies.push({ name: 'synonym', weight: strategyWeight.synonym!, results: this._synonymSearch(queryText, maxResults) })
+      strategies.push({
+        name: 'synonym',
+        weight: strategyWeight.synonym!,
+        results: this._synonymSearch(queryText, maxResults),
+      })
     }
 
     // Merge scores
     for (const strat of strategies) {
       for (const result of strat.results) {
-        const existing = allScores.get(result.document.id) ?? { score: 0, matchedTerms: [], strategies: [] }
+        const existing = allScores.get(result.document.id) ?? {
+          score: 0,
+          matchedTerms: [],
+          strategies: [],
+        }
         existing.score += result.score * strat.weight
         for (const term of result.highlights) {
           if (!existing.matchedTerms.includes(term)) existing.matchedTerms.push(term)
@@ -5051,7 +5480,10 @@ export class SparkSearchEngine {
 
   /** Tokenize text into lowercase words */
   private _tokenize(text: string): string[] {
-    return text.toLowerCase().split(/\s+/).filter(w => w.length > 1)
+    return text
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(w => w.length > 1)
   }
 
   /** Build inverted index entry */
@@ -5129,7 +5561,9 @@ export class SparkSearchEngine {
 
   /** Cosine similarity between two TF-IDF vectors */
   private _cosineSimilarity(a: Map<string, number>, b: Map<string, number>): number {
-    let dot = 0, magA = 0, magB = 0
+    let dot = 0,
+      magA = 0,
+      magB = 0
 
     for (const [term, val] of a) {
       magA += val * val
@@ -5234,7 +5668,10 @@ export class SparkSearchEngine {
 
     for (const group of synonymGroups) {
       for (const word of group) {
-        this.synonyms.set(word, group.filter(w => w !== word))
+        this.synonyms.set(
+          word,
+          group.filter(w => w !== word),
+        )
       }
     }
   }
@@ -5270,12 +5707,16 @@ export class MemoryManager {
   // ── Store & Retrieve ───────────────────────────────────────────────────────
 
   /** Store a memory entry */
-  store(key: string, value: string, options?: {
-    category?: string
-    importance?: number
-    associations?: string[]
-    decayRate?: number
-  }): MemoryEntry {
+  store(
+    key: string,
+    value: string,
+    options?: {
+      category?: string
+      importance?: number
+      associations?: string[]
+      decayRate?: number
+    },
+  ): MemoryEntry {
     if (this.entries.size >= this.config.maxEntries) {
       this._consolidate()
     }
@@ -5317,12 +5758,17 @@ export class MemoryManager {
 
   /** Search memories by content similarity */
   recall(query: string, maxResults = 5): MemoryEntry[] {
-    const queryTokens = new Set(query.toLowerCase().split(/\s+/).filter(w => w.length > 2))
+    const queryTokens = new Set(
+      query
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 2),
+    )
     const scored: Array<{ entry: MemoryEntry; score: number }> = []
 
     for (const entry of this.entries.values()) {
       const entryTokens = new Set(
-        (entry.key + ' ' + entry.value + ' ' + entry.category).toLowerCase().split(/\s+/)
+        (entry.key + ' ' + entry.value + ' ' + entry.category).toLowerCase().split(/\s+/),
       )
 
       let overlap = 0
@@ -5668,9 +6114,12 @@ export class AdaptiveToolSelector {
     const existing = records.find(r => r.toolName === toolName && r.domain === domain)
     if (existing) {
       existing.totalCalls++
-      existing.successRate += (((result.success ? 1 : 0) - existing.successRate) / existing.totalCalls)
-      existing.averageConfidence += ((result.confidence - existing.averageConfidence) / existing.totalCalls)
-      existing.averageLatencyMs += ((result.durationMs - existing.averageLatencyMs) / existing.totalCalls)
+      existing.successRate +=
+        ((result.success ? 1 : 0) - existing.successRate) / existing.totalCalls
+      existing.averageConfidence +=
+        (result.confidence - existing.averageConfidence) / existing.totalCalls
+      existing.averageLatencyMs +=
+        (result.durationMs - existing.averageLatencyMs) / existing.totalCalls
       existing.lastUsed = Date.now()
     } else {
       records.push({
@@ -5686,7 +6135,10 @@ export class AdaptiveToolSelector {
   }
 
   /** Select the best tool for a domain based on historical performance */
-  selectBestTool(candidates: string[], domain: TaskDomain): { toolName: string; score: number; reason: string } {
+  selectBestTool(
+    candidates: string[],
+    domain: TaskDomain,
+  ): { toolName: string; score: number; reason: string } {
     let bestTool = candidates[0] ?? 'spark_general'
     let bestScore = -1
     let bestReason = 'default selection'
@@ -5710,7 +6162,9 @@ export class AdaptiveToolSelector {
       }
 
       const latest = records[records.length - 1]!
-      const score = latest.successRate * 0.4 + latest.averageConfidence * 0.3 +
+      const score =
+        latest.successRate * 0.4 +
+        latest.averageConfidence * 0.3 +
         (1 - Math.min(latest.averageLatencyMs / 10000, 1)) * 0.15 +
         Math.min(latest.totalCalls / 50, 1) * 0.15
 
@@ -5759,7 +6213,11 @@ export class ParallelExecutor {
 
   /** Execute multiple tool calls in parallel */
   async executeParallel(
-    tasks: Array<{ toolName: string; input: string; handler: (input: string) => Promise<AgentToolResult> | AgentToolResult }>,
+    tasks: Array<{
+      toolName: string
+      input: string
+      handler: (input: string) => Promise<AgentToolResult> | AgentToolResult
+    }>,
   ): Promise<ParallelResult> {
     const startTime = Date.now()
     const results: AgentToolResult[] = []
@@ -5784,7 +6242,7 @@ export class ParallelExecutor {
               durationMs: Date.now() - start,
             } as AgentToolResult
           }
-        })
+        }),
       )
 
       for (const result of batchResults) {
@@ -5832,13 +6290,17 @@ export class DynamicPlanner {
   private plans: Map<string, DynamicPlan> = new Map()
 
   /** Create a dynamic plan from a goal */
-  createPlan(goal: string, steps: Array<{
-    description: string
-    tool: string
-    dependencies?: string[]
-    priority?: number
-    maxRetries?: number
-  }>, constraints?: string[]): DynamicPlan {
+  createPlan(
+    goal: string,
+    steps: Array<{
+      description: string
+      tool: string
+      dependencies?: string[]
+      priority?: number
+      maxRetries?: number
+    }>,
+    constraints?: string[],
+  ): DynamicPlan {
     const planId = `plan_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 
     const planSteps: PlanStep[] = steps.map((s, i) => ({
@@ -5868,13 +6330,15 @@ export class DynamicPlanner {
 
   /** Get ready steps (all dependencies satisfied) */
   getReadySteps(plan: DynamicPlan): PlanStep[] {
-    return plan.steps.filter(step => {
-      if (step.status !== 'pending') return false
-      return step.dependencies.every(depId => {
-        const dep = plan.steps.find(s => s.id === depId)
-        return dep?.status === 'complete'
+    return plan.steps
+      .filter(step => {
+        if (step.status !== 'pending') return false
+        return step.dependencies.every(depId => {
+          const dep = plan.steps.find(s => s.id === depId)
+          return dep?.status === 'complete'
+        })
       })
-    }).sort((a, b) => a.priority - b.priority)
+      .sort((a, b) => a.priority - b.priority)
   }
 
   /** Mark a step as complete */
@@ -5897,7 +6361,12 @@ export class DynamicPlanner {
   }
 
   /** Replan: create alternative steps for failed ones */
-  replan(plan: DynamicPlan, failedStepId: string, alternativeDescription: string, alternativeTool: string): PlanStep {
+  replan(
+    plan: DynamicPlan,
+    failedStepId: string,
+    alternativeDescription: string,
+    alternativeTool: string,
+  ): PlanStep {
     const failedStep = plan.steps.find(s => s.id === failedStepId)
     if (failedStep) {
       failedStep.retries++
@@ -5934,9 +6403,8 @@ export class DynamicPlanner {
     const completed = new Set<string>()
 
     while (completed.size < plan.steps.length) {
-      const ready = plan.steps.filter(s =>
-        !completed.has(s.id) &&
-        s.dependencies.every(d => completed.has(d))
+      const ready = plan.steps.filter(
+        s => !completed.has(s.id) && s.dependencies.every(d => completed.has(d)),
       )
 
       if (ready.length === 0) break // Circular dependency or all done

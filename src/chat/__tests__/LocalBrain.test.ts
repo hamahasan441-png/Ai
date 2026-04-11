@@ -22,7 +22,9 @@ vi.mock('fs', () => {
   const store = new Map<string, string>()
   return {
     existsSync: vi.fn((p: string) => store.has(p)),
-    writeFileSync: vi.fn((p: string, data: string) => { store.set(p, data) }),
+    writeFileSync: vi.fn((p: string, data: string) => {
+      store.set(p, data)
+    }),
     readFileSync: vi.fn((p: string) => {
       if (store.has(p)) return store.get(p)
       throw new Error('ENOENT')
@@ -35,7 +37,9 @@ vi.mock('fs', () => {
         store.delete(from)
       }
     }),
-    unlinkSync: vi.fn((p: string) => { store.delete(p) }),
+    unlinkSync: vi.fn((p: string) => {
+      store.delete(p)
+    }),
     __store: store,
   }
 })
@@ -121,7 +125,7 @@ describe('LocalBrain', () => {
     it('reinforces existing patterns', () => {
       brain.learn('What is Redux?', 'Redux is a state management library.')
       brain.learn('What is Redux?', 'Redux manages application state.')
-      expect(brain.getLearnedPatternCount()).toBe(1)  // Same pattern, reinforced
+      expect(brain.getLearnedPatternCount()).toBe(1) // Same pattern, reinforced
     })
 
     it('does not learn when disabled', () => {
@@ -135,7 +139,7 @@ describe('LocalBrain', () => {
       b.learn('q1', 'a1')
       b.learn('q2', 'a2')
       b.learn('q3', 'a3')
-      b.learn('q4', 'a4')  // Should evict one
+      b.learn('q4', 'a4') // Should evict one
       expect(b.getLearnedPatternCount()).toBe(3)
     })
 
@@ -209,8 +213,8 @@ describe('LocalBrain', () => {
 
     it('handles out-of-bounds turn index gracefully', async () => {
       await brain.chat('test')
-      brain.feedbackOnTurn(999, true)  // Should not throw
-      brain.feedbackOnTurn(-1, true)   // Should not throw
+      brain.feedbackOnTurn(999, true) // Should not throw
+      brain.feedbackOnTurn(-1, true) // Should not throw
     })
   })
 
@@ -313,13 +317,43 @@ describe('LocalBrain', () => {
     it('handles old patterns without priority field', () => {
       // Simulate old brain state without priority
       const state = {
-        config: { model: 'test', maxResponseLength: 4096, creativity: 0.3, systemPrompt: '', learningEnabled: true, maxLearnedPatterns: 100, autoSavePath: '', autoSaveInterval: 5, decayRate: 0.01, minConfidence: 0.1, useTfIdf: true },
+        config: {
+          model: 'test',
+          maxResponseLength: 4096,
+          creativity: 0.3,
+          systemPrompt: '',
+          learningEnabled: true,
+          maxLearnedPatterns: 100,
+          autoSavePath: '',
+          autoSaveInterval: 5,
+          decayRate: 0.01,
+          minConfidence: 0.1,
+          useTfIdf: true,
+        },
         learnedPatterns: [
-          { inputPattern: 'test', keywords: ['test'], response: 'response', category: 'learned', reinforcements: 1, lastUsed: new Date().toISOString(), confidence: 0.5 },
+          {
+            inputPattern: 'test',
+            keywords: ['test'],
+            response: 'response',
+            category: 'learned',
+            reinforcements: 1,
+            lastUsed: new Date().toISOString(),
+            confidence: 0.5,
+          },
         ],
         conversationHistory: [],
         knowledgeAdditions: [],
-        stats: { totalChats: 0, totalCodeGenerations: 0, totalCodeReviews: 0, totalImageAnalyses: 0, totalLearnings: 1, patternsLearned: 1, knowledgeEntriesAdded: 0, createdAt: new Date().toISOString(), lastUsedAt: new Date().toISOString() },
+        stats: {
+          totalChats: 0,
+          totalCodeGenerations: 0,
+          totalCodeReviews: 0,
+          totalImageAnalyses: 0,
+          totalLearnings: 1,
+          patternsLearned: 1,
+          knowledgeEntriesAdded: 0,
+          createdAt: new Date().toISOString(),
+          lastUsedAt: new Date().toISOString(),
+        },
       }
 
       const restored = LocalBrain.deserializeBrain(JSON.stringify(state))
@@ -454,10 +488,7 @@ function x(a,b,c,d,e,f,g,h,i,j) {
 
   describe('fixCode (CodeMaster CodeFixer)', () => {
     it('returns FixResult with fixes array', () => {
-      const result = brain.fixCode(
-        'if (x == null) { console.log(x) }',
-        'javascript',
-      )
+      const result = brain.fixCode('if (x == null) { console.log(x) }', 'javascript')
       expect(result).toBeDefined()
       expect(result.fixes).toBeDefined()
       expect(Array.isArray(result.fixes)).toBe(true)
@@ -534,9 +565,9 @@ function process(data) {
     it('detects security issues via CodeMaster', async () => {
       const code = 'function run(input) { eval(input); }'
       const result = await brain.reviewCode({ code, language: 'javascript' })
-      const securityIssues = result.issues.filter(i =>
-        i.message.toLowerCase().includes('eval') ||
-        i.message.toLowerCase().includes('security'),
+      const securityIssues = result.issues.filter(
+        i =>
+          i.message.toLowerCase().includes('eval') || i.message.toLowerCase().includes('security'),
       )
       expect(securityIssues.length).toBeGreaterThan(0)
     })
@@ -840,7 +871,12 @@ function process(data) {
     })
 
     it('generates component + test + types + styles for UI', async () => {
-      const result = await brain.generateMultiFile('button component', 'typescript', ['component', 'test', 'types', 'styles'])
+      const result = await brain.generateMultiFile('button component', 'typescript', [
+        'component',
+        'test',
+        'types',
+        'styles',
+      ])
       expect(result.files.length).toBe(4)
       expect(result.files.some(f => f.filename.endsWith('.tsx'))).toBe(true)
       expect(result.files.some(f => f.filename.endsWith('.test.ts'))).toBe(true)
@@ -849,7 +885,11 @@ function process(data) {
     })
 
     it('generates api + test + types for API', async () => {
-      const result = await brain.generateMultiFile('create an api endpoint', 'typescript', ['api', 'test', 'types'])
+      const result = await brain.generateMultiFile('create an api endpoint', 'typescript', [
+        'api',
+        'test',
+        'types',
+      ])
       expect(result.files.length).toBe(3)
       expect(result.files.some(f => f.filename.includes('.api.'))).toBe(true)
     })
@@ -860,7 +900,10 @@ function process(data) {
     })
 
     it('generates hook files', async () => {
-      const result = await brain.generateMultiFile('custom hook for auth', 'typescript', ['hook', 'test'])
+      const result = await brain.generateMultiFile('custom hook for auth', 'typescript', [
+        'hook',
+        'test',
+      ])
       expect(result.files.some(f => f.filename.startsWith('use'))).toBe(true)
     })
 
@@ -886,7 +929,8 @@ function process(data) {
 
   describe('suggestRefactorings', () => {
     it('detects long methods', () => {
-      const longFunction = 'function longFunc() {\n' + Array(35).fill('  const x = 1\n').join('') + '}'
+      const longFunction =
+        'function longFunc() {\n' + Array(35).fill('  const x = 1\n').join('') + '}'
       const suggestions = brain.suggestRefactorings(longFunction)
       expect(suggestions.some(s => s.smell === 'Long Method')).toBe(true)
     })
@@ -923,7 +967,8 @@ function process(data) {
     })
 
     it('returns sorted by priority', () => {
-      const longCode = 'function longFunc() {\n' + Array(65).fill('  const x = 86400\n').join('') + '}'
+      const longCode =
+        'function longFunc() {\n' + Array(65).fill('  const x = 86400\n').join('') + '}'
       const suggestions = brain.suggestRefactorings(longCode)
       if (suggestions.length >= 2) {
         const priorities = suggestions.map(s => s.priority)
@@ -942,7 +987,8 @@ function process(data) {
     })
 
     it('includes suggestion text', () => {
-      const longFunction = 'function longFunc() {\n' + Array(35).fill('  const x = 1\n').join('') + '}'
+      const longFunction =
+        'function longFunc() {\n' + Array(35).fill('  const x = 1\n').join('') + '}'
       const suggestions = brain.suggestRefactorings(longFunction)
       for (const s of suggestions) {
         expect(s.suggestion).toBeDefined()
@@ -1047,7 +1093,11 @@ function process(data) {
       const freshBrain = new LocalBrain({ learningEnabled: true, useTfIdf: true })
       const result = freshBrain.assessConfidence('help me with this')
       if (!result.confident) {
-        expect(result.clarifyingQuestions!.some(q => q.toLowerCase().includes('language') || q.toLowerCase().includes('details'))).toBe(true)
+        expect(
+          result.clarifyingQuestions!.some(
+            q => q.toLowerCase().includes('language') || q.toLowerCase().includes('details'),
+          ),
+        ).toBe(true)
       }
     })
 

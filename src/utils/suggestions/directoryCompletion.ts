@@ -52,10 +52,7 @@ const pathCache = new LRUCache<string, PathEntry[]>({
 /**
  * Parses a partial path into directory and prefix components
  */
-export function parsePartialPath(
-  partialPath: string,
-  basePath?: string,
-): ParsedPath {
+export function parsePartialPath(partialPath: string, basePath?: string): ParsedPath {
   // Handle empty input
   if (!partialPath) {
     const directory = basePath || getCwd()
@@ -81,9 +78,7 @@ export function parsePartialPath(
  * Scans a directory and returns subdirectories
  * Uses LRU cache to avoid repeated filesystem calls
  */
-export async function scanDirectory(
-  dirPath: string,
-): Promise<DirectoryEntry[]> {
+export async function scanDirectory(dirPath: string): Promise<DirectoryEntry[]> {
   // Check cache first
   const cached = directoryCache.get(dirPath)
   if (cached) {

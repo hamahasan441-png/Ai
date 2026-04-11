@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  MultiModalFusion,
-  type SourceOutput,
-  type FusionConflict,
-} from '../MultiModalFusion'
+import { MultiModalFusion, type SourceOutput, type FusionConflict } from '../MultiModalFusion'
 
 // ── Helpers ──
 
@@ -208,8 +204,16 @@ describe('MultiModalFusion fuse', () => {
   it('fuses two valid source outputs', () => {
     const src1 = fusion.registerSource('s1', 'ai')
     const src2 = fusion.registerSource('s2', 'ai')
-    const o1 = makeOutput({ sourceId: src1.id, content: 'Deep learning uses neural networks', confidence: 0.9 })
-    const o2 = makeOutput({ sourceId: src2.id, content: 'Transformers advanced language modeling', confidence: 0.8 })
+    const o1 = makeOutput({
+      sourceId: src1.id,
+      content: 'Deep learning uses neural networks',
+      confidence: 0.9,
+    })
+    const o2 = makeOutput({
+      sourceId: src2.id,
+      content: 'Transformers advanced language modeling',
+      confidence: 0.8,
+    })
     const result = fusion.fuse([o1, o2])
     expect(result.fusedContent.length).toBeGreaterThan(0)
     expect(result.confidence).toBeGreaterThan(0)
@@ -219,8 +223,16 @@ describe('MultiModalFusion fuse', () => {
   it('increments totalFusions stat', () => {
     const src1 = fusion.registerSource('s1', 'ai')
     const src2 = fusion.registerSource('s2', 'ai')
-    const o1 = makeOutput({ sourceId: src1.id, content: 'Neural networks learn representations', confidence: 0.8 })
-    const o2 = makeOutput({ sourceId: src2.id, content: 'Gradient descent optimizes parameters', confidence: 0.7 })
+    const o1 = makeOutput({
+      sourceId: src1.id,
+      content: 'Neural networks learn representations',
+      confidence: 0.8,
+    })
+    const o2 = makeOutput({
+      sourceId: src2.id,
+      content: 'Gradient descent optimizes parameters',
+      confidence: 0.7,
+    })
     fusion.fuse([o1, o2])
     expect(fusion.getStats().totalFusions).toBe(1)
   })
@@ -246,8 +258,16 @@ describe('MultiModalFusion fuse', () => {
   it('updates source useCount after fusion', () => {
     const src1 = fusion.registerSource('s1', 'ai')
     const src2 = fusion.registerSource('s2', 'ai')
-    const o1 = makeOutput({ sourceId: src1.id, content: 'Reinforcement learning trains agents', confidence: 0.9 })
-    const o2 = makeOutput({ sourceId: src2.id, content: 'Reward functions guide behavior', confidence: 0.8 })
+    const o1 = makeOutput({
+      sourceId: src1.id,
+      content: 'Reinforcement learning trains agents',
+      confidence: 0.9,
+    })
+    const o2 = makeOutput({
+      sourceId: src2.id,
+      content: 'Reward functions guide behavior',
+      confidence: 0.8,
+    })
     fusion.fuse([o1, o2])
     const sources = fusion.getSources()
     const s1 = sources.find(s => s.id === src1.id)!
@@ -257,8 +277,16 @@ describe('MultiModalFusion fuse', () => {
   it('explanation includes source count', () => {
     const src1 = fusion.registerSource('s1', 'ai')
     const src2 = fusion.registerSource('s2', 'ai')
-    const o1 = makeOutput({ sourceId: src1.id, content: 'Convolutional layers extract features', confidence: 0.9 })
-    const o2 = makeOutput({ sourceId: src2.id, content: 'Pooling layers reduce dimensions', confidence: 0.8 })
+    const o1 = makeOutput({
+      sourceId: src1.id,
+      content: 'Convolutional layers extract features',
+      confidence: 0.9,
+    })
+    const o2 = makeOutput({
+      sourceId: src2.id,
+      content: 'Pooling layers reduce dimensions',
+      confidence: 0.8,
+    })
     const result = fusion.fuse([o1, o2])
     expect(result.explanation).toContain('Fused 2 source outputs')
   })
@@ -266,7 +294,11 @@ describe('MultiModalFusion fuse', () => {
   it('respects minSourcesForFusion=1 config', () => {
     const f = new MultiModalFusion({ minSourcesForFusion: 1 })
     const src = f.registerSource('s1', 'ai')
-    const o = makeOutput({ sourceId: src.id, content: 'Single source data analysis result', confidence: 0.85 })
+    const o = makeOutput({
+      sourceId: src.id,
+      content: 'Single source data analysis result',
+      confidence: 0.85,
+    })
     const result = f.fuse([o])
     expect(result.confidence).toBeGreaterThan(0)
     expect(result.explanation).toContain('Fused 1 source')
@@ -277,9 +309,21 @@ describe('MultiModalFusion fuse', () => {
     const s2 = fusion.registerSource('s2', 'ai')
     const s3 = fusion.registerSource('s3', 'ai')
     const result = fusion.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Attention mechanisms weight inputs selectively', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Embeddings represent words as vectors', confidence: 0.85 }),
-      makeOutput({ sourceId: s3.id, content: 'Tokenization splits text into subwords', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Attention mechanisms weight inputs selectively',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Embeddings represent words as vectors',
+        confidence: 0.85,
+      }),
+      makeOutput({
+        sourceId: s3.id,
+        content: 'Tokenization splits text into subwords',
+        confidence: 0.8,
+      }),
     ])
     expect(result.sources).toHaveLength(3)
     expect(result.confidence).toBeGreaterThan(0)
@@ -289,7 +333,11 @@ describe('MultiModalFusion fuse', () => {
     const s1 = fusion.registerSource('s1', 'ai', 0.9)
     const s2 = fusion.registerSource('s2', 'ai', 0.5)
     const result = fusion.fuse([
-      makeOutput({ sourceId: s1.id, content: 'BERT uses bidirectional attention', confidence: 0.95 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'BERT uses bidirectional attention',
+        confidence: 0.95,
+      }),
       makeOutput({ sourceId: s2.id, content: 'GPT uses autoregressive decoding', confidence: 0.4 }),
     ])
     expect(result.fusedContent).toContain('BERT')
@@ -300,8 +348,16 @@ describe('MultiModalFusion fuse', () => {
     const s1 = f.registerSource('s1', 'health')
     const s2 = f.registerSource('s2', 'health')
     const result = f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Exercise improves cardiovascular health significantly', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Exercise does not improve cardiovascular health', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Exercise improves cardiovascular health significantly',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Exercise does not improve cardiovascular health',
+        confidence: 0.8,
+      }),
     ])
     expect(result.conflicts).toHaveLength(0)
   })
@@ -322,8 +378,18 @@ describe('MultiModalFusion fuse', () => {
     const s1 = f.registerSource('s1', 'ai')
     const s2 = f.registerSource('s2', 'biology')
     const _result = f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Neural networks model brain patterns', confidence: 0.9, domain: 'ai' }),
-      makeOutput({ sourceId: s2.id, content: 'Neurons fire in brain patterns', confidence: 0.85, domain: 'biology' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Neural networks model brain patterns',
+        confidence: 0.9,
+        domain: 'ai',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Neurons fire in brain patterns',
+        confidence: 0.85,
+        domain: 'biology',
+      }),
     ])
     expect(f.getStats().totalCrossDomainSyntheses).toBe(0)
   })
@@ -332,8 +398,16 @@ describe('MultiModalFusion fuse', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'ai')
     const result = fusion.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Backpropagation computes gradients efficiently', confidence: 0.777 }),
-      makeOutput({ sourceId: s2.id, content: 'Stochastic gradient descent converges slowly', confidence: 0.333 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Backpropagation computes gradients efficiently',
+        confidence: 0.777,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Stochastic gradient descent converges slowly',
+        confidence: 0.333,
+      }),
     ])
     const decimals = result.confidence.toString().split('.')[1]
     expect(!decimals || decimals.length <= 2).toBe(true)
@@ -343,8 +417,16 @@ describe('MultiModalFusion fuse', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'ai')
     const result = fusion.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Transfer learning reuses pretrained models', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Fine-tuning adapts pretrained models', confidence: 0.85 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Transfer learning reuses pretrained models',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Fine-tuning adapts pretrained models',
+        confidence: 0.85,
+      }),
     ])
     const decimals = result.consensusLevel.toString().split('.')[1]
     expect(!decimals || decimals.length <= 2).toBe(true)
@@ -354,8 +436,16 @@ describe('MultiModalFusion fuse', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'ai')
     fusion.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Recurrent networks handle sequences well', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'LSTM cells retain long-term memory', confidence: 0.85 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Recurrent networks handle sequences well',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'LSTM cells retain long-term memory',
+        confidence: 0.85,
+      }),
     ])
     expect(fusion.getStats().avgFusionConfidence).toBeGreaterThan(0)
   })
@@ -374,8 +464,16 @@ describe('MultiModalFusion detectConflicts', () => {
     const s1 = fusion.registerSource('s1', 'health')
     const s2 = fusion.registerSource('s2', 'health')
     const conflicts = fusion.detectConflicts([
-      makeOutput({ sourceId: s1.id, content: 'Regular exercise improves cardiovascular health significantly', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Regular exercise does not improve cardiovascular health significantly', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Regular exercise improves cardiovascular health significantly',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Regular exercise does not improve cardiovascular health significantly',
+        confidence: 0.8,
+      }),
     ])
     expect(conflicts.length).toBeGreaterThanOrEqual(1)
     expect(conflicts[0].source1Id).toBe(s1.id)
@@ -386,8 +484,16 @@ describe('MultiModalFusion detectConflicts', () => {
     const s1 = fusion.registerSource('s1', 'cooking')
     const s2 = fusion.registerSource('s2', 'music')
     const conflicts = fusion.detectConflicts([
-      makeOutput({ sourceId: s1.id, content: 'Sourdough bread requires long fermentation times', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Jazz improvisation follows harmonic chord progressions', confidence: 0.85 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Sourdough bread requires long fermentation times',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Jazz improvisation follows harmonic chord progressions',
+        confidence: 0.85,
+      }),
     ])
     expect(conflicts).toHaveLength(0)
   })
@@ -409,8 +515,16 @@ describe('MultiModalFusion detectConflicts', () => {
     const s1 = fusion.registerSource('alpha', 'health')
     const s2 = fusion.registerSource('beta', 'health')
     const conflicts = fusion.detectConflicts([
-      makeOutput({ sourceId: s1.id, content: 'Vitamin supplements improve overall health significantly', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Vitamin supplements do not improve overall health', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Vitamin supplements improve overall health significantly',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Vitamin supplements do not improve overall health',
+        confidence: 0.8,
+      }),
     ])
     if (conflicts.length > 0) {
       expect(conflicts[0].description).toContain('alpha')
@@ -422,8 +536,16 @@ describe('MultiModalFusion detectConflicts', () => {
     const s1 = fusion.registerSource('s1', 'finance')
     const s2 = fusion.registerSource('s2', 'finance')
     const conflicts = fusion.detectConflicts([
-      makeOutput({ sourceId: s1.id, content: 'Stock markets always recover after major crashes eventually', confidence: 0.8 }),
-      makeOutput({ sourceId: s2.id, content: 'Stock markets never recover after major crashes eventually', confidence: 0.7 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Stock markets always recover after major crashes eventually',
+        confidence: 0.8,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Stock markets never recover after major crashes eventually',
+        confidence: 0.7,
+      }),
     ])
     expect(conflicts.length).toBeGreaterThanOrEqual(1)
   })
@@ -433,9 +555,21 @@ describe('MultiModalFusion detectConflicts', () => {
     const s2 = fusion.registerSource('s2', 'health')
     const s3 = fusion.registerSource('s3', 'health')
     const conflicts = fusion.detectConflicts([
-      makeOutput({ sourceId: s1.id, content: 'Coffee consumption improves alertness and cognitive performance', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Coffee consumption does not improve alertness or cognitive performance', confidence: 0.8 }),
-      makeOutput({ sourceId: s3.id, content: 'Coffee consumption never improves alertness and cognitive performance', confidence: 0.7 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Coffee consumption improves alertness and cognitive performance',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Coffee consumption does not improve alertness or cognitive performance',
+        confidence: 0.8,
+      }),
+      makeOutput({
+        sourceId: s3.id,
+        content: 'Coffee consumption never improves alertness and cognitive performance',
+        confidence: 0.7,
+      }),
     ])
     expect(conflicts.length).toBeGreaterThanOrEqual(1)
   })
@@ -444,8 +578,16 @@ describe('MultiModalFusion detectConflicts', () => {
     const s1 = fusion.registerSource('s1', 'cooking')
     const s2 = fusion.registerSource('s2', 'astronomy')
     const conflicts = fusion.detectConflicts([
-      makeOutput({ sourceId: s1.id, content: 'Baking bread requires yeast and flour combined together', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Black holes warp spacetime creating singularities', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Baking bread requires yeast and flour combined together',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Black holes warp spacetime creating singularities',
+        confidence: 0.8,
+      }),
     ])
     expect(conflicts).toHaveLength(0)
   })
@@ -459,8 +601,16 @@ describe('MultiModalFusion resolveConflict', () => {
     const s1 = f.registerSource('s1', 'ai', 0.9)
     const s2 = f.registerSource('s2', 'ai', 0.5)
     const outputs = [
-      makeOutput({ sourceId: s1.id, content: 'Supervised learning requires labeled training data', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Supervised learning does not require labeled data', confidence: 0.5 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Supervised learning requires labeled training data',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Supervised learning does not require labeled data',
+        confidence: 0.5,
+      }),
     ]
     const conflict: FusionConflict = {
       source1Id: s1.id,
@@ -484,8 +634,16 @@ describe('MultiModalFusion resolveConflict', () => {
     const s1 = f.registerSource('s1', 'ai', 0.8)
     const s2 = f.registerSource('s2', 'ai', 0.8)
     const outputs = [
-      makeOutput({ sourceId: s1.id, content: 'Transformers outperform recurrent models', confidence: 0.95 }),
-      makeOutput({ sourceId: s2.id, content: 'Recurrent models outperform transformers', confidence: 0.6 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Transformers outperform recurrent models',
+        confidence: 0.95,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Recurrent models outperform transformers',
+        confidence: 0.6,
+      }),
     ]
     const conflict: FusionConflict = {
       source1Id: s1.id,
@@ -505,8 +663,16 @@ describe('MultiModalFusion resolveConflict', () => {
     const s1 = f.registerSource('s1', 'ai', 0.9)
     const s2 = f.registerSource('s2', 'ai', 0.3)
     const outputs = [
-      makeOutput({ sourceId: s1.id, content: 'GANs generate realistic synthetic images', confidence: 0.8 }),
-      makeOutput({ sourceId: s2.id, content: 'GANs cannot generate realistic images', confidence: 0.7 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'GANs generate realistic synthetic images',
+        confidence: 0.8,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'GANs cannot generate realistic images',
+        confidence: 0.7,
+      }),
     ]
     const conflict: FusionConflict = {
       source1Id: s1.id,
@@ -583,8 +749,16 @@ describe('MultiModalFusion resolveConflict', () => {
     const s1 = f.registerSource('s1', 'ai', 0.5)
     const s2 = f.registerSource('s2', 'ai', 0.9)
     const outputs = [
-      makeOutput({ sourceId: s1.id, content: 'Low reliability source view on classification', confidence: 0.8 }),
-      makeOutput({ sourceId: s2.id, content: 'High reliability source view on classification', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Low reliability source view on classification',
+        confidence: 0.8,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'High reliability source view on classification',
+        confidence: 0.8,
+      }),
     ]
     const conflict: FusionConflict = {
       source1Id: s1.id,
@@ -604,7 +778,11 @@ describe('MultiModalFusion resolveConflict', () => {
     const s2 = f.registerSource('s2', 'ai', 0.95)
     const outputs = [
       makeOutput({ sourceId: s1.id, content: 'Low weighted source opinion here', confidence: 0.5 }),
-      makeOutput({ sourceId: s2.id, content: 'High weighted source opinion here', confidence: 0.9 }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'High weighted source opinion here',
+        confidence: 0.9,
+      }),
     ]
     const conflict: FusionConflict = {
       source1Id: s1.id,
@@ -647,8 +825,16 @@ describe('MultiModalFusion detectConsensus', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'ai')
     const result = fusion.detectConsensus([
-      makeOutput({ sourceId: s1.id, content: 'Deep learning revolutionized computer vision', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Deep learning revolutionized computer vision', confidence: 0.85 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Deep learning revolutionized computer vision',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Deep learning revolutionized computer vision',
+        confidence: 0.85,
+      }),
     ])
     expect(result.reached).toBe(true)
     expect(result.level).toBe(1)
@@ -660,9 +846,21 @@ describe('MultiModalFusion detectConsensus', () => {
     const s2 = fusion.registerSource('s2', 'ai')
     const s3 = fusion.registerSource('s3', 'ai')
     const result = fusion.detectConsensus([
-      makeOutput({ sourceId: s1.id, content: 'Transformer models excel at language understanding tasks', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Transformer models are great at language understanding tasks', confidence: 0.85 }),
-      makeOutput({ sourceId: s3.id, content: 'Transformer models perform well in language understanding tasks', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Transformer models excel at language understanding tasks',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Transformer models are great at language understanding tasks',
+        confidence: 0.85,
+      }),
+      makeOutput({
+        sourceId: s3.id,
+        content: 'Transformer models perform well in language understanding tasks',
+        confidence: 0.8,
+      }),
     ])
     expect(result.reached).toBe(true)
     expect(result.level).toBeGreaterThan(0)
@@ -672,8 +870,16 @@ describe('MultiModalFusion detectConsensus', () => {
     const s1 = fusion.registerSource('s1', 'cooking')
     const s2 = fusion.registerSource('s2', 'astronomy')
     const result = fusion.detectConsensus([
-      makeOutput({ sourceId: s1.id, content: 'Baking sourdough requires starter culture', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Quantum entanglement enables teleportation', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Baking sourdough requires starter culture',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Quantum entanglement enables teleportation',
+        confidence: 0.8,
+      }),
     ])
     expect(result.reached).toBe(false)
     expect(result.agreeing.length).toBeLessThanOrEqual(1)
@@ -685,9 +891,21 @@ describe('MultiModalFusion detectConsensus', () => {
     const s2 = high.registerSource('s2', 'ai')
     const s3 = high.registerSource('s3', 'cooking')
     const outputs = [
-      makeOutput({ sourceId: s1.id, content: 'Machine learning patterns classification', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Machine learning patterns classification', confidence: 0.85 }),
-      makeOutput({ sourceId: s3.id, content: 'Bread baking temperature timing yeast flour', confidence: 0.7 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Machine learning patterns classification',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Machine learning patterns classification',
+        confidence: 0.85,
+      }),
+      makeOutput({
+        sourceId: s3.id,
+        content: 'Bread baking temperature timing yeast flour',
+        confidence: 0.7,
+      }),
     ]
     const result = high.detectConsensus(outputs)
     // with threshold 0.99, 2 out of 3 agreeing (0.67) won't reach consensus
@@ -698,8 +916,16 @@ describe('MultiModalFusion detectConsensus', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'ai')
     const result = fusion.detectConsensus([
-      makeOutput({ sourceId: s1.id, content: 'Classification algorithms categorize data', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Classification algorithms categorize data', confidence: 0.85 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Classification algorithms categorize data',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Classification algorithms categorize data',
+        confidence: 0.85,
+      }),
     ])
     expect(result.level).toBe(1)
   })
@@ -718,8 +944,18 @@ describe('MultiModalFusion synthesizeCrossDomain', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'ai')
     const insights = fusion.synthesizeCrossDomain([
-      makeOutput({ sourceId: s1.id, content: 'Neural networks process data', confidence: 0.9, domain: 'ai' }),
-      makeOutput({ sourceId: s2.id, content: 'Deep learning models improve', confidence: 0.85, domain: 'ai' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Neural networks process data',
+        confidence: 0.9,
+        domain: 'ai',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Deep learning models improve',
+        confidence: 0.85,
+        domain: 'ai',
+      }),
     ])
     expect(insights).toHaveLength(0)
   })
@@ -733,8 +969,18 @@ describe('MultiModalFusion synthesizeCrossDomain', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'biology')
     const insights = fusion.synthesizeCrossDomain([
-      makeOutput({ sourceId: s1.id, content: 'Neural network models learn patterns through training data', confidence: 0.9, domain: 'ai' }),
-      makeOutput({ sourceId: s2.id, content: 'Biological neural pathways learn patterns through experience', confidence: 0.85, domain: 'biology' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Neural network models learn patterns through training data',
+        confidence: 0.9,
+        domain: 'ai',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Biological neural pathways learn patterns through experience',
+        confidence: 0.85,
+        domain: 'biology',
+      }),
     ])
     expect(insights.length).toBeGreaterThanOrEqual(1)
     if (insights.length > 0) {
@@ -749,8 +995,18 @@ describe('MultiModalFusion synthesizeCrossDomain', () => {
     const s1 = fusion.registerSource('s1', 'cooking')
     const s2 = fusion.registerSource('s2', 'astronomy')
     const insights = fusion.synthesizeCrossDomain([
-      makeOutput({ sourceId: s1.id, content: 'Baking bread requires yeast flour dough', confidence: 0.9, domain: 'cooking' }),
-      makeOutput({ sourceId: s2.id, content: 'Galaxies contain billions of stars planets', confidence: 0.85, domain: 'astronomy' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Baking bread requires yeast flour dough',
+        confidence: 0.9,
+        domain: 'cooking',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Galaxies contain billions of stars planets',
+        confidence: 0.85,
+        domain: 'astronomy',
+      }),
     ])
     expect(insights).toHaveLength(0)
   })
@@ -759,8 +1015,18 @@ describe('MultiModalFusion synthesizeCrossDomain', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'neuroscience')
     const insights = fusion.synthesizeCrossDomain([
-      makeOutput({ sourceId: s1.id, content: 'Pattern recognition learning algorithms model brain processing', confidence: 0.9, domain: 'ai' }),
-      makeOutput({ sourceId: s2.id, content: 'Brain processing patterns recognition learning neurons', confidence: 0.85, domain: 'neuroscience' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Pattern recognition learning algorithms model brain processing',
+        confidence: 0.9,
+        domain: 'ai',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Brain processing patterns recognition learning neurons',
+        confidence: 0.85,
+        domain: 'neuroscience',
+      }),
     ])
     if (insights.length > 0) {
       expect(insights[0].insight).toContain('ai')
@@ -773,9 +1039,24 @@ describe('MultiModalFusion synthesizeCrossDomain', () => {
     const s2 = fusion.registerSource('s2', 'biology')
     const s3 = fusion.registerSource('s3', 'psychology')
     const insights = fusion.synthesizeCrossDomain([
-      makeOutput({ sourceId: s1.id, content: 'Learning algorithms adapt behavior through feedback signals', confidence: 0.9, domain: 'ai' }),
-      makeOutput({ sourceId: s2.id, content: 'Organisms adapt behavior through evolutionary feedback signals', confidence: 0.85, domain: 'biology' }),
-      makeOutput({ sourceId: s3.id, content: 'Humans adapt behavior through cognitive feedback signals', confidence: 0.8, domain: 'psychology' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Learning algorithms adapt behavior through feedback signals',
+        confidence: 0.9,
+        domain: 'ai',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Organisms adapt behavior through evolutionary feedback signals',
+        confidence: 0.85,
+        domain: 'biology',
+      }),
+      makeOutput({
+        sourceId: s3.id,
+        content: 'Humans adapt behavior through cognitive feedback signals',
+        confidence: 0.8,
+        domain: 'psychology',
+      }),
     ])
     // Could produce up to 3 pairwise insights
     expect(insights.length).toBeGreaterThanOrEqual(1)
@@ -785,8 +1066,18 @@ describe('MultiModalFusion synthesizeCrossDomain', () => {
     const s1 = fusion.registerSource('s1', 'AI')
     const s2 = fusion.registerSource('s2', 'ai')
     const insights = fusion.synthesizeCrossDomain([
-      makeOutput({ sourceId: s1.id, content: 'Neural networks process data', confidence: 0.9, domain: 'AI' }),
-      makeOutput({ sourceId: s2.id, content: 'Neural networks process data too', confidence: 0.85, domain: 'ai' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Neural networks process data',
+        confidence: 0.9,
+        domain: 'AI',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Neural networks process data too',
+        confidence: 0.85,
+        domain: 'ai',
+      }),
     ])
     // Same domain after normalization → no cross-domain
     expect(insights).toHaveLength(0)
@@ -899,8 +1190,16 @@ describe('MultiModalFusion provideFeedback', () => {
   it('good feedback (>=0.5) increases source reliability', () => {
     const s1 = fusion.registerSource('s1', 'ai', 0.7)
     const s2 = fusion.registerSource('s2', 'ai', 0.7)
-    const o1 = makeOutput({ sourceId: s1.id, content: 'Attention mechanisms are powerful models', confidence: 0.9 })
-    const o2 = makeOutput({ sourceId: s2.id, content: 'Transformers use attention mechanisms effectively', confidence: 0.85 })
+    const o1 = makeOutput({
+      sourceId: s1.id,
+      content: 'Attention mechanisms are powerful models',
+      confidence: 0.9,
+    })
+    const o2 = makeOutput({
+      sourceId: s2.id,
+      content: 'Transformers use attention mechanisms effectively',
+      confidence: 0.85,
+    })
     const _result = fusion.fuse([o1, o2])
 
     // Get a fusion ID from the log by providing feedback with known key
@@ -984,8 +1283,16 @@ describe('MultiModalFusion getStats / getSources / getConfig / reset', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'ai')
     fusion.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Clustering groups similar data points together', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Dimensionality reduction compresses feature space', confidence: 0.85 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Clustering groups similar data points together',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Dimensionality reduction compresses feature space',
+        confidence: 0.85,
+      }),
     ])
     fusion.provideFeedback('f1', 0.8)
     fusion.reset()
@@ -1011,8 +1318,16 @@ describe('MultiModalFusion getStats / getSources / getConfig / reset', () => {
     const s1 = fusion.registerSource('s1', 'ai')
     const s2 = fusion.registerSource('s2', 'ai')
     fusion.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Deep learning models require large training datasets', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Deep learning models require large training datasets', confidence: 0.85 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Deep learning models require large training datasets',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Deep learning models require large training datasets',
+        confidence: 0.85,
+      }),
     ])
     expect(fusion.getStats().totalConsensusReached).toBeGreaterThanOrEqual(1)
   })
@@ -1021,8 +1336,16 @@ describe('MultiModalFusion getStats / getSources / getConfig / reset', () => {
     const s1 = fusion.registerSource('s1', 'health')
     const s2 = fusion.registerSource('s2', 'health')
     fusion.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Meditation reduces stress levels significantly', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Meditation does not reduce stress levels significantly', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Meditation reduces stress levels significantly',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Meditation does not reduce stress levels significantly',
+        confidence: 0.8,
+      }),
     ])
     expect(fusion.getStats().totalConflictsResolved).toBeGreaterThanOrEqual(1)
   })
@@ -1038,9 +1361,24 @@ describe('MultiModalFusion integration scenarios', () => {
     const s3 = f.registerSource('audio-model', 'audio', 0.7)
 
     const result = f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Text analysis reveals positive sentiment about machine learning', confidence: 0.85, domain: 'nlp' }),
-      makeOutput({ sourceId: s2.id, content: 'Image classification detects objects with machine learning accuracy', confidence: 0.8, domain: 'cv' }),
-      makeOutput({ sourceId: s3.id, content: 'Speech recognition improves with machine learning techniques', confidence: 0.75, domain: 'audio' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Text analysis reveals positive sentiment about machine learning',
+        confidence: 0.85,
+        domain: 'nlp',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Image classification detects objects with machine learning accuracy',
+        confidence: 0.8,
+        domain: 'cv',
+      }),
+      makeOutput({
+        sourceId: s3.id,
+        content: 'Speech recognition improves with machine learning techniques',
+        confidence: 0.75,
+        domain: 'audio',
+      }),
     ])
 
     expect(result.fusedContent.length).toBeGreaterThan(0)
@@ -1060,8 +1398,16 @@ describe('MultiModalFusion integration scenarios', () => {
 
     for (let i = 0; i < 5; i++) {
       f.fuse([
-        makeOutput({ sourceId: s1.id, content: `Analysis batch ${i} showing positive results trends`, confidence: 0.8 }),
-        makeOutput({ sourceId: s2.id, content: `Analysis batch ${i} confirming positive results trends`, confidence: 0.75 }),
+        makeOutput({
+          sourceId: s1.id,
+          content: `Analysis batch ${i} showing positive results trends`,
+          confidence: 0.8,
+        }),
+        makeOutput({
+          sourceId: s2.id,
+          content: `Analysis batch ${i} confirming positive results trends`,
+          confidence: 0.75,
+        }),
       ])
     }
 
@@ -1075,8 +1421,16 @@ describe('MultiModalFusion integration scenarios', () => {
     const s2 = f.registerSource('pessimist', 'market')
 
     f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Regular exercise significantly improves cardiovascular health outcomes', confidence: 0.8 }),
-      makeOutput({ sourceId: s2.id, content: 'Regular exercise does not improve cardiovascular health outcomes', confidence: 0.75 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Regular exercise significantly improves cardiovascular health outcomes',
+        confidence: 0.8,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Regular exercise does not improve cardiovascular health outcomes',
+        confidence: 0.75,
+      }),
     ])
 
     expect(f.getStats().totalConflictsResolved).toBeGreaterThanOrEqual(1)
@@ -1088,8 +1442,18 @@ describe('MultiModalFusion integration scenarios', () => {
     const s2 = f.registerSource('s2', 'technology')
 
     f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Medical imaging diagnosis benefits from pattern recognition algorithms', confidence: 0.9, domain: 'medicine' }),
-      makeOutput({ sourceId: s2.id, content: 'Computer vision pattern recognition algorithms detect anomalies', confidence: 0.85, domain: 'technology' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Medical imaging diagnosis benefits from pattern recognition algorithms',
+        confidence: 0.9,
+        domain: 'medicine',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Computer vision pattern recognition algorithms detect anomalies',
+        confidence: 0.85,
+        domain: 'technology',
+      }),
     ])
 
     // Cross-domain synthesis produces insights if shared keywords exist
@@ -1103,8 +1467,16 @@ describe('MultiModalFusion integration scenarios', () => {
     const s2 = f.registerSource('unreliable', 'ai', 0.3)
 
     f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Gradient boosting improves prediction accuracy score', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Random forests provide ensemble learning predictions score', confidence: 0.5 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Gradient boosting improves prediction accuracy score',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Random forests provide ensemble learning predictions score',
+        confidence: 0.5,
+      }),
     ])
 
     // The reliable source should maintain reasonable reliability
@@ -1116,8 +1488,16 @@ describe('MultiModalFusion integration scenarios', () => {
     const s1 = f.registerSource('s1', 'ai')
     const s2 = f.registerSource('s2', 'ai')
     f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Bayesian inference updates prior beliefs', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Maximum likelihood estimation parameters fitting', confidence: 0.85 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Bayesian inference updates prior beliefs',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Maximum likelihood estimation parameters fitting',
+        confidence: 0.85,
+      }),
     ])
 
     f.reset()
@@ -1128,8 +1508,16 @@ describe('MultiModalFusion integration scenarios', () => {
     const s3 = f.registerSource('s3', 'nlp')
     const s4 = f.registerSource('s4', 'nlp')
     f.fuse([
-      makeOutput({ sourceId: s3.id, content: 'Named entity recognition extracts information entities', confidence: 0.85 }),
-      makeOutput({ sourceId: s4.id, content: 'Sentiment analysis determines text polarity emotions', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s3.id,
+        content: 'Named entity recognition extracts information entities',
+        confidence: 0.85,
+      }),
+      makeOutput({
+        sourceId: s4.id,
+        content: 'Sentiment analysis determines text polarity emotions',
+        confidence: 0.8,
+      }),
     ])
     expect(f.getStats().totalFusions).toBe(1)
   })
@@ -1142,8 +1530,16 @@ describe('MultiModalFusion integration scenarios', () => {
 
     // Use s2 and s3 to increase their useCount
     f.fuse([
-      makeOutput({ sourceId: s2.id, content: 'Tokenization preprocesses text data efficiently', confidence: 0.8 }),
-      makeOutput({ sourceId: s3.id, content: 'Feature extraction identifies important patterns', confidence: 0.75 }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Tokenization preprocesses text data efficiently',
+        confidence: 0.8,
+      }),
+      makeOutput({
+        sourceId: s3.id,
+        content: 'Feature extraction identifies important patterns',
+        confidence: 0.75,
+      }),
     ])
 
     // Register s4 — should evict s1 (least used, useCount=0)
@@ -1158,8 +1554,16 @@ describe('MultiModalFusion integration scenarios', () => {
     const s1 = f.registerSource('s1', 'health')
     const s2 = f.registerSource('s2', 'health')
     const result = f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Caffeine consumption enhances cognitive performance significantly', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Caffeine consumption does not enhance cognitive performance significantly', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Caffeine consumption enhances cognitive performance significantly',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Caffeine consumption does not enhance cognitive performance significantly',
+        confidence: 0.8,
+      }),
     ])
     if (result.conflicts.length > 0) {
       expect(result.explanation).toContain('majority_vote')
@@ -1176,8 +1580,18 @@ describe('MultiModalFusion integration scenarios', () => {
     const s2 = f.registerSource('image-analyzer', 'cv', 0.85)
 
     const result = f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Pattern recognition algorithms identify recurring structures data', confidence: 0.9, domain: 'nlp' }),
-      makeOutput({ sourceId: s2.id, content: 'Visual pattern recognition algorithms detect objects structures data', confidence: 0.85, domain: 'cv' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Pattern recognition algorithms identify recurring structures data',
+        confidence: 0.9,
+        domain: 'nlp',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Visual pattern recognition algorithms detect objects structures data',
+        confidence: 0.85,
+        domain: 'cv',
+      }),
     ])
 
     expect(result.fusedContent.length).toBeGreaterThan(0)
@@ -1213,8 +1627,16 @@ describe('MultiModalFusion integration scenarios', () => {
     const sHigh = f.registerSource('expert', 'ai', 0.99)
     const sLow = f.registerSource('novice', 'ai', 0.01)
     const result = f.fuse([
-      makeOutput({ sourceId: sHigh.id, content: 'Expert analysis confirms hypothesis with strong evidence', confidence: 0.95 }),
-      makeOutput({ sourceId: sLow.id, content: 'Novice guess speculates without any strong evidence', confidence: 0.1 }),
+      makeOutput({
+        sourceId: sHigh.id,
+        content: 'Expert analysis confirms hypothesis with strong evidence',
+        confidence: 0.95,
+      }),
+      makeOutput({
+        sourceId: sLow.id,
+        content: 'Novice guess speculates without any strong evidence',
+        confidence: 0.1,
+      }),
     ])
     expect(result.confidence).toBeGreaterThan(0.5)
   })
@@ -1238,8 +1660,16 @@ describe('MultiModalFusion integration scenarios', () => {
     const s1 = f.registerSource('s1', 'health')
     const s2 = f.registerSource('s2', 'health')
     const result = f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Vitamin supplements improve overall health outcomes significantly', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Vitamin supplements do not improve overall health outcomes significantly', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Vitamin supplements improve overall health outcomes significantly',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Vitamin supplements do not improve overall health outcomes significantly',
+        confidence: 0.8,
+      }),
     ])
     expect(Array.isArray(result.conflicts)).toBe(true)
     if (result.conflicts.length > 0) {
@@ -1257,9 +1687,21 @@ describe('MultiModalFusion integration scenarios', () => {
     expect(f.getSources()).toHaveLength(6)
 
     const result = f.fuse([
-      makeOutput({ sourceId: sources[0].id, content: 'Classification algorithms assign labels to data points', confidence: 0.8 }),
-      makeOutput({ sourceId: sources[1].id, content: 'Regression models predict continuous numerical values', confidence: 0.75 }),
-      makeOutput({ sourceId: sources[2].id, content: 'Clustering groups similar items without labels', confidence: 0.7 }),
+      makeOutput({
+        sourceId: sources[0].id,
+        content: 'Classification algorithms assign labels to data points',
+        confidence: 0.8,
+      }),
+      makeOutput({
+        sourceId: sources[1].id,
+        content: 'Regression models predict continuous numerical values',
+        confidence: 0.75,
+      }),
+      makeOutput({
+        sourceId: sources[2].id,
+        content: 'Clustering groups similar items without labels',
+        confidence: 0.7,
+      }),
     ])
     expect(result.sources).toHaveLength(3)
     expect(result.confidence).toBeGreaterThan(0)
@@ -1270,8 +1712,18 @@ describe('MultiModalFusion integration scenarios', () => {
     const s1 = f.registerSource('s1', 'ai')
     const s2 = f.registerSource('s2', 'ai')
     const result = f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Feature engineering creates better model inputs', confidence: 0.9, metadata: { version: 1 } }),
-      makeOutput({ sourceId: s2.id, content: 'Data augmentation increases training variety', confidence: 0.85, metadata: { version: 2 } }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Feature engineering creates better model inputs',
+        confidence: 0.9,
+        metadata: { version: 1 },
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Data augmentation increases training variety',
+        confidence: 0.85,
+        metadata: { version: 2 },
+      }),
     ])
     expect(result.sources[0].metadata).toEqual({ version: 1 })
     expect(result.sources[1].metadata).toEqual({ version: 2 })
@@ -1282,8 +1734,16 @@ describe('MultiModalFusion integration scenarios', () => {
     const s1 = f.registerSource('s1', 'ai')
     const _s2 = f.registerSource('s2', 'ai')
     const result = f.fuse([
-      makeOutput({ sourceId: s1.id, content: 'Optimization algorithms find minimum loss values', confidence: 0.9 }),
-      makeOutput({ sourceId: 'unregistered-id', content: 'Learning rate schedules adapt training speed', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Optimization algorithms find minimum loss values',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: 'unregistered-id',
+        content: 'Learning rate schedules adapt training speed',
+        confidence: 0.8,
+      }),
     ])
     // Both outputs are valid (positive confidence, non-empty content)
     expect(result.sources).toHaveLength(2)
@@ -1296,8 +1756,16 @@ describe('MultiModalFusion integration scenarios', () => {
 
     for (let i = 0; i < 3; i++) {
       f.fuse([
-        makeOutput({ sourceId: s1.id, content: `Batch normalization stabilizes training iteration ${i}`, confidence: 0.8 }),
-        makeOutput({ sourceId: s2.id, content: `Dropout prevents overfitting during training iteration ${i}`, confidence: 0.75 }),
+        makeOutput({
+          sourceId: s1.id,
+          content: `Batch normalization stabilizes training iteration ${i}`,
+          confidence: 0.8,
+        }),
+        makeOutput({
+          sourceId: s2.id,
+          content: `Dropout prevents overfitting during training iteration ${i}`,
+          confidence: 0.75,
+        }),
       ])
     }
 
@@ -1329,8 +1797,16 @@ describe('MultiModalFusion integration scenarios', () => {
     const s1 = f.registerSource('s1', 'health')
     const s2 = f.registerSource('s2', 'health')
     const conflicts = f.detectConflicts([
-      makeOutput({ sourceId: s1.id, content: 'Sleep deprivation impairs cognitive function significantly', confidence: 0.9 }),
-      makeOutput({ sourceId: s2.id, content: 'Sleep deprivation does not impair cognitive function significantly', confidence: 0.8 }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Sleep deprivation impairs cognitive function significantly',
+        confidence: 0.9,
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Sleep deprivation does not impair cognitive function significantly',
+        confidence: 0.8,
+      }),
     ])
     if (conflicts.length > 0) {
       expect(conflicts[0].resolutionConfidence).toBe(0)
@@ -1343,8 +1819,18 @@ describe('MultiModalFusion integration scenarios', () => {
     const s1 = f.registerSource('s1', 'ai')
     const s2 = f.registerSource('s2', 'neuroscience')
     const insights = f.synthesizeCrossDomain([
-      makeOutput({ sourceId: s1.id, content: 'Neural network learning algorithms process patterns data', confidence: 0.9, domain: 'ai' }),
-      makeOutput({ sourceId: s2.id, content: 'Brain neural pathways learning patterns data recognition', confidence: 0.85, domain: 'neuroscience' }),
+      makeOutput({
+        sourceId: s1.id,
+        content: 'Neural network learning algorithms process patterns data',
+        confidence: 0.9,
+        domain: 'ai',
+      }),
+      makeOutput({
+        sourceId: s2.id,
+        content: 'Brain neural pathways learning patterns data recognition',
+        confidence: 0.85,
+        domain: 'neuroscience',
+      }),
     ])
     for (const insight of insights) {
       expect(insight.confidence).toBeGreaterThanOrEqual(0)

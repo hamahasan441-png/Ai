@@ -141,7 +141,11 @@ export class PhaseRunner {
   getModuleStats(): Record<string, unknown> {
     const stats: Record<string, unknown> = {}
     for (const [name, slot] of this.slots) {
-      if (slot.initialized && slot.instance && typeof (slot.instance as Record<string, unknown>)['getStats'] === 'function') {
+      if (
+        slot.initialized &&
+        slot.instance &&
+        typeof (slot.instance as Record<string, unknown>)['getStats'] === 'function'
+      ) {
         try {
           stats[name] = (slot.instance as { getStats(): unknown }).getStats()
         } catch {
@@ -156,7 +160,11 @@ export class PhaseRunner {
   serializeModules(): Record<string, unknown> {
     const data: Record<string, unknown> = {}
     for (const [name, slot] of this.slots) {
-      if (slot.initialized && slot.instance && typeof (slot.instance as Record<string, unknown>)['serialize'] === 'function') {
+      if (
+        slot.initialized &&
+        slot.instance &&
+        typeof (slot.instance as Record<string, unknown>)['serialize'] === 'function'
+      ) {
         try {
           data[name] = (slot.instance as { serialize(): unknown }).serialize()
         } catch {
@@ -172,9 +180,13 @@ export class PhaseRunner {
     const failures: string[] = []
     for (const [name, state] of Object.entries(data)) {
       const slot = this.slots.get(name)
-      if (slot?.initialized && slot.instance && typeof (slot.instance as Record<string, unknown>)['deserialize'] === 'function') {
+      if (
+        slot?.initialized &&
+        slot.instance &&
+        typeof (slot.instance as Record<string, unknown>)['deserialize'] === 'function'
+      ) {
         try {
-          (slot.instance as { deserialize(d: unknown): void }).deserialize(state)
+          ;(slot.instance as { deserialize(d: unknown): void }).deserialize(state)
         } catch {
           failures.push(name)
         }

@@ -59,7 +59,9 @@ describe('CloudLimit — Token Budget & Continuation Protocol', () => {
         maxSessionTokens: 100,
         budgetWarningThreshold: 0.5,
       })
-      const result = await tinyBrain.chat('What is a design pattern in software engineering and how do they help?')
+      const result = await tinyBrain.chat(
+        'What is a design pattern in software engineering and how do they help?',
+      )
       // Should have consumed significant portion of tiny budget
       const budget = tinyBrain.getTokenBudget()
       if (budget.usagePercent >= 0.5) {

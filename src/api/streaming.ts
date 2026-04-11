@@ -126,10 +126,12 @@ export class SSEFormatter {
 
   /** Format a comment line (ignored by EventSource clients, useful for keep-alive) */
   formatComment(text: string): string {
-    return text
-      .split('\n')
-      .map((l) => `: ${l}`)
-      .join('\n') + '\n\n'
+    return (
+      text
+        .split('\n')
+        .map(l => `: ${l}`)
+        .join('\n') + '\n\n'
+    )
   }
 
   /** Format a heartbeat comment */
@@ -230,7 +232,11 @@ export class StreamBuffer {
 
   private notifyDrain(): void {
     for (const h of this.drainHandlers) {
-      try { h() } catch { /* swallow drain errors */ }
+      try {
+        h()
+      } catch {
+        /* swallow drain errors */
+      }
     }
   }
 }
@@ -356,7 +362,7 @@ export class StreamManager {
 
   /** List all active channels */
   listChannels(): StreamChannelInfo[] {
-    return Array.from(this.channels.values()).map((ch) => ch.toInfo())
+    return Array.from(this.channels.values()).map(ch => ch.toInfo())
   }
 
   /** Broadcast an event to every channel */
@@ -377,7 +383,10 @@ export class StreamManager {
 
   /** Return aggregate statistics */
   getStats(): StreamStats {
-    return { ...this.stats, avgLatency: this.latencyCount ? this.latencySum / this.latencyCount : 0 }
+    return {
+      ...this.stats,
+      avgLatency: this.latencyCount ? this.latencySum / this.latencyCount : 0,
+    }
   }
 
   private recordLatency(ms: number): void {
@@ -418,11 +427,12 @@ export class AIStreamProcessor {
    * Stream code analysis results.
    * Emits progress chunks as analysis proceeds.
    */
-  async *streamCodeAnalysis(
-    code: string,
-    language: string,
-  ): AsyncGenerator<StreamChunk> {
-    yield { type: 'thinking', content: 'Analysing code…', metadata: { language, length: code.length } }
+  async *streamCodeAnalysis(code: string, language: string): AsyncGenerator<StreamChunk> {
+    yield {
+      type: 'thinking',
+      content: 'Analysing code…',
+      metadata: { language, length: code.length },
+    }
 
     const lines = code.split('\n')
     const totalLines = lines.length

@@ -91,9 +91,7 @@ export class KurdishTranslationCorpus {
    * Get a random sample of pairs from a category (or all categories).
    */
   sample(count = 5, categoryName?: string): TranslationPair[] {
-    const pool = categoryName
-      ? (this.getCategory(categoryName)?.pairs ?? [])
-      : this.getAllPairs()
+    const pool = categoryName ? (this.getCategory(categoryName)?.pairs ?? []) : this.getAllPairs()
     const shuffled = [...pool].sort(() => Math.random() - 0.5)
     return shuffled.slice(0, Math.min(count, shuffled.length))
   }
@@ -209,10 +207,10 @@ export class KurdishTranslationCorpus {
         pairs: [
           {
             ckb: 'فیلمی کچانی ڕۆژ باس لە تێکۆشانی ژنانی کورد دەکات دژ بە چەتەکانی داعش.',
-            eng: 'The Girls of the Sun film is about the Kurdish women\'s fight against ISIS gangs.',
+            eng: "The Girls of the Sun film is about the Kurdish women's fight against ISIS gangs.",
           },
           {
-            ckb: 'فیلمی \'کچانی ڕۆژ لە 71هەمین فێستیڤاڵی نێودەوڵەتیی کان لە فەرەنسا یەکێک بوو لەو 21 فیلم کە بۆ وەرگرتنی خەڵاتی زێڕین، لە پێشبڕکێدایە.',
+            ckb: "فیلمی 'کچانی ڕۆژ لە 71هەمین فێستیڤاڵی نێودەوڵەتیی کان لە فەرەنسا یەکێک بوو لەو 21 فیلم کە بۆ وەرگرتنی خەڵاتی زێڕین، لە پێشبڕکێدایە.",
             eng: '"Girls of the Sun" is among the 21 films running for the Golden Palm in the 71st International Film Festival, and was screened on Saturday for curious audiences.',
           },
           {
@@ -220,7 +218,7 @@ export class KurdishTranslationCorpus {
             eng: 'Awazê Çiya music band composed of guerrillas has released a new song called "From mountains to seas".',
           },
           {
-            ckb: 'فیلمی \'بۆ ئازادی\' کە لەبارەی بەرخۆدانی سوور بەرهەمهێنراوە، لە ناوەندی کلتور و هونەری محەمەد شێخۆ لە قامشلۆ نمایشکرا.',
+            ckb: "فیلمی 'بۆ ئازادی' کە لەبارەی بەرخۆدانی سوور بەرهەمهێنراوە، لە ناوەندی کلتور و هونەری محەمەد شێخۆ لە قامشلۆ نمایشکرا.",
             eng: 'The film Ji Bo Azadiyê (The end will be spectacular) about the resistance of Sur was screened at Mihemed Şêxo Culture and Art Center in Qamishlo.',
           },
           {

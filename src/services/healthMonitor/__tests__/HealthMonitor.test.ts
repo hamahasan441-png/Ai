@@ -85,7 +85,9 @@ describe('HealthMonitor', () => {
     it('should pass when check completes in time', async () => {
       monitor.registerTimeoutCheck(
         'fast-check',
-        async () => { /* instant */ },
+        async () => {
+          /* instant */
+        },
         1000,
       )
       const report = await monitor.runAllChecks()
@@ -95,7 +97,9 @@ describe('HealthMonitor', () => {
     it('should fail when check times out', async () => {
       monitor.registerTimeoutCheck(
         'slow-check',
-        async () => { await new Promise(r => setTimeout(r, 5000)) },
+        async () => {
+          await new Promise(r => setTimeout(r, 5000))
+        },
         50,
       )
       const report = await monitor.runAllChecks()
@@ -321,7 +325,9 @@ describe('HealthMonitor', () => {
     })
 
     it('should handle callback errors gracefully', async () => {
-      monitor.onAlert(() => { throw new Error('callback error') })
+      monitor.onAlert(() => {
+        throw new Error('callback error')
+      })
       monitor.addThreshold({
         metric: 'heapPercent',
         operator: '>',
@@ -428,7 +434,13 @@ describe('HealthMonitor', () => {
     it('should evaluate > operator', async () => {
       const alerts: unknown[] = []
       monitor.onAlert(a => alerts.push(a))
-      monitor.addThreshold({ metric: 'heapPercent', operator: '>', value: 0, message: 't', severity: 'warning' })
+      monitor.addThreshold({
+        metric: 'heapPercent',
+        operator: '>',
+        value: 0,
+        message: 't',
+        severity: 'warning',
+      })
       await monitor.runAllChecks()
       expect(alerts.length).toBe(1)
     })
@@ -436,7 +448,13 @@ describe('HealthMonitor', () => {
     it('should evaluate <= operator', async () => {
       const alerts: unknown[] = []
       monitor.onAlert(a => alerts.push(a))
-      monitor.addThreshold({ metric: 'heapPercent', operator: '<=', value: 100, message: 't', severity: 'warning' })
+      monitor.addThreshold({
+        metric: 'heapPercent',
+        operator: '<=',
+        value: 100,
+        message: 't',
+        severity: 'warning',
+      })
       await monitor.runAllChecks()
       expect(alerts.length).toBe(1)
     })
@@ -444,7 +462,13 @@ describe('HealthMonitor', () => {
     it('should evaluate == operator', async () => {
       const alerts: unknown[] = []
       monitor.onAlert(a => alerts.push(a))
-      monitor.addThreshold({ metric: 'heapPercent', operator: '==', value: -1, message: 't', severity: 'warning' })
+      monitor.addThreshold({
+        metric: 'heapPercent',
+        operator: '==',
+        value: -1,
+        message: 't',
+        severity: 'warning',
+      })
       await monitor.runAllChecks()
       expect(alerts.length).toBe(0) // heapPercent is never -1
     })

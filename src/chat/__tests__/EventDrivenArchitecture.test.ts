@@ -11,13 +11,17 @@ describe('EventDrivenArchitecture', () => {
 
   describe('KB entry tests', () => {
     it('should match EDA/kafka/event sourcing keywords', async () => {
-      const r = await brain.chat('explain event driven architecture eda message broker kafka rabbitmq event sourcing cqrs command query responsibility')
+      const r = await brain.chat(
+        'explain event driven architecture eda message broker kafka rabbitmq event sourcing cqrs command query responsibility',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/event|kafka|rabbitmq|cqrs|sourcing|message/)
     })
 
     it('should match saga/pub-sub keywords', async () => {
-      const r = await brain.chat('explain saga pattern choreography orchestration distributed transaction pub sub publish subscribe dead letter queue')
+      const r = await brain.chat(
+        'explain saga pattern choreography orchestration distributed transaction pub sub publish subscribe dead letter queue',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/saga|choreography|pub.sub|dead\s+letter|distributed/)
     })

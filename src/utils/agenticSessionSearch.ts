@@ -102,9 +102,7 @@ function extractTranscript(messages: SerializedMessage[]): string {
     .replace(/\s+/g, ' ')
     .trim()
 
-  return text.length > MAX_TRANSCRIPT_CHARS
-    ? text.slice(0, MAX_TRANSCRIPT_CHARS) + '…'
-    : text
+  return text.length > MAX_TRANSCRIPT_CHARS ? text.slice(0, MAX_TRANSCRIPT_CHARS) + '…' : text
 }
 
 /**
@@ -164,14 +162,9 @@ export async function agenticSessionSearch(
   if (matchingLogs.length >= MAX_SESSIONS_TO_SEARCH) {
     logsToSearch = matchingLogs.slice(0, MAX_SESSIONS_TO_SEARCH)
   } else {
-    const nonMatchingLogs = logs.filter(
-      log => !logContainsQuery(log, queryLower),
-    )
+    const nonMatchingLogs = logs.filter(log => !logContainsQuery(log, queryLower))
     const remainingSlots = MAX_SESSIONS_TO_SEARCH - matchingLogs.length
-    logsToSearch = [
-      ...matchingLogs,
-      ...nonMatchingLogs.slice(0, remainingSlots),
-    ]
+    logsToSearch = [...matchingLogs, ...nonMatchingLogs.slice(0, remainingSlots)]
   }
 
   // Debug: log what data we have
@@ -253,9 +246,7 @@ Search query: "${query}"
 Find the sessions that are most relevant to this query.`
 
   // Debug: log first part of the session list
-  logForDebugging(
-    `Agentic search prompt (first 500 chars): ${userMessage.slice(0, 500)}...`,
-  )
+  logForDebugging(`Agentic search prompt (first 500 chars): ${userMessage.slice(0, 500)}...`)
 
   try {
     const model = getSmallFastModel()
@@ -294,9 +285,7 @@ Find the sessions that are most relevant to this query.`
       .filter(index => index >= 0 && index < logsWithTranscripts.length)
       .map(index => logsWithTranscripts[index]!)
 
-    logForDebugging(
-      `Agentic search found ${relevantLogs.length} relevant sessions`,
-    )
+    logForDebugging(`Agentic search found ${relevantLogs.length} relevant sessions`)
 
     return relevantLogs
   } catch (error) {

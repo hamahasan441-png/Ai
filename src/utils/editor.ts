@@ -1,9 +1,4 @@
-import {
-  type SpawnOptions,
-  type SpawnSyncOptions,
-  spawn,
-  spawnSync,
-} from 'child_process'
+import { type SpawnOptions, type SpawnSyncOptions, spawn, spawnSync } from 'child_process'
 import memoize from 'lodash-es/memoize.js'
 import { basename } from 'path'
 import instances from '../ink/instances.js'
@@ -55,11 +50,7 @@ export function classifyGuiEditor(editor: string): string | undefined {
  * Build goto-line argv for a GUI editor. VS Code family uses -g file:line;
  * subl uses bare file:line; others don't support goto-line.
  */
-function guiGotoArgv(
-  guiFamily: string,
-  filePath: string,
-  line: number | undefined,
-): string[] {
+function guiGotoArgv(guiFamily: string, filePath: string, line: number | undefined): string[] {
   if (!line) return [filePath]
   if (VSCODE_FAMILY.has(guiFamily)) return ['-g', `${filePath}:${line}`]
   if (guiFamily === 'subl') return [`${filePath}:${line}`]
@@ -78,10 +69,7 @@ function guiGotoArgv(
  *
  * Returns true if the editor was launched, false if no editor is available.
  */
-export function openFileInExternalEditor(
-  filePath: string,
-  line?: number,
-): boolean {
+export function openFileInExternalEditor(filePath: string, line?: number): boolean {
   const editor = getExternalEditor()
   if (!editor) return false
 
@@ -112,9 +100,7 @@ export function openFileInExternalEditor(
     }
     // spawn() emits ENOENT asynchronously. ENOENT on $VISUAL/$EDITOR is a
     // user-config error, not an internal bug — don't pollute error telemetry.
-    child.on('error', e =>
-      logForDebugging(`editor spawn failed: ${e}`, { level: 'error' }),
-    )
+    child.on('error', e => logForDebugging(`editor spawn failed: ${e}`, { level: 'error' }))
     child.unref()
     return true
   }
@@ -143,10 +129,7 @@ export function openFileInExternalEditor(
       })
     } else {
       // POSIX: spawn directly (no shell), argv array is quote-safe.
-      const args = [
-        ...editorArgs,
-        ...(useGotoLine ? [`+${line}`, filePath] : [filePath]),
-      ]
+      const args = [...editorArgs, ...(useGotoLine ? [`+${line}`, filePath] : [filePath])]
       result = spawnSync(base, args, syncOpts)
     }
     if (result.error) {

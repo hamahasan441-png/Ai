@@ -69,11 +69,7 @@ async function isDesktopInstalled(): Promise<boolean> {
     return code === 0 && stdout.trim().length > 0
   } else if (platform === 'win32') {
     // On Windows, try to query the registry for the protocol handler
-    const { code } = await execFileNoThrow('reg', [
-      'query',
-      'HKEY_CLASSES_ROOT\\claude',
-      '/ve',
-    ])
+    const { code } = await execFileNoThrow('reg', ['query', 'HKEY_CLASSES_ROOT\\claude', '/ve'])
     return code === 0
   }
 
@@ -187,12 +183,7 @@ async function openDeepLink(deepLinkUrl: string): Promise<boolean> {
     return code === 0
   } else if (platform === 'win32') {
     // On Windows, use cmd /c start to open URLs
-    const { code } = await execFileNoThrow('cmd', [
-      '/c',
-      'start',
-      '',
-      deepLinkUrl,
-    ])
+    const { code } = await execFileNoThrow('cmd', ['/c', 'start', '', deepLinkUrl])
     return code === 0
   }
 
@@ -215,8 +206,7 @@ export async function openCurrentSessionInDesktop(): Promise<{
   if (!installed) {
     return {
       success: false,
-      error:
-        'Claude Desktop is not installed. Install it from https://claude.ai/download',
+      error: 'Claude Desktop is not installed. Install it from https://claude.ai/download',
     }
   }
 

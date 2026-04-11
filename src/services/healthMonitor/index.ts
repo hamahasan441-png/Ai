@@ -148,7 +148,10 @@ export class HealthMonitor {
         await Promise.race([
           check(),
           new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error(`Health check timeout after ${timeoutMs}ms`)), timeoutMs),
+            setTimeout(
+              () => reject(new Error(`Health check timeout after ${timeoutMs}ms`)),
+              timeoutMs,
+            ),
           ),
         ])
         const responseTime = Date.now() - start
@@ -284,7 +287,7 @@ export class HealthMonitor {
 
   /** Get active alerts */
   getActiveAlerts(): Alert[] {
-    return this.alerts.filter((a) => !a.resolved)
+    return this.alerts.filter(a => !a.resolved)
   }
 
   /** Get all alerts */
@@ -298,11 +301,11 @@ export class HealthMonitor {
     const totalMem = this.getTotalMemory()
 
     return {
-      memoryUsageMB: Math.round(memUsage.rss / 1024 / 1024 * 100) / 100,
-      memoryTotalMB: Math.round(totalMem / 1024 / 1024 * 100) / 100,
+      memoryUsageMB: Math.round((memUsage.rss / 1024 / 1024) * 100) / 100,
+      memoryTotalMB: Math.round((totalMem / 1024 / 1024) * 100) / 100,
       memoryPercent: totalMem > 0 ? Math.round((memUsage.rss / totalMem) * 100 * 100) / 100 : 0,
-      heapUsedMB: Math.round(memUsage.heapUsed / 1024 / 1024 * 100) / 100,
-      heapTotalMB: Math.round(memUsage.heapTotal / 1024 / 1024 * 100) / 100,
+      heapUsedMB: Math.round((memUsage.heapUsed / 1024 / 1024) * 100) / 100,
+      heapTotalMB: Math.round((memUsage.heapTotal / 1024 / 1024) * 100) / 100,
       heapPercent:
         memUsage.heapTotal > 0
           ? Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100 * 100) / 100
@@ -313,11 +316,14 @@ export class HealthMonitor {
   }
 
   /** Get trend for a metric over the last N reports */
-  getTrend(metric: 'memoryPercent' | 'heapPercent' | 'eventLoopLagMs', count = 10): 'rising' | 'stable' | 'falling' | 'unknown' {
+  getTrend(
+    metric: 'memoryPercent' | 'heapPercent' | 'eventLoopLagMs',
+    count = 10,
+  ): 'rising' | 'stable' | 'falling' | 'unknown' {
     if (this.history.length < 2) return 'unknown'
 
     const recent = this.history.slice(-count)
-    const values = recent.map((r) => {
+    const values = recent.map(r => {
       switch (metric) {
         case 'memoryPercent':
           return r.resources.memoryPercent
@@ -370,8 +376,8 @@ export class HealthMonitor {
   // ── Private methods ──
 
   private buildReport(results: HealthCheckResult[], resources: SystemResources): HealthReport {
-    const degraded = results.filter((r) => r.status === 'degraded').map((r) => r.name)
-    const unhealthy = results.filter((r) => r.status === 'unhealthy').map((r) => r.name)
+    const degraded = results.filter(r => r.status === 'degraded').map(r => r.name)
+    const unhealthy = results.filter(r => r.status === 'unhealthy').map(r => r.name)
 
     // Check resource thresholds
     if (resources.memoryPercent >= this.opts.memoryCriticalPercent) {
@@ -412,7 +418,7 @@ export class HealthMonitor {
 
       // Check if already active
       const existingAlert = this.alerts.find(
-        (a) => a.threshold.metric === threshold.metric && !a.resolved,
+        a => a.threshold.metric === threshold.metric && !a.resolved,
       )
 
       if (triggered && !existingAlert) {

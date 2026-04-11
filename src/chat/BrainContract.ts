@@ -17,9 +17,9 @@
 
 /** The five canonical steps of every brain interaction. */
 export enum BrainStep {
-  INPUT  = 'INPUT',
-  THINK  = 'THINK',
-  TOOL   = 'TOOL',
+  INPUT = 'INPUT',
+  THINK = 'THINK',
+  TOOL = 'TOOL',
   VERIFY = 'VERIFY',
   OUTPUT = 'OUTPUT',
 }
@@ -131,9 +131,7 @@ export function validateTrace(trace: PipelineTrace): ContractValidation {
 
   // Check all 5 steps present
   if (trace.steps.length !== BRAIN_STEP_ORDER.length) {
-    errors.push(
-      `Expected ${BRAIN_STEP_ORDER.length} steps, got ${trace.steps.length}`,
-    )
+    errors.push(`Expected ${BRAIN_STEP_ORDER.length} steps, got ${trace.steps.length}`)
   }
 
   // Check step ordering
@@ -227,7 +225,7 @@ export class TraceBuilder {
     if (expected && step !== expected) {
       throw new Error(
         `Contract violation: expected step '${expected}' but got '${step}'. ` +
-        `Steps must follow order: ${BRAIN_STEP_ORDER.join(' → ')}`,
+          `Steps must follow order: ${BRAIN_STEP_ORDER.join(' → ')}`,
       )
     }
 

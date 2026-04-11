@@ -98,9 +98,10 @@ async function resolveOne(att: InboundAttachment): Promise<string | undefined> {
   // uuid-prefix makes collisions impossible across messages and within one
   // (same filename, different files). 8 chars is enough — this isn't security.
   const safeName = sanitizeFileName(att.file_name)
-  const prefix = (
-    att.file_uuid.slice(0, 8) || randomUUID().slice(0, 8)
-  ).replace(/[^a-zA-Z0-9_-]/g, '_')
+  const prefix = (att.file_uuid.slice(0, 8) || randomUUID().slice(0, 8)).replace(
+    /[^a-zA-Z0-9_-]/g,
+    '_',
+  )
   const dir = uploadsDir()
   const outPath = join(dir, `${prefix}-${safeName}`)
 
@@ -120,9 +121,7 @@ async function resolveOne(att: InboundAttachment): Promise<string | undefined> {
  * Resolve all attachments on an inbound message to a prefix string of
  * @path refs. Empty string if none resolved.
  */
-export async function resolveInboundAttachments(
-  attachments: InboundAttachment[],
-): Promise<string> {
+export async function resolveInboundAttachments(attachments: InboundAttachment[]): Promise<string> {
   if (attachments.length === 0) return ''
   debug(`resolving ${attachments.length} attachment(s)`)
   const paths = await Promise.all(attachments.map(resolveOne))
@@ -149,11 +148,7 @@ export function prependPathRefs(
   if (i !== -1) {
     const b = content[i]!
     if (b.type === 'text') {
-      return [
-        ...content.slice(0, i),
-        { ...b, text: prefix + b.text },
-        ...content.slice(i + 1),
-      ]
+      return [...content.slice(0, i), { ...b, text: prefix + b.text }, ...content.slice(i + 1)]
     }
   }
   // No text block — append one at the end so it's last.

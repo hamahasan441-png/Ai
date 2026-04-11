@@ -1,6 +1,4 @@
-function handleEPIPE(
-  stream: NodeJS.WriteStream,
-): (err: NodeJS.ErrnoException) => void {
+function handleEPIPE(stream: NodeJS.WriteStream): (err: NodeJS.ErrnoException) => void {
   return (err: NodeJS.ErrnoException) => {
     if (err.code === 'EPIPE') {
       stream.destroy()
@@ -47,10 +45,7 @@ export function exitWithError(message: string): never {
 // unconditionally (caller's accumulator needs all chunks, not just the first).
 // Returns true on timeout, false on end. Used by -p mode to distinguish a
 // real pipe producer from an inherited-but-idle parent stdin.
-export function peekForStdinData(
-  stream: NodeJS.EventEmitter,
-  ms: number,
-): Promise<boolean> {
+export function peekForStdinData(stream: NodeJS.EventEmitter, ms: number): Promise<boolean> {
   return new Promise<boolean>(resolve => {
     const done = (timedOut: boolean) => {
       clearTimeout(peek)

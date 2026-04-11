@@ -51,10 +51,7 @@ import type {
   DocumentAnalysisOutput,
 } from './types.js'
 
-import {
-  isSupportedImageType,
-  validateImageData,
-} from './types.js'
+import { isSupportedImageType, validateImageData } from './types.js'
 
 import { LocalBrain } from './LocalBrain.js'
 
@@ -71,12 +68,7 @@ import type {
   LocalBrainStats,
 } from './LocalBrain.js'
 
-import type {
-  CodeAnalysis,
-  CodeReviewOutput,
-  FixResult,
-  TaskPlan,
-} from './codemaster/types.js'
+import type { CodeAnalysis, CodeReviewOutput, FixResult, TaskPlan } from './codemaster/types.js'
 
 import { LearningEngine } from './codemaster/LearningEngine.js'
 
@@ -313,7 +305,8 @@ export class DevBrain implements BrainInterface {
       creativity: this.config.localBrainConfig?.creativity ?? 0.6,
       maxLearnedPatterns: this.config.localBrainConfig?.maxLearnedPatterns ?? 10000,
       learningEnabled: this.config.localBrainConfig?.learningEnabled ?? true,
-      systemPrompt: 'You are the local thinking engine of a developer AI. Think deeply, reason thoroughly, and provide raw analysis.',
+      systemPrompt:
+        'You are the local thinking engine of a developer AI. Think deeply, reason thoroughly, and provide raw analysis.',
     })
 
     // Inject developer-focused knowledge
@@ -345,7 +338,9 @@ export class DevBrain implements BrainInterface {
   // ╚═══════════════════════════════════════════════════════════════════════════╝
 
   /** Chat with the DevBrain. Delegates to LocalBrain. */
-  async chat(userMessage: string): Promise<{ text: string; usage: TokenUsage; durationMs: number }> {
+  async chat(
+    userMessage: string,
+  ): Promise<{ text: string; usage: TokenUsage; durationMs: number }> {
     this.stats.totalRequests++
     this.stats.localRequests++
     const start = Date.now()
@@ -476,7 +471,11 @@ export class DevBrain implements BrainInterface {
   }
 
   /** Assess confidence in answering a question. */
-  assessConfidence(question: string): { confident: boolean; score: number; clarifyingQuestions?: string[] } {
+  assessConfidence(question: string): {
+    confident: boolean
+    score: number
+    clarifyingQuestions?: string[]
+  } {
     return this.localBrain.assessConfidence(question)
   }
 
@@ -573,22 +572,54 @@ export class DevBrain implements BrainInterface {
   // ║  Intelligence Module Delegation                                          ║
   // ╚═══════════════════════════════════════════════════════════════════════════╝
 
-  getTradingEngine(): TradingEngine | null { return this.localBrain.getTradingEngine() }
-  getMarketAnalyzer(): MarketAnalyzer | null { return this.localBrain.getMarketAnalyzer() }
-  getPortfolioOptimizer(): PortfolioOptimizer | null { return this.localBrain.getPortfolioOptimizer() }
-  getStrategyEngine(): StrategyEngine | null { return this.localBrain.getStrategyEngine() }
-  getDecisionEngine(): DecisionEngine | null { return this.localBrain.getDecisionEngine() }
-  getKnowledgeSynthesizer(): KnowledgeSynthesizer | null { return this.localBrain.getKnowledgeSynthesizer() }
-  getEconomicAnalyzer(): EconomicAnalyzer | null { return this.localBrain.getEconomicAnalyzer() }
-  getSecurityTrainer(): SecurityTrainer | null { return this.localBrain.getSecurityTrainer() }
-  getEmotionEngine(): EmotionEngine | null { return this.localBrain.getEmotionEngine() }
-  getTemporalReasoner(): TemporalReasoner | null { return this.localBrain.getTemporalReasoner() }
-  getNormalizationEngine(): NormalizationEngine | null { return this.localBrain.getNormalizationEngine() }
-  getBayesianNetwork(): BayesianNetwork | null { return this.localBrain.getBayesianNetwork() }
-  getOntologyManager(): OntologyManager | null { return this.localBrain.getOntologyManager() }
-  getDialogueManager(): DialogueManager | null { return this.localBrain.getDialogueManager() }
-  getArgumentAnalyzer(): ArgumentAnalyzer | null { return this.localBrain.getArgumentAnalyzer() }
-  getNarrativeEngine(): NarrativeEngine | null { return this.localBrain.getNarrativeEngine() }
+  getTradingEngine(): TradingEngine | null {
+    return this.localBrain.getTradingEngine()
+  }
+  getMarketAnalyzer(): MarketAnalyzer | null {
+    return this.localBrain.getMarketAnalyzer()
+  }
+  getPortfolioOptimizer(): PortfolioOptimizer | null {
+    return this.localBrain.getPortfolioOptimizer()
+  }
+  getStrategyEngine(): StrategyEngine | null {
+    return this.localBrain.getStrategyEngine()
+  }
+  getDecisionEngine(): DecisionEngine | null {
+    return this.localBrain.getDecisionEngine()
+  }
+  getKnowledgeSynthesizer(): KnowledgeSynthesizer | null {
+    return this.localBrain.getKnowledgeSynthesizer()
+  }
+  getEconomicAnalyzer(): EconomicAnalyzer | null {
+    return this.localBrain.getEconomicAnalyzer()
+  }
+  getSecurityTrainer(): SecurityTrainer | null {
+    return this.localBrain.getSecurityTrainer()
+  }
+  getEmotionEngine(): EmotionEngine | null {
+    return this.localBrain.getEmotionEngine()
+  }
+  getTemporalReasoner(): TemporalReasoner | null {
+    return this.localBrain.getTemporalReasoner()
+  }
+  getNormalizationEngine(): NormalizationEngine | null {
+    return this.localBrain.getNormalizationEngine()
+  }
+  getBayesianNetwork(): BayesianNetwork | null {
+    return this.localBrain.getBayesianNetwork()
+  }
+  getOntologyManager(): OntologyManager | null {
+    return this.localBrain.getOntologyManager()
+  }
+  getDialogueManager(): DialogueManager | null {
+    return this.localBrain.getDialogueManager()
+  }
+  getArgumentAnalyzer(): ArgumentAnalyzer | null {
+    return this.localBrain.getArgumentAnalyzer()
+  }
+  getNarrativeEngine(): NarrativeEngine | null {
+    return this.localBrain.getNarrativeEngine()
+  }
 
   // ╔═══════════════════════════════════════════════════════════════════════════╗
   // ║  Enhanced Methods — Powered by LocalBrain                                ║
@@ -606,14 +637,24 @@ export class DevBrain implements BrainInterface {
   }
 
   /** Generate a multi-file project. */
-  async generateMultiFile(description: string, language: string, fileTypes?: string[]): Promise<MultiFileResult> {
+  async generateMultiFile(
+    description: string,
+    language: string,
+    fileTypes?: string[],
+  ): Promise<MultiFileResult> {
     this.stats.totalRequests++
     this.stats.totalMultiFileGenerations++
     this.stats.localRequests++
     const start = Date.now()
     const lang = language as ProgrammingLanguage
     const result = await this.localBrain.generateMultiFile(description, lang, fileTypes)
-    this.addDebugLog('generateMultiFile', description, result.explanation, result.explanation, Date.now() - start)
+    this.addDebugLog(
+      'generateMultiFile',
+      description,
+      result.explanation,
+      result.explanation,
+      Date.now() - start,
+    )
     return result
   }
 
@@ -624,7 +665,13 @@ export class DevBrain implements BrainInterface {
     this.stats.localRequests++
     const start = Date.now()
     const result = this.localBrain.explainCode(code, language)
-    this.addDebugLog('explainCode', code.substring(0, 200), result.summary, result.summary, Date.now() - start)
+    this.addDebugLog(
+      'explainCode',
+      code.substring(0, 200),
+      result.summary,
+      result.summary,
+      Date.now() - start,
+    )
     return result
   }
 
@@ -633,7 +680,11 @@ export class DevBrain implements BrainInterface {
   // ╚═══════════════════════════════════════════════════════════════════════════╝
 
   /** Generate a coding exercise with description, starter code, hints, and solution. */
-  async generateExercise(topic: string, difficulty: ExerciseDifficulty, language: string): Promise<CodingExercise> {
+  async generateExercise(
+    topic: string,
+    difficulty: ExerciseDifficulty,
+    language: string,
+  ): Promise<CodingExercise> {
     this.stats.totalRequests++
     this.stats.totalExercisesGenerated++
     this.stats.localRequests++
@@ -641,7 +692,11 @@ export class DevBrain implements BrainInterface {
   }
 
   /** Evaluate a code submission against an exercise. */
-  async evaluateCode(code: string, exercise: CodingExercise, language: string): Promise<CodeEvaluation> {
+  async evaluateCode(
+    code: string,
+    exercise: CodingExercise,
+    language: string,
+  ): Promise<CodeEvaluation> {
     this.stats.totalRequests++
     this.stats.totalCodeEvaluations++
     this.stats.localRequests++
@@ -656,7 +711,8 @@ export class DevBrain implements BrainInterface {
     const localStats = this.localBrain.getStats() as LocalBrainStats
     const patternCount = this.localBrain.getLearnedPatternCount()
     const _knowledgeSize = this.localBrain.getKnowledgeBaseSize()
-    const totalInteractions = localStats.totalChats + localStats.totalCodeGenerations + localStats.totalCodeReviews
+    const totalInteractions =
+      localStats.totalChats + localStats.totalCodeGenerations + localStats.totalCodeReviews
 
     // Determine skill level based on interaction depth
     let level: ExerciseDifficulty = 'beginner'
@@ -744,7 +800,11 @@ export class DevBrain implements BrainInterface {
   }
 
   /** Explain a programming concept at a given difficulty level with examples. */
-  async explainConcept(concept: string, language?: string, difficulty?: ExerciseDifficulty): Promise<{
+  async explainConcept(
+    concept: string,
+    language?: string,
+    difficulty?: ExerciseDifficulty,
+  ): Promise<{
     concept: string
     explanation: string
     examples: string[]
@@ -756,9 +816,10 @@ export class DevBrain implements BrainInterface {
     const diff = difficulty ?? 'intermediate'
 
     const knowledgeResults = this.localBrain.searchKnowledge(concept, 5)
-    const localExplanation = knowledgeResults.length > 0
-      ? knowledgeResults.map(r => r.entry.content).join('\n\n')
-      : `${concept} is a programming concept commonly used in software development.`
+    const localExplanation =
+      knowledgeResults.length > 0
+        ? knowledgeResults.map(r => r.entry.content).join('\n\n')
+        : `${concept} is a programming concept commonly used in software development.`
 
     const relatedConcepts = knowledgeResults
       .flatMap(r => r.matchedKeywords)
@@ -768,7 +829,9 @@ export class DevBrain implements BrainInterface {
     return {
       concept,
       explanation: localExplanation,
-      examples: language ? [`See ${language} documentation for practical examples of ${concept}.`] : [`See language documentation for practical examples of ${concept}.`],
+      examples: language
+        ? [`See ${language} documentation for practical examples of ${concept}.`]
+        : [`See language documentation for practical examples of ${concept}.`],
       relatedConcepts,
       difficulty: diff,
     }
@@ -808,17 +871,103 @@ export class DevBrain implements BrainInterface {
   /** Extract key topics from a message. */
   private extractKeyTopics(message: string): string[] {
     const stopWords = new Set([
-      'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-      'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
-      'should', 'may', 'might', 'can', 'shall', 'to', 'of', 'in', 'for',
-      'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through', 'during',
-      'before', 'after', 'above', 'below', 'between', 'out', 'off', 'over',
-      'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when',
-      'where', 'why', 'how', 'all', 'each', 'every', 'both', 'few', 'more',
-      'most', 'other', 'some', 'such', 'no', 'not', 'only', 'same', 'so',
-      'than', 'too', 'very', 'just', 'because', 'but', 'and', 'or', 'if',
-      'what', 'which', 'who', 'this', 'that', 'these', 'those', 'me', 'my',
-      'you', 'your', 'it', 'its', 'we', 'they', 'them', 'about',
+      'the',
+      'a',
+      'an',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'being',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+      'will',
+      'would',
+      'could',
+      'should',
+      'may',
+      'might',
+      'can',
+      'shall',
+      'to',
+      'of',
+      'in',
+      'for',
+      'on',
+      'with',
+      'at',
+      'by',
+      'from',
+      'as',
+      'into',
+      'through',
+      'during',
+      'before',
+      'after',
+      'above',
+      'below',
+      'between',
+      'out',
+      'off',
+      'over',
+      'under',
+      'again',
+      'further',
+      'then',
+      'once',
+      'here',
+      'there',
+      'when',
+      'where',
+      'why',
+      'how',
+      'all',
+      'each',
+      'every',
+      'both',
+      'few',
+      'more',
+      'most',
+      'other',
+      'some',
+      'such',
+      'no',
+      'not',
+      'only',
+      'same',
+      'so',
+      'than',
+      'too',
+      'very',
+      'just',
+      'because',
+      'but',
+      'and',
+      'or',
+      'if',
+      'what',
+      'which',
+      'who',
+      'this',
+      'that',
+      'these',
+      'those',
+      'me',
+      'my',
+      'you',
+      'your',
+      'it',
+      'its',
+      'we',
+      'they',
+      'them',
+      'about',
     ])
 
     return message
@@ -856,62 +1005,74 @@ export class DevBrain implements BrainInterface {
       {
         category: 'dev-tools',
         keywords: ['debug', 'debugger', 'breakpoint', 'gdb', 'lldb', 'devtools'],
-        content: 'Debugging tools: GDB/LLDB (native code), Chrome DevTools (JS), VS Code debugger (multi-lang), strace/dtrace (system calls), Wireshark (network), Valgrind (memory). Always use breakpoints over printf debugging for complex issues.',
+        content:
+          'Debugging tools: GDB/LLDB (native code), Chrome DevTools (JS), VS Code debugger (multi-lang), strace/dtrace (system calls), Wireshark (network), Valgrind (memory). Always use breakpoints over printf debugging for complex issues.',
       },
       {
         category: 'dev-security',
         keywords: ['reverse', 'engineer', 'binary', 'disassemble', 'decompile', 'exploit'],
-        content: 'Reverse engineering tools: IDA Pro, Ghidra (free, NSA), Binary Ninja, radare2/Cutter. For web: Burp Suite, OWASP ZAP. Binary analysis: objdump, nm, readelf, file, strings. Dynamic: ltrace, strace, frida. Memory: Valgrind, AddressSanitizer.',
+        content:
+          'Reverse engineering tools: IDA Pro, Ghidra (free, NSA), Binary Ninja, radare2/Cutter. For web: Burp Suite, OWASP ZAP. Binary analysis: objdump, nm, readelf, file, strings. Dynamic: ltrace, strace, frida. Memory: Valgrind, AddressSanitizer.',
       },
       {
         category: 'dev-internals',
         keywords: ['memory', 'allocation', 'heap', 'stack', 'garbage', 'collector', 'runtime'],
-        content: 'Memory management: Stack (LIFO, auto-cleanup, fast), Heap (dynamic, malloc/free/new/delete), GC strategies (mark-sweep, generational, concurrent). V8 internals: Ignition interpreter → TurboFan JIT. Memory layouts: vtable, padding, alignment. Use AddressSanitizer for memory bugs.',
+        content:
+          'Memory management: Stack (LIFO, auto-cleanup, fast), Heap (dynamic, malloc/free/new/delete), GC strategies (mark-sweep, generational, concurrent). V8 internals: Ignition interpreter → TurboFan JIT. Memory layouts: vtable, padding, alignment. Use AddressSanitizer for memory bugs.',
       },
       {
         category: 'dev-networking',
         keywords: ['socket', 'tcp', 'udp', 'http', 'network', 'protocol', 'packet'],
-        content: 'Network programming: TCP (reliable, ordered, streams), UDP (fast, unreliable, datagrams). Socket programming: socket() → bind() → listen() → accept(). HTTP/2 multiplexing, HTTP/3 QUIC. Raw sockets for packet crafting. Use epoll/kqueue for scalable I/O.',
+        content:
+          'Network programming: TCP (reliable, ordered, streams), UDP (fast, unreliable, datagrams). Socket programming: socket() → bind() → listen() → accept(). HTTP/2 multiplexing, HTTP/3 QUIC. Raw sockets for packet crafting. Use epoll/kqueue for scalable I/O.',
       },
       {
         category: 'dev-systems',
         keywords: ['kernel', 'os', 'syscall', 'process', 'thread', 'ipc', 'signal'],
-        content: 'Systems programming: System calls (read, write, open, fork, exec, mmap, ioctl). Process management: fork/exec, waitpid, signals. IPC: pipes, shared memory, message queues, Unix domain sockets. Threading: pthreads, mutexes, condition variables, read-write locks.',
+        content:
+          'Systems programming: System calls (read, write, open, fork, exec, mmap, ioctl). Process management: fork/exec, waitpid, signals. IPC: pipes, shared memory, message queues, Unix domain sockets. Threading: pthreads, mutexes, condition variables, read-write locks.',
       },
       {
         category: 'dev-crypto',
         keywords: ['crypto', 'encrypt', 'hash', 'cipher', 'key', 'certificate', 'tls', 'ssl'],
-        content: 'Cryptography: Symmetric (AES-256-GCM), Asymmetric (RSA, Ed25519, X25519), Hash (SHA-256, SHA-3, BLAKE3), KDF (Argon2, scrypt, bcrypt). TLS 1.3 handshake, certificate pinning, perfect forward secrecy. Never roll your own crypto.',
+        content:
+          'Cryptography: Symmetric (AES-256-GCM), Asymmetric (RSA, Ed25519, X25519), Hash (SHA-256, SHA-3, BLAKE3), KDF (Argon2, scrypt, bcrypt). TLS 1.3 handshake, certificate pinning, perfect forward secrecy. Never roll your own crypto.',
       },
       {
         category: 'dev-perf',
         keywords: ['profile', 'benchmark', 'optimize', 'performance', 'flamegraph', 'cache'],
-        content: 'Performance: Profile first (perf, flamegraphs, pprof). CPU: branch prediction, cache lines (64B), SIMD, loop unrolling. Memory: spatial/temporal locality, avoid false sharing. I/O: io_uring (Linux), batch operations, memory-mapped files. Benchmark: criterion (Rust), JMH (Java), hyperfine (CLI).',
+        content:
+          'Performance: Profile first (perf, flamegraphs, pprof). CPU: branch prediction, cache lines (64B), SIMD, loop unrolling. Memory: spatial/temporal locality, avoid false sharing. I/O: io_uring (Linux), batch operations, memory-mapped files. Benchmark: criterion (Rust), JMH (Java), hyperfine (CLI).',
       },
       {
         category: 'dev-containers',
         keywords: ['docker', 'container', 'kubernetes', 'k8s', 'pod', 'namespace', 'cgroup'],
-        content: 'Container internals: namespaces (PID, NET, MNT, UTS, IPC, USER), cgroups (resource limits), overlay filesystems. Docker: multi-stage builds, layer caching, health checks. K8s: pods, services, deployments, ingress, HPA, PDB. Use distroless/scratch base images for security.',
+        content:
+          'Container internals: namespaces (PID, NET, MNT, UTS, IPC, USER), cgroups (resource limits), overlay filesystems. Docker: multi-stage builds, layer caching, health checks. K8s: pods, services, deployments, ingress, HPA, PDB. Use distroless/scratch base images for security.',
       },
       {
         category: 'training-exercises',
         keywords: ['exercise', 'practice', 'coding', 'challenge', 'problem', 'kata'],
-        content: 'Coding exercises best practices: Start with clear problem statements, provide starter code scaffolding, include hints of increasing specificity, always provide a reference solution, test edge cases, match difficulty to skill level. Use progressive difficulty: beginner (syntax, loops), intermediate (data structures, algorithms), advanced (system design, optimization), expert (concurrency, distributed systems).',
+        content:
+          'Coding exercises best practices: Start with clear problem statements, provide starter code scaffolding, include hints of increasing specificity, always provide a reference solution, test edge cases, match difficulty to skill level. Use progressive difficulty: beginner (syntax, loops), intermediate (data structures, algorithms), advanced (system design, optimization), expert (concurrency, distributed systems).',
       },
       {
         category: 'training-topics',
         keywords: ['training', 'topics', 'curriculum', 'learning', 'path', 'roadmap'],
-        content: 'Common training topics per language — JavaScript/TypeScript: closures, promises, async/await, generics, type guards, decorators. Python: generators, decorators, context managers, metaclasses, asyncio. Rust: ownership, borrowing, lifetimes, traits, async. Go: goroutines, channels, interfaces, error handling. Java: generics, streams, concurrency, design patterns. Universal: algorithms, data structures, design patterns, testing, debugging.',
+        content:
+          'Common training topics per language — JavaScript/TypeScript: closures, promises, async/await, generics, type guards, decorators. Python: generators, decorators, context managers, metaclasses, asyncio. Rust: ownership, borrowing, lifetimes, traits, async. Go: goroutines, channels, interfaces, error handling. Java: generics, streams, concurrency, design patterns. Universal: algorithms, data structures, design patterns, testing, debugging.',
       },
       {
         category: 'training-assessment',
         keywords: ['assessment', 'skill', 'level', 'evaluate', 'measure', 'progress'],
-        content: 'Skill assessment criteria: Code correctness (does it work?), code quality (readability, naming, structure), efficiency (time/space complexity), error handling (edge cases, validation), testing (unit tests, coverage), design (patterns, SOLID, modularity), documentation (comments, JSDoc), security awareness. Levels: beginner (syntax mastery), intermediate (patterns & libraries), advanced (architecture & optimization), expert (systems design & mentoring).',
+        content:
+          'Skill assessment criteria: Code correctness (does it work?), code quality (readability, naming, structure), efficiency (time/space complexity), error handling (edge cases, validation), testing (unit tests, coverage), design (patterns, SOLID, modularity), documentation (comments, JSDoc), security awareness. Levels: beginner (syntax mastery), intermediate (patterns & libraries), advanced (architecture & optimization), expert (systems design & mentoring).',
       },
       {
         category: 'training-algorithms',
         keywords: ['algorithm', 'sort', 'search', 'graph', 'dynamic', 'programming', 'tree'],
-        content: 'Algorithm training patterns: Sorting (bubble, merge, quick, heap — understand tradeoffs). Searching (binary search, BFS, DFS, A*). Dynamic programming (memoization, tabulation, optimal substructure). Graph algorithms (Dijkstra, Bellman-Ford, topological sort, MST). Tree traversals (inorder, preorder, postorder, level-order). String algorithms (KMP, Rabin-Karp, trie). Practice pattern: understand → implement → analyze complexity → optimize → apply to real problems.',
+        content:
+          'Algorithm training patterns: Sorting (bubble, merge, quick, heap — understand tradeoffs). Searching (binary search, BFS, DFS, A*). Dynamic programming (memoization, tabulation, optimal substructure). Graph algorithms (Dijkstra, Bellman-Ford, topological sort, MST). Tree traversals (inorder, preorder, postorder, level-order). String algorithms (KMP, Rabin-Karp, trie). Practice pattern: understand → implement → analyze complexity → optimize → apply to real problems.',
       },
     ]
 
@@ -923,13 +1084,15 @@ export class DevBrain implements BrainInterface {
   /** Update running average for local latency. */
   private updateLocalLatency(ms: number): void {
     const n = this.stats.localRequests
-    this.stats.avgLocalLatencyMs = n <= 1
-      ? ms
-      : (this.stats.avgLocalLatencyMs * (n - 1) + ms) / n
+    this.stats.avgLocalLatencyMs = n <= 1 ? ms : (this.stats.avgLocalLatencyMs * (n - 1) + ms) / n
   }
 
   /** Build a coding exercise using local knowledge (no API needed). */
-  private buildExerciseLocally(topic: string, difficulty: ExerciseDifficulty, language: string): CodingExercise {
+  private buildExerciseLocally(
+    topic: string,
+    difficulty: ExerciseDifficulty,
+    language: string,
+  ): CodingExercise {
     const difficultyMinutes: Record<ExerciseDifficulty, number> = {
       beginner: 15,
       intermediate: 30,
@@ -952,7 +1115,13 @@ export class DevBrain implements BrainInterface {
       },
       expert: {
         prefix: 'Architect a production-grade',
-        concepts: ['distributed systems', 'performance tuning', 'security', 'scalability', 'system design'],
+        concepts: [
+          'distributed systems',
+          'performance tuning',
+          'security',
+          'scalability',
+          'system design',
+        ],
       },
     }
 
@@ -990,7 +1159,10 @@ export class DevBrain implements BrainInterface {
       go: `package main\n\n// ${topic}\n// TODO: Implement your solution here\n\nfunc solve(input string) string {\n\tpanic("not implemented")\n}\n`,
       java: `// ${topic}\n// TODO: Implement your solution here\n\npublic class Solution {\n    public static Object solve(Object input) {\n        throw new UnsupportedOperationException("Not implemented");\n    }\n}\n`,
     }
-    return templates[language.toLowerCase()] ?? `// ${topic}\n// TODO: Implement your solution in ${language}\n`
+    return (
+      templates[language.toLowerCase()] ??
+      `// ${topic}\n// TODO: Implement your solution in ${language}\n`
+    )
   }
 
   /** Get solution template for an exercise. */
@@ -1007,13 +1179,20 @@ export class DevBrain implements BrainInterface {
   }
 
   /** Evaluate code submission locally. */
-  private evaluateCodeLocally(code: string, exercise: CodingExercise, language: string): CodeEvaluation {
+  private evaluateCodeLocally(
+    code: string,
+    exercise: CodingExercise,
+    language: string,
+  ): CodeEvaluation {
     const feedback: string[] = []
     const improvements: string[] = []
     const conceptsUsed: string[] = []
     let score = BASE_EVALUATION_SCORE
 
-    const lines = code.trim().split('\n').filter(l => l.trim().length > 0)
+    const lines = code
+      .trim()
+      .split('\n')
+      .filter(l => l.trim().length > 0)
     if (lines.length === 0) {
       return {
         score: 0,
@@ -1030,7 +1209,12 @@ export class DevBrain implements BrainInterface {
       feedback.push('Good code structure with meaningful content.')
     }
 
-    if (code.includes('try') || code.includes('catch') || code.includes('except') || code.includes('Error')) {
+    if (
+      code.includes('try') ||
+      code.includes('catch') ||
+      code.includes('except') ||
+      code.includes('Error')
+    ) {
       score += 10
       conceptsUsed.push('error handling')
       feedback.push('Good: Includes error handling.')
@@ -1051,7 +1235,12 @@ export class DevBrain implements BrainInterface {
       conceptsUsed.push('type safety')
     }
 
-    if (code.includes('function') || code.includes('def ') || code.includes('class ') || code.includes('=>')) {
+    if (
+      code.includes('function') ||
+      code.includes('def ') ||
+      code.includes('class ') ||
+      code.includes('=>')
+    ) {
       score += 5
       conceptsUsed.push('modular design')
     }
@@ -1083,12 +1272,34 @@ export class DevBrain implements BrainInterface {
   }
 
   /** Get recommended training topics based on skill gaps. */
-  private getRecommendedTopics(language: string, level: ExerciseDifficulty, knowledgeCount: number): string[] {
+  private getRecommendedTopics(
+    language: string,
+    level: ExerciseDifficulty,
+    knowledgeCount: number,
+  ): string[] {
     const topicsByLevel: Record<ExerciseDifficulty, string[]> = {
-      beginner: ['variables and types', 'control flow', 'functions', 'arrays and loops', 'basic I/O'],
+      beginner: [
+        'variables and types',
+        'control flow',
+        'functions',
+        'arrays and loops',
+        'basic I/O',
+      ],
       intermediate: ['data structures', 'algorithms', 'error handling', 'testing', 'OOP patterns'],
-      advanced: ['design patterns', 'performance optimization', 'concurrency', 'architecture', 'security'],
-      expert: ['distributed systems', 'compiler internals', 'memory management', 'system design', 'mentoring'],
+      advanced: [
+        'design patterns',
+        'performance optimization',
+        'concurrency',
+        'architecture',
+        'security',
+      ],
+      expert: [
+        'distributed systems',
+        'compiler internals',
+        'memory management',
+        'system design',
+        'mentoring',
+      ],
     }
 
     const topics = topicsByLevel[level] ?? topicsByLevel.intermediate
@@ -1099,29 +1310,45 @@ export class DevBrain implements BrainInterface {
   }
 
   /** Build training topics for a training plan. */
-  private buildTrainingTopics(language: string, skillLevel: ExerciseDifficulty, goals: string[]): TrainingTopic[] {
+  private buildTrainingTopics(
+    language: string,
+    skillLevel: ExerciseDifficulty,
+    goals: string[],
+  ): TrainingTopic[] {
     const topics: TrainingTopic[] = []
     let order = 1
 
     const coreTopic: Record<ExerciseDifficulty, Array<{ name: string; desc: string }>> = {
       beginner: [
-        { name: 'Syntax Fundamentals', desc: `Learn ${language} syntax, types, and basic operations` },
+        {
+          name: 'Syntax Fundamentals',
+          desc: `Learn ${language} syntax, types, and basic operations`,
+        },
         { name: 'Control Flow', desc: 'Master conditionals, loops, and iteration patterns' },
         { name: 'Functions', desc: 'Write reusable functions with proper parameters and returns' },
         { name: 'Data Structures', desc: 'Work with arrays, objects, and collections' },
       ],
       intermediate: [
-        { name: 'Advanced Data Structures', desc: 'Implement stacks, queues, trees, and hash maps' },
+        {
+          name: 'Advanced Data Structures',
+          desc: 'Implement stacks, queues, trees, and hash maps',
+        },
         { name: 'Algorithm Design', desc: 'Learn sorting, searching, and recursive algorithms' },
         { name: 'Error Handling', desc: 'Build robust code with comprehensive error handling' },
         { name: 'Testing', desc: 'Write unit tests and practice TDD' },
         { name: 'Design Patterns', desc: 'Apply common design patterns in practice' },
       ],
       advanced: [
-        { name: 'Architecture Patterns', desc: 'Design modular, scalable application architectures' },
+        {
+          name: 'Architecture Patterns',
+          desc: 'Design modular, scalable application architectures',
+        },
         { name: 'Performance', desc: 'Profile and optimize code for speed and memory' },
         { name: 'Concurrency', desc: 'Handle async operations, threading, and parallelism' },
-        { name: 'Security', desc: 'Implement secure coding practices and vulnerability prevention' },
+        {
+          name: 'Security',
+          desc: 'Implement secure coding practices and vulnerability prevention',
+        },
       ],
       expert: [
         { name: 'System Design', desc: 'Design large-scale distributed systems' },
@@ -1140,7 +1367,10 @@ export class DevBrain implements BrainInterface {
           `Implement a ${ct.name.toLowerCase()} exercise in ${language}`,
           `Solve a real-world problem using ${ct.name.toLowerCase()}`,
         ],
-        resources: [`${language} documentation on ${ct.name.toLowerCase()}`, `Practice problems for ${ct.name.toLowerCase()}`],
+        resources: [
+          `${language} documentation on ${ct.name.toLowerCase()}`,
+          `Practice problems for ${ct.name.toLowerCase()}`,
+        ],
         order: order++,
       })
     }
@@ -1150,10 +1380,7 @@ export class DevBrain implements BrainInterface {
         name: goal,
         description: `Focused training on: ${goal} in ${language}`,
         difficulty: skillLevel,
-        exercises: [
-          `Build a project using ${goal}`,
-          `Complete a ${goal} coding challenge`,
-        ],
+        exercises: [`Build a project using ${goal}`, `Complete a ${goal} coding challenge`],
         resources: [`${goal} best practices`, `${language} ${goal} guide`],
         order: order++,
       })

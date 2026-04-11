@@ -79,7 +79,7 @@ export const DEFAULT_GATE_CONFIG: ConfidenceGateConfig = {
 }
 
 const HEDGE_PREFIXES = [
-  'I\'m not entirely certain, but ',
+  "I'm not entirely certain, but ",
   'Based on my understanding, ',
   'I believe, though I may be wrong, that ',
   'From what I know, ',
@@ -87,10 +87,10 @@ const HEDGE_PREFIXES = [
 ]
 
 const ABSTAIN_MESSAGES = [
-  'I don\'t have enough information to answer this confidently. Could you provide more context?',
-  'I\'m not confident enough in my answer to give you a reliable response on this topic.',
-  'This is outside my area of reliable knowledge. I\'d rather not guess.',
-  'I don\'t want to risk giving you incorrect information on this. Can you rephrase or narrow down the question?',
+  "I don't have enough information to answer this confidently. Could you provide more context?",
+  "I'm not confident enough in my answer to give you a reliable response on this topic.",
+  "This is outside my area of reliable knowledge. I'd rather not guess.",
+  "I don't want to risk giving you incorrect information on this. Can you rephrase or narrow down the question?",
 ]
 
 // ─── ConfidenceGate ────────────────────────────────────────────────────────────
@@ -127,13 +127,13 @@ export class ConfidenceGate {
     const explanation = this.buildExplanation(calibrated, signals, decision)
 
     // Generate hedge prefix or abstain message
-    const hedgePrefix = decision === 'hedge'
-      ? HEDGE_PREFIXES[this.decisionCount % HEDGE_PREFIXES.length]!
-      : null
+    const hedgePrefix =
+      decision === 'hedge' ? HEDGE_PREFIXES[this.decisionCount % HEDGE_PREFIXES.length]! : null
 
-    const abstainMessage = decision === 'abstain'
-      ? ABSTAIN_MESSAGES[this.decisionCount % ABSTAIN_MESSAGES.length]!
-      : null
+    const abstainMessage =
+      decision === 'abstain'
+        ? ABSTAIN_MESSAGES[this.decisionCount % ABSTAIN_MESSAGES.length]!
+        : null
 
     return {
       decision,
@@ -156,8 +156,7 @@ export class ConfidenceGate {
    * Quick check: should we hedge for this confidence level?
    */
   shouldHedge(confidence: number): boolean {
-    return confidence >= this.config.abstainThreshold &&
-           confidence < this.config.hedgeThreshold
+    return confidence >= this.config.abstainThreshold && confidence < this.config.hedgeThreshold
   }
 
   // ── Calibration Feedback ───────────────────────────────────────────────────
@@ -168,11 +167,7 @@ export class ConfidenceGate {
    * @param actualSuccess - Whether the response was actually correct/useful
    * @param decision - The gate decision that was made
    */
-  recordOutcome(
-    predictedConfidence: number,
-    actualSuccess: boolean,
-    decision: GateDecision,
-  ): void {
+  recordOutcome(predictedConfidence: number, actualSuccess: boolean, decision: GateDecision): void {
     if (!this.config.enableCalibration) return
 
     this.calibrationRecords.push({
@@ -213,8 +208,12 @@ export class ConfidenceGate {
 
     for (const record of this.calibrationRecords) {
       switch (record.decision) {
-        case 'abstain': abstainCount++; break
-        case 'hedge': hedgeCount++; break
+        case 'abstain':
+          abstainCount++
+          break
+        case 'hedge':
+          hedgeCount++
+          break
         case 'respond': {
           respondCount++
           if (record.actualSuccess) respondSuccessCount++
@@ -232,9 +231,7 @@ export class ConfidenceGate {
       respondCount,
       calibrationError: calibrationErrorSum / total,
       abstainRate: abstainCount / total,
-      accuracyWhenResponding: respondCount > 0
-        ? respondSuccessCount / respondCount
-        : 0,
+      accuracyWhenResponding: respondCount > 0 ? respondSuccessCount / respondCount : 0,
     }
   }
 
@@ -283,9 +280,7 @@ export class ConfidenceGate {
     signals: ConfidenceSignal[],
     decision: GateDecision,
   ): string {
-    const parts: string[] = [
-      `Aggregate confidence: ${(confidence * 100).toFixed(1)}%.`,
-    ]
+    const parts: string[] = [`Aggregate confidence: ${(confidence * 100).toFixed(1)}%.`]
 
     if (signals.length > 0) {
       const top = [...signals].sort((a, b) => b.score * b.weight - a.score * a.weight)[0]

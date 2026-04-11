@@ -16,12 +16,12 @@
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export interface CounterfactualResult {
-  isCounterfactual: boolean;
-  premise: string;
-  implications: string[];
-  risks: string[];
-  alternatives: string[];
-  confidence: number;
+  isCounterfactual: boolean
+  premise: string
+  implications: string[]
+  risks: string[]
+  alternatives: string[]
+  confidence: number
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -37,14 +37,14 @@ const COUNTERFACTUAL_PATTERNS = [
   /\bif\s+instead\b/i,
   /\bconsider\s+switching\b/i,
   /\bhad\s+we\s+chosen\b/i,
-];
+]
 
 interface ScenarioTemplate {
-  pattern: RegExp;
-  category: string;
-  implications: string[];
-  risks: string[];
-  alternatives: string[];
+  pattern: RegExp
+  category: string
+  implications: string[]
+  risks: string[]
+  alternatives: string[]
 }
 
 const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
@@ -148,31 +148,31 @@ const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
       'Evaluate hybrid cloud for gradual migration',
     ],
   },
-];
+]
 
 // ── CounterfactualReasoner Class ─────────────────────────────────────────────
 
 export class CounterfactualReasoner {
-  private analyzeCount = 0;
-  private counterfactualCount = 0;
-  private categoryCounts: Record<string, number> = {};
+  private analyzeCount = 0
+  private counterfactualCount = 0
+  private categoryCounts: Record<string, number> = {}
 
   constructor() {
-    this.categoryCounts = {};
+    this.categoryCounts = {}
   }
 
   /**
    * Check if text contains a counterfactual
    */
   isCounterfactual(text: string): boolean {
-    return COUNTERFACTUAL_PATTERNS.some(p => p.test(text));
+    return COUNTERFACTUAL_PATTERNS.some(p => p.test(text))
   }
 
   /**
    * Analyze a counterfactual scenario
    */
   analyze(query: string): CounterfactualResult {
-    this.analyzeCount++;
+    this.analyzeCount++
 
     if (!query || !this.isCounterfactual(query)) {
       return {
@@ -182,53 +182,49 @@ export class CounterfactualReasoner {
         risks: [],
         alternatives: [],
         confidence: 0,
-      };
+      }
     }
 
-    this.counterfactualCount++;
+    this.counterfactualCount++
 
     // Extract premise
-    const premise = this.extractPremise(query);
+    const premise = this.extractPremise(query)
 
     // Find matching scenario templates
-    const matchedTemplates = SCENARIO_TEMPLATES.filter(t => t.pattern.test(query));
+    const matchedTemplates = SCENARIO_TEMPLATES.filter(t => t.pattern.test(query))
 
-    let implications: string[] = [];
-    let risks: string[] = [];
-    let alternatives: string[] = [];
-    let confidence = 0.5;
+    let implications: string[] = []
+    let risks: string[] = []
+    let alternatives: string[] = []
+    let confidence = 0.5
 
     if (matchedTemplates.length > 0) {
       // Combine from matched templates
       for (const template of matchedTemplates) {
-        implications.push(...template.implications);
-        risks.push(...template.risks);
-        alternatives.push(...template.alternatives);
-        this.categoryCounts[template.category] =
-          (this.categoryCounts[template.category] || 0) + 1;
+        implications.push(...template.implications)
+        risks.push(...template.risks)
+        alternatives.push(...template.alternatives)
+        this.categoryCounts[template.category] = (this.categoryCounts[template.category] || 0) + 1
       }
-      confidence = Math.min(1, 0.5 + matchedTemplates.length * 0.15);
+      confidence = Math.min(1, 0.5 + matchedTemplates.length * 0.15)
     } else {
       // Generic counterfactual response
       implications = [
         'The change would affect existing workflows and processes',
         'Team familiarity and training needs would change',
         'Integration points with other systems need evaluation',
-      ];
-      risks = [
-        'Unknown unknowns in the new approach',
-        'Transition period may affect productivity',
-      ];
+      ]
+      risks = ['Unknown unknowns in the new approach', 'Transition period may affect productivity']
       alternatives = [
         'Consider a gradual migration approach',
         'Prototype the change before committing fully',
-      ];
+      ]
     }
 
     // Deduplicate
-    implications = [...new Set(implications)];
-    risks = [...new Set(risks)];
-    alternatives = [...new Set(alternatives)];
+    implications = [...new Set(implications)]
+    risks = [...new Set(risks)]
+    alternatives = [...new Set(alternatives)]
 
     return {
       isCounterfactual: true,
@@ -237,7 +233,7 @@ export class CounterfactualReasoner {
       risks,
       alternatives,
       confidence,
-    };
+    }
   }
 
   /**
@@ -251,31 +247,31 @@ export class CounterfactualReasoner {
       /imagine\s+(.+?)(?:\?|$)/i,
       /if\s+we\s+(.+?)(?:\?|,|$)/i,
       /what\s+would\s+happen\s+if\s+(.+?)(?:\?|$)/i,
-    ];
+    ]
 
     for (const pattern of patterns) {
-      const match = text.match(pattern);
+      const match = text.match(pattern)
       if (match && match[1]) {
-        return match[1].trim();
+        return match[1].trim()
       }
     }
 
-    return text.replace(/\?/g, '').trim();
+    return text.replace(/\?/g, '').trim()
   }
 
   /**
    * Get statistics
    */
   getStats(): {
-    analyzeCount: number;
-    counterfactualCount: number;
-    categoryCounts: Record<string, number>;
+    analyzeCount: number
+    counterfactualCount: number
+    categoryCounts: Record<string, number>
   } {
     return {
       analyzeCount: this.analyzeCount,
       counterfactualCount: this.counterfactualCount,
       categoryCounts: { ...this.categoryCounts },
-    };
+    }
   }
 
   /**
@@ -286,18 +282,18 @@ export class CounterfactualReasoner {
       analyzeCount: this.analyzeCount,
       counterfactualCount: this.counterfactualCount,
       categoryCounts: this.categoryCounts,
-    });
+    })
   }
 
   /**
    * Deserialize state
    */
   static deserialize(data: string): CounterfactualReasoner {
-    const parsed = JSON.parse(data);
-    const reasoner = new CounterfactualReasoner();
-    reasoner.analyzeCount = parsed.analyzeCount || 0;
-    reasoner.counterfactualCount = parsed.counterfactualCount || 0;
-    reasoner.categoryCounts = parsed.categoryCounts || {};
-    return reasoner;
+    const parsed = JSON.parse(data)
+    const reasoner = new CounterfactualReasoner()
+    reasoner.analyzeCount = parsed.analyzeCount || 0
+    reasoner.counterfactualCount = parsed.counterfactualCount || 0
+    reasoner.categoryCounts = parsed.categoryCounts || {}
+    return reasoner
   }
 }

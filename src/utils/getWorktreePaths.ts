@@ -59,9 +59,7 @@ export async function getWorktreePaths(cwd: string): Promise<string[]> {
   })
 
   // Sort worktrees: current worktree first, then alphabetically
-  const currentWorktree = worktreePaths.find(
-    path => cwd === path || cwd.startsWith(path + sep),
-  )
+  const currentWorktree = worktreePaths.find(path => cwd === path || cwd.startsWith(path + sep))
   const otherWorktrees = worktreePaths
     .filter(path => path !== currentWorktree)
     .sort((a, b) => a.localeCompare(b))

@@ -184,12 +184,7 @@ describe('FileNavigator', () => {
   // ═══════════════════════════════════════════════════════════
 
   describe('buildDirectoryTree', () => {
-    const files = [
-      'src/index.ts',
-      'src/utils/helpers.ts',
-      'src/components/Button.tsx',
-      'README.md',
-    ]
+    const files = ['src/index.ts', 'src/utils/helpers.ts', 'src/components/Button.tsx', 'README.md']
 
     it('should create a root node', () => {
       const tree = nav.buildDirectoryTree(files)
@@ -390,9 +385,7 @@ describe('FileNavigator', () => {
     })
 
     it('should use import map for direct dependents', () => {
-      const importMap = new Map([
-        ['src/app.ts', ['./utils']],
-      ])
+      const importMap = new Map([['src/app.ts', ['./utils']]])
       const impact = nav.analyzeImpact('src/utils.ts', allFiles, importMap)
       expect(impact.directDependents).toContain('src/app.ts')
     })

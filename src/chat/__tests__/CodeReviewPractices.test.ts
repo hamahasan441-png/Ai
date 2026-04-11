@@ -16,21 +16,33 @@ describe('CodeReviewPractices', () => {
 
   describe('KB entry tests', () => {
     it('should match review checklist and techniques keywords', async () => {
-      const r = await brain.chat('explain review checklist correctness readability performance security tests review techniques line by line architecture review nitpick blocking')
+      const r = await brain.chat(
+        'explain review checklist correctness readability performance security tests review techniques line by line architecture review nitpick blocking',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/review\s+checklist|correctness|readability|performance|security|line.by.line|architecture|nitpick|blocking/)
+      expect(r.text.toLowerCase()).toMatch(
+        /review\s+checklist|correctness|readability|performance|security|line.by.line|architecture|nitpick|blocking/,
+      )
     })
 
     it('should match feedback and common review issues keywords', async () => {
-      const r = await brain.chat('explain giving feedback constructive criticism praise asking questions suggesting alternatives common review issues magic numbers poor naming race conditions')
+      const r = await brain.chat(
+        'explain giving feedback constructive criticism praise asking questions suggesting alternatives common review issues magic numbers poor naming race conditions',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/feedback|constructive|criticism|praise|magic\s+number|naming|race\s+condition/)
+      expect(r.text.toLowerCase()).toMatch(
+        /feedback|constructive|criticism|praise|magic\s+number|naming|race\s+condition/,
+      )
     })
 
     it('should match automated review tools and PR strategies keywords', async () => {
-      const r = await brain.chat('explain automated review tools linters static analysis sonarqube codeclimate codacy pr strategies small prs stacked prs draft prs merge strategies')
+      const r = await brain.chat(
+        'explain automated review tools linters static analysis sonarqube codeclimate codacy pr strategies small prs stacked prs draft prs merge strategies',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/automated|linter|static\s+analysis|sonarqube|codeclimate|pr\s+strateg|small|stacked|draft|merge/)
+      expect(r.text.toLowerCase()).toMatch(
+        /automated|linter|static\s+analysis|sonarqube|codeclimate|pr\s+strateg|small|stacked|draft|merge/,
+      )
     })
   })
 

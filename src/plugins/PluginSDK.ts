@@ -342,7 +342,9 @@ export class PluginSDK {
   /**
    * Get a registered plugin's info.
    */
-  getPlugin(pluginId: string): { manifest: PluginManifest; state: PluginState; error: string | null } | undefined {
+  getPlugin(
+    pluginId: string,
+  ): { manifest: PluginManifest; state: PluginState; error: string | null } | undefined {
     const plugin = this.plugins.get(pluginId)
     if (!plugin) return undefined
 
@@ -357,7 +359,7 @@ export class PluginSDK {
    * List all registered plugins.
    */
   listPlugins(): Array<{ id: string; name: string; state: PluginState; version: string }> {
-    return Array.from(this.plugins.values()).map((p) => ({
+    return Array.from(this.plugins.values()).map(p => ({
       id: p.definition.manifest.id,
       name: p.definition.manifest.name,
       state: p.state,

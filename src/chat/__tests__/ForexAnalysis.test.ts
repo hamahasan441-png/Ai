@@ -11,21 +11,31 @@ describe('Forex Market Analysis Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about forex currency pairs and fundamentals', async () => {
-      const r = await brain.chat('explain forex market analysis currency pair major minor exotic fundamental analysis economic indicator')
+      const r = await brain.chat(
+        'explain forex market analysis currency pair major minor exotic fundamental analysis economic indicator',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/currency|forex|pair|pip|fundamental|economic/)
     })
 
     it('answers about forex sessions and central banks', async () => {
-      const r = await brain.chat('explain forex session market hours central bank monetary policy rate decision hawkish dovish')
+      const r = await brain.chat(
+        'explain forex session market hours central bank monetary policy rate decision hawkish dovish',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/session|london|tokyo|central\s+bank|hawkish|dovish|rate/)
+      expect(r.text.toLowerCase()).toMatch(
+        /session|london|tokyo|central\s+bank|hawkish|dovish|rate/,
+      )
     })
 
     it('answers about multi-timeframe and intermarket analysis', async () => {
-      const r = await brain.chat('explain forex multi timeframe analysis top down weekly daily intermarket analysis bonds commodities correlation')
+      const r = await brain.chat(
+        'explain forex multi timeframe analysis top down weekly daily intermarket analysis bonds commodities correlation',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/timeframe|intermarket|correlation|support|resistance|trend/)
+      expect(r.text.toLowerCase()).toMatch(
+        /timeframe|intermarket|correlation|support|resistance|trend/,
+      )
     })
   })
 

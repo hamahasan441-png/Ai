@@ -33,8 +33,6 @@ export function migrateBypassPermissionsAcceptedToSettings(): void {
       return updatedConfig
     })
   } catch (error) {
-    logError(
-      new Error(`Failed to migrate bypass permissions accepted: ${error}`),
-    )
+    logError(new Error(`Failed to migrate bypass permissions accepted: ${error}`))
   }
 }

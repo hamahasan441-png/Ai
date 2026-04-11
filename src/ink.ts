@@ -45,10 +45,7 @@ export { Ansi } from './ink/Ansi.js'
 export type { Props as AppProps } from './ink/components/AppContext.js'
 export type { Props as BaseBoxProps } from './ink/components/Box.js'
 export { default as BaseBox } from './ink/components/Box.js'
-export type {
-  ButtonState,
-  Props as ButtonProps,
-} from './ink/components/Button.js'
+export type { ButtonState, Props as ButtonProps } from './ink/components/Button.js'
 export { default as Button } from './ink/components/Button.js'
 export type { Props as LinkProps } from './ink/components/Link.js'
 export { default as Link } from './ink/components/Link.js'

@@ -7,9 +7,7 @@ import { getSessionsSinceLastShown, recordTipShown } from './tipHistory.js'
 import { getRelevantTips } from './tipRegistry.js'
 import type { Tip, TipContext } from './types.js'
 
-export function selectTipWithLongestTimeSinceShown(
-  availableTips: Tip[],
-): Tip | undefined {
+export function selectTipWithLongestTimeSinceShown(availableTips: Tip[]): Tip | undefined {
   if (availableTips.length === 0) {
     return undefined
   }
@@ -29,9 +27,7 @@ export function selectTipWithLongestTimeSinceShown(
   return tipsWithSessions[0]?.tip
 }
 
-export async function getTipToShowOnSpinner(
-  context?: TipContext,
-): Promise<Tip | undefined> {
+export async function getTipToShowOnSpinner(context?: TipContext): Promise<Tip | undefined> {
   // Check if tips are disabled (default to true if not set)
   if (getSettings_DEPRECATED().spinnerTipsEnabled === false) {
     return undefined
@@ -51,8 +47,7 @@ export function recordShownTip(tip: Tip): void {
 
   // Log event for analytics
   logEvent('tengu_tip_shown', {
-    tipIdLength:
-      tip.id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+    tipIdLength: tip.id as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     cooldownSessions: tip.cooldownSessions,
   })
 }

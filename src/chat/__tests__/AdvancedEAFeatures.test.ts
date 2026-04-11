@@ -10,18 +10,30 @@ describe('Advanced EA Features Knowledge', () => {
   })
 
   it('explains trailing stop, breakeven, and partial close', async () => {
-    const r = await brain.chat('How to code a trailing stop, breakeven stop loss, and partial close order in MQL?')
-    expect(r.text.toLowerCase()).toMatch(/trailing|breakeven|partial\s*close|ordermodify|stoploss|atr/)
+    const r = await brain.chat(
+      'How to code a trailing stop, breakeven stop loss, and partial close order in MQL?',
+    )
+    expect(r.text.toLowerCase()).toMatch(
+      /trailing|breakeven|partial\s*close|ordermodify|stoploss|atr/,
+    )
   })
 
   it('covers news filter, session filter, and spread filter for EAs', async () => {
-    const r = await brain.chat('How to add a news filter, session filter, and spread filter to an expert advisor?')
-    expect(r.text.toLowerCase()).toMatch(/news|session|spread|filter|hour|mode_spread|isTradeAllowed|trading/i)
+    const r = await brain.chat(
+      'How to add a news filter, session filter, and spread filter to an expert advisor?',
+    )
+    expect(r.text.toLowerCase()).toMatch(
+      /news|session|spread|filter|hour|mode_spread|isTradeAllowed|trading/i,
+    )
   })
 
   it('explains EA dashboard panel development', async () => {
-    const r = await brain.chat('How to create an EA dashboard panel HUD with MQL graphical interface?')
-    expect(r.text.toLowerCase()).toMatch(/objectcreate|panel|label|rectangle|dashboard|display|balance|cappdialog/)
+    const r = await brain.chat(
+      'How to create an EA dashboard panel HUD with MQL graphical interface?',
+    )
+    expect(r.text.toLowerCase()).toMatch(
+      /objectcreate|panel|label|rectangle|dashboard|display|balance|cappdialog/,
+    )
   })
 
   describe('Semantic Memory', () => {

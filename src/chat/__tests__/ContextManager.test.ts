@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  ContextManager,
-  type ContextTurn,
-} from '../ContextManager'
+import { ContextManager, type ContextTurn } from '../ContextManager'
 
 // ── Helpers ──
 
@@ -174,7 +171,9 @@ describe('getCurrentTopic', () => {
   })
 
   it('detects debugging topic from error-related keywords', () => {
-    mgr.addTurn(makeTurn('user', 'I have a bug and the error causes a crash with an exception', 1000))
+    mgr.addTurn(
+      makeTurn('user', 'I have a bug and the error causes a crash with an exception', 1000),
+    )
     const topic = mgr.getCurrentTopic()
     expect(topic).not.toBeNull()
     expect(topic!.name).toBe('debugging')
@@ -455,9 +454,15 @@ describe('serialize and deserialize', () => {
     const mgr = new ContextManager()
     mgr.addTurn(makeTurn('user', 'I use react and typescript daily', 1000))
 
-    const originalEntities = mgr.getActiveEntities().map(e => e.name).sort()
+    const originalEntities = mgr
+      .getActiveEntities()
+      .map(e => e.name)
+      .sort()
     const restored = ContextManager.deserialize(mgr.serialize())
-    const restoredEntities = restored.getActiveEntities().map(e => e.name).sort()
+    const restoredEntities = restored
+      .getActiveEntities()
+      .map(e => e.name)
+      .sort()
     expect(restoredEntities).toEqual(originalEntities)
   })
 

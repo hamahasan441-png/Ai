@@ -19,13 +19,21 @@ describe('Data Science & Machine Learning Knowledge', () => {
     })
 
     it('describes random forest and decision trees', async () => {
-      const r = await brain.chat('How does a random forest machine learning model work with decision trees for supervised learning?')
-      expect(r.text.toLowerCase()).toMatch(/random\s*forest|decision\s*tree|ensemble|bagging|split|classif|regress|supervis/)
+      const r = await brain.chat(
+        'How does a random forest machine learning model work with decision trees for supervised learning?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /random\s*forest|decision\s*tree|ensemble|bagging|split|classif|regress|supervis/,
+      )
     })
 
     it('explains SVM classifier and margin', async () => {
-      const r = await brain.chat('How does an SVM classifier model in sklearn find the maximum margin for supervised learning?')
-      expect(r.text.toLowerCase()).toMatch(/svm|support\s*vector|margin|hyperplane|kernel|classif|supervis|sklearn/)
+      const r = await brain.chat(
+        'How does an SVM classifier model in sklearn find the maximum margin for supervised learning?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /svm|support\s*vector|margin|hyperplane|kernel|classif|supervis|sklearn/,
+      )
     })
 
     it('covers sklearn model training workflow', async () => {
@@ -38,13 +46,19 @@ describe('Data Science & Machine Learning Knowledge', () => {
 
   describe('Unsupervised Learning', () => {
     it('explains K-Means clustering algorithm', async () => {
-      const r = await brain.chat('How does K-Means and DBSCAN clustering work for unsupervised learning with PCA dimensionality reduction?')
+      const r = await brain.chat(
+        'How does K-Means and DBSCAN clustering work for unsupervised learning with PCA dimensionality reduction?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/k-?means|cluster|centroid|unsupervis|dbscan|density|pca|dimension/)
+      expect(r.text.toLowerCase()).toMatch(
+        /k-?means|cluster|centroid|unsupervis|dbscan|density|pca|dimension/,
+      )
     })
 
     it('describes DBSCAN density-based clustering', async () => {
-      const r = await brain.chat('How does DBSCAN density-based clustering handle noise and outliers?')
+      const r = await brain.chat(
+        'How does DBSCAN density-based clustering handle noise and outliers?',
+      )
       expect(r.text.toLowerCase()).toMatch(/dbscan|density|cluster|noise|outlier/)
     })
 
@@ -58,13 +72,19 @@ describe('Data Science & Machine Learning Knowledge', () => {
 
   describe('Deep Learning', () => {
     it('explains neural network fundamentals', async () => {
-      const r = await brain.chat('What are the deep learning neural network fundamentals with PyTorch and TensorFlow?')
+      const r = await brain.chat(
+        'What are the deep learning neural network fundamentals with PyTorch and TensorFlow?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/neural|deep\s*learn|layer|activation|pytorch|tensorflow/)
+      expect(r.text.toLowerCase()).toMatch(
+        /neural|deep\s*learn|layer|activation|pytorch|tensorflow/,
+      )
     })
 
     it('describes backpropagation and gradient descent', async () => {
-      const r = await brain.chat('How does backpropagation and gradient descent work in neural networks?')
+      const r = await brain.chat(
+        'How does backpropagation and gradient descent work in neural networks?',
+      )
       expect(r.text.toLowerCase()).toMatch(/backprop|gradient|loss|optim|descent|adam/)
     })
 
@@ -78,14 +98,18 @@ describe('Data Science & Machine Learning Knowledge', () => {
 
   describe('CNN & Computer Vision', () => {
     it('explains convolutional neural network architecture', async () => {
-      const r = await brain.chat('How does a CNN image classification convolutional neural network work?')
+      const r = await brain.chat(
+        'How does a CNN image classification convolutional neural network work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/cnn|convolut|filter|pool|image|classif/)
     })
 
     it('describes transfer learning with pretrained models', async () => {
       const r = await brain.chat('How does CNN transfer learning with ResNet or EfficientNet work?')
-      expect(r.text.toLowerCase()).toMatch(/transfer|pretrain|resnet|efficientnet|fine-?tun|imagenet/)
+      expect(r.text.toLowerCase()).toMatch(
+        /transfer|pretrain|resnet|efficientnet|fine-?tun|imagenet/,
+      )
     })
 
     it('covers object detection architectures', async () => {
@@ -105,7 +129,9 @@ describe('Data Science & Machine Learning Knowledge', () => {
 
     it('describes transformer architecture and attention', async () => {
       const r = await brain.chat('How does the transformer model attention mechanism work in NLP?')
-      expect(r.text.toLowerCase()).toMatch(/transformer|attention|self-?attention|multi-?head|positional/)
+      expect(r.text.toLowerCase()).toMatch(
+        /transformer|attention|self-?attention|multi-?head|positional/,
+      )
     })
 
     it('covers word embeddings and representations', async () => {
@@ -129,7 +155,9 @@ describe('Data Science & Machine Learning Knowledge', () => {
     })
 
     it('covers feature engineering techniques', async () => {
-      const r = await brain.chat('What are the key feature engineering and data preprocessing steps?')
+      const r = await brain.chat(
+        'What are the key feature engineering and data preprocessing steps?',
+      )
       expect(r.text.toLowerCase()).toMatch(/feature|encod|scal|missing|transform|preprocess/)
     })
 
@@ -149,13 +177,17 @@ describe('Data Science & Machine Learning Knowledge', () => {
     })
 
     it('compares LightGBM and CatBoost', async () => {
-      const r = await brain.chat('What are the differences between LightGBM and CatBoost gradient boosting?')
+      const r = await brain.chat(
+        'What are the differences between LightGBM and CatBoost gradient boosting?',
+      )
       expect(r.text.toLowerCase()).toMatch(/lightgbm|catboost|gradient|boost|leaf|categorical/)
     })
 
     it('describes hyperparameter tuning', async () => {
       const r = await brain.chat('How to tune hyperparameters for gradient boosting models?')
-      expect(r.text.toLowerCase()).toMatch(/hyperparameter|tun|grid|random|optuna|learning_rate|depth/)
+      expect(r.text.toLowerCase()).toMatch(
+        /hyperparameter|tun|grid|random|optuna|learning_rate|depth/,
+      )
     })
   })
 
@@ -169,7 +201,9 @@ describe('Data Science & Machine Learning Knowledge', () => {
     })
 
     it('covers policy gradient methods', async () => {
-      const r = await brain.chat('How do reinforcement learning policy gradient methods like PPO work?')
+      const r = await brain.chat(
+        'How do reinforcement learning policy gradient methods like PPO work?',
+      )
       expect(r.text.toLowerCase()).toMatch(/policy|gradient|ppo|actor|critic|proximal/)
     })
   })
@@ -178,9 +212,13 @@ describe('Data Science & Machine Learning Knowledge', () => {
 
   describe('Time Series Forecasting', () => {
     it('explains ARIMA time series model', async () => {
-      const r = await brain.chat('How does the ARIMA model work for time series forecasting with Prophet seasonal decomposition?')
+      const r = await brain.chat(
+        'How does the ARIMA model work for time series forecasting with Prophet seasonal decomposition?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/arima|time\s*series|forecast|autoregress|station|prophet|season/)
+      expect(r.text.toLowerCase()).toMatch(
+        /arima|time\s*series|forecast|autoregress|station|prophet|season/,
+      )
     })
 
     it('covers LSTM and Prophet for forecasting', async () => {
@@ -204,8 +242,12 @@ describe('Data Science & Machine Learning Knowledge', () => {
     })
 
     it('describes variational autoencoders', async () => {
-      const r = await brain.chat('How does a variational autoencoder VAE learn latent representations?')
-      expect(r.text.toLowerCase()).toMatch(/vae|variational|autoencoder|latent|kl|divergen|encoder|decoder/)
+      const r = await brain.chat(
+        'How does a variational autoencoder VAE learn latent representations?',
+      )
+      expect(r.text.toLowerCase()).toMatch(
+        /vae|variational|autoencoder|latent|kl|divergen|encoder|decoder/,
+      )
     })
   })
 

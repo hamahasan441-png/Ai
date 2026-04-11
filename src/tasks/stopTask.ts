@@ -35,10 +35,7 @@ type StopTaskResult = {
  * not running, or unsupported type). Callers can inspect `error.code` to
  * distinguish the failure reason.
  */
-export async function stopTask(
-  taskId: string,
-  context: StopTaskContext,
-): Promise<StopTaskResult> {
+export async function stopTask(taskId: string, context: StopTaskContext): Promise<StopTaskResult> {
   const { getAppState, setAppState } = context
   const appState = getAppState()
   const task = appState.tasks?.[taskId] as TaskStateBase | undefined
@@ -48,18 +45,12 @@ export async function stopTask(
   }
 
   if (task.status !== 'running') {
-    throw new StopTaskError(
-      `Task ${taskId} is not running (status: ${task.status})`,
-      'not_running',
-    )
+    throw new StopTaskError(`Task ${taskId} is not running (status: ${task.status})`, 'not_running')
   }
 
   const taskImpl = getTaskByType(task.type)
   if (!taskImpl) {
-    throw new StopTaskError(
-      `Unsupported task type: ${task.type}`,
-      'unsupported_type',
-    )
+    throw new StopTaskError(`Unsupported task type: ${task.type}`, 'unsupported_type')
   }
 
   await taskImpl.kill(taskId, setAppState)

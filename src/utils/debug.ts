@@ -5,11 +5,7 @@ import { getSessionId } from 'src/bootstrap/state.js'
 
 import { type BufferedWriter, createBufferedWriter } from './bufferedWriter.js'
 import { registerCleanup } from './cleanupRegistry.js'
-import {
-  type DebugFilter,
-  parseDebugFilter,
-  shouldShowDebugMessage,
-} from './debugFilter.js'
+import { type DebugFilter, parseDebugFilter, shouldShowDebugMessage } from './debugFilter.js'
 import { getClaudeConfigHomeDir, isEnvTruthy } from './envUtils.js'
 import { getFsImplementation } from './fsOperations.js'
 import { writeToStderr } from './process.js'
@@ -83,9 +79,7 @@ export const getDebugFilter = memoize((): DebugFilter | null => {
 })
 
 export const isDebugToStdErr = memoize((): boolean => {
-  return (
-    process.argv.includes('--debug-to-stderr') || process.argv.includes('-d2e')
-  )
+  return process.argv.includes('--debug-to-stderr') || process.argv.includes('-d2e')
 })
 
 export const getDebugFilePath = memoize((): string | null => {

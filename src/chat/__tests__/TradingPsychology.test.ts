@@ -11,21 +11,33 @@ describe('Trading Psychology Knowledge', () => {
 
   describe('KB entries', () => {
     it('answers about trading psychology and biases', async () => {
-      const r = await brain.chat('explain trading psychology emotional discipline fear greed cognitive bias overconfidence loss aversion recency')
+      const r = await brain.chat(
+        'explain trading psychology emotional discipline fear greed cognitive bias overconfidence loss aversion recency',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/psychology|emotion|discipline|fear|greed|bias|loss\s+aversion/)
+      expect(r.text.toLowerCase()).toMatch(
+        /psychology|emotion|discipline|fear|greed|bias|loss\s+aversion/,
+      )
     })
 
     it('answers about risk management and trading plans', async () => {
-      const r = await brain.chat('explain risk management position sizing percent risk trading plan rules entry exit criteria performance metrics')
+      const r = await brain.chat(
+        'explain risk management position sizing percent risk trading plan rules entry exit criteria performance metrics',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/risk|position\s+siz|trading\s+plan|performance|metric|win\s+rate/)
+      expect(r.text.toLowerCase()).toMatch(
+        /risk|position\s+siz|trading\s+plan|performance|metric|win\s+rate/,
+      )
     })
 
     it('answers about market regimes and trading mistakes', async () => {
-      const r = await brain.chat('explain market regime trend range volatile quiet adapting trading mistakes revenge trading overtrading professional')
+      const r = await brain.chat(
+        'explain market regime trend range volatile quiet adapting trading mistakes revenge trading overtrading professional',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/regime|trend|range|volatile|revenge|overtrading|professional/)
+      expect(r.text.toLowerCase()).toMatch(
+        /regime|trend|range|volatile|revenge|overtrading|professional/,
+      )
     })
   })
 

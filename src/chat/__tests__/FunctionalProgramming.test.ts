@@ -12,13 +12,19 @@ describe('Functional Programming Knowledge', () => {
   // ── FP Fundamentals ────────────────────────────────────────────────────
   describe('FP Fundamentals', () => {
     it('explains pure functions and immutability', async () => {
-      const r = await brain.chat('What are functional programming pure function immutability concepts?')
+      const r = await brain.chat(
+        'What are functional programming pure function immutability concepts?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/pure\s*function|immutab|functional|side\s*effect|first.?class/)
+      expect(r.text.toLowerCase()).toMatch(
+        /pure\s*function|immutab|functional|side\s*effect|first.?class/,
+      )
     })
 
     it('covers higher order functions', async () => {
-      const r = await brain.chat('How do higher order function map filter reduce functional composition work?')
+      const r = await brain.chat(
+        'How do higher order function map filter reduce functional composition work?',
+      )
       expect(r.text.toLowerCase()).toMatch(/higher.?order|map|filter|reduce|composition|function/)
     })
   })
@@ -26,13 +32,17 @@ describe('Functional Programming Knowledge', () => {
   // ── Monads & ADTs ──────────────────────────────────────────────────────
   describe('Monads & Algebraic Types', () => {
     it('explains monads and ADTs', async () => {
-      const r = await brain.chat('What are monad functor applicative type class algebraic data types in FP?')
+      const r = await brain.chat(
+        'What are monad functor applicative type class algebraic data types in FP?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/monad|functor|applicative|algebraic|type|maybe|either/)
     })
 
     it('covers Maybe Either error handling', async () => {
-      const r = await brain.chat('How does Maybe Either Option Result error handling work in functional programming?')
+      const r = await brain.chat(
+        'How does Maybe Either Option Result error handling work in functional programming?',
+      )
       expect(r.text.toLowerCase()).toMatch(/maybe|either|option|result|error|monad|pattern/)
     })
   })
@@ -40,13 +50,17 @@ describe('Functional Programming Knowledge', () => {
   // ── Haskell ────────────────────────────────────────────────────────────
   describe('Haskell', () => {
     it('explains Haskell type system and lazy evaluation', async () => {
-      const r = await brain.chat('How does the Haskell type system lazy evaluation and typeclass system work?')
+      const r = await brain.chat(
+        'How does the Haskell type system lazy evaluation and typeclass system work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
       expect(r.text.toLowerCase()).toMatch(/haskell|type|lazy|evaluation|typeclass|io\s*monad|pure/)
     })
 
     it('covers GHC compiler and packages', async () => {
-      const r = await brain.chat('What are GHC Haskell compiler cabal stack package management tools?')
+      const r = await brain.chat(
+        'What are GHC Haskell compiler cabal stack package management tools?',
+      )
       expect(r.text.toLowerCase()).toMatch(/haskell|ghc|cabal|stack|compiler|package|hackage/)
     })
   })
@@ -54,30 +68,42 @@ describe('Functional Programming Knowledge', () => {
   // ── Rust Functional Features ───────────────────────────────────────────
   describe('Rust Functional', () => {
     it('explains Rust ownership and pattern matching', async () => {
-      const r = await brain.chat('How do Rust ownership borrow checker lifetime safety and pattern matching work?')
+      const r = await brain.chat(
+        'How do Rust ownership borrow checker lifetime safety and pattern matching work?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/rust|ownership|borrow|lifetime|pattern\s*match|option|result/)
+      expect(r.text.toLowerCase()).toMatch(
+        /rust|ownership|borrow|lifetime|pattern\s*match|option|result/,
+      )
     })
 
     it('covers Rust traits and iterators', async () => {
       const r = await brain.chat('How do Rust trait generic zero cost abstraction iterators work?')
-      expect(r.text.toLowerCase()).toMatch(/rust|trait|generic|iterator|zero.?cost|closure|abstract/)
+      expect(r.text.toLowerCase()).toMatch(
+        /rust|trait|generic|iterator|zero.?cost|closure|abstract/,
+      )
     })
   })
 
   // ── FP Languages ───────────────────────────────────────────────────────
   describe('FP Languages', () => {
     it('explains Scala Elixir Clojure', async () => {
-      const r = await brain.chat('What are Scala functional OOP and Elixir Erlang OTP and Clojure Lisp JVM languages?')
+      const r = await brain.chat(
+        'What are Scala functional OOP and Elixir Erlang OTP and Clojure Lisp JVM languages?',
+      )
       expect(r.text.length).toBeGreaterThan(50)
-      expect(r.text.toLowerCase()).toMatch(/scala|elixir|clojure|erlang|jvm|pattern\s*match|otp|functional/)
+      expect(r.text.toLowerCase()).toMatch(
+        /scala|elixir|clojure|erlang|jvm|pattern\s*match|otp|functional/,
+      )
     })
   })
 
   // ── Reactive Programming ───────────────────────────────────────────────
   describe('Reactive Programming', () => {
     it('explains RxJS and reactive streams', async () => {
-      const r = await brain.chat('How does reactive programming with RxJS observable stream operators work?')
+      const r = await brain.chat(
+        'How does reactive programming with RxJS observable stream operators work?',
+      )
       expect(r.text.toLowerCase()).toMatch(/reactive|rxjs|observable|stream|operator|signal|event/)
     })
   })

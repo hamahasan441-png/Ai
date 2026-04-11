@@ -153,8 +153,8 @@ describe('MemoryCache', () => {
   describe('stats tracking', () => {
     it('tracks hits and misses', () => {
       cache.set('k', 'v')
-      cache.get('k')    // hit
-      cache.get('k')    // hit
+      cache.get('k') // hit
+      cache.get('k') // hit
       cache.get('miss') // miss
 
       const stats = cache.getStats()

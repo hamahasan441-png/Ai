@@ -28,10 +28,7 @@ const inputSchema = lazySchema(() =>
       .string()
       .optional()
       .describe('SQL query to execute (required for query/explain commands)'),
-    table: z
-      .string()
-      .optional()
-      .describe('Table name (required for describe command)'),
+    table: z.string().optional().describe('Table name (required for describe command)'),
     max_rows: z
       .number()
       .int()
@@ -88,7 +85,10 @@ function validateSql(sql: string): { valid: boolean; reason?: string } {
   // Block multiple statements (basic ; splitting, doesn't handle strings perfectly)
   const statementCount = trimmed.split(';').filter(s => s.trim().length > 0).length
   if (statementCount > 1) {
-    return { valid: false, reason: 'Multiple SQL statements are not allowed. Execute one statement at a time.' }
+    return {
+      valid: false,
+      reason: 'Multiple SQL statements are not allowed. Execute one statement at a time.',
+    }
   }
 
   return { valid: true }
@@ -102,7 +102,13 @@ function detectDatabaseType(connectionString: string): DatabaseType {
   const lower = connectionString.toLowerCase()
   if (lower.startsWith('postgresql://') || lower.startsWith('postgres://')) return 'postgresql'
   if (lower.startsWith('mysql://')) return 'mysql'
-  if (lower.startsWith('sqlite://') || lower.endsWith('.db') || lower.endsWith('.sqlite') || lower.endsWith('.sqlite3')) return 'sqlite'
+  if (
+    lower.startsWith('sqlite://') ||
+    lower.endsWith('.db') ||
+    lower.endsWith('.sqlite') ||
+    lower.endsWith('.sqlite3')
+  )
+    return 'sqlite'
   // Default to SQLite for file paths
   return 'sqlite'
 }
@@ -152,9 +158,9 @@ async function executeSqlite(
       try {
         switch (command) {
           case 'tables': {
-            const rows = db.prepare(
-              "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
-            ).all() as Array<{ name: string }>
+            const rows = db
+              .prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+              .all() as Array<{ name: string }>
             return {
               command,
               database_type: 'sqlite',
@@ -165,9 +171,11 @@ async function executeSqlite(
           }
 
           case 'schema': {
-            const rows = db.prepare(
-              "SELECT sql FROM sqlite_master WHERE type IN ('table', 'view') ORDER BY name"
-            ).all() as Array<{ sql: string }>
+            const rows = db
+              .prepare(
+                "SELECT sql FROM sqlite_master WHERE type IN ('table', 'view') ORDER BY name",
+              )
+              .all() as Array<{ sql: string }>
             return {
               command,
               database_type: 'sqlite',
@@ -178,16 +186,25 @@ async function executeSqlite(
 
           case 'describe': {
             if (!table) throw new Error('Table name is required for describe command')
-            const rows = db.prepare(`PRAGMA table_info("${table.replace(/"/g, '""')}")`).all() as Array<{
-              name: string; type: string; notnull: number; dflt_value: unknown; pk: number
+            const rows = db
+              .prepare(`PRAGMA table_info("${table.replace(/"/g, '""')}")`)
+              .all() as Array<{
+              name: string
+              type: string
+              notnull: number
+              dflt_value: unknown
+              pk: number
             }>
             return {
               command,
               database_type: 'sqlite',
               columns: ['name', 'type', 'notnull', 'default', 'pk'],
               rows: rows.map(r => ({
-                name: r.name, type: r.type,
-                notnull: r.notnull === 1, default: r.dflt_value, pk: r.pk === 1,
+                name: r.name,
+                type: r.type,
+                notnull: r.notnull === 1,
+                default: r.dflt_value,
+                pk: r.pk === 1,
               })),
               row_count: rows.length,
               execution_time_ms: Date.now() - start,
@@ -209,7 +226,9 @@ async function executeSqlite(
           case 'query': {
             if (!sql) throw new Error('SQL query is required for query command')
             if (readOnly && isWriteOperation(sql)) {
-              throw new Error('Write operations are not allowed in read-only mode. Set read_only: false to allow writes.')
+              throw new Error(
+                'Write operations are not allowed in read-only mode. Set read_only: false to allow writes.',
+              )
             }
 
             const validation = validateSql(sql)
@@ -238,7 +257,9 @@ async function executeSqlite(
               rows: limited,
               row_count: limited.length,
               execution_time_ms: Date.now() - start,
-              ...(rows.length > maxRows ? { message: `Showing ${maxRows} of ${rows.length} rows` } : {}),
+              ...(rows.length > maxRows
+                ? { message: `Showing ${maxRows} of ${rows.length} rows` }
+                : {}),
             }
           }
 
@@ -284,19 +305,24 @@ async function executeSqliteCli(
   switch (command) {
     case 'tables': {
       const output = runSqlite("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
-      const rows = output ? JSON.parse(output) as Array<{ name: string }> : []
+      const rows = output ? (JSON.parse(output) as Array<{ name: string }>) : []
       return {
-        command, database_type: 'sqlite',
-        tables: rows.map(r => r.name), row_count: rows.length,
+        command,
+        database_type: 'sqlite',
+        tables: rows.map(r => r.name),
+        row_count: rows.length,
         execution_time_ms: Date.now() - start,
       }
     }
 
     case 'schema': {
-      const output = runSqlite("SELECT sql FROM sqlite_master WHERE type IN ('table','view') ORDER BY name")
-      const rows = output ? JSON.parse(output) as Array<{ sql: string }> : []
+      const output = runSqlite(
+        "SELECT sql FROM sqlite_master WHERE type IN ('table','view') ORDER BY name",
+      )
+      const rows = output ? (JSON.parse(output) as Array<{ sql: string }>) : []
       return {
-        command, database_type: 'sqlite',
+        command,
+        database_type: 'sqlite',
         schema_info: rows.map(r => r.sql).join('\n\n'),
         execution_time_ms: Date.now() - start,
       }
@@ -305,11 +331,13 @@ async function executeSqliteCli(
     case 'describe': {
       if (!table) throw new Error('Table name required')
       const output = runSqlite(`PRAGMA table_info("${table.replace(/"/g, '""')}")`)
-      const rows = output ? JSON.parse(output) as Record<string, unknown>[] : []
+      const rows = output ? (JSON.parse(output) as Record<string, unknown>[]) : []
       return {
-        command, database_type: 'sqlite',
+        command,
+        database_type: 'sqlite',
         columns: ['name', 'type', 'notnull', 'dflt_value', 'pk'],
-        rows, row_count: rows.length,
+        rows,
+        row_count: rows.length,
         execution_time_ms: Date.now() - start,
       }
     }
@@ -323,11 +351,14 @@ async function executeSqliteCli(
       if (!validation.valid) throw new Error(validation.reason)
 
       const output = runSqlite(`${sql} LIMIT ${maxRows}`)
-      const rows = output ? JSON.parse(output) as Record<string, unknown>[] : []
+      const rows = output ? (JSON.parse(output) as Record<string, unknown>[]) : []
       const columns = rows.length > 0 ? Object.keys(rows[0]!) : []
       return {
-        command, database_type: 'sqlite',
-        columns, rows, row_count: rows.length,
+        command,
+        database_type: 'sqlite',
+        columns,
+        rows,
+        row_count: rows.length,
         execution_time_ms: Date.now() - start,
       }
     }
@@ -362,9 +393,7 @@ async function executePostgresql(
   try {
     pg = await import('pg')
   } catch {
-    throw new Error(
-      'PostgreSQL driver (pg) is not installed. Run: npm install pg'
-    )
+    throw new Error('PostgreSQL driver (pg) is not installed. Run: npm install pg')
   }
 
   const Client = pg.default?.Client ?? pg.Client
@@ -379,10 +408,11 @@ async function executePostgresql(
     switch (command) {
       case 'tables': {
         const result = await client.query(
-          "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name"
+          "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name",
         )
         return {
-          command, database_type: 'postgresql',
+          command,
+          database_type: 'postgresql',
           tables: result.rows.map((r: any) => r.table_name),
           row_count: result.rowCount,
           execution_time_ms: Date.now() - start,
@@ -393,13 +423,15 @@ async function executePostgresql(
         const result = await client.query(
           `SELECT table_name, column_name, data_type, is_nullable, column_default
            FROM information_schema.columns WHERE table_schema = 'public'
-           ORDER BY table_name, ordinal_position`
+           ORDER BY table_name, ordinal_position`,
         )
-        const schemaLines = result.rows.map((r: any) =>
-          `${r.table_name}.${r.column_name}: ${r.data_type} ${r.is_nullable === 'NO' ? 'NOT NULL' : 'NULLABLE'} ${r.column_default ? `DEFAULT ${r.column_default}` : ''}`
+        const schemaLines = result.rows.map(
+          (r: any) =>
+            `${r.table_name}.${r.column_name}: ${r.data_type} ${r.is_nullable === 'NO' ? 'NOT NULL' : 'NULLABLE'} ${r.column_default ? `DEFAULT ${r.column_default}` : ''}`,
         )
         return {
-          command, database_type: 'postgresql',
+          command,
+          database_type: 'postgresql',
           schema_info: schemaLines.join('\n'),
           execution_time_ms: Date.now() - start,
         }
@@ -411,10 +443,11 @@ async function executePostgresql(
           `SELECT column_name, data_type, is_nullable, column_default
            FROM information_schema.columns WHERE table_name = $1
            ORDER BY ordinal_position`,
-          [table]
+          [table],
         )
         return {
-          command, database_type: 'postgresql',
+          command,
+          database_type: 'postgresql',
           columns: ['column_name', 'data_type', 'is_nullable', 'column_default'],
           rows: result.rows,
           row_count: result.rowCount,
@@ -426,7 +459,8 @@ async function executePostgresql(
         if (!sql) throw new Error('SQL required')
         const result = await client.query(`EXPLAIN ${sql}`)
         return {
-          command, database_type: 'postgresql',
+          command,
+          database_type: 'postgresql',
           rows: result.rows,
           row_count: result.rowCount,
           execution_time_ms: Date.now() - start,
@@ -444,8 +478,11 @@ async function executePostgresql(
         const result = await client.query(`${sql} LIMIT ${maxRows}`)
         const columns = result.fields?.map((f: any) => f.name) ?? []
         return {
-          command, database_type: 'postgresql',
-          columns, rows: result.rows, row_count: result.rowCount,
+          command,
+          database_type: 'postgresql',
+          columns,
+          rows: result.rows,
+          row_count: result.rowCount,
           execution_time_ms: Date.now() - start,
         }
       }
@@ -473,12 +510,12 @@ async function executeMysql(
   try {
     mysql2 = await import('mysql2/promise')
   } catch {
-    throw new Error(
-      'MySQL driver (mysql2) is not installed. Run: npm install mysql2'
-    )
+    throw new Error('MySQL driver (mysql2) is not installed. Run: npm install mysql2')
   }
 
-  const connection = await (mysql2.default?.createConnection ?? mysql2.createConnection)(connectionString)
+  const connection = await (mysql2.default?.createConnection ?? mysql2.createConnection)(
+    connectionString,
+  )
 
   try {
     if (readOnly) {
@@ -490,8 +527,10 @@ async function executeMysql(
         const [rows] = await connection.execute('SHOW TABLES')
         const tables = (rows as any[]).map((r: any) => Object.values(r)[0] as string)
         return {
-          command, database_type: 'mysql',
-          tables, row_count: tables.length,
+          command,
+          database_type: 'mysql',
+          tables,
+          row_count: tables.length,
           execution_time_ms: Date.now() - start,
         }
       }
@@ -500,13 +539,15 @@ async function executeMysql(
         const [rows] = await connection.execute(
           `SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT
            FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE()
-           ORDER BY TABLE_NAME, ORDINAL_POSITION`
+           ORDER BY TABLE_NAME, ORDINAL_POSITION`,
         )
-        const schemaLines = (rows as any[]).map((r: any) =>
-          `${r.TABLE_NAME}.${r.COLUMN_NAME}: ${r.DATA_TYPE} ${r.IS_NULLABLE === 'NO' ? 'NOT NULL' : 'NULLABLE'}`
+        const schemaLines = (rows as any[]).map(
+          (r: any) =>
+            `${r.TABLE_NAME}.${r.COLUMN_NAME}: ${r.DATA_TYPE} ${r.IS_NULLABLE === 'NO' ? 'NOT NULL' : 'NULLABLE'}`,
         )
         return {
-          command, database_type: 'mysql',
+          command,
+          database_type: 'mysql',
           schema_info: schemaLines.join('\n'),
           execution_time_ms: Date.now() - start,
         }
@@ -516,7 +557,8 @@ async function executeMysql(
         if (!table) throw new Error('Table name required')
         const [rows] = await connection.execute(`DESCRIBE \`${table.replace(/`/g, '``')}\``)
         return {
-          command, database_type: 'mysql',
+          command,
+          database_type: 'mysql',
           columns: ['Field', 'Type', 'Null', 'Key', 'Default', 'Extra'],
           rows: rows as Record<string, unknown>[],
           row_count: (rows as any[]).length,
@@ -528,7 +570,8 @@ async function executeMysql(
         if (!sql) throw new Error('SQL required')
         const [rows] = await connection.execute(`EXPLAIN ${sql}`)
         return {
-          command, database_type: 'mysql',
+          command,
+          database_type: 'mysql',
           rows: rows as Record<string, unknown>[],
           row_count: (rows as any[]).length,
           execution_time_ms: Date.now() - start,
@@ -546,8 +589,10 @@ async function executeMysql(
         const [rows, fields] = await connection.execute(`${sql} LIMIT ${maxRows}`)
         const columns = (fields as any[])?.map((f: any) => f.name) ?? []
         return {
-          command, database_type: 'mysql',
-          columns, rows: rows as Record<string, unknown>[],
+          command,
+          database_type: 'mysql',
+          columns,
+          rows: rows as Record<string, unknown>[],
           row_count: (rows as any[]).length,
           execution_time_ms: Date.now() - start,
         }
@@ -582,20 +627,32 @@ export const DatabaseTool = buildTool({
       switch (dbType) {
         case 'sqlite':
           result = await executeSqlite(
-            input.connection_string, input.command,
-            input.sql, input.table, maxRows, readOnly,
+            input.connection_string,
+            input.command,
+            input.sql,
+            input.table,
+            maxRows,
+            readOnly,
           )
           break
         case 'postgresql':
           result = await executePostgresql(
-            input.connection_string, input.command,
-            input.sql, input.table, maxRows, readOnly,
+            input.connection_string,
+            input.command,
+            input.sql,
+            input.table,
+            maxRows,
+            readOnly,
           )
           break
         case 'mysql':
           result = await executeMysql(
-            input.connection_string, input.command,
-            input.sql, input.table, maxRows, readOnly,
+            input.connection_string,
+            input.command,
+            input.sql,
+            input.table,
+            maxRows,
+            readOnly,
           )
           break
         default:
@@ -620,12 +677,18 @@ export const DatabaseTool = buildTool({
   async description(input: Input) {
     const dbType = detectDatabaseType(input.connection_string)
     switch (input.command) {
-      case 'query': return `Execute SQL query on ${dbType} database`
-      case 'schema': return `Show ${dbType} database schema`
-      case 'tables': return `List tables in ${dbType} database`
-      case 'describe': return `Describe table '${input.table}' in ${dbType} database`
-      case 'explain': return `Explain query plan on ${dbType} database`
-      default: return `Database operation on ${dbType}`
+      case 'query':
+        return `Execute SQL query on ${dbType} database`
+      case 'schema':
+        return `Show ${dbType} database schema`
+      case 'tables':
+        return `List tables in ${dbType} database`
+      case 'describe':
+        return `Describe table '${input.table}' in ${dbType} database`
+      case 'explain':
+        return `Explain query plan on ${dbType} database`
+      default:
+        return `Database operation on ${dbType}`
     }
   },
 
@@ -641,7 +704,7 @@ export const DatabaseTool = buildTool({
   },
 
   isConcurrencySafe() {
-    return true  // Database queries can run concurrently
+    return true // Database queries can run concurrently
   },
 
   isEnabled() {

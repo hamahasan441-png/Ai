@@ -28,11 +28,11 @@ export interface StrategicStep {
   readonly id: string
   readonly action: string
   readonly description: string
-  readonly estimatedDuration: number   // minutes
-  readonly estimatedCost: number       // 0-1 relative
+  readonly estimatedDuration: number // minutes
+  readonly estimatedCost: number // 0-1 relative
   readonly dependencies: string[]
-  readonly riskLevel: number           // 0-1
-  readonly successProbability: number  // 0-1
+  readonly riskLevel: number // 0-1
+  readonly successProbability: number // 0-1
   status: PlanStepStatus
   readonly contingencyStepIds: string[] // fallback steps if this fails
 }
@@ -107,7 +107,7 @@ export interface StrategicPlannerConfig {
   readonly maxContingencies: number
   readonly monteCarloSimulations: number
   readonly maxPlans: number
-  readonly riskTolerance: number  // 0-1
+  readonly riskTolerance: number // 0-1
   readonly maxScenarios: number
 }
 
@@ -132,7 +132,10 @@ export const DEFAULT_STRATEGIC_PLANNER_CONFIG: StrategicPlannerConfig = {
 }
 
 /** Action templates for common objectives. */
-const ACTION_TEMPLATES: Record<string, Array<{ action: string; duration: number; risk: number; success: number }>> = {
+const ACTION_TEMPLATES: Record<
+  string,
+  Array<{ action: string; duration: number; risk: number; success: number }>
+> = {
   develop: [
     { action: 'Requirements analysis', duration: 60, risk: 0.1, success: 0.95 },
     { action: 'Architecture design', duration: 120, risk: 0.2, success: 0.9 },
@@ -383,7 +386,7 @@ export class StrategicPlanner {
       bestCaseDuration: durations[0] ?? 0,
       percentile95Duration: durations[Math.floor(numSims * 0.95)] ?? 0,
       riskDistribution: Object.fromEntries(
-        Object.entries(riskCounts).map(([k, v]) => [k, v / numSims])
+        Object.entries(riskCounts).map(([k, v]) => [k, v / numSims]),
       ),
     }
   }
@@ -489,11 +492,12 @@ export class StrategicPlanner {
 
     // Score: lower duration, lower cost, lower risk, higher success
     const score1 = -durationDelta / 100 - costDelta - riskDelta + successDelta
-    const recommendation = score1 > 0
-      ? `Plan 1 ("${p1.objective.slice(0, 40)}") is recommended`
-      : score1 < 0
-        ? `Plan 2 ("${p2.objective.slice(0, 40)}") is recommended`
-        : 'Both plans are roughly equivalent'
+    const recommendation =
+      score1 > 0
+        ? `Plan 1 ("${p1.objective.slice(0, 40)}") is recommended`
+        : score1 < 0
+          ? `Plan 2 ("${p2.objective.slice(0, 40)}") is recommended`
+          : 'Both plans are roughly equivalent'
 
     return {
       plan1Id: planId1,
@@ -515,9 +519,24 @@ export class StrategicPlanner {
 
     return [
       { resource: 'Time', amount: plan.totalEstimatedDuration, unit: 'minutes', critical: true },
-      { resource: 'Cognitive effort', amount: plan.steps.length * 15, unit: 'minutes', critical: false },
-      { resource: 'Risk budget', amount: plan.riskScore * 100, unit: 'percent', critical: plan.riskScore > this.config.riskTolerance },
-      { resource: 'Contingency buffer', amount: plan.contingencies.length * 30, unit: 'minutes', critical: plan.contingencies.length === 0 },
+      {
+        resource: 'Cognitive effort',
+        amount: plan.steps.length * 15,
+        unit: 'minutes',
+        critical: false,
+      },
+      {
+        resource: 'Risk budget',
+        amount: plan.riskScore * 100,
+        unit: 'percent',
+        critical: plan.riskScore > this.config.riskTolerance,
+      },
+      {
+        resource: 'Contingency buffer',
+        amount: plan.contingencies.length * 30,
+        unit: 'minutes',
+        critical: plan.contingencies.length === 0,
+      },
     ]
   }
 
@@ -530,7 +549,8 @@ export class StrategicPlanner {
       totalRepairs: this.stats.totalRepairs,
       totalComparisons: this.stats.totalComparisons,
       avgPlanSteps: this.stats.planCount > 0 ? this.stats.totalSteps / this.stats.planCount : 0,
-      avgSuccessRate: this.stats.planCount > 0 ? this.stats.totalSuccessRate / this.stats.planCount : 0,
+      avgSuccessRate:
+        this.stats.planCount > 0 ? this.stats.totalSuccessRate / this.stats.planCount : 0,
     }
   }
 
@@ -551,7 +571,9 @@ export class StrategicPlanner {
         for (const p of data.plans) engine.plans.set(p.id, p)
       }
       if (data.stats) Object.assign(engine.stats, data.stats)
-    } catch { /* fresh engine on failure */ }
+    } catch {
+      /* fresh engine on failure */
+    }
     return engine
   }
 }

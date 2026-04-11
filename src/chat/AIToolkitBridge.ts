@@ -290,32 +290,193 @@ export interface ModelInfo {
 /** Registry of all supported models */
 export const SUPPORTED_MODELS: ModelInfo[] = [
   // Image models
-  { id: 'black-forest-labs/FLUX.1-dev', name: 'FLUX.1', type: 'image', huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.1-dev', minVRAMGB: 12, features: ['text-to-image', 'lora-training'] },
-  { id: 'black-forest-labs/FLUX.2-dev', name: 'FLUX.2', type: 'image', huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.2-dev', minVRAMGB: 12, features: ['text-to-image', 'lora-training'] },
-  { id: 'black-forest-labs/FLUX.2-klein-base-4B', name: 'FLUX.2 Klein 4B', type: 'image', huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.2-klein-base-4B', minVRAMGB: 8, features: ['text-to-image', 'lora-training'] },
-  { id: 'black-forest-labs/FLUX.2-klein-base-9B', name: 'FLUX.2 Klein 9B', type: 'image', huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.2-klein-base-9B', minVRAMGB: 16, features: ['text-to-image', 'lora-training'] },
-  { id: 'ostris/Flex.1-alpha', name: 'Flex.1', type: 'image', huggingFaceUrl: 'https://huggingface.co/ostris/Flex.1-alpha', minVRAMGB: 12, features: ['text-to-image', 'lora-training', 'redux'] },
-  { id: 'ostris/Flex.2-preview', name: 'Flex.2', type: 'image', huggingFaceUrl: 'https://huggingface.co/ostris/Flex.2-preview', minVRAMGB: 12, features: ['text-to-image', 'lora-training'] },
-  { id: 'lodestones/Chroma1-Base', name: 'Chroma', type: 'image', huggingFaceUrl: 'https://huggingface.co/lodestones/Chroma1-Base', minVRAMGB: 12, features: ['text-to-image', 'lora-training'] },
-  { id: 'Alpha-VLLM/Lumina-Image-2.0', name: 'Lumina2', type: 'image', huggingFaceUrl: 'https://huggingface.co/Alpha-VLLM/Lumina-Image-2.0', minVRAMGB: 16, features: ['text-to-image', 'lora-training', 'full-fine-tune'] },
-  { id: 'Qwen/Qwen-Image', name: 'Qwen-Image', type: 'image', huggingFaceUrl: 'https://huggingface.co/Qwen/Qwen-Image', minVRAMGB: 12, features: ['text-to-image', 'lora-training'] },
-  { id: 'HiDream-ai/HiDream-I1-Full', name: 'HiDream', type: 'image', huggingFaceUrl: 'https://huggingface.co/HiDream-ai/HiDream-I1-Full', minVRAMGB: 48, features: ['text-to-image', 'lora-training'] },
-  { id: 'OmniGen2/OmniGen2', name: 'OmniGen2', type: 'image', huggingFaceUrl: 'https://huggingface.co/OmniGen2/OmniGen2', minVRAMGB: 12, features: ['text-to-image', 'lora-training'] },
-  { id: 'stabilityai/stable-diffusion-xl-base-1.0', name: 'SDXL', type: 'image', huggingFaceUrl: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0', minVRAMGB: 8, features: ['text-to-image', 'lora-training'] },
-  { id: 'stable-diffusion-v1-5/stable-diffusion-v1-5', name: 'SD 1.5', type: 'image', huggingFaceUrl: 'https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5', minVRAMGB: 4, features: ['text-to-image', 'lora-training'] },
+  {
+    id: 'black-forest-labs/FLUX.1-dev',
+    name: 'FLUX.1',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.1-dev',
+    minVRAMGB: 12,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'black-forest-labs/FLUX.2-dev',
+    name: 'FLUX.2',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.2-dev',
+    minVRAMGB: 12,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'black-forest-labs/FLUX.2-klein-base-4B',
+    name: 'FLUX.2 Klein 4B',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.2-klein-base-4B',
+    minVRAMGB: 8,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'black-forest-labs/FLUX.2-klein-base-9B',
+    name: 'FLUX.2 Klein 9B',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.2-klein-base-9B',
+    minVRAMGB: 16,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'ostris/Flex.1-alpha',
+    name: 'Flex.1',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/ostris/Flex.1-alpha',
+    minVRAMGB: 12,
+    features: ['text-to-image', 'lora-training', 'redux'],
+  },
+  {
+    id: 'ostris/Flex.2-preview',
+    name: 'Flex.2',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/ostris/Flex.2-preview',
+    minVRAMGB: 12,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'lodestones/Chroma1-Base',
+    name: 'Chroma',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/lodestones/Chroma1-Base',
+    minVRAMGB: 12,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'Alpha-VLLM/Lumina-Image-2.0',
+    name: 'Lumina2',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/Alpha-VLLM/Lumina-Image-2.0',
+    minVRAMGB: 16,
+    features: ['text-to-image', 'lora-training', 'full-fine-tune'],
+  },
+  {
+    id: 'Qwen/Qwen-Image',
+    name: 'Qwen-Image',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/Qwen/Qwen-Image',
+    minVRAMGB: 12,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'HiDream-ai/HiDream-I1-Full',
+    name: 'HiDream',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/HiDream-ai/HiDream-I1-Full',
+    minVRAMGB: 48,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'OmniGen2/OmniGen2',
+    name: 'OmniGen2',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/OmniGen2/OmniGen2',
+    minVRAMGB: 12,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'stabilityai/stable-diffusion-xl-base-1.0',
+    name: 'SDXL',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0',
+    minVRAMGB: 8,
+    features: ['text-to-image', 'lora-training'],
+  },
+  {
+    id: 'stable-diffusion-v1-5/stable-diffusion-v1-5',
+    name: 'SD 1.5',
+    type: 'image',
+    huggingFaceUrl: 'https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5',
+    minVRAMGB: 4,
+    features: ['text-to-image', 'lora-training'],
+  },
   // Edit models
-  { id: 'black-forest-labs/FLUX.1-Kontext-dev', name: 'FLUX Kontext', type: 'edit', huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.1-Kontext-dev', minVRAMGB: 16, features: ['image-editing', 'instruction-edit', 'lora-training'] },
-  { id: 'Qwen/Qwen-Image-Edit', name: 'Qwen Image Edit', type: 'edit', huggingFaceUrl: 'https://huggingface.co/Qwen/Qwen-Image-Edit', minVRAMGB: 16, features: ['image-editing', 'instruction-edit'] },
-  { id: 'HiDream-ai/HiDream-E1-1', name: 'HiDream E1', type: 'edit', huggingFaceUrl: 'https://huggingface.co/HiDream-ai/HiDream-E1-1', minVRAMGB: 24, features: ['image-editing'] },
+  {
+    id: 'black-forest-labs/FLUX.1-Kontext-dev',
+    name: 'FLUX Kontext',
+    type: 'edit',
+    huggingFaceUrl: 'https://huggingface.co/black-forest-labs/FLUX.1-Kontext-dev',
+    minVRAMGB: 16,
+    features: ['image-editing', 'instruction-edit', 'lora-training'],
+  },
+  {
+    id: 'Qwen/Qwen-Image-Edit',
+    name: 'Qwen Image Edit',
+    type: 'edit',
+    huggingFaceUrl: 'https://huggingface.co/Qwen/Qwen-Image-Edit',
+    minVRAMGB: 16,
+    features: ['image-editing', 'instruction-edit'],
+  },
+  {
+    id: 'HiDream-ai/HiDream-E1-1',
+    name: 'HiDream E1',
+    type: 'edit',
+    huggingFaceUrl: 'https://huggingface.co/HiDream-ai/HiDream-E1-1',
+    minVRAMGB: 24,
+    features: ['image-editing'],
+  },
   // Video models
-  { id: 'Wan-AI/Wan2.1-T2V-1.3B-Diffusers', name: 'Wan 2.1 1.3B', type: 'video', huggingFaceUrl: 'https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B-Diffusers', minVRAMGB: 8, features: ['text-to-video', 'lora-training'] },
-  { id: 'Wan-AI/Wan2.1-T2V-14B-Diffusers', name: 'Wan 2.1 14B', type: 'video', huggingFaceUrl: 'https://huggingface.co/Wan-AI/Wan2.1-T2V-14B-Diffusers', minVRAMGB: 24, features: ['text-to-video', 'lora-training'] },
-  { id: 'Wan-AI/Wan2.1-I2V-14B-480P-Diffusers', name: 'Wan 2.1 I2V 480P', type: 'video', huggingFaceUrl: 'https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P-Diffusers', minVRAMGB: 24, features: ['image-to-video'] },
-  { id: 'Wan-AI/Wan2.2-T2V-A14B-Diffusers', name: 'Wan 2.2 14B', type: 'video', huggingFaceUrl: 'https://huggingface.co/Wan-AI/Wan2.2-T2V-A14B-Diffusers', minVRAMGB: 24, features: ['text-to-video', 'lora-training'] },
-  { id: 'Lightricks/LTX-2', name: 'LTX-2', type: 'video', huggingFaceUrl: 'https://huggingface.co/Lightricks/LTX-2', minVRAMGB: 12, features: ['text-to-video'] },
-  { id: 'Lightricks/LTX-2.3', name: 'LTX-2.3', type: 'video', huggingFaceUrl: 'https://huggingface.co/Lightricks/LTX-2.3', minVRAMGB: 12, features: ['text-to-video'] },
+  {
+    id: 'Wan-AI/Wan2.1-T2V-1.3B-Diffusers',
+    name: 'Wan 2.1 1.3B',
+    type: 'video',
+    huggingFaceUrl: 'https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B-Diffusers',
+    minVRAMGB: 8,
+    features: ['text-to-video', 'lora-training'],
+  },
+  {
+    id: 'Wan-AI/Wan2.1-T2V-14B-Diffusers',
+    name: 'Wan 2.1 14B',
+    type: 'video',
+    huggingFaceUrl: 'https://huggingface.co/Wan-AI/Wan2.1-T2V-14B-Diffusers',
+    minVRAMGB: 24,
+    features: ['text-to-video', 'lora-training'],
+  },
+  {
+    id: 'Wan-AI/Wan2.1-I2V-14B-480P-Diffusers',
+    name: 'Wan 2.1 I2V 480P',
+    type: 'video',
+    huggingFaceUrl: 'https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P-Diffusers',
+    minVRAMGB: 24,
+    features: ['image-to-video'],
+  },
+  {
+    id: 'Wan-AI/Wan2.2-T2V-A14B-Diffusers',
+    name: 'Wan 2.2 14B',
+    type: 'video',
+    huggingFaceUrl: 'https://huggingface.co/Wan-AI/Wan2.2-T2V-A14B-Diffusers',
+    minVRAMGB: 24,
+    features: ['text-to-video', 'lora-training'],
+  },
+  {
+    id: 'Lightricks/LTX-2',
+    name: 'LTX-2',
+    type: 'video',
+    huggingFaceUrl: 'https://huggingface.co/Lightricks/LTX-2',
+    minVRAMGB: 12,
+    features: ['text-to-video'],
+  },
+  {
+    id: 'Lightricks/LTX-2.3',
+    name: 'LTX-2.3',
+    type: 'video',
+    huggingFaceUrl: 'https://huggingface.co/Lightricks/LTX-2.3',
+    minVRAMGB: 12,
+    features: ['text-to-video'],
+  },
   // Experimental
-  { id: 'lodestones/Zeta-Chroma', name: 'Zeta Chroma', type: 'experimental', huggingFaceUrl: 'https://huggingface.co/lodestones/Zeta-Chroma', minVRAMGB: 16, features: ['text-to-image'] },
+  {
+    id: 'lodestones/Zeta-Chroma',
+    name: 'Zeta Chroma',
+    type: 'experimental',
+    huggingFaceUrl: 'https://huggingface.co/lodestones/Zeta-Chroma',
+    minVRAMGB: 16,
+    features: ['text-to-image'],
+  },
 ]
 
 // ╔═══════════════════════════════════════════════════════════════════════════════╗
@@ -352,7 +513,9 @@ export class AIToolkitBridge {
 
     try {
       // Check Python
-      const pyVersion = this.execPython('import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")')
+      const pyVersion = this.execPython(
+        'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")',
+      )
       status.pythonVersion = pyVersion.trim()
 
       // Check if toolkit path exists
@@ -590,7 +753,7 @@ config:
 
     this.activeJobs.set(jobId, job)
 
-    child.on('exit', (code) => {
+    child.on('exit', code => {
       job.status = code === 0 ? 'completed' : 'failed'
       job.process = null
     })
@@ -731,7 +894,7 @@ config:
       '3d': '3D render, octane render, unreal engine, volumetric lighting',
     }
 
-    const styleHint = style ? styleMap[style] ?? '' : ''
+    const styleHint = style ? (styleMap[style] ?? '') : ''
     return [prompt, qualityBoosters, styleHint].filter(Boolean).join(', ')
   }
 
@@ -771,7 +934,9 @@ config:
     const lines = stdout.split('\n')
     for (const line of lines) {
       // Look for saved file references
-      const match = line.match(/(?:saved?|output|wrote?|generated?)\s*(?:to|:)\s*(.+\.(png|jpg|jpeg|webp|mp4|safetensors|ckpt))/i)
+      const match = line.match(
+        /(?:saved?|output|wrote?|generated?)\s*(?:to|:)\s*(.+\.(png|jpg|jpeg|webp|mp4|safetensors|ckpt))/i,
+      )
       if (match?.[1]) {
         paths.push(match[1].trim())
       }
@@ -850,18 +1015,25 @@ export function quickLoRAConfig(name: string, datasetPath: string, model?: strin
  */
 export function listModels(type?: 'image' | 'video' | 'edit' | 'experimental'): string {
   const models = type ? SUPPORTED_MODELS.filter(m => m.type === type) : SUPPORTED_MODELS
-  return models.map(m => `${m.name} (${m.id}) — ${m.type}, ${m.minVRAMGB}GB VRAM, features: ${m.features.join(', ')}`).join('\n')
+  return models
+    .map(
+      m =>
+        `${m.name} (${m.id}) — ${m.type}, ${m.minVRAMGB}GB VRAM, features: ${m.features.join(', ')}`,
+    )
+    .join('\n')
 }
 
 /**
  * Get recommended model for a use case.
  */
-export function recommendModel(useCase: 'fast-image' | 'quality-image' | 'video' | 'editing' | 'low-vram'): ModelInfo {
+export function recommendModel(
+  useCase: 'fast-image' | 'quality-image' | 'video' | 'editing' | 'low-vram',
+): ModelInfo {
   const recommendations: Record<string, string> = {
     'fast-image': 'stable-diffusion-v1-5/stable-diffusion-v1-5',
     'quality-image': 'black-forest-labs/FLUX.1-dev',
-    'video': 'Wan-AI/Wan2.1-T2V-1.3B-Diffusers',
-    'editing': 'black-forest-labs/FLUX.1-Kontext-dev',
+    video: 'Wan-AI/Wan2.1-T2V-1.3B-Diffusers',
+    editing: 'black-forest-labs/FLUX.1-Kontext-dev',
     'low-vram': 'stable-diffusion-v1-5/stable-diffusion-v1-5',
   }
   const modelId = recommendations[useCase]

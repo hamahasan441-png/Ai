@@ -31,17 +31,17 @@ export interface Capability {
   readonly domain: string
   readonly skill: string
   readonly proficiency: ProficiencyLevel
-  readonly confidence: number   // 0-1 how confident in this self-assessment
+  readonly confidence: number // 0-1 how confident in this self-assessment
   readonly evidence: string[]
   readonly lastTestedAt: number
-  readonly successRate: number  // historical success in this area
+  readonly successRate: number // historical success in this area
   readonly sampleSize: number
 }
 
 export interface KnowledgeBoundary {
   readonly domain: string
   readonly state: KnowledgeState
-  readonly coverage: number   // 0-1 how much of the domain is covered
+  readonly coverage: number // 0-1 how much of the domain is covered
   readonly gaps: string[]
   readonly strengths: string[]
   readonly lastAssessedAt: number
@@ -51,7 +51,7 @@ export interface Limitation {
   readonly id: string
   readonly category: LimitationCategory
   readonly description: string
-  readonly severity: number    // 0-1
+  readonly severity: number // 0-1
   readonly workaround: string | null
   readonly isTransient: boolean
 }
@@ -79,7 +79,7 @@ export interface CompetenceEstimate {
 
 export interface UncertaintyMap {
   readonly domain: string
-  readonly overallUncertainty: number  // 0-1
+  readonly overallUncertainty: number // 0-1
   readonly factors: Array<{ factor: string; uncertainty: number }>
 }
 
@@ -107,7 +107,7 @@ export interface SelfModelEngineConfig {
   readonly maxGrowthRecords: number
   readonly confidenceDecayPerDay: number
   readonly minSamplesForReliable: number
-  readonly assessmentInterval: number  // ms between auto-assessments
+  readonly assessmentInterval: number // ms between auto-assessments
 }
 
 export interface SelfModelEngineStats {
@@ -128,7 +128,7 @@ export const DEFAULT_SELF_MODEL_CONFIG: SelfModelEngineConfig = {
   maxGrowthRecords: 200,
   confidenceDecayPerDay: 0.01,
   minSamplesForReliable: 5,
-  assessmentInterval: 3600000,  // 1 hour
+  assessmentInterval: 3600000, // 1 hour
 }
 
 const PROFICIENCY_SCORES: Record<ProficiencyLevel, number> = {
@@ -149,14 +149,62 @@ const PROFICIENCY_FROM_SCORE = (score: number): ProficiencyLevel => {
 
 /** Built-in limitations of an AI system. */
 const BUILT_IN_LIMITATIONS: Omit<Limitation, 'id'>[] = [
-  { category: 'knowledge_cutoff', description: 'Training data has a temporal cutoff', severity: 0.6, workaround: 'Clearly state knowledge cutoff date', isTransient: false },
-  { category: 'real_time_data', description: 'Cannot access real-time data', severity: 0.5, workaround: 'Request user to provide current data', isTransient: false },
-  { category: 'computation', description: 'Limited computational resources for complex math', severity: 0.4, workaround: 'Break into smaller steps', isTransient: false },
-  { category: 'context_length', description: 'Limited context window', severity: 0.3, workaround: 'Summarize and prioritize context', isTransient: false },
-  { category: 'multimodal', description: 'Limited multimodal understanding', severity: 0.3, workaround: 'Request text descriptions of non-text content', isTransient: false },
-  { category: 'reliability', description: 'May generate plausible but incorrect information', severity: 0.7, workaround: 'Always verify important facts', isTransient: false },
-  { category: 'personalization', description: 'No persistent memory across sessions by default', severity: 0.4, workaround: 'Use explicit context in each session', isTransient: true },
-  { category: 'creativity', description: 'Creative output is pattern-based, not truly novel', severity: 0.3, workaround: 'Combine multiple approaches for originality', isTransient: false },
+  {
+    category: 'knowledge_cutoff',
+    description: 'Training data has a temporal cutoff',
+    severity: 0.6,
+    workaround: 'Clearly state knowledge cutoff date',
+    isTransient: false,
+  },
+  {
+    category: 'real_time_data',
+    description: 'Cannot access real-time data',
+    severity: 0.5,
+    workaround: 'Request user to provide current data',
+    isTransient: false,
+  },
+  {
+    category: 'computation',
+    description: 'Limited computational resources for complex math',
+    severity: 0.4,
+    workaround: 'Break into smaller steps',
+    isTransient: false,
+  },
+  {
+    category: 'context_length',
+    description: 'Limited context window',
+    severity: 0.3,
+    workaround: 'Summarize and prioritize context',
+    isTransient: false,
+  },
+  {
+    category: 'multimodal',
+    description: 'Limited multimodal understanding',
+    severity: 0.3,
+    workaround: 'Request text descriptions of non-text content',
+    isTransient: false,
+  },
+  {
+    category: 'reliability',
+    description: 'May generate plausible but incorrect information',
+    severity: 0.7,
+    workaround: 'Always verify important facts',
+    isTransient: false,
+  },
+  {
+    category: 'personalization',
+    description: 'No persistent memory across sessions by default',
+    severity: 0.4,
+    workaround: 'Use explicit context in each session',
+    isTransient: true,
+  },
+  {
+    category: 'creativity',
+    description: 'Creative output is pattern-based, not truly novel',
+    severity: 0.3,
+    workaround: 'Combine multiple approaches for originality',
+    isTransient: false,
+  },
 ]
 
 /** Domain keyword detection. */
@@ -218,7 +266,12 @@ export class SelfModelEngine {
   // ── Capability management ──────────────────────────────────────────────
 
   /** Register or update a capability. */
-  registerCapability(domain: string, skill: string, proficiency: ProficiencyLevel, evidence: string[] = []): Capability {
+  registerCapability(
+    domain: string,
+    skill: string,
+    proficiency: ProficiencyLevel,
+    evidence: string[] = [],
+  ): Capability {
     const key = `${domain}::${skill}`
     const existing = this.findCapability(domain, skill)
 
@@ -252,8 +305,9 @@ export class SelfModelEngine {
 
     // Enforce max
     if (this.capabilities.size > this.config.maxCapabilities) {
-      const oldest = [...this.capabilities.entries()]
-        .sort(([, a], [, b]) => a.lastTestedAt - b.lastTestedAt)[0]
+      const oldest = [...this.capabilities.entries()].sort(
+        ([, a], [, b]) => a.lastTestedAt - b.lastTestedAt,
+      )[0]
       if (oldest) this.capabilities.delete(oldest[0])
     }
 
@@ -283,7 +337,9 @@ export class SelfModelEngine {
     const cap = this.findCapability(domain, skill)
     if (!cap) {
       // Auto-register on first encounter
-      this.registerCapability(domain, skill, success ? 'beginner' : 'novice', [success ? 'first success' : 'first attempt failed'])
+      this.registerCapability(domain, skill, success ? 'beginner' : 'novice', [
+        success ? 'first success' : 'first attempt failed',
+      ])
       return
     }
 
@@ -296,7 +352,10 @@ export class SelfModelEngine {
       successRate: newRate,
       sampleSize: newSize,
       lastTestedAt: Date.now(),
-      proficiency: newSize >= this.config.minSamplesForReliable ? PROFICIENCY_FROM_SCORE(newRate) : cap.proficiency,
+      proficiency:
+        newSize >= this.config.minSamplesForReliable
+          ? PROFICIENCY_FROM_SCORE(newRate)
+          : cap.proficiency,
     }
 
     this.capabilities.set(key, updated)
@@ -343,7 +402,12 @@ export class SelfModelEngine {
   // ── Limitation management ──────────────────────────────────────────────
 
   /** Add a custom limitation. */
-  addLimitation(category: LimitationCategory, description: string, severity: number, workaround?: string): Limitation {
+  addLimitation(
+    category: LimitationCategory,
+    description: string,
+    severity: number,
+    workaround?: string,
+  ): Limitation {
     const limitation: Limitation = {
       id: generateId('lim'),
       category,
@@ -358,8 +422,9 @@ export class SelfModelEngine {
     // Enforce max
     if (this.limitations.size > this.config.maxLimitations) {
       // Remove least severe
-      const least = [...this.limitations.entries()]
-        .sort(([, a], [, b]) => a.severity - b.severity)[0]
+      const least = [...this.limitations.entries()].sort(
+        ([, a], [, b]) => a.severity - b.severity,
+      )[0]
       if (least) this.limitations.delete(least[0])
     }
 
@@ -399,13 +464,13 @@ export class SelfModelEngine {
     // Compute estimated proficiency
     let avgScore = 0.5
     if (relevantCaps.length > 0) {
-      avgScore = relevantCaps.reduce((s, c) => s + PROFICIENCY_SCORES[c.proficiency], 0) / relevantCaps.length
+      avgScore =
+        relevantCaps.reduce((s, c) => s + PROFICIENCY_SCORES[c.proficiency], 0) /
+        relevantCaps.length
     }
 
     const proficiency = PROFICIENCY_FROM_SCORE(avgScore)
-    const confidence = relevantCaps.length > 0
-      ? Math.min(1, relevantCaps.length / 5) * 0.8
-      : 0.2
+    const confidence = relevantCaps.length > 0 ? Math.min(1, relevantCaps.length / 5) * 0.8 : 0.2
 
     let recommendation: CompetenceEstimate['recommendation']
     if (avgScore >= 0.7 && confidence >= 0.6) recommendation = 'proceed'
@@ -413,9 +478,10 @@ export class SelfModelEngine {
     else if (avgScore >= 0.2) recommendation = 'seek_help'
     else recommendation = 'decline'
 
-    const reasoning = relevantCaps.length > 0
-      ? `Found ${relevantCaps.length} relevant capabilities with avg proficiency ${(avgScore * 100).toFixed(0)}%`
-      : `No specific capabilities registered for domains: ${domains.join(', ')}`
+    const reasoning =
+      relevantCaps.length > 0
+        ? `Found ${relevantCaps.length} relevant capabilities with avg proficiency ${(avgScore * 100).toFixed(0)}%`
+        : `No specific capabilities registered for domains: ${domains.join(', ')}`
 
     return {
       taskDescription,
@@ -440,9 +506,8 @@ export class SelfModelEngine {
       factors.push({ factor: cap.skill, uncertainty })
     }
 
-    const overall = factors.length > 0
-      ? factors.reduce((s, f) => s + f.uncertainty, 0) / factors.length
-      : 0.8
+    const overall =
+      factors.length > 0 ? factors.reduce((s, f) => s + f.uncertainty, 0) / factors.length : 0.8
 
     return { domain, overallUncertainty: overall, factors }
   }
@@ -454,9 +519,10 @@ export class SelfModelEngine {
     const allCaps = [...this.capabilities.values()]
     const allBounds = [...this.boundaries.values()]
 
-    const overallCompetence = allCaps.length > 0
-      ? allCaps.reduce((s, c) => s + PROFICIENCY_SCORES[c.proficiency], 0) / allCaps.length
-      : 0
+    const overallCompetence =
+      allCaps.length > 0
+        ? allCaps.reduce((s, c) => s + PROFICIENCY_SCORES[c.proficiency], 0) / allCaps.length
+        : 0
 
     const topStrengths = allCaps
       .filter(c => PROFICIENCY_SCORES[c.proficiency] >= 0.7)
@@ -474,9 +540,8 @@ export class SelfModelEngine {
       .filter(b => b.state === 'uncertain' || b.state === 'unknown')
       .map(b => b.domain)
 
-    const avgConfidence = allCaps.length > 0
-      ? allCaps.reduce((s, c) => s + c.confidence, 0) / allCaps.length
-      : 0
+    const avgConfidence =
+      allCaps.length > 0 ? allCaps.reduce((s, c) => s + c.confidence, 0) / allCaps.length : 0
 
     const growthAreas = this.growthRecords
       .slice(-10)
@@ -511,11 +576,12 @@ export class SelfModelEngine {
       totalLimitations: this.limitations.size,
       totalCompetenceChecks: this.stats.totalCompetenceChecks,
       totalGrowthEvents: this.stats.totalGrowthEvents,
-      avgConfidence: allCaps.length > 0
-        ? allCaps.reduce((s, c) => s + c.confidence, 0) / allCaps.length
-        : 0,
-      knownDomains: allBounds.filter(b => b.state === 'known' || b.state === 'partially_known').length,
-      uncertainDomains: allBounds.filter(b => b.state === 'uncertain' || b.state === 'unknown').length,
+      avgConfidence:
+        allCaps.length > 0 ? allCaps.reduce((s, c) => s + c.confidence, 0) / allCaps.length : 0,
+      knownDomains: allBounds.filter(b => b.state === 'known' || b.state === 'partially_known')
+        .length,
+      uncertainDomains: allBounds.filter(b => b.state === 'uncertain' || b.state === 'unknown')
+        .length,
     }
   }
 
@@ -551,7 +617,9 @@ export class SelfModelEngine {
         engine.growthRecords.push(...data.growthRecords)
       }
       if (data.stats) Object.assign(engine.stats, data.stats)
-    } catch { /* fresh engine on failure */ }
+    } catch {
+      /* fresh engine on failure */
+    }
     return engine
   }
 }

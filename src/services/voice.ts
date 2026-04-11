@@ -276,8 +276,7 @@ export async function checkRecordingAvailability(): Promise<RecordingAvailabilit
   if (process.platform === 'win32') {
     return {
       available: false,
-      reason:
-        'Voice recording requires the native audio module, which could not be loaded.',
+      reason: 'Voice recording requires the native audio module, which could not be loaded.',
     }
   }
 
@@ -342,8 +341,7 @@ export async function startRecording(
   // Try native audio module first (macOS, Linux, Windows via cpal)
   const napi = await loadAudioNapi()
   const nativeAvailable =
-    napi.isNativeAudioAvailable() &&
-    (process.platform !== 'linux' || (await linuxHasAlsaCards()))
+    napi.isNativeAudioAvailable() && (process.platform !== 'linux' || (await linuxHasAlsaCards()))
   const useSilenceDetection = options?.silenceDetection !== false
   if (nativeAvailable) {
     // Ensure any previous recording is fully stopped
@@ -383,11 +381,7 @@ export async function startRecording(
   // on headless Linux with both alsa-utils and SoX, the availability
   // check falls through to SoX (probe.ok=false, not WSL) but this path
   // would still pick broken arecord. Probe is memoized; zero latency.
-  if (
-    process.platform === 'linux' &&
-    hasCommand('arecord') &&
-    (await probeArecord()).ok
-  ) {
+  if (process.platform === 'linux' && hasCommand('arecord') && (await probeArecord()).ok) {
     return startArecordRecording(onData, onEnd)
   }
 
@@ -465,10 +459,7 @@ function startSoxRecording(
   return true
 }
 
-function startArecordRecording(
-  onData: (chunk: Buffer) => void,
-  onEnd: () => void,
-): boolean {
+function startArecordRecording(onData: (chunk: Buffer) => void, onEnd: () => void): boolean {
   // Record raw PCM: 16 kHz, 16-bit signed little-endian, mono, to stdout.
   // arecord does not support built-in silence detection, so this backend
   // is best suited for push-to-talk (silenceDetection: false).

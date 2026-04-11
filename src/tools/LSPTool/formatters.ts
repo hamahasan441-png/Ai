@@ -59,10 +59,7 @@ function formatUri(uri: string | undefined, cwd?: string): string {
     // Normalize separators to forward slashes for consistent display output
     const relativePath = relative(cwd, filePath).replaceAll('\\', '/')
     // Only use relative path if it's shorter and doesn't start with ../..
-    if (
-      relativePath.length < filePath.length &&
-      !relativePath.startsWith('../../')
-    ) {
+    if (relativePath.length < filePath.length && !relativePath.startsWith('../../')) {
       return relativePath
     }
   }
@@ -155,26 +152,19 @@ export function formatGoToDefinitionResult(
     if (validLocations.length === 1) {
       return `Defined in ${formatLocation(validLocations[0]!, cwd)}`
     }
-    const locationList = validLocations
-      .map(loc => `  ${formatLocation(loc, cwd)}`)
-      .join('\n')
+    const locationList = validLocations.map(loc => `  ${formatLocation(loc, cwd)}`).join('\n')
     return `Found ${validLocations.length} definitions:\n${locationList}`
   }
 
   // Single result - convert LocationLink if needed
-  const location = isLocationLink(result)
-    ? locationLinkToLocation(result)
-    : result
+  const location = isLocationLink(result) ? locationLinkToLocation(result) : result
   return `Defined in ${formatLocation(location, cwd)}`
 }
 
 /**
  * Formats findReferences result
  */
-export function formatFindReferencesResult(
-  result: Location[] | null,
-  cwd?: string,
-): string {
+export function formatFindReferencesResult(result: Location[] | null, cwd?: string): string {
   if (!result || result.length === 0) {
     return 'No references found. This may occur if the symbol has no usages, or if the LSP server has not fully indexed the workspace.'
   }
@@ -201,9 +191,7 @@ export function formatFindReferencesResult(
   // Group references by file
   const byFile = groupByFile(validLocations, cwd)
 
-  const lines: string[] = [
-    `Found ${validLocations.length} references across ${byFile.size} files:`,
-  ]
+  const lines: string[] = [`Found ${validLocations.length} references across ${byFile.size} files:`]
 
   for (const [filePath, locations] of byFile) {
     lines.push(`\n${filePath}:`)
@@ -220,9 +208,7 @@ export function formatFindReferencesResult(
 /**
  * Extracts text content from MarkupContent or MarkedString
  */
-function extractMarkupText(
-  contents: MarkupContent | MarkedString | MarkedString[],
-): string {
+function extractMarkupText(contents: MarkupContent | MarkedString | MarkedString[]): string {
   if (Array.isArray(contents)) {
     return contents
       .map(item => {
@@ -304,10 +290,7 @@ function symbolKindToString(kind: SymbolKind): string {
 /**
  * Formats a single DocumentSymbol with indentation
  */
-function formatDocumentSymbolNode(
-  symbol: DocumentSymbol,
-  indent: number = 0,
-): string[] {
+function formatDocumentSymbolNode(symbol: DocumentSymbol, indent: number = 0): string[] {
   const lines: string[] = []
   const prefix = '  '.repeat(indent)
   const kind = symbolKindToString(symbol.kind)
@@ -377,9 +360,7 @@ export function formatWorkspaceSymbolResult(
   }
 
   // Log and filter out any symbols with undefined location.uri
-  const invalidSymbols = result.filter(
-    sym => !sym || !sym.location || !sym.location.uri,
-  )
+  const invalidSymbols = result.filter(sym => !sym || !sym.location || !sym.location.uri)
   if (invalidSymbols.length > 0) {
     logForDebugging(
       `formatWorkspaceSymbolResult: Filtering out ${invalidSymbols.length} invalid symbol(s) - this should have been caught earlier`,
@@ -387,9 +368,7 @@ export function formatWorkspaceSymbolResult(
     )
   }
 
-  const validSymbols = result.filter(
-    sym => sym && sym.location && sym.location.uri,
-  )
+  const validSymbols = result.filter(sym => sym && sym.location && sym.location.uri)
 
   if (validSymbols.length === 0) {
     return 'No symbols found in workspace. This may occur if the workspace is empty, or if the LSP server has not finished indexing the project.'
@@ -425,16 +404,12 @@ export function formatWorkspaceSymbolResult(
  * Formats a CallHierarchyItem with its location
  * Validates URI before formatting to handle malformed LSP data
  */
-function formatCallHierarchyItem(
-  item: CallHierarchyItem,
-  cwd?: string,
-): string {
+function formatCallHierarchyItem(item: CallHierarchyItem, cwd?: string): string {
   // Validate URI - handle undefined/null gracefully
   if (!item.uri) {
-    logForDebugging(
-      'formatCallHierarchyItem: CallHierarchyItem has undefined URI',
-      { level: 'warn' },
-    )
+    logForDebugging('formatCallHierarchyItem: CallHierarchyItem has undefined URI', {
+      level: 'warn',
+    })
     return `${item.name} (${symbolKindToString(item.kind)}) - <unknown location>`
   }
 
@@ -483,9 +458,7 @@ export function formatIncomingCallsResult(
     return 'No incoming calls found (nothing calls this function)'
   }
 
-  const lines = [
-    `Found ${result.length} incoming ${plural(result.length, 'call')}:`,
-  ]
+  const lines = [`Found ${result.length} incoming ${plural(result.length, 'call')}:`]
 
   // Group by file
   const byFile = new Map<string, CallHierarchyIncomingCall[]>()
@@ -543,9 +516,7 @@ export function formatOutgoingCallsResult(
     return 'No outgoing calls found (this function calls nothing)'
   }
 
-  const lines = [
-    `Found ${result.length} outgoing ${plural(result.length, 'call')}:`,
-  ]
+  const lines = [`Found ${result.length} outgoing ${plural(result.length, 'call')}:`]
 
   // Group by file
   const byFile = new Map<string, CallHierarchyOutgoingCall[]>()

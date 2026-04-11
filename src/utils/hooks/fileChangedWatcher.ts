@@ -19,9 +19,7 @@ let initialized = false
 let hasEnvHooks = false
 let notifyCallback: ((text: string, isError: boolean) => void) | null = null
 
-export function setEnvHookNotifier(
-  cb: ((text: string, isError: boolean) => void) | null,
-): void {
+export function setEnvHookNotifier(cb: ((text: string, isError: boolean) => void) | null): void {
   notifyCallback = cb
 }
 
@@ -31,9 +29,7 @@ export function initializeFileChangedWatcher(cwd: string): void {
   currentCwd = cwd
 
   const config = getHooksConfigFromSnapshot()
-  hasEnvHooks =
-    (config?.CwdChanged?.length ?? 0) > 0 ||
-    (config?.FileChanged?.length ?? 0) > 0
+  hasEnvHooks = (config?.CwdChanged?.length ?? 0) > 0 || (config?.FileChanged?.length ?? 0) > 0
 
   if (hasEnvHooks) {
     registerCleanup(async () => dispose())
@@ -45,9 +41,7 @@ export function initializeFileChangedWatcher(cwd: string): void {
   startWatching(paths)
 }
 
-function resolveWatchPaths(
-  config?: ReturnType<typeof getHooksConfigFromSnapshot>,
-): string[] {
+function resolveWatchPaths(config?: ReturnType<typeof getHooksConfigFromSnapshot>): string[] {
   const matchers = (config ?? getHooksConfigFromSnapshot())?.FileChanged ?? []
 
   // Matcher field: filenames to watch in cwd, pipe-separated (e.g. ".envrc|.env")
@@ -77,10 +71,7 @@ function startWatching(paths: string[]): void {
   watcher.on('unlink', p => handleFileEvent(p, 'unlink'))
 }
 
-function handleFileEvent(
-  path: string,
-  event: 'change' | 'add' | 'unlink',
-): void {
+function handleFileEvent(path: string, event: 'change' | 'add' | 'unlink'): void {
   logForDebugging(`FileChanged: ${event} ${path}`)
   void executeFileChangedHooks(path, event)
     .then(({ results, watchPaths, systemMessages }) => {
@@ -130,17 +121,13 @@ function restartWatching(): void {
   }
 }
 
-export async function onCwdChangedForHooks(
-  oldCwd: string,
-  newCwd: string,
-): Promise<void> {
+export async function onCwdChangedForHooks(oldCwd: string, newCwd: string): Promise<void> {
   if (oldCwd === newCwd) return
 
   // Re-evaluate from the current snapshot so mid-session hook changes are picked up
   const config = getHooksConfigFromSnapshot()
   const currentHasEnvHooks =
-    (config?.CwdChanged?.length ?? 0) > 0 ||
-    (config?.FileChanged?.length ?? 0) > 0
+    (config?.CwdChanged?.length ?? 0) > 0 || (config?.FileChanged?.length ?? 0) > 0
   if (!currentHasEnvHooks) return
   currentCwd = newCwd
 

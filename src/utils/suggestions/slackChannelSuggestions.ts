@@ -20,16 +20,11 @@ export const subscribeKnownChannels = knownChannelsChanged.subscribe
 let inflightQuery: string | null = null
 let inflightPromise: Promise<string[]> | null = null
 
-function findSlackClient(
-  clients: MCPServerConnection[],
-): MCPServerConnection | undefined {
+function findSlackClient(clients: MCPServerConnection[]): MCPServerConnection | undefined {
   return clients.find(c => c.type === 'connected' && c.name.includes('slack'))
 }
 
-async function fetchChannels(
-  clients: MCPServerConnection[],
-  query: string,
-): Promise<string[]> {
+async function fetchChannels(clients: MCPServerConnection[], query: string): Promise<string[]> {
   const slackClient = findSlackClient(clients)
   if (!slackClient || slackClient.type !== 'connected') {
     return []
@@ -66,9 +61,7 @@ async function fetchChannels(
 
 // The Slack MCP server wraps its markdown in a JSON envelope:
 // {"results":"# Search Results...\nName: #chan\n..."}
-const resultsEnvelopeSchema = lazySchema(() =>
-  z.object({ results: z.string() }),
-)
+const resultsEnvelopeSchema = lazySchema(() => z.object({ results: z.string() }))
 
 function unwrapResults(text: string): string {
   const trimmed = text.trim()
@@ -107,9 +100,7 @@ export function getKnownChannelsVersion(): number {
   return knownChannelsVersion
 }
 
-export function findSlackChannelPositions(
-  text: string,
-): Array<{ start: number; end: number }> {
+export function findSlackChannelPositions(text: string): Array<{ start: number; end: number }> {
   const positions: Array<{ start: number; end: number }> = []
   const re = /(^|\s)#([a-z0-9][a-z0-9_-]{0,79})(?=\s|$)/g
   let m: RegExpExecArray | null
@@ -127,20 +118,14 @@ export function findSlackChannelPositions(
 // locally. This keeps the query maximally specific (avoiding the 20-result
 // cap) while never sending a partial word that kills the search.
 function mcpQueryFor(searchToken: string): string {
-  const lastSep = Math.max(
-    searchToken.lastIndexOf('-'),
-    searchToken.lastIndexOf('_'),
-  )
+  const lastSep = Math.max(searchToken.lastIndexOf('-'), searchToken.lastIndexOf('_'))
   return lastSep > 0 ? searchToken.slice(0, lastSep) : searchToken
 }
 
 // Find a cached entry whose key is a prefix of mcpQuery and still has
 // matches for searchToken. Lets typing "c"→"cl"→"cla" reuse the "c" cache
 // instead of issuing a new MCP call per keystroke.
-function findReusableCacheEntry(
-  mcpQuery: string,
-  searchToken: string,
-): string[] | undefined {
+function findReusableCacheEntry(mcpQuery: string, searchToken: string): string[] | undefined {
   let best: string[] | undefined
   let bestLen = 0
   for (const [key, channels] of cache) {

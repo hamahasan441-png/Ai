@@ -86,7 +86,11 @@ describe('NormalizationEngine', () => {
     })
 
     it('skips unicode normalization when set to none', () => {
-      const e = new NormalizationEngine({ unicodeNormalization: 'none', caseFolding: false, trimWhitespace: false })
+      const e = new NormalizationEngine({
+        unicodeNormalization: 'none',
+        caseFolding: false,
+        trimWhitespace: false,
+      })
       const result = e.normalize('Hello')
       expect(result.text.normalized).toBe('Hello')
     })
@@ -213,9 +217,7 @@ describe('NormalizationEngine', () => {
     })
 
     it('increments pipeline execution count', () => {
-      const pipe = engine.createPipeline('counter', [
-        { type: 'trim', enabled: true, params: {} },
-      ])
+      const pipe = engine.createPipeline('counter', [{ type: 'trim', enabled: true, params: {} }])
       engine.executePipeline(pipe.id, '  hi  ')
       engine.executePipeline(pipe.id, '  bye  ')
       const retrieved = engine.getPipeline(pipe.id)
@@ -584,9 +586,7 @@ describe('NormalizationEngine', () => {
       engine.addRule('my-rule', 'foo', 'bar')
       engine.addSynonyms('happy', ['glad'])
       engine.addAbbreviation('brb', 'be right back')
-      engine.createPipeline('my-pipe', [
-        { type: 'caseFold', enabled: true, params: {} },
-      ])
+      engine.createPipeline('my-pipe', [{ type: 'caseFold', enabled: true, params: {} }])
       engine.normalize('some text foo')
 
       const json = engine.serialize()

@@ -15,12 +15,12 @@
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-export type FormatType = 'plain' | 'code' | 'table' | 'list' | 'steps' | 'comparison';
+export type FormatType = 'plain' | 'code' | 'table' | 'list' | 'steps' | 'comparison'
 
 export interface FormatDetection {
-  recommendedFormat: FormatType;
-  confidence: number;
-  indicators: string[];
+  recommendedFormat: FormatType
+  confidence: number
+  indicators: string[]
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -79,89 +79,91 @@ const FORMAT_PATTERNS: Record<FormatType, { patterns: RegExp[]; keywords: string
     patterns: [],
     keywords: [],
   },
-};
+}
 
 // ── MultiFormatGenerator Class ───────────────────────────────────────────────
 
 export class MultiFormatGenerator {
-  private detectCount = 0;
-  private formatCount = 0;
-  private formatCounts: Record<string, number> = {};
+  private detectCount = 0
+  private formatCount = 0
+  private formatCounts: Record<string, number> = {}
 
   constructor() {
-    this.formatCounts = {};
+    this.formatCounts = {}
   }
 
   /**
    * Detect optimal format for a query
    */
   detectFormat(query: string): FormatDetection {
-    this.detectCount++;
+    this.detectCount++
 
     if (!query || query.trim().length === 0) {
-      return { recommendedFormat: 'plain', confidence: 0.5, indicators: [] };
+      return { recommendedFormat: 'plain', confidence: 0.5, indicators: [] }
     }
 
-    const trimmed = query.trim().toLowerCase();
-    let bestFormat: FormatType = 'plain';
-    let bestScore = 0;
-    let bestIndicators: string[] = [];
+    const trimmed = query.trim().toLowerCase()
+    let bestFormat: FormatType = 'plain'
+    let bestScore = 0
+    let bestIndicators: string[] = []
 
-    for (const [format, { patterns, keywords }] of Object.entries(FORMAT_PATTERNS) as Array<[FormatType, { patterns: RegExp[]; keywords: string[] }]>) {
-      if (format === 'plain') continue;
+    for (const [format, { patterns, keywords }] of Object.entries(FORMAT_PATTERNS) as Array<
+      [FormatType, { patterns: RegExp[]; keywords: string[] }]
+    >) {
+      if (format === 'plain') continue
 
-      let score = 0;
-      const indicators: string[] = [];
+      let score = 0
+      const indicators: string[] = []
 
       for (const pattern of patterns) {
         if (pattern.test(trimmed)) {
-          score += 0.35;
-          indicators.push(`pattern:${pattern.source.slice(0, 25)}`);
+          score += 0.35
+          indicators.push(`pattern:${pattern.source.slice(0, 25)}`)
         }
       }
 
       for (const keyword of keywords) {
         if (trimmed.includes(keyword)) {
-          score += 0.15;
-          indicators.push(`keyword:${keyword}`);
+          score += 0.15
+          indicators.push(`keyword:${keyword}`)
         }
       }
 
       if (score > bestScore) {
-        bestScore = score;
-        bestFormat = format;
-        bestIndicators = indicators;
+        bestScore = score
+        bestFormat = format
+        bestIndicators = indicators
       }
     }
 
-    this.formatCounts[bestFormat] = (this.formatCounts[bestFormat] || 0) + 1;
+    this.formatCounts[bestFormat] = (this.formatCounts[bestFormat] || 0) + 1
 
     return {
       recommendedFormat: bestFormat,
       confidence: Math.min(1, bestScore),
       indicators: bestIndicators,
-    };
+    }
   }
 
   /**
    * Format text according to format type
    */
   format(text: string, formatType: string): string {
-    this.formatCount++;
+    this.formatCount++
 
     switch (formatType) {
       case 'code':
-        return this.formatAsCode(text);
+        return this.formatAsCode(text)
       case 'table':
-        return this.formatAsTable(text);
+        return this.formatAsTable(text)
       case 'list':
-        return this.formatAsList(text);
+        return this.formatAsList(text)
       case 'steps':
-        return this.formatAsSteps(text);
+        return this.formatAsSteps(text)
       case 'comparison':
-        return this.formatAsTable(text); // comparison uses table format
+        return this.formatAsTable(text) // comparison uses table format
       default:
-        return text;
+        return text
     }
   }
 
@@ -169,8 +171,8 @@ export class MultiFormatGenerator {
    * Format as code block (wrap if not already)
    */
   private formatAsCode(text: string): string {
-    if (text.includes('```')) return text; // already formatted
-    return '```\n' + text + '\n```';
+    if (text.includes('```')) return text // already formatted
+    return '```\n' + text + '\n```'
   }
 
   /**
@@ -178,13 +180,13 @@ export class MultiFormatGenerator {
    */
   private formatAsTable(text: string): string {
     // If already has table markers, return as-is
-    if (text.includes('|') && text.includes('---')) return text;
+    if (text.includes('|') && text.includes('---')) return text
 
     // Try to extract comparison items
-    const lines = text.split('\n').filter(l => l.trim().length > 0);
-    if (lines.length < 2) return text;
+    const lines = text.split('\n').filter(l => l.trim().length > 0)
+    if (lines.length < 2) return text
 
-    return text; // return as-is if we can't reliably table-ify
+    return text // return as-is if we can't reliably table-ify
   }
 
   /**
@@ -192,13 +194,13 @@ export class MultiFormatGenerator {
    */
   private formatAsList(text: string): string {
     // If already has list markers, return as-is
-    if (/^[-*•]\s/m.test(text)) return text;
+    if (/^[-*•]\s/m.test(text)) return text
 
     // Split by sentences and format as list
-    const sentences = text.split(/[.]\s+/).filter(s => s.trim().length > 5);
-    if (sentences.length <= 1) return text;
+    const sentences = text.split(/[.]\s+/).filter(s => s.trim().length > 5)
+    if (sentences.length <= 1) return text
 
-    return sentences.map(s => `• ${s.trim().replace(/\.$/, '')}`).join('\n');
+    return sentences.map(s => `• ${s.trim().replace(/\.$/, '')}`).join('\n')
   }
 
   /**
@@ -206,28 +208,28 @@ export class MultiFormatGenerator {
    */
   private formatAsSteps(text: string): string {
     // If already has numbered steps, return as-is
-    if (/^\d+[.)]\s/m.test(text)) return text;
+    if (/^\d+[.)]\s/m.test(text)) return text
 
     // Split by sentences and number them
-    const sentences = text.split(/[.]\s+/).filter(s => s.trim().length > 5);
-    if (sentences.length <= 1) return text;
+    const sentences = text.split(/[.]\s+/).filter(s => s.trim().length > 5)
+    if (sentences.length <= 1) return text
 
-    return sentences.map((s, i) => `${i + 1}. ${s.trim().replace(/\.$/, '')}`).join('\n');
+    return sentences.map((s, i) => `${i + 1}. ${s.trim().replace(/\.$/, '')}`).join('\n')
   }
 
   /**
    * Get statistics
    */
   getStats(): {
-    detectCount: number;
-    formatCount: number;
-    formatCounts: Record<string, number>;
+    detectCount: number
+    formatCount: number
+    formatCounts: Record<string, number>
   } {
     return {
       detectCount: this.detectCount,
       formatCount: this.formatCount,
       formatCounts: { ...this.formatCounts },
-    };
+    }
   }
 
   /**
@@ -238,18 +240,18 @@ export class MultiFormatGenerator {
       detectCount: this.detectCount,
       formatCount: this.formatCount,
       formatCounts: this.formatCounts,
-    });
+    })
   }
 
   /**
    * Deserialize state
    */
   static deserialize(data: string): MultiFormatGenerator {
-    const parsed = JSON.parse(data);
-    const generator = new MultiFormatGenerator();
-    generator.detectCount = parsed.detectCount || 0;
-    generator.formatCount = parsed.formatCount || 0;
-    generator.formatCounts = parsed.formatCounts || {};
-    return generator;
+    const parsed = JSON.parse(data)
+    const generator = new MultiFormatGenerator()
+    generator.detectCount = parsed.detectCount || 0
+    generator.formatCount = parsed.formatCount || 0
+    generator.formatCounts = parsed.formatCounts || {}
+    return generator
   }
 }

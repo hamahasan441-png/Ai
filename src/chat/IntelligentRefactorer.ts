@@ -244,11 +244,10 @@ export class IntelligentRefactorer {
     }
 
     // Magic numbers
-    const magicNums = [...code.matchAll(/(?<![.\w])(\d{2,})(?![.\w])/g)]
-      .filter(m => {
-        const n = parseInt(m[1], 10)
-        return n !== 0 && n !== 1 && n !== 100 && n !== 10
-      })
+    const magicNums = [...code.matchAll(/(?<![.\w])(\d{2,})(?![.\w])/g)].filter(m => {
+      const n = parseInt(m[1], 10)
+      return n !== 0 && n !== 1 && n !== 100 && n !== 10
+    })
     if (magicNums.length >= 3) {
       suggestions.push({
         type: 'replace_magic_number',
@@ -257,7 +256,10 @@ export class IntelligentRefactorer {
         impact: 'low',
         startLine: 0,
         endLine: 0,
-        originalCode: magicNums.slice(0, 3).map(m => m[1]).join(', '),
+        originalCode: magicNums
+          .slice(0, 3)
+          .map(m => m[1])
+          .join(', '),
         suggestedCode: 'const NAMED_CONSTANT = value',
         rationale: 'Named constants improve readability and maintainability',
       })
@@ -281,13 +283,18 @@ export class IntelligentRefactorer {
     // Compute impact and priority
     const totalImpact = round2(
       filtered.reduce((s, f) => s + (f.impact === 'high' ? 3 : f.impact === 'medium' ? 2 : 1), 0) /
-      Math.max(1, filtered.length),
+        Math.max(1, filtered.length),
     )
     const estimatedComplexityReduction = round2(
-      filtered.filter(s => ['extract_method', 'decompose_conditional', 'simplify_boolean'].includes(s.type)).length * 2.5,
+      filtered.filter(s =>
+        ['extract_method', 'decompose_conditional', 'simplify_boolean'].includes(s.type),
+      ).length * 2.5,
     )
     const priorityOrder = filtered
-      .map((s, i) => ({ i, score: s.confidence * (s.impact === 'high' ? 3 : s.impact === 'medium' ? 2 : 1) }))
+      .map((s, i) => ({
+        i,
+        score: s.confidence * (s.impact === 'high' ? 3 : s.impact === 'medium' ? 2 : 1),
+      }))
       .sort((a, b) => b.score - a.score)
       .map(x => x.i)
 
@@ -314,7 +321,11 @@ export class IntelligentRefactorer {
     const lines = code.split('\n')
 
     // Find functions and check complexity
-    const funcMatches = [...code.matchAll(/(?:(?:public|private|protected)\s+)?(?:static\s+)?(?:async\s+)?(\w+)\s*\(([^)]*)\)\s*(?::\s*[^{]*)?\s*\{/g)]
+    const funcMatches = [
+      ...code.matchAll(
+        /(?:(?:public|private|protected)\s+)?(?:static\s+)?(?:async\s+)?(\w+)\s*\(([^)]*)\)\s*(?::\s*[^{]*)?\s*\{/g,
+      ),
+    ]
     for (const fm of funcMatches) {
       const funcName = fm[1]
       const startIdx = fm.index!
@@ -376,11 +387,33 @@ export class IntelligentRefactorer {
       if (blockStart !== -1 && blockEnd !== -1 && blockEnd - blockStart >= 5) {
         const extractedBody = bodyLines.slice(blockStart, blockEnd).join('\n')
         // Find variables used
-        const usedVars = [...new Set(
-          extractedBody.match(/\b[a-z]\w*\b/g)?.filter(v =>
-            !['if', 'for', 'while', 'return', 'const', 'let', 'var', 'true', 'false', 'null', 'undefined', 'new', 'this', 'else', 'break', 'continue'].includes(v),
-          ) ?? [],
-        )]
+        const usedVars = [
+          ...new Set(
+            extractedBody
+              .match(/\b[a-z]\w*\b/g)
+              ?.filter(
+                v =>
+                  ![
+                    'if',
+                    'for',
+                    'while',
+                    'return',
+                    'const',
+                    'let',
+                    'var',
+                    'true',
+                    'false',
+                    'null',
+                    'undefined',
+                    'new',
+                    'this',
+                    'else',
+                    'break',
+                    'continue',
+                  ].includes(v),
+              ) ?? [],
+          ),
+        ]
         // Find which are defined outside
         const outerCode = bodyLines.slice(0, blockStart).join('\n')
         const params = usedVars.filter(v => new RegExp(`\\b${v}\\b`).test(outerCode)).slice(0, 5)
@@ -453,7 +486,9 @@ export class IntelligentRefactorer {
     }
 
     // Boolean variables without is/has/should prefix
-    const boolVars = [...code.matchAll(/(?:const|let|var)\s+(\w+)\s*(?::\s*boolean\s*)?=\s*(?:true|false)\b/g)]
+    const boolVars = [
+      ...code.matchAll(/(?:const|let|var)\s+(\w+)\s*(?::\s*boolean\s*)?=\s*(?:true|false)\b/g),
+    ]
     for (const bv of boolVars) {
       const name = bv[1]
       if (/^(is|has|should|can|will|did|was)/.test(name)) continue
@@ -494,7 +529,11 @@ export class IntelligentRefactorer {
     }
 
     // if (x) return true; else return false;
-    const ifReturnBool = [...code.matchAll(/if\s*\(([^)]+)\)\s*(?:return\s+true|{\s*return\s+true\s*;?\s*})\s*;?\s*(?:else\s+)?(?:return\s+false|{\s*return\s+false\s*;?\s*})/g)]
+    const ifReturnBool = [
+      ...code.matchAll(
+        /if\s*\(([^)]+)\)\s*(?:return\s+true|{\s*return\s+true\s*;?\s*})\s*;?\s*(?:else\s+)?(?:return\s+false|{\s*return\s+false\s*;?\s*})/g,
+      ),
+    ]
     for (const m of ifReturnBool) {
       results.push({
         original: m[0],
@@ -530,7 +569,9 @@ export class IntelligentRefactorer {
     }
 
     // Negated condition: if (!x) { ... } else { ... } → if (x) { ... } else { ... }
-    const negatedIfs = [...code.matchAll(/if\s*\(\s*!(\w+)\s*\)\s*\{([^}]*)\}\s*else\s*\{([^}]*)\}/g)]
+    const negatedIfs = [
+      ...code.matchAll(/if\s*\(\s*!(\w+)\s*\)\s*\{([^}]*)\}\s*else\s*\{([^}]*)\}/g),
+    ]
     for (const ni of negatedIfs) {
       if (ni[2].trim().length < ni[3].trim().length) {
         results.push({
@@ -631,7 +672,11 @@ export class IntelligentRefactorer {
       if (/^\s*(else\s+)?if\s*\(/.test(lines[i])) {
         if (ifElseChain === 0) chainStart = i + 1
         ifElseChain++
-      } else if (!/^\s*[{}]\s*$/.test(lines[i]) && !/^\s*else\s*\{/.test(lines[i]) && lines[i].trim().length > 0) {
+      } else if (
+        !/^\s*[{}]\s*$/.test(lines[i]) &&
+        !/^\s*else\s*\{/.test(lines[i]) &&
+        lines[i].trim().length > 0
+      ) {
         if (ifElseChain >= 4) {
           suggestions.push({
             type: 'decompose_conditional',
@@ -659,7 +704,11 @@ export class IntelligentRefactorer {
     this.stats.lastUsedAt = new Date().toISOString()
     this.stats.totalApplied++
 
-    if (suggestion.originalCode && suggestion.suggestedCode && code.includes(suggestion.originalCode)) {
+    if (
+      suggestion.originalCode &&
+      suggestion.suggestedCode &&
+      code.includes(suggestion.originalCode)
+    ) {
       return code.replace(suggestion.originalCode, suggestion.suggestedCode)
     }
     return code
@@ -676,8 +725,12 @@ export class IntelligentRefactorer {
 
   // ── Accessors ───────────────────────────────────────────────────────────────
 
-  getStats(): Readonly<IntelligentRefactorerStats> { return { ...this.stats } }
-  getConfig(): Readonly<IntelligentRefactorerConfig> { return { ...this.config } }
+  getStats(): Readonly<IntelligentRefactorerStats> {
+    return { ...this.stats }
+  }
+  getConfig(): Readonly<IntelligentRefactorerConfig> {
+    return { ...this.config }
+  }
 
   // ── Persistence ─────────────────────────────────────────────────────────────
 
@@ -686,7 +739,10 @@ export class IntelligentRefactorer {
   }
 
   static deserialize(json: string): IntelligentRefactorer {
-    const data = JSON.parse(json) as { config: IntelligentRefactorerConfig; stats: IntelligentRefactorerStats }
+    const data = JSON.parse(json) as {
+      config: IntelligentRefactorerConfig
+      stats: IntelligentRefactorerStats
+    }
     const instance = new IntelligentRefactorer(data.config)
     Object.assign(instance.stats, data.stats)
     return instance
@@ -702,7 +758,9 @@ export class IntelligentRefactorer {
     const setA = new Set(tokensA)
     const setB = new Set(tokensB)
     let intersection = 0
-    for (const t of setA) { if (setB.has(t)) intersection++ }
+    for (const t of setA) {
+      if (setB.has(t)) intersection++
+    }
     return intersection / Math.max(setA.size, setB.size)
   }
 }
