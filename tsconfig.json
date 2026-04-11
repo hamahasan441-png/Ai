@@ -15,7 +15,22 @@
     "sourceMap": true,
     "jsx": "react-jsx",
     "lib": ["ES2022"],
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "bun:bundle": ["./src/utils/stubs/bun-bundle.ts"],
+      "bun:ffi": ["./src/utils/stubs/bun-ffi.ts"],
+      "@anthropic-ai/sdk": ["./src/utils/stubs/anthropic-sdk.ts"],
+      "@anthropic-ai/sdk/*": ["./src/utils/stubs/anthropic-sdk.ts"],
+      "@anthropic-ai/sandbox-runtime": ["./src/utils/stubs/anthropic-sandbox-runtime.ts"],
+      "@alcalzone/ansi-tokenize": ["./src/utils/stubs/alcalzone-ansi-tokenize.ts"],
+      "@ant/claude-for-chrome-mcp": ["./src/utils/stubs/ant-claude-for-chrome-mcp.ts"],
+      "@ant/computer-use-input": ["./src/utils/stubs/ant-computer-use-input.ts"],
+      "@ant/computer-use-mcp": ["./src/utils/stubs/ant-computer-use-mcp.ts"],
+      "@ant/computer-use-mcp/*": ["./src/utils/stubs/ant-computer-use-mcp.ts"],
+      "@ant/computer-use-swift": ["./src/utils/stubs/ant-computer-use-swift.ts"],
+      "@anthropic-ai/mcpb": ["./src/utils/stubs/anthropic-mcpb.ts"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "dist", "src/**/__tests__/**"]
