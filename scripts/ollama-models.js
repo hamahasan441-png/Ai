@@ -338,13 +338,14 @@ async function listModels() {
       const header = families[m.family]
       if (header) {
         console.log(cyan(`  ${header}`))
-      } else if (['codellama', 'deepseek', 'phi', 'gemma', 'starcoder'].includes(m.family) && currentFamily !== '__other') {
-        // already printed "Other Models" header
+      } else if (!families[m.family] && currentFamily !== '__other') {
+        console.log(cyan('  ── Other Models ───────────────────────────────────────────'))
+        currentFamily = '__other'
       }
-      currentFamily = m.family
+      if (currentFamily !== '__other') currentFamily = m.family
     }
 
-    const isInstalled = installed.some((name) => name.startsWith(modelId.split(':')[0]) && name.includes(modelId.split(':')[1]))
+    const isInstalled = installed.some((name) => name === modelId)
     const status = isInstalled ? green('✓ installed') : dim('not installed')
     const tierBadge = m.tier === 'recommended' ? yellow(' [RECOMMENDED]') : ''
 

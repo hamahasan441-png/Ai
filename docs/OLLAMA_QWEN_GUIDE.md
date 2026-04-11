@@ -249,7 +249,7 @@ ollama list
 
 # Example output:
 # NAME                    ID              SIZE    MODIFIED
-# qwen2.5-coder:7b       a]1b2c3d4e5f    4.7 GB  2 hours ago
+# qwen2.5-coder:7b       a1b2c3d4e5f     4.7 GB  2 hours ago
 # llama3.2:3b             f6g7h8i9j0k1    2.0 GB  2 hours ago
 ```
 
