@@ -45,7 +45,7 @@ npm install
 ### Docker
 ```bash
 docker build -t ai .
-docker run -it --rm -e ANTHROPIC_API_KEY=your-key ai
+docker run -it --rm ai
 ```
 
 ### From Source (Development)
