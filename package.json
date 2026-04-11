@@ -30,6 +30,7 @@
     "build": "tsc",
     "start": "tsx --import ./src/utils/stubs/macro-globals.ts src/entrypoints/cli.tsx",
     "dev": "tsx --import ./src/utils/stubs/macro-globals.ts src/entrypoints/cli.tsx",
+    "setup": "node scripts/setup.js",
     "download-models": "node scripts/download-models.js",
     "postinstall": "node scripts/postinstall.js",
     "prepublishOnly": "npm run typecheck && npm run test",
