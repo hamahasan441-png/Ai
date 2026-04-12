@@ -26,6 +26,7 @@ import type {
   ChatSession,
   DashboardModelInfo,
   SystemStats,
+  UploadedFile,
 } from '../server.js'
 
 // ─── Helper ──────────────────────────────────────────────────────────────────
@@ -102,7 +103,7 @@ describe('AI Dashboard', () => {
       const config = server.getConfig()
       expect(config.port).toBe(port)
       expect(config.host).toBe('127.0.0.1')
-      expect(config.defaultModel).toBe('qwen2.5-coder:7b')
+      expect(config.defaultModel).toBe('local-brain')
     })
   })
 
@@ -346,7 +347,7 @@ describe('AI Dashboard', () => {
       const res = await fetch(`${baseUrl}/api/settings`)
       expect(res.status).toBe(200)
       const data = JSON.parse(res.body)
-      expect(data.defaultModel).toBe('qwen2.5-coder:7b')
+      expect(data.defaultModel).toBe('local-brain')
       expect(data.ollamaHost).toBe('localhost')
     })
 
@@ -595,5 +596,250 @@ describe('Backward-Compatible APIs', () => {
     const res = await fetch(`${baseUrl}/`)
     expect(res.body.toLowerCase()).not.toContain('anthropic')
     expect(res.body.toLowerCase()).not.toContain('claude')
+  })
+})
+
+// ─── Local Brain Chat Tests ──────────────────────────────────────────────────
+
+describe('Local Brain Chat', () => {
+  let server: DashboardServer
+  let port: number
+  let baseUrl: string
+
+  beforeEach(async () => {
+    port = 30000 + Math.floor(Math.random() * 10000)
+    server = new DashboardServer({ port, host: '127.0.0.1' })
+    await server.start()
+    baseUrl = `http://127.0.0.1:${port}`
+  })
+
+  afterEach(async () => {
+    await server.stop()
+  })
+
+  it('POST /api/chat with local-brain returns response without Ollama', async () => {
+    const res = await fetch(`${baseUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'local-brain',
+        messages: [{ role: 'user', content: 'Hello, how are you?' }],
+      }),
+    })
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.text).toBeTruthy()
+    expect(data.model).toBe('local-brain')
+    expect(typeof data.durationMs).toBe('number')
+    expect(typeof data.tokensUsed).toBe('number')
+    expect(data.error).toBeUndefined()
+  })
+
+  it('local-brain chat handles code questions', async () => {
+    const res = await fetch(`${baseUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'local-brain',
+        messages: [{ role: 'user', content: 'How do I sort an array in JavaScript?' }],
+      }),
+    })
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.text).toBeTruthy()
+    expect(data.text.length).toBeGreaterThan(10)
+  })
+
+  it('local-brain chat creates a session', async () => {
+    await fetch(`${baseUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'local-brain',
+        messages: [{ role: 'user', content: 'test message' }],
+      }),
+    })
+    const sessRes = await fetch(`${baseUrl}/api/sessions`)
+    const sessData = JSON.parse(sessRes.body)
+    expect(sessData.sessions.length).toBe(1)
+    expect(sessData.sessions[0].model).toBe('local-brain')
+  })
+
+  it('local-brain handles multi-turn conversation', async () => {
+    const res = await fetch(`${baseUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'local-brain',
+        messages: [
+          { role: 'user', content: 'What is binary search?' },
+          { role: 'assistant', content: 'Binary search is an algorithm.' },
+          { role: 'user', content: 'Can you explain more?' },
+        ],
+      }),
+    })
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.text).toBeTruthy()
+  })
+
+  it('DASHBOARD_MODELS includes local-brain as first entry', () => {
+    expect(DASHBOARD_MODELS[0]!.id).toBe('local-brain')
+    expect(DASHBOARD_MODELS[0]!.status).toBe('available')
+    expect(DASHBOARD_MODELS[0]!.family).toBe('local')
+  })
+
+  it('dashboard page shows Local Brain Ready badge', async () => {
+    const res = await fetch(`${baseUrl}/`)
+    expect(res.body).toContain('Local Brain Ready')
+  })
+
+  it('chat page shows Local Brain as default selected model', async () => {
+    const res = await fetch(`${baseUrl}/chat`)
+    expect(res.body).toContain('local-brain')
+    expect(res.body).toContain('Local Brain (DevBrain)')
+    expect(res.body).toContain('No Ollama')
+  })
+
+  it('server has DevBrain instance', () => {
+    const brain = server.getDevBrain()
+    expect(brain).toBeTruthy()
+    expect(typeof brain.chat).toBe('function')
+  })
+})
+
+// ─── File Upload Tests ───────────────────────────────────────────────────────
+
+describe('File Upload', () => {
+  let server: DashboardServer
+  let port: number
+  let baseUrl: string
+
+  beforeEach(async () => {
+    port = 30000 + Math.floor(Math.random() * 10000)
+    server = new DashboardServer({ port, host: '127.0.0.1' })
+    await server.start()
+    baseUrl = `http://127.0.0.1:${port}`
+  })
+
+  afterEach(async () => {
+    await server.stop()
+  })
+
+  it('POST /api/upload stores a file', async () => {
+    const res = await fetch(`${baseUrl}/api/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'test.txt',
+        type: 'text/plain',
+        content: 'Hello World',
+        size: 11,
+      }),
+    })
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.ok).toBe(true)
+    expect(data.file.name).toBe('test.txt')
+    expect(data.file.type).toBe('text/plain')
+    expect(data.file.id).toBeTruthy()
+  })
+
+  it('POST /api/upload rejects missing content', async () => {
+    const res = await fetch(`${baseUrl}/api/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'test.txt' }),
+    })
+    expect(res.status).toBe(400)
+  })
+
+  it('POST /api/upload rejects invalid JSON', async () => {
+    const res = await fetch(`${baseUrl}/api/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: 'not json',
+    })
+    expect(res.status).toBe(400)
+  })
+
+  it('GET /api/uploads returns uploaded files', async () => {
+    await fetch(`${baseUrl}/api/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'a.txt', type: 'text/plain', content: 'aaa', size: 3 }),
+    })
+    await fetch(`${baseUrl}/api/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'b.js', type: 'text/javascript', content: 'bbb', size: 3 }),
+    })
+    const res = await fetch(`${baseUrl}/api/uploads`)
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.files.length).toBe(2)
+  })
+
+  it('chat with local-brain and file attachment works', async () => {
+    const res = await fetch(`${baseUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'local-brain',
+        messages: [{ role: 'user', content: 'Analyze this file' }],
+        attachments: [{
+          id: 'test-file-1',
+          name: 'example.py',
+          type: 'text/x-python',
+          size: 42,
+          content: 'def hello():\n    print("Hello World")\n\nhello()',
+        }],
+      }),
+    })
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.text).toBeTruthy()
+    expect(data.model).toBe('local-brain')
+  })
+
+  it('chat with local-brain and image attachment works', async () => {
+    // Use a minimal valid base64 "image" (1x1 PNG pixel)
+    const minimalPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+    const res = await fetch(`${baseUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'local-brain',
+        messages: [{ role: 'user', content: 'What is in this image?' }],
+        attachments: [{
+          id: 'test-img-1',
+          name: 'photo.png',
+          type: 'image/png',
+          size: 100,
+          content: minimalPng,
+        }],
+      }),
+    })
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.text).toBeTruthy()
+    expect(data.model).toBe('local-brain')
+  })
+
+  it('chat page has file upload button', async () => {
+    const res = await fetch(`${baseUrl}/chat`)
+    expect(res.body).toContain('file-input')
+    expect(res.body).toContain('📎')
+  })
+
+  it('chat page has image upload button', async () => {
+    const res = await fetch(`${baseUrl}/chat`)
+    expect(res.body).toContain('image-input')
+    expect(res.body).toContain('🖼️')
+  })
+
+  it('chat page has attachment bar container', async () => {
+    const res = await fetch(`${baseUrl}/chat`)
+    expect(res.body).toContain('attachment-bar')
   })
 })
