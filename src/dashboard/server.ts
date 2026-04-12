@@ -21,6 +21,10 @@
 
 import * as http from 'http'
 import * as os from 'os'
+import * as path from 'path'
+import * as fs from 'fs'
+
+import { DevBrain } from '../chat/DevBrain.js'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -39,6 +43,15 @@ export interface DashboardConfig {
   defaultMaxTokens: number
 }
 
+/** Uploaded file metadata */
+export interface UploadedFile {
+  id: string
+  name: string
+  type: string
+  size: number
+  content: string  // text content or base64 for images
+}
+
 /** Chat message for the dashboard */
 export interface DashboardChatMessage {
   id: string
@@ -48,6 +61,7 @@ export interface DashboardChatMessage {
   timestamp: number
   tokensUsed?: number
   durationMs?: number
+  attachments?: UploadedFile[]
 }
 
 /** Chat session */
@@ -107,13 +121,25 @@ const DEFAULT_CONFIG: DashboardConfig = {
   llamaCppPort: 8080,
   title: 'AI Dashboard',
   maxChatHistory: 1000,
-  defaultModel: 'qwen2.5-coder:7b',
+  defaultModel: 'local-brain',
   defaultTemperature: 0.7,
   defaultMaxTokens: 2048,
 }
 
 /** All supported models for the dashboard */
 export const DASHBOARD_MODELS: DashboardModelInfo[] = [
+  {
+    id: 'local-brain',
+    name: 'Local Brain (DevBrain)',
+    family: 'local',
+    parameterCount: 'N/A',
+    quantization: 'N/A',
+    contextWindow: 100000,
+    status: 'available',
+    backend: 'ollama',
+    description: 'Built-in offline AI brain with 47+ intelligence modules. No Ollama needed — works instantly.',
+    strengths: ['Chat', 'Code Generation', 'Code Review', 'Image Analysis', 'File Analysis', 'Reasoning', 'Security', 'All Modules'],
+  },
   {
     id: 'qwen2.5-coder:7b',
     name: 'Qwen2.5-Coder 7B',
@@ -712,7 +738,7 @@ export function renderDashboardPage(stats: SystemStats, models: DashboardModelIn
   return `${htmlHead('AI Dashboard')}
 ${sidebarHtml('dashboard')}
 <div class="main">
-  <div class="topbar"><h2>🏠 Dashboard Overview</h2><span class="badge ${stats.ollamaAvailable ? 'badge-green' : 'badge-red'}">${stats.ollamaAvailable ? 'Ollama Online' : 'Ollama Offline'}</span></div>
+  <div class="topbar"><h2>🏠 Dashboard Overview</h2><span class="badge badge-green">Local Brain Ready</span><span style="margin-left:8px" class="badge ${stats.ollamaAvailable ? 'badge-green' : 'badge-orange'}">${stats.ollamaAvailable ? 'Ollama Online' : 'Ollama Optional'}</span></div>
   <div class="content">
     <div class="cards">
       <div class="card"><h3>System</h3><div class="value">${stats.platform}</div><div class="sub">${stats.arch} • ${stats.cpus} CPUs</div></div>
@@ -736,7 +762,7 @@ ${sidebarHtml('dashboard')}
 /** Chat page */
 export function renderChatPage(models: DashboardModelInfo[], defaultModel: string): string {
   const modelOptions = models.map(m =>
-    `<option value="${m.id}" ${m.id === defaultModel ? 'selected' : ''}>${m.name} (${m.parameterCount})</option>`
+    `<option value="${m.id}" ${m.id === defaultModel ? 'selected' : ''}>${m.name} (${m.parameterCount})${m.id === 'local-brain' ? ' ✅ No Ollama' : ''}</option>`
   ).join('\n          ')
 
   return `${htmlHead('Chat — AI Dashboard')}
@@ -745,21 +771,28 @@ ${sidebarHtml('chat')}
   <div class="chat-container">
     <div class="chat-header">
       <label for="model-select" style="font-weight:600">Model:</label>
-      <select id="model-select">
+      <select id="model-select" onchange="onModelChange()">
         ${modelOptions}
       </select>
+      <span id="model-status" class="badge badge-green" style="font-size:0.75rem"></span>
       <label for="temp-input" style="margin-left:16px;font-weight:600">Temp:</label>
       <input type="number" id="temp-input" value="0.7" min="0" max="2" step="0.1" style="width:70px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:0.9rem">
       <button onclick="clearChat()" class="btn" style="margin-left:auto;background:var(--red);padding:8px 16px;font-size:0.85rem">🗑 Clear</button>
     </div>
     <div class="chat-messages" id="messages">
-      <div style="text-align:center;color:var(--text2);margin-top:40vh">
-        <div style="font-size:3rem;margin-bottom:12px">💬</div>
-        <p>Select a model and start chatting!</p>
-        <p style="font-size:0.8rem;margin-top:8px">All models run 100% locally via Ollama.</p>
+      <div style="text-align:center;color:var(--text2);margin-top:30vh">
+        <div style="font-size:3rem;margin-bottom:12px">🧠</div>
+        <p><strong>Local Brain Chat</strong> — powered by DevBrain + 47 AI modules</p>
+        <p style="font-size:0.85rem;margin-top:8px;color:var(--green)">✅ Works instantly — No Ollama required!</p>
+        <p style="font-size:0.8rem;margin-top:8px;color:var(--text2)">Upload files 📎 and images 🖼️ for analysis. All processing runs 100% locally.</p>
       </div>
     </div>
+    <div id="attachment-bar" style="display:none;padding:8px 20px;background:var(--bg3);border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px"></div>
     <div class="chat-input-area">
+      <input type="file" id="file-input" style="display:none" multiple onchange="handleFileSelect(event)">
+      <input type="file" id="image-input" style="display:none" accept="image/*" onchange="handleImageSelect(event)">
+      <button onclick="document.getElementById('file-input').click()" title="Upload File" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:1.1rem;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">📎</button>
+      <button onclick="document.getElementById('image-input').click()" title="Upload Image" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:1.1rem;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">🖼️</button>
       <textarea id="chat-input" placeholder="Type your message... (Shift+Enter for new line)" rows="1" onkeydown="handleKeyDown(event)"></textarea>
       <button class="send-btn" id="send-btn" onclick="sendMessage()">Send ➤</button>
     </div>
@@ -771,9 +804,24 @@ const inputEl = document.getElementById('chat-input');
 const sendBtn = document.getElementById('send-btn');
 const modelSelect = document.getElementById('model-select');
 const tempInput = document.getElementById('temp-input');
+const attachmentBar = document.getElementById('attachment-bar');
 
 let chatHistory = [];
 let isLoading = false;
+let pendingAttachments = [];
+
+function onModelChange() {
+  const isLocal = modelSelect.value === 'local-brain';
+  const statusEl = document.getElementById('model-status');
+  if (isLocal) {
+    statusEl.textContent = '✅ Ready';
+    statusEl.className = 'badge badge-green';
+  } else {
+    statusEl.textContent = '⚡ Ollama';
+    statusEl.className = 'badge badge-orange';
+  }
+}
+onModelChange();
 
 function handleKeyDown(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
@@ -784,16 +832,96 @@ function handleKeyDown(e) {
 
 function clearChat() {
   chatHistory = [];
-  messagesEl.innerHTML = '<div style="text-align:center;color:var(--text2);margin-top:40vh"><div style="font-size:3rem;margin-bottom:12px">💬</div><p>Chat cleared. Start a new conversation!</p></div>';
+  pendingAttachments = [];
+  updateAttachmentBar();
+  messagesEl.innerHTML = '<div style="text-align:center;color:var(--text2);margin-top:30vh"><div style="font-size:3rem;margin-bottom:12px">🧠</div><p>Chat cleared. Start a new conversation!</p></div>';
 }
 
-function addMessage(role, content, meta) {
-  // Clear placeholder
+function handleFileSelect(event) {
+  const files = event.target.files;
+  for (const file of files) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const att = {
+        id: Date.now() + '-' + Math.random().toString(36).slice(2,9),
+        name: file.name,
+        type: file.type || 'text/plain',
+        size: file.size,
+        content: e.target.result
+      };
+      pendingAttachments.push(att);
+      updateAttachmentBar();
+    };
+    if (file.type.startsWith('image/')) {
+      reader.readAsDataURL(file);
+    } else {
+      reader.readAsText(file);
+    }
+  }
+  event.target.value = '';
+}
+
+function handleImageSelect(event) {
+  const files = event.target.files;
+  for (const file of files) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64 = e.target.result.split(',')[1] || e.target.result;
+      const att = {
+        id: Date.now() + '-' + Math.random().toString(36).slice(2,9),
+        name: file.name,
+        type: file.type || 'image/png',
+        size: file.size,
+        content: base64
+      };
+      pendingAttachments.push(att);
+      updateAttachmentBar();
+    };
+    reader.readAsDataURL(file);
+  }
+  event.target.value = '';
+}
+
+function removeAttachment(id) {
+  pendingAttachments = pendingAttachments.filter(a => a.id !== id);
+  updateAttachmentBar();
+}
+
+function updateAttachmentBar() {
+  if (pendingAttachments.length === 0) {
+    attachmentBar.style.display = 'none';
+    attachmentBar.innerHTML = '';
+    return;
+  }
+  attachmentBar.style.display = 'flex';
+  attachmentBar.innerHTML = pendingAttachments.map(a => {
+    const isImage = a.type.startsWith('image/');
+    const icon = isImage ? '🖼️' : '📄';
+    const sizeStr = a.size > 1024*1024 ? (a.size/(1024*1024)).toFixed(1)+'MB' : a.size > 1024 ? (a.size/1024).toFixed(1)+'KB' : a.size+'B';
+    return '<span style="background:var(--accent);padding:4px 10px;border-radius:16px;font-size:0.8rem;display:flex;align-items:center;gap:6px">' +
+      icon + ' ' + escapeHtml(a.name) + ' <span style="color:var(--text2)">(' + sizeStr + ')</span>' +
+      '<span style="cursor:pointer;color:var(--red);font-weight:bold" onclick="removeAttachment(\\'' + a.id + '\\')">&times;</span></span>';
+  }).join('');
+}
+
+function addMessage(role, content, meta, attachments) {
   if (chatHistory.length === 0 && role === 'user') {
     messagesEl.innerHTML = '';
   }
   const div = document.createElement('div');
   div.className = 'msg msg-' + role;
+  let attHtml = '';
+  if (attachments && attachments.length > 0) {
+    attHtml = '<div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px">' +
+      attachments.map(a => {
+        const isImage = a.type.startsWith('image/');
+        if (isImage && a.content) {
+          const src = a.content.startsWith('data:') ? a.content : 'data:' + a.type + ';base64,' + a.content;
+          return '<div style="display:inline-block"><img src="' + src + '" style="max-width:200px;max-height:150px;border-radius:8px;border:1px solid var(--border)" alt="' + escapeHtml(a.name) + '"><div style="font-size:0.7rem;color:var(--text2)">' + escapeHtml(a.name) + '</div></div>';
+        }
+        return '<span style="background:var(--bg3);padding:3px 8px;border-radius:8px;font-size:0.75rem">📄 ' + escapeHtml(a.name) + '</span>';
+      }).join('') + '</div>';
+  }
   let metaHtml = '';
   if (meta) {
     const parts = [];
@@ -802,7 +930,7 @@ function addMessage(role, content, meta) {
     if (meta.tokensUsed) parts.push(meta.tokensUsed + ' tokens');
     metaHtml = '<div class="msg-meta">' + parts.join(' • ') + '</div>';
   }
-  div.innerHTML = escapeHtml(content) + metaHtml;
+  div.innerHTML = attHtml + escapeHtml(content) + metaHtml;
   messagesEl.appendChild(div);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
@@ -815,38 +943,44 @@ function escapeHtml(text) {
 
 async function sendMessage() {
   const text = inputEl.value.trim();
-  if (!text || isLoading) return;
+  if ((!text && pendingAttachments.length === 0) || isLoading) return;
 
   isLoading = true;
   sendBtn.disabled = true;
   sendBtn.textContent = '⏳...';
 
-  chatHistory.push({ role: 'user', content: text });
-  addMessage('user', text);
+  const currentAttachments = [...pendingAttachments];
+  const displayText = text || (currentAttachments.length > 0 ? 'Analyze attached file(s)' : '');
+
+  chatHistory.push({ role: 'user', content: displayText });
+  addMessage('user', displayText, null, currentAttachments);
   inputEl.value = '';
   inputEl.style.height = 'auto';
+  pendingAttachments = [];
+  updateAttachmentBar();
 
-  // Add loading indicator
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'msg msg-assistant';
   loadingDiv.id = 'loading-msg';
-  loadingDiv.innerHTML = '<span style="animation:pulse 1.5s infinite">🤔 Thinking...</span>';
+  loadingDiv.innerHTML = '<span style="animation:pulse 1.5s infinite">🧠 Thinking...</span>';
   messagesEl.appendChild(loadingDiv);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
   try {
+    const payload = {
+      model: modelSelect.value,
+      messages: chatHistory,
+      temperature: parseFloat(tempInput.value) || 0.7,
+      attachments: currentAttachments,
+    };
+
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: modelSelect.value,
-        messages: chatHistory,
-        temperature: parseFloat(tempInput.value) || 0.7,
-      }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
 
-    // Remove loading
     const ld = document.getElementById('loading-msg');
     if (ld) ld.remove();
 
@@ -863,7 +997,11 @@ async function sendMessage() {
   } catch (err) {
     const ld = document.getElementById('loading-msg');
     if (ld) ld.remove();
-    addMessage('assistant', '❌ Failed to connect. Make sure Ollama is running: ollama serve');
+    if (modelSelect.value === 'local-brain') {
+      addMessage('assistant', '❌ Local Brain error. Check console for details.');
+    } else {
+      addMessage('assistant', '❌ Failed to connect. Make sure Ollama is running: ollama serve');
+    }
   }
 
   isLoading = false;
@@ -872,7 +1010,6 @@ async function sendMessage() {
   inputEl.focus();
 }
 
-// Auto-resize textarea
 inputEl.addEventListener('input', function() {
   this.style.height = 'auto';
   this.style.height = Math.min(this.scrollHeight, 200) + 'px';
@@ -1057,9 +1194,12 @@ export class DashboardServer {
   private server: http.Server | null = null
   private sessions: ChatSession[] = []
   private models: DashboardModelInfo[] = [...DASHBOARD_MODELS]
+  private devBrain: DevBrain
+  private uploadedFiles: Map<string, UploadedFile> = new Map()
 
   constructor(config?: Partial<DashboardConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config }
+    this.devBrain = new DevBrain({ autoLearn: true, debugMode: false })
   }
 
   /** Get the server configuration */
@@ -1075,6 +1215,16 @@ export class DashboardServer {
   /** Get model list with current status */
   getModels(): DashboardModelInfo[] {
     return [...this.models]
+  }
+
+  /** Get the DevBrain instance for direct access */
+  getDevBrain(): DevBrain {
+    return this.devBrain
+  }
+
+  /** Get uploaded files */
+  getUploadedFiles(): UploadedFile[] {
+    return [...this.uploadedFiles.values()]
   }
 
   /** Update model statuses from Ollama */
@@ -1144,6 +1294,17 @@ export class DashboardServer {
 
       if (pathname === '/api/settings' && method === 'GET') {
         sendJson(res, this.config)
+        return
+      }
+
+      if (pathname === '/api/upload' && method === 'POST') {
+        const body = await readBody(req)
+        this.handleFileUpload(res, body)
+        return
+      }
+
+      if (pathname === '/api/uploads' && method === 'GET') {
+        sendJson(res, { files: [...this.uploadedFiles.values()] })
         return
       }
 
@@ -1241,7 +1402,13 @@ export class DashboardServer {
 
   /** Handle chat API */
   private async handleChatApi(res: http.ServerResponse, body: string): Promise<void> {
-    let parsed: { model?: string; messages?: Array<{ role: string; content: string }>; temperature?: number; maxTokens?: number }
+    let parsed: {
+      model?: string
+      messages?: Array<{ role: string; content: string }>
+      temperature?: number
+      maxTokens?: number
+      attachments?: Array<{ id: string; name: string; type: string; size: number; content: string }>
+    }
     try {
       parsed = JSON.parse(body)
     } catch {
@@ -1253,12 +1420,108 @@ export class DashboardServer {
     const messages = parsed.messages ?? []
     const temperature = parsed.temperature ?? this.config.defaultTemperature
     const maxTokens = parsed.maxTokens ?? this.config.defaultMaxTokens
+    const attachments = parsed.attachments ?? []
 
     if (messages.length === 0) {
       sendJson(res, { error: 'No messages provided' }, 400)
       return
     }
 
+    // Store attachments if provided
+    for (const att of attachments) {
+      if (att.id && att.name) {
+        this.uploadedFiles.set(att.id, {
+          id: att.id,
+          name: att.name,
+          type: att.type ?? 'application/octet-stream',
+          size: att.size ?? 0,
+          content: att.content ?? '',
+        })
+      }
+    }
+
+    // ── Route to Local Brain (DevBrain) — no Ollama needed ──
+    if (model === 'local-brain') {
+      try {
+        const start = Date.now()
+        const lastMessage = messages[messages.length - 1]
+        let userText = lastMessage?.content ?? ''
+
+        // Enrich message with file context if attachments present
+        if (attachments.length > 0) {
+          const fileContextParts: string[] = []
+          for (const att of attachments) {
+            const isImage = att.type?.startsWith('image/')
+            if (isImage) {
+              // Analyze image via DevBrain
+              try {
+                const imageResult = await this.devBrain.analyzeImage({
+                  imageData: att.content,
+                  mediaType: att.type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+                })
+                fileContextParts.push(`[Image: ${att.name}]\n${imageResult.description}`)
+              } catch {
+                fileContextParts.push(`[Image: ${att.name}] (image attached)`)
+              }
+            } else {
+              // Text/document content
+              const preview = att.content.length > 5000 ? att.content.substring(0, 5000) + '...(truncated)' : att.content
+              fileContextParts.push(`[File: ${att.name}]\n${preview}`)
+            }
+          }
+          if (fileContextParts.length > 0) {
+            userText = fileContextParts.join('\n\n') + '\n\n' + userText
+          }
+        }
+
+        const result = await this.devBrain.chat(userText)
+        const durationMs = Date.now() - start
+
+        // Store in session
+        const session: ChatSession = {
+          id: generateId(),
+          title: (messages[0]?.content ?? 'Chat').slice(0, 50),
+          model,
+          messages: messages.map(m => ({
+            id: generateId(),
+            role: m.role as 'user' | 'assistant' | 'system',
+            content: m.content,
+            model,
+            timestamp: Date.now(),
+          })),
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        }
+
+        session.messages.push({
+          id: generateId(),
+          role: 'assistant',
+          content: result.text,
+          model,
+          timestamp: Date.now(),
+          tokensUsed: result.usage.inputTokens + result.usage.outputTokens,
+          durationMs,
+        })
+
+        this.sessions.push(session)
+        if (this.sessions.length > this.config.maxChatHistory) {
+          this.sessions.shift()
+        }
+
+        sendJson(res, {
+          text: result.text,
+          model,
+          tokensUsed: result.usage.inputTokens + result.usage.outputTokens,
+          durationMs,
+        })
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Chat request failed'
+        sendJson(res, { error: `Local Brain error: ${msg}` }, 500)
+      }
+      return
+    }
+
+    // ── Route to Ollama for external models ──
     try {
       const result = await chatWithOllama(
         this.config.ollamaHost,
@@ -1309,6 +1572,37 @@ export class DashboardServer {
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Chat request failed'
       sendJson(res, { error: `Failed to chat with model "${model}": ${msg}. Make sure Ollama is running (ollama serve) and the model is pulled (ollama pull ${model}).` }, 503)
+    }
+  }
+
+  /** Handle file upload API */
+  private handleFileUpload(res: http.ServerResponse, body: string): void {
+    try {
+      const parsed = JSON.parse(body) as {
+        name?: string
+        type?: string
+        content?: string
+        size?: number
+      }
+
+      if (!parsed.name || !parsed.content) {
+        sendJson(res, { error: 'Missing file name or content' }, 400)
+        return
+      }
+
+      const file: UploadedFile = {
+        id: generateId(),
+        name: parsed.name,
+        type: parsed.type ?? 'application/octet-stream',
+        size: parsed.size ?? parsed.content.length,
+        content: parsed.content,
+      }
+
+      this.uploadedFiles.set(file.id, file)
+
+      sendJson(res, { ok: true, file: { id: file.id, name: file.name, type: file.type, size: file.size } })
+    } catch {
+      sendJson(res, { error: 'Invalid upload JSON' }, 400)
     }
   }
 
