@@ -1147,6 +1147,58 @@ export class DashboardServer {
         return
       }
 
+      // Backward-compatible API endpoints (from main branch dashboard)
+      if (pathname === '/api/status' && method === 'GET') {
+        const mem = process.memoryUsage()
+        const ollamaRunning = await checkOllama(this.config.ollamaHost, this.config.ollamaPort)
+        sendJson(res, {
+          ok: true,
+          nodeVersion: process.version,
+          platform: process.platform,
+          arch: process.arch,
+          uptime: Math.floor(process.uptime()),
+          memoryMB: Math.round(mem.rss / 1024 / 1024),
+          heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024),
+          heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024),
+          ollamaRunning,
+          pid: process.pid,
+          cwd: process.cwd(),
+        })
+        return
+      }
+
+      if (pathname === '/api/modules' && method === 'GET') {
+        const moduleNames = [
+          'LocalBrain', 'ModelSpark', 'QwenLocalLLM', 'LocalLLMBridge',
+          'SemanticEngine', 'IntentEngine', 'ReasoningEngine', 'MetaCognition',
+          'ContextManager', 'SemanticMemory', 'PlanningEngine', 'CodeOptimizer',
+          'ExploitSearchEngine', 'BufferOverflowDebugger', 'PythonBlackHat',
+          'VulnerabilityScanner', 'ThreatModeler', 'NetworkForensics',
+          'CyberThreatIntelligence', 'CreativeEngine', 'EmotionEngine',
+          'KnowledgeGraphEngine', 'DecisionEngine', 'CollaborationEngine',
+          'DocumentAnalyzer', 'CodeAgent', 'TradingEngine', 'AdvancedSearchEngine',
+          'BayesianNetwork', 'TemporalReasoner', 'ConceptMapper', 'PatternRecognizer',
+          'SelfReflectionEngine', 'DebateEngine', 'ScientificReasoner', 'EthicalReasoner',
+          'KurdishLanguageUtils', 'ImageAnalyzer', 'PdfExpert', 'TaskOrchestrator',
+        ]
+        sendJson(res, { ok: true, modules: moduleNames })
+        return
+      }
+
+      if (pathname === '/api/config' && method === 'GET') {
+        sendJson(res, {
+          ok: true,
+          config: {
+            ollamaUrl: `http://${this.config.ollamaHost}:${this.config.ollamaPort}`,
+            llamaCppUrl: `http://${this.config.llamaCppHost}:${this.config.llamaCppPort}`,
+            defaultModel: this.config.defaultModel,
+            dashboardPort: this.config.port,
+            version: '2.3.0',
+          },
+        })
+        return
+      }
+
       // Page routes
       if (pathname === '/' && method === 'GET') {
         await this.refreshModelStatus()
@@ -1324,6 +1376,19 @@ export class DashboardServer {
 }
 
 // ─── CLI Entry Point ─────────────────────────────────────────────────────────
+
+/** Backward-compatible startDashboard function (used by main branch tests) */
+export function startDashboard(port?: number): http.Server {
+  const dashboard = new DashboardServer({ port: port ?? DEFAULT_CONFIG.port })
+  const server = http.createServer((req, res) => {
+    dashboard.handleRequest(req, res).catch(err => {
+      console.error('Dashboard error:', err)
+      sendJson(res, { error: 'Internal server error' }, 500)
+    })
+  })
+  server.listen(port ?? DEFAULT_CONFIG.port, DEFAULT_CONFIG.host)
+  return server
+}
 
 if (process.argv[1]?.endsWith('server.ts') || process.argv[1]?.endsWith('server.js')) {
   const dashboard = new DashboardServer()

@@ -17,6 +17,7 @@ import {
   renderModelsPage,
   renderModulesPage,
   renderSettingsPage,
+  startDashboard,
 } from '../server.js'
 
 import type {
@@ -533,5 +534,66 @@ describe('DASHBOARD_MODELS', () => {
       expect(m.description.length).toBeGreaterThan(10)
       expect(m.strengths.length).toBeGreaterThan(0)
     }
+  })
+})
+
+// ─── Backward-compatible API tests (from main branch) ────────────────────────
+
+describe('Backward-Compatible APIs', () => {
+  let server: DashboardServer
+  let port: number
+  let baseUrl: string
+
+  beforeEach(async () => {
+    port = 30000 + Math.floor(Math.random() * 10000)
+    server = new DashboardServer({ port, host: '127.0.0.1' })
+    await server.start()
+    baseUrl = `http://127.0.0.1:${port}`
+  })
+
+  afterEach(async () => {
+    await server.stop()
+  })
+
+  it('should export startDashboard function', () => {
+    expect(typeof startDashboard).toBe('function')
+  })
+
+  it('GET /api/status returns system info with ok field', async () => {
+    const res = await fetch(`${baseUrl}/api/status`)
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.ok).toBe(true)
+    expect(data).toHaveProperty('nodeVersion')
+    expect(data).toHaveProperty('platform')
+    expect(data).toHaveProperty('memoryMB')
+    expect(data).toHaveProperty('pid')
+  })
+
+  it('GET /api/modules returns module list with ok field', async () => {
+    const res = await fetch(`${baseUrl}/api/modules`)
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.ok).toBe(true)
+    expect(Array.isArray(data.modules)).toBe(true)
+    expect(data.modules.length).toBeGreaterThan(20)
+  })
+
+  it('GET /api/config returns configuration with ok field', async () => {
+    const res = await fetch(`${baseUrl}/api/config`)
+    expect(res.status).toBe(200)
+    const data = JSON.parse(res.body)
+    expect(data.ok).toBe(true)
+    expect(data.config).toHaveProperty('ollamaUrl')
+    expect(data.config).toHaveProperty('defaultModel')
+    expect(data.config).toHaveProperty('version')
+    expect(data.config.ollamaUrl).toContain('localhost')
+    expect(data.config.llamaCppUrl).toContain('localhost')
+  })
+
+  it('dashboard HTML contains no Anthropic references', async () => {
+    const res = await fetch(`${baseUrl}/`)
+    expect(res.body.toLowerCase()).not.toContain('anthropic')
+    expect(res.body.toLowerCase()).not.toContain('claude')
   })
 })

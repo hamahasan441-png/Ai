@@ -18,9 +18,8 @@ export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS
 }
 
 /**
- * Check if ANTHROPIC_BASE_URL is a first-party Anthropic API URL.
- * Returns true if not set (default API) or points to api.anthropic.com
- * (or api-staging.anthropic.com for ant users).
+ * Check if base URL is a first-party local API URL.
+ * Returns true if not set (default local API) or points to localhost.
  */
 export function isFirstPartyAnthropicBaseUrl(): boolean {
   const baseUrl = process.env.ANTHROPIC_BASE_URL
@@ -28,12 +27,9 @@ export function isFirstPartyAnthropicBaseUrl(): boolean {
     return true
   }
   try {
-    const host = new URL(baseUrl).host
-    const allowedHosts = ['api.anthropic.com']
-    if (process.env.USER_TYPE === 'ant') {
-      allowedHosts.push('api-staging.anthropic.com')
-    }
-    return allowedHosts.includes(host)
+    const parsed = new URL(baseUrl)
+    const hostname = parsed.hostname
+    return hostname === 'localhost' || hostname === '127.0.0.1'
   } catch {
     return false
   }

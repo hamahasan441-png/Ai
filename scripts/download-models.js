@@ -88,6 +88,40 @@ const MODELS = {
     url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q2_k.gguf',
     description: 'Needs ~4 GB RAM. Significant quality loss.',
   },
+  // ── Qwen2.5-Coder 1.5B ──────────────────────────────────────────────────
+  'qwen-1.5b-q4': {
+    id: 'qwen2.5-coder-1.5b-instruct-q4_k_m',
+    label: 'Qwen2.5-Coder 1.5B  Q4_K_M  (lightweight)',
+    family: 'qwen',
+    sizeInMb: 990,
+    url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf',
+    description: 'Very fast. Needs ~2 GB RAM. Good for mobile/low-resource devices.',
+  },
+  'qwen-1.5b-q8': {
+    id: 'qwen2.5-coder-1.5b-instruct-q8_0',
+    label: 'Qwen2.5-Coder 1.5B  Q8_0',
+    family: 'qwen',
+    sizeInMb: 1680,
+    url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-1.5b-instruct-q8_0.gguf',
+    description: 'Higher quality small model. Needs ~3 GB RAM.',
+  },
+  // ── Qwen2.5-Coder 3B ────────────────────────────────────────────────────
+  'qwen-3b-q4': {
+    id: 'qwen2.5-coder-3b-instruct-q4_k_m',
+    label: 'Qwen2.5-Coder 3B  Q4_K_M  (balanced)',
+    family: 'qwen',
+    sizeInMb: 2010,
+    url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/resolve/main/qwen2.5-coder-3b-instruct-q4_k_m.gguf',
+    description: 'Good balance for 4 GB RAM systems.',
+  },
+  'qwen-3b-q8': {
+    id: 'qwen2.5-coder-3b-instruct-q8_0',
+    label: 'Qwen2.5-Coder 3B  Q8_0',
+    family: 'qwen',
+    sizeInMb: 3430,
+    url: 'https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/resolve/main/qwen2.5-coder-3b-instruct-q8_0.gguf',
+    description: 'Higher quality 3B model. Needs ~5 GB RAM.',
+  },
   // ── LLaMA 3.2 ────────────────────────────────────────────────────────────
   'llama-3b-q4': {
     id: 'llama-3.2-3b-instruct-q4_k_m',

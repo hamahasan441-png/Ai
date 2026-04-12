@@ -45,7 +45,7 @@ npm install
 ### Docker
 ```bash
 docker build -t ai .
-docker run -it --rm -e ANTHROPIC_API_KEY=your-key ai
+docker run -it --rm ai
 ```
 
 ### From Source (Development)
@@ -55,6 +55,71 @@ cd Ai
 npm install
 npm test
 ```
+
+## 🦙 Local LLM Setup (Ollama & Qwen)
+
+This AI runs **fully offline** using local LLMs via [Ollama](https://ollama.com). No API keys needed.
+
+### Quick Setup
+
+```bash
+# 1. Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# 2. Start the Ollama server
+ollama serve &
+
+# 3. Download recommended models
+ollama pull qwen2.5-coder:7b    # Primary — code specialist (4.7 GB)
+ollama pull llama3.2:3b          # Secondary — general purpose (2.0 GB)
+
+# 4. Start our AI (auto-connects to Ollama)
+npm start
+```
+
+Or use our management scripts:
+```bash
+npm run ollama-models -- --recommended    # Pull recommended models via script
+npm run download-models -- --all          # Download GGUF files from HuggingFace
+```
+
+### Available Qwen Models
+
+| Model | Command | Size | RAM | Best For |
+|-------|---------|------|-----|----------|
+| Qwen 2.5 Coder 0.5B | `ollama pull qwen2.5-coder:0.5b` | 400 MB | 1 GB | Ultra-light, low-resource |
+| Qwen 2.5 Coder 1.5B | `ollama pull qwen2.5-coder:1.5b` | 1 GB | 2 GB | Fast, mobile/embedded |
+| Qwen 2.5 Coder 3B | `ollama pull qwen2.5-coder:3b` | 2 GB | 4 GB | Good quality, moderate |
+| **Qwen 2.5 Coder 7B** ★ | `ollama pull qwen2.5-coder:7b` | **4.7 GB** | **6 GB** | **Recommended** |
+| Qwen 2.5 Coder 14B | `ollama pull qwen2.5-coder:14b` | 9 GB | 12 GB | High quality |
+| Qwen 2.5 Coder 32B | `ollama pull qwen2.5-coder:32b` | 20 GB | 24 GB | Very high quality |
+| Qwen 2.5 72B | `ollama pull qwen2.5:72b` | 44 GB | 48 GB | Maximum quality |
+
+### Other Supported Models
+
+```bash
+ollama pull llama3.1:8b          # LLaMA 3.1 — better general reasoning
+ollama pull mistral:7b           # Mistral — strong reasoning
+ollama pull codellama:7b         # CodeLlama — Meta code model
+ollama pull deepseek-coder:6.7b  # DeepSeek Coder
+ollama pull phi3:mini            # Phi-3 Mini — Microsoft efficient model
+ollama pull gemma2:9b            # Gemma 2 — Google model
+ollama pull starcoder2:7b        # StarCoder 2 — code completion
+```
+
+### How It Connects
+
+The AI auto-detects Ollama at `localhost:11434` and uses models through these components:
+
+| Component | What It Does |
+|-----------|-------------|
+| `QwenLocalLLM` | Direct Qwen inference — code generation, completions |
+| `LocalLLMBridge` | Smart routing — picks best model/method per query |
+| `ModelSpark` | Dual-model ensemble — Qwen + LLaMA for best quality |
+
+**📖 Full guide:** [docs/OLLAMA_QWEN_GUIDE.md](docs/OLLAMA_QWEN_GUIDE.md) — installation, configuration, troubleshooting, and advanced usage.
+
+---
 
 ## ✨ What's New in v2.2
 
@@ -343,7 +408,79 @@ An AI system that **uses every file in the repository**. Three files work togeth
 | `src/types/` | 10+ | TypeScript type definitions |
 | `src/constants/` | 5+ | App-wide constants |
 
-## Quick Start
+## 🎮 Run Commands & Usage
+
+### Essential Commands
+
+```bash
+npm start                                  # Start the AI CLI (interactive chat)
+npm run dashboard                          # Start web dashboard (localhost:3210)
+npm run setup                              # Full guided setup
+npm test                                   # Run all tests
+npm run ollama-models -- --recommended     # Pull recommended models
+npm run download-models -- --all           # Download GGUF model files
+```
+
+### Chat Usage (inside the AI)
+
+Once running with `npm start`, just type naturally:
+
+```
+You: Write a Python function to sort a list
+You: Now add type hints and error handling
+You: Can you write tests for it too?
+You: /model qwen2.5-coder:7b       ← switch models
+You: /help                          ← see all commands
+You: /compact                       ← manage context window
+You: /memory                        ← persistent memory
+You: /review                        ← code review
+You: /diff                          ← git diff
+You: /commit                        ← git commit
+```
+
+### Model Commands
+
+```bash
+# Ollama direct commands
+ollama pull qwen2.5-coder:7b              # Download code model (★ recommended)
+ollama pull llama3.2:3b                    # Download general model (★ recommended)
+ollama run qwen2.5-coder:7b "prompt"      # One-shot query
+ollama run qwen2.5-coder:7b               # Interactive chat
+ollama list                                # List downloaded models
+ollama ps                                  # Running models + GPU info
+ollama rm <model>                          # Remove a model
+ollama show <model>                        # Show model details
+```
+
+### Using in Code
+
+```ts
+import { ModelSpark, QwenLocalLLM, LocalLLMBridge, LocalBrain } from './chat/index.js'
+
+// Dual-model ensemble (best quality)
+const spark = new ModelSpark({
+  primaryModel: 'qwen2.5-coder:7b',
+  secondaryModel: 'llama3.2:3b',
+  strategy: 'ensemble',
+})
+const result = await spark.infer('Explain the Observer pattern')
+
+// Direct Qwen inference
+const qwen = new QwenLocalLLM({ backend: 'ollama', model: 'qwen2.5-coder:7b' })
+const response = await qwen.generate({ prompt: 'Write a binary search', maxTokens: 2048 })
+
+// Smart routing (auto-selects best method)
+const bridge = new LocalLLMBridge()
+const answer = await bridge.query('How do I implement REST APIs?')
+
+// Offline brain (no LLM needed)
+const brain = new LocalBrain({ enableIntelligence: true })
+const chat = brain.chat('What is a binary search tree?')
+```
+
+**📖 Full commands & usage guide:** [docs/COMMANDS_AND_USAGE.md](docs/COMMANDS_AND_USAGE.md) — all run commands, chat features, model commands, slash commands, tool reference, and API examples.
+
+## Quick Start (Code API)
 
 ```ts
 import { IntegratedAI, MODULE_DIRECTORY } from './chat/index.js'
@@ -351,22 +488,22 @@ import { IntegratedAI, MODULE_DIRECTORY } from './chat/index.js'
 // Create the integrated AI (uses ALL modules)
 const ai = new IntegratedAI({
   title: 'My Session',
-  model: 'claude-sonnet-4-20250514',
+  model: 'qwen2.5-coder:7b',
 })
 
-// 💬 Chat (uses AiChat.ts brain → Claude API)
+// 💬 Chat (uses local LLM — fully offline)
 await ai.chat_send('Explain this project')
 
 // 💻 Write code (uses Code Writer — 24 languages)
 await ai.writeCode({ description: 'REST API', language: 'typescript', style: 'production' })
 
-// 🖼 Analyze images (uses Image Analyzer — like Claude Opus vision)
+// 🖼 Analyze images (uses Image Analyzer)
 await ai.analyzeImage({ imageData: base64, mediaType: 'image/png' })
 
-// 🔧 See all 38 tools
-console.log(`Tools: ${ai.getToolCount()}`)  // 38
+// 🔧 See all 39 tools
+console.log(`Tools: ${ai.getToolCount()}`)  // 39
 
-// 📋 See all 50+ commands
+// 📋 See all 100+ commands
 const cmds = await ai.getAvailableCommands()
 
 // 🌍 Get project context
