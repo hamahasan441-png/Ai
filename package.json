@@ -36,7 +36,8 @@
     "ollama-models": "node scripts/ollama-models.js",
     "postinstall": "node scripts/postinstall.js",
     "prepublishOnly": "npm run typecheck && npm run test",
-    "prepack": "echo 'Note: This package requires tsx or a TypeScript runtime to execute the CLI entry point.'"
+    "prepack": "echo 'Note: This package requires tsx or a TypeScript runtime to execute the CLI entry point.'",
+    "dashboard": "tsx src/dashboard/server.ts"
   },
   "repository": {
     "type": "git",

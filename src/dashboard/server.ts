@@ -1,1187 +1,1399 @@
 /**
- * AI Dashboard Server
- *
- * A professional web UI dashboard for managing local AI models,
- * monitoring system status, and interacting with the AI.
- * Runs fully offline — no external API dependencies.
+ * ╔═══════════════════════════════════════════════════════════════════════════════╗
+ * ║                                                                             ║
+ * ║   🖥️  A I   D A S H B O A R D  —  LOCAL WEB UI                              ║
+ * ║                                                                             ║
+ * ║   Full-featured web dashboard with chat UI supporting ALL local models.     ║
+ * ║   No external APIs — connects to Ollama/llama.cpp running locally.          ║
+ * ║                                                                             ║
+ * ║   Pages:                                                                    ║
+ * ║     🏠 Dashboard  — Overview, system stats, quick actions                   ║
+ * ║     💬 Chat       — Multi-model chat with model selector                    ║
+ * ║     🤖 Models     — Browse, manage, check status of all models             ║
+ * ║     📊 Modules    — View all AI modules and capabilities                    ║
+ * ║     ⚙️  Settings   — Configure ports, models, preferences                   ║
+ * ║                                                                             ║
+ * ║   Run: npm run dashboard   or   tsx src/dashboard/server.ts                 ║
+ * ║   Default port: 3210 (configurable via AI_DASHBOARD_PORT)                   ║
+ * ║                                                                             ║
+ * ╚═══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { createServer, type IncomingMessage, type ServerResponse } from 'http'
-import { resolve, extname } from 'path'
-import { readFile, readdir, stat } from 'fs/promises'
+import * as http from 'http'
+import * as os from 'os'
 
-const DEFAULT_PORT = parseInt(process.env.AI_DASHBOARD_PORT ?? '3210', 10)
-const VERSION = '2.3.0'
+// ─── Types ───────────────────────────────────────────────────────────────────
 
-// ── MIME types ────────────────────────────────────────────────────────────────
-const MIME_TYPES: Record<string, string> = {
-  '.html': 'text/html',
-  '.css': 'text/css',
-  '.js': 'application/javascript',
-  '.json': 'application/json',
-  '.png': 'image/png',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
+/** Dashboard configuration */
+export interface DashboardConfig {
+  port: number
+  host: string
+  ollamaHost: string
+  ollamaPort: number
+  llamaCppHost: string
+  llamaCppPort: number
+  title: string
+  maxChatHistory: number
+  defaultModel: string
+  defaultTemperature: number
+  defaultMaxTokens: number
 }
 
-// ── Helper: get Ollama models ─────────────────────────────────────────────────
-async function getOllamaModels(): Promise<object[]> {
-  try {
-    const ollamaUrl = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434'
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 3000)
-    const resp = await fetch(`${ollamaUrl}/api/tags`, { signal: controller.signal })
-    clearTimeout(timeout)
-    if (!resp.ok) return []
-    const data = (await resp.json()) as { models?: object[] }
-    return data.models ?? []
-  } catch {
-    return []
-  }
+/** Chat message for the dashboard */
+export interface DashboardChatMessage {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  model: string
+  timestamp: number
+  tokensUsed?: number
+  durationMs?: number
 }
 
-// ── Helper: get system info ───────────────────────────────────────────────────
-function getSystemInfo(): Record<string, unknown> {
-  const mem = process.memoryUsage()
+/** Chat session */
+export interface ChatSession {
+  id: string
+  title: string
+  model: string
+  messages: DashboardChatMessage[]
+  createdAt: number
+  updatedAt: number
+}
+
+/** Model status info */
+export interface DashboardModelInfo {
+  id: string
+  name: string
+  family: string
+  parameterCount: string
+  quantization: string
+  contextWindow: number
+  status: 'available' | 'loaded' | 'unavailable'
+  backend: 'ollama' | 'llama_cpp' | 'unknown'
+  description: string
+  strengths: string[]
+}
+
+/** System stats */
+export interface SystemStats {
+  platform: string
+  arch: string
+  cpus: number
+  totalMemoryGB: number
+  freeMemoryGB: number
+  uptime: number
+  nodeVersion: string
+  ollamaAvailable: boolean
+  llamaCppAvailable: boolean
+  modelsLoaded: number
+  totalChats: number
+}
+
+/** API route handler */
+export type RouteHandler = (
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  body?: string,
+) => void | Promise<void>
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const DEFAULT_CONFIG: DashboardConfig = {
+  port: parseInt(process.env.AI_DASHBOARD_PORT ?? '3210', 10),
+  host: '0.0.0.0',
+  ollamaHost: 'localhost',
+  ollamaPort: 11434,
+  llamaCppHost: 'localhost',
+  llamaCppPort: 8080,
+  title: 'AI Dashboard',
+  maxChatHistory: 1000,
+  defaultModel: 'qwen2.5-coder:7b',
+  defaultTemperature: 0.7,
+  defaultMaxTokens: 2048,
+}
+
+/** All supported models for the dashboard */
+export const DASHBOARD_MODELS: DashboardModelInfo[] = [
+  {
+    id: 'qwen2.5-coder:7b',
+    name: 'Qwen2.5-Coder 7B',
+    family: 'qwen2.5',
+    parameterCount: '7B',
+    quantization: 'Q4_K_M',
+    contextWindow: 32768,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Best-in-class for code generation, review, and debugging.',
+    strengths: ['Code Generation', 'Code Review', 'Debugging', 'Security Analysis'],
+  },
+  {
+    id: 'qwen2.5-coder:1.5b',
+    name: 'Qwen2.5-Coder 1.5B',
+    family: 'qwen2.5',
+    parameterCount: '1.5B',
+    quantization: 'Q4_K_M',
+    contextWindow: 32768,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Ultra-fast lightweight coder for quick completions.',
+    strengths: ['Code Completion', 'Fast Drafting'],
+  },
+  {
+    id: 'llama3.1:8b',
+    name: 'LLaMA 3.1 8B',
+    family: 'llama3',
+    parameterCount: '8B',
+    quantization: 'Q4_K_M',
+    contextWindow: 131072,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Excellent reasoning, math, and general knowledge with 128K context.',
+    strengths: ['Reasoning', 'Math', 'Creative Writing', 'Planning'],
+  },
+  {
+    id: 'llama3:8b',
+    name: 'LLaMA 3 8B',
+    family: 'llama3',
+    parameterCount: '8B',
+    quantization: 'Q4_K_M',
+    contextWindow: 8192,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Fast general-purpose model for conversation and reasoning.',
+    strengths: ['Conversation', 'Summarization', 'Translation'],
+  },
+  {
+    id: 'mistral:7b',
+    name: 'Mistral 7B',
+    family: 'mistral',
+    parameterCount: '7B',
+    quantization: 'Q4_K_M',
+    contextWindow: 32768,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Balanced model with strong reasoning and instruction following.',
+    strengths: ['Reasoning', 'Instruction Following', 'Analysis'],
+  },
+  {
+    id: 'codellama:7b',
+    name: 'CodeLlama 7B',
+    family: 'codellama',
+    parameterCount: '7B',
+    quantization: 'Q4_K_M',
+    contextWindow: 16384,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Meta code-specialized LLM for generation and infilling.',
+    strengths: ['Code Generation', 'Code Infilling', 'Debugging'],
+  },
+  {
+    id: 'deepseek-coder:6.7b',
+    name: 'DeepSeek Coder 6.7B',
+    family: 'deepseek',
+    parameterCount: '6.7B',
+    quantization: 'Q4_K_M',
+    contextWindow: 16384,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Strong code generation model trained on 2T tokens of code.',
+    strengths: ['Code Generation', 'Code Completion', 'Bug Fixing'],
+  },
+  {
+    id: 'phi3:mini',
+    name: 'Phi-3 Mini',
+    family: 'phi',
+    parameterCount: '3.8B',
+    quantization: 'Q4_K_M',
+    contextWindow: 4096,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Compact yet powerful model from Microsoft for reasoning tasks.',
+    strengths: ['Reasoning', 'Math', 'Compact Size'],
+  },
+  {
+    id: 'gemma2:9b',
+    name: 'Gemma 2 9B',
+    family: 'gemma',
+    parameterCount: '9B',
+    quantization: 'Q4_K_M',
+    contextWindow: 8192,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Google open model with strong benchmarks across tasks.',
+    strengths: ['Reasoning', 'Coding', 'Analysis'],
+  },
+  {
+    id: 'starcoder2:7b',
+    name: 'StarCoder2 7B',
+    family: 'starcoder',
+    parameterCount: '7B',
+    quantization: 'Q4_K_M',
+    contextWindow: 16384,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Code-specialized model trained on The Stack v2.',
+    strengths: ['Code Generation', 'Multi-language Code', 'Completion'],
+  },
+  {
+    id: 'qwen2.5:72b',
+    name: 'Qwen2.5 72B',
+    family: 'qwen2.5',
+    parameterCount: '72B',
+    quantization: 'Q4_K_M',
+    contextWindow: 32768,
+    status: 'unavailable',
+    backend: 'ollama',
+    description: 'Largest Qwen model — near GPT-4 level for all tasks. Needs 48GB+ RAM.',
+    strengths: ['Everything', 'Code', 'Reasoning', 'Creative Writing', 'Analysis'],
+  },
+]
+
+// ─── Utility Functions ───────────────────────────────────────────────────────
+
+/** Generate a unique ID */
+export function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+}
+
+/** Get system statistics */
+export function getSystemStats(sessions: ChatSession[]): SystemStats {
+  const cpus = os.cpus()
   return {
+    platform: os.platform(),
+    arch: os.arch(),
+    cpus: cpus.length,
+    totalMemoryGB: Math.round((os.totalmem() / 1024 / 1024 / 1024) * 10) / 10,
+    freeMemoryGB: Math.round((os.freemem() / 1024 / 1024 / 1024) * 10) / 10,
+    uptime: Math.floor(os.uptime()),
     nodeVersion: process.version,
-    platform: process.platform,
-    arch: process.arch,
-    uptime: Math.floor(process.uptime()),
-    memoryMB: Math.round(mem.rss / 1024 / 1024),
-    heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024),
-    heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024),
-    ollamaRunning: false, // updated asynchronously
-    pid: process.pid,
-    cwd: process.cwd(),
+    ollamaAvailable: false,
+    llamaCppAvailable: false,
+    modelsLoaded: 0,
+    totalChats: sessions.length,
   }
 }
 
-async function checkOllamaRunning(): Promise<boolean> {
-  try {
-    const ollamaUrl = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434'
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 2000)
-    const resp = await fetch(`${ollamaUrl}/api/tags`, { signal: controller.signal })
-    clearTimeout(timeout)
-    return resp.ok
-  } catch {
-    return false
+/** Parse URL query parameters */
+export function parseQuery(url: string): Record<string, string> {
+  const qIdx = url.indexOf('?')
+  if (qIdx < 0) return {}
+  const params: Record<string, string> = {}
+  const qs = url.slice(qIdx + 1)
+  for (const pair of qs.split('&')) {
+    const [k, v] = pair.split('=')
+    if (k) params[decodeURIComponent(k)] = decodeURIComponent(v ?? '')
   }
+  return params
 }
 
-// ── Helper: list local chat modules ───────────────────────────────────────────
-async function getChatModules(): Promise<string[]> {
-  try {
-    const chatDir = resolve(__dirname, '..', 'chat')
-    const files = await readdir(chatDir)
-    return files.filter(f => f.endsWith('.ts') && !f.endsWith('.test.ts') && f !== 'index.ts')
-  } catch {
-    return []
-  }
+/** Read request body */
+export function readBody(req: http.IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = []
+    req.on('data', (chunk: Buffer) => chunks.push(chunk))
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')))
+    req.on('error', reject)
+  })
 }
 
-// ── API route handler ─────────────────────────────────────────────────────────
-async function handleAPI(path: string, _req: IncomingMessage, res: ServerResponse): Promise<void> {
-  res.setHeader('Content-Type', 'application/json')
-  res.setHeader('Access-Control-Allow-Origin', '*')
-
-  switch (path) {
-    case '/api/status': {
-      const info = getSystemInfo()
-      info.ollamaRunning = await checkOllamaRunning()
-      res.end(JSON.stringify({ ok: true, ...info }))
-      break
-    }
-    case '/api/models': {
-      const models = await getOllamaModels()
-      res.end(JSON.stringify({ ok: true, models }))
-      break
-    }
-    case '/api/modules': {
-      const modules = await getChatModules()
-      res.end(JSON.stringify({ ok: true, modules }))
-      break
-    }
-    case '/api/config': {
-      const config = {
-        ollamaUrl: process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434',
-        llamaCppUrl: process.env.LLAMACPP_BASE_URL ?? 'http://localhost:8080',
-        defaultModel: process.env.AI_DEFAULT_MODEL ?? 'qwen2.5-coder:7b',
-        dashboardPort: DEFAULT_PORT,
-        version: VERSION,
-      }
-      res.end(JSON.stringify({ ok: true, config }))
-      break
-    }
-    default:
-      res.statusCode = 404
-      res.end(JSON.stringify({ ok: false, error: 'Not found' }))
-  }
+/** Send JSON response */
+export function sendJson(res: http.ServerResponse, data: unknown, status = 200): void {
+  const body = JSON.stringify(data)
+  res.writeHead(status, {
+    'Content-Type': 'application/json',
+    'Content-Length': Buffer.byteLength(body),
+    'Access-Control-Allow-Origin': '*',
+  })
+  res.end(body)
 }
 
-// ── Main request handler ──────────────────────────────────────────────────────
-async function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  const url = req.url ?? '/'
-
-  // API routes
-  if (url.startsWith('/api/')) {
-    await handleAPI(url.split('?')[0], req, res)
-    return
-  }
-
-  // Serve the SPA dashboard
-  const html = getDashboardHTML()
-  res.setHeader('Content-Type', 'text/html')
+/** Send HTML response */
+export function sendHtml(res: http.ServerResponse, html: string, status = 200): void {
+  res.writeHead(status, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Content-Length': Buffer.byteLength(html),
+  })
   res.end(html)
 }
 
-// ── Start server ──────────────────────────────────────────────────────────────
-export function startDashboard(port?: number): ReturnType<typeof createServer> {
-  const p = port ?? DEFAULT_PORT
-  const server = createServer(handler)
-  server.listen(p, () => {
-    console.log(`\n  🤖 AI Dashboard running at http://localhost:${p}\n`)
+/** Check if Ollama is running */
+export async function checkOllama(host: string, port: number): Promise<boolean> {
+  return new Promise(resolve => {
+    const req = http.request({ hostname: host, port, path: '/api/tags', method: 'GET', timeout: 2000 }, res => {
+      res.resume()
+      resolve(res.statusCode === 200)
+    })
+    req.on('error', () => resolve(false))
+    req.on('timeout', () => { req.destroy(); resolve(false) })
+    req.end()
   })
+}
+
+/** List models from Ollama */
+export async function listOllamaModels(host: string, port: number): Promise<string[]> {
+  return new Promise(resolve => {
+    const req = http.request({ hostname: host, port, path: '/api/tags', method: 'GET', timeout: 5000 }, res => {
+      const chunks: Buffer[] = []
+      res.on('data', (c: Buffer) => chunks.push(c))
+      res.on('end', () => {
+        try {
+          const data = JSON.parse(Buffer.concat(chunks).toString('utf-8'))
+          const models = (data.models ?? []).map((m: { name: string }) => m.name)
+          resolve(models)
+        } catch {
+          resolve([])
+        }
+      })
+    })
+    req.on('error', () => resolve([]))
+    req.on('timeout', () => { req.destroy(); resolve([]) })
+    req.end()
+  })
+}
+
+/** Send chat to Ollama and get response */
+export async function chatWithOllama(
+  host: string,
+  port: number,
+  model: string,
+  messages: Array<{ role: string; content: string }>,
+  options?: { temperature?: number; maxTokens?: number },
+): Promise<{ text: string; tokensUsed: number; durationMs: number }> {
+  const start = Date.now()
+  return new Promise((resolve, reject) => {
+    const payload = JSON.stringify({
+      model,
+      messages,
+      stream: false,
+      options: {
+        temperature: options?.temperature ?? 0.7,
+        num_predict: options?.maxTokens ?? 2048,
+      },
+    })
+
+    const req = http.request(
+      {
+        hostname: host,
+        port,
+        path: '/api/chat',
+        method: 'POST',
+        timeout: 120000,
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+      },
+      res => {
+        const chunks: Buffer[] = []
+        res.on('data', (c: Buffer) => chunks.push(c))
+        res.on('end', () => {
+          try {
+            const data = JSON.parse(Buffer.concat(chunks).toString('utf-8'))
+            resolve({
+              text: data.message?.content ?? data.response ?? 'No response from model.',
+              tokensUsed: (data.eval_count ?? 0) + (data.prompt_eval_count ?? 0),
+              durationMs: Date.now() - start,
+            })
+          } catch {
+            resolve({ text: 'Error parsing model response.', tokensUsed: 0, durationMs: Date.now() - start })
+          }
+        })
+      },
+    )
+    req.on('error', err => reject(err))
+    req.on('timeout', () => { req.destroy(); reject(new Error('Request timeout')) })
+    req.write(payload)
+    req.end()
+  })
+}
+
+// ─── HTML Templates ──────────────────────────────────────────────────────────
+
+/** Generate the common HTML head with CSS */
+function htmlHead(title: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title}</title>
+<style>
+:root {
+  --bg: #0f0f0f;
+  --bg2: #1a1a2e;
+  --bg3: #16213e;
+  --accent: #0f3460;
+  --primary: #e94560;
+  --text: #eee;
+  --text2: #aaa;
+  --border: #333;
+  --green: #00e676;
+  --orange: #ff9800;
+  --red: #f44336;
+  --blue: #2196f3;
+  --radius: 12px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+}
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.sidebar-header h1 { font-size: 1.3rem; color: var(--primary); }
+.sidebar-header p { font-size: 0.75rem; color: var(--text2); margin-top: 4px; }
+.nav { flex: 1; padding: 12px; }
+.nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  color: var(--text2);
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+.nav a:hover, .nav a.active {
+  background: var(--accent);
+  color: var(--text);
+}
+.nav a .icon { font-size: 1.2rem; }
+/* Main content */
+.main {
+  margin-left: 260px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.topbar h2 { font-size: 1.2rem; }
+.content { padding: 24px; flex: 1; }
+/* Cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.card h3 { font-size: 0.9rem; color: var(--text2); margin-bottom: 8px; }
+.card .value { font-size: 1.8rem; font-weight: 700; }
+.card .sub { font-size: 0.8rem; color: var(--text2); margin-top: 4px; }
+/* Status badges */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.badge-green { background: rgba(0,230,118,0.15); color: var(--green); }
+.badge-orange { background: rgba(255,152,0,0.15); color: var(--orange); }
+.badge-red { background: rgba(244,67,54,0.15); color: var(--red); }
+/* Tables */
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--text2); font-size: 0.85rem; text-transform: uppercase; }
+tr:hover { background: rgba(255,255,255,0.03); }
+/* Chat UI */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 73px);
+}
+.chat-header {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+.chat-header select {
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  min-width: 200px;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.msg {
+  max-width: 80%;
+  padding: 14px 18px;
+  border-radius: 16px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.msg-user {
+  align-self: flex-end;
+  background: var(--accent);
+  border-bottom-right-radius: 4px;
+}
+.msg-assistant {
+  align-self: flex-start;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.msg-meta {
+  font-size: 0.7rem;
+  color: var(--text2);
+  margin-top: 6px;
+}
+.chat-input-area {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.chat-input-area textarea {
+  flex: 1;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  min-height: 48px;
+  max-height: 200px;
+}
+.chat-input-area textarea:focus { border-color: var(--primary); }
+.send-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.send-btn:hover { opacity: 0.85; }
+.send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* Model cards */
+.model-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.model-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: transform 0.2s;
+}
+.model-card:hover { transform: translateY(-2px); }
+.model-card h3 { color: var(--primary); margin-bottom: 6px; }
+.model-card .family { color: var(--text2); font-size: 0.8rem; margin-bottom: 10px; }
+.model-card .desc { font-size: 0.9rem; color: var(--text2); margin-bottom: 12px; }
+.model-card .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  background: rgba(233,69,96,0.1);
+  color: var(--primary);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+/* Settings form */
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; color: var(--text2); font-size: 0.85rem; margin-bottom: 6px; }
+.form-group input, .form-group select {
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  font-size: 0.95rem;
+}
+.btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:hover { opacity: 0.85; }
+/* Module list */
+.module-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.module-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+}
+.module-item h4 { color: var(--blue); font-size: 0.95rem; margin-bottom: 4px; }
+.module-item p { color: var(--text2); font-size: 0.82rem; }
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar { width: 60px; }
+  .sidebar-header h1, .sidebar-header p, .nav a span { display: none; }
+  .nav a { justify-content: center; padding: 12px; }
+  .main { margin-left: 60px; }
+}
+</style>
+</head>
+<body>`
+}
+
+/** Sidebar navigation */
+function sidebarHtml(activePage: string): string {
+  const links = [
+    { href: '/', icon: '🏠', label: 'Dashboard', id: 'dashboard' },
+    { href: '/chat', icon: '💬', label: 'Chat', id: 'chat' },
+    { href: '/models', icon: '🤖', label: 'Models', id: 'models' },
+    { href: '/modules', icon: '📊', label: 'Modules', id: 'modules' },
+    { href: '/settings', icon: '⚙️', label: 'Settings', id: 'settings' },
+  ]
+  return `
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>🧠 AI Dashboard</h1>
+    <p>100% Local • No API Keys</p>
+  </div>
+  <nav class="nav">
+    ${links.map(l => `<a href="${l.href}" class="${l.id === activePage ? 'active' : ''}"><span class="icon">${l.icon}</span><span>${l.label}</span></a>`).join('\n    ')}
+  </nav>
+</div>`
+}
+
+/** Dashboard home page */
+export function renderDashboardPage(stats: SystemStats, models: DashboardModelInfo[]): string {
+  const availableModels = models.filter(m => m.status !== 'unavailable').length
+  return `${htmlHead('AI Dashboard')}
+${sidebarHtml('dashboard')}
+<div class="main">
+  <div class="topbar"><h2>🏠 Dashboard Overview</h2><span class="badge ${stats.ollamaAvailable ? 'badge-green' : 'badge-red'}">${stats.ollamaAvailable ? 'Ollama Online' : 'Ollama Offline'}</span></div>
+  <div class="content">
+    <div class="cards">
+      <div class="card"><h3>System</h3><div class="value">${stats.platform}</div><div class="sub">${stats.arch} • ${stats.cpus} CPUs</div></div>
+      <div class="card"><h3>Memory</h3><div class="value">${stats.freeMemoryGB} GB free</div><div class="sub">of ${stats.totalMemoryGB} GB total</div></div>
+      <div class="card"><h3>Models</h3><div class="value">${availableModels} / ${models.length}</div><div class="sub">available models</div></div>
+      <div class="card"><h3>Chat Sessions</h3><div class="value">${stats.totalChats}</div><div class="sub">conversations</div></div>
+      <div class="card"><h3>Node.js</h3><div class="value">${stats.nodeVersion}</div><div class="sub">runtime version</div></div>
+      <div class="card"><h3>Uptime</h3><div class="value">${Math.floor(stats.uptime / 3600)}h ${Math.floor((stats.uptime % 3600) / 60)}m</div><div class="sub">system uptime</div></div>
+    </div>
+    <h3 style="margin-bottom:12px">Quick Actions</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <a href="/chat" class="btn">💬 Start Chat</a>
+      <a href="/models" class="btn" style="background:var(--blue)">🤖 View Models</a>
+      <a href="/modules" class="btn" style="background:var(--green);color:#000">📊 AI Modules</a>
+    </div>
+  </div>
+</div>
+</body></html>`
+}
+
+/** Chat page */
+export function renderChatPage(models: DashboardModelInfo[], defaultModel: string): string {
+  const modelOptions = models.map(m =>
+    `<option value="${m.id}" ${m.id === defaultModel ? 'selected' : ''}>${m.name} (${m.parameterCount})</option>`
+  ).join('\n          ')
+
+  return `${htmlHead('Chat — AI Dashboard')}
+${sidebarHtml('chat')}
+<div class="main">
+  <div class="chat-container">
+    <div class="chat-header">
+      <label for="model-select" style="font-weight:600">Model:</label>
+      <select id="model-select">
+        ${modelOptions}
+      </select>
+      <label for="temp-input" style="margin-left:16px;font-weight:600">Temp:</label>
+      <input type="number" id="temp-input" value="0.7" min="0" max="2" step="0.1" style="width:70px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:0.9rem">
+      <button onclick="clearChat()" class="btn" style="margin-left:auto;background:var(--red);padding:8px 16px;font-size:0.85rem">🗑 Clear</button>
+    </div>
+    <div class="chat-messages" id="messages">
+      <div style="text-align:center;color:var(--text2);margin-top:40vh">
+        <div style="font-size:3rem;margin-bottom:12px">💬</div>
+        <p>Select a model and start chatting!</p>
+        <p style="font-size:0.8rem;margin-top:8px">All models run 100% locally via Ollama.</p>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <textarea id="chat-input" placeholder="Type your message... (Shift+Enter for new line)" rows="1" onkeydown="handleKeyDown(event)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">Send ➤</button>
+    </div>
+  </div>
+</div>
+<script>
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('chat-input');
+const sendBtn = document.getElementById('send-btn');
+const modelSelect = document.getElementById('model-select');
+const tempInput = document.getElementById('temp-input');
+
+let chatHistory = [];
+let isLoading = false;
+
+function handleKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function clearChat() {
+  chatHistory = [];
+  messagesEl.innerHTML = '<div style="text-align:center;color:var(--text2);margin-top:40vh"><div style="font-size:3rem;margin-bottom:12px">💬</div><p>Chat cleared. Start a new conversation!</p></div>';
+}
+
+function addMessage(role, content, meta) {
+  // Clear placeholder
+  if (chatHistory.length === 0 && role === 'user') {
+    messagesEl.innerHTML = '';
+  }
+  const div = document.createElement('div');
+  div.className = 'msg msg-' + role;
+  let metaHtml = '';
+  if (meta) {
+    const parts = [];
+    if (meta.model) parts.push(meta.model);
+    if (meta.durationMs) parts.push((meta.durationMs / 1000).toFixed(1) + 's');
+    if (meta.tokensUsed) parts.push(meta.tokensUsed + ' tokens');
+    metaHtml = '<div class="msg-meta">' + parts.join(' • ') + '</div>';
+  }
+  div.innerHTML = escapeHtml(content) + metaHtml;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text || isLoading) return;
+
+  isLoading = true;
+  sendBtn.disabled = true;
+  sendBtn.textContent = '⏳...';
+
+  chatHistory.push({ role: 'user', content: text });
+  addMessage('user', text);
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+
+  // Add loading indicator
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'msg msg-assistant';
+  loadingDiv.id = 'loading-msg';
+  loadingDiv.innerHTML = '<span style="animation:pulse 1.5s infinite">🤔 Thinking...</span>';
+  messagesEl.appendChild(loadingDiv);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: modelSelect.value,
+        messages: chatHistory,
+        temperature: parseFloat(tempInput.value) || 0.7,
+      }),
+    });
+    const data = await res.json();
+
+    // Remove loading
+    const ld = document.getElementById('loading-msg');
+    if (ld) ld.remove();
+
+    if (data.error) {
+      addMessage('assistant', '❌ Error: ' + data.error, { model: modelSelect.value });
+    } else {
+      chatHistory.push({ role: 'assistant', content: data.text });
+      addMessage('assistant', data.text, {
+        model: modelSelect.options[modelSelect.selectedIndex].text,
+        durationMs: data.durationMs,
+        tokensUsed: data.tokensUsed,
+      });
+    }
+  } catch (err) {
+    const ld = document.getElementById('loading-msg');
+    if (ld) ld.remove();
+    addMessage('assistant', '❌ Failed to connect. Make sure Ollama is running: ollama serve');
+  }
+
+  isLoading = false;
+  sendBtn.disabled = false;
+  sendBtn.textContent = 'Send ➤';
+  inputEl.focus();
+}
+
+// Auto-resize textarea
+inputEl.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+});
+</script>
+<style>
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+</body></html>`
+}
+
+/** Models page */
+export function renderModelsPage(models: DashboardModelInfo[]): string {
+  const modelCards = models.map(m => `
+    <div class="model-card">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <h3>${m.name}</h3>
+        <span class="badge ${m.status === 'loaded' ? 'badge-green' : m.status === 'available' ? 'badge-orange' : 'badge-red'}">${m.status}</span>
+      </div>
+      <div class="family">${m.family} • ${m.parameterCount} • ${m.quantization} • ${m.contextWindow.toLocaleString()} ctx</div>
+      <div class="desc">${m.description}</div>
+      <div class="tags">${m.strengths.map(s => `<span class="tag">${s}</span>`).join('')}</div>
+      <div style="margin-top:12px"><a href="/chat?model=${encodeURIComponent(m.id)}" class="btn" style="padding:6px 14px;font-size:0.82rem">💬 Chat with ${m.name}</a></div>
+    </div>
+  `).join('')
+
+  return `${htmlHead('Models — AI Dashboard')}
+${sidebarHtml('models')}
+<div class="main">
+  <div class="topbar"><h2>🤖 All Models</h2><span style="color:var(--text2)">${models.length} models available</span></div>
+  <div class="content">
+    <div class="model-grid">${modelCards}</div>
+  </div>
+</div>
+</body></html>`
+}
+
+/** AI Modules page listing all chat modules */
+export function renderModulesPage(): string {
+  const modules = [
+    { name: 'LocalBrain', desc: 'Standalone offline AI brain with 47+ intelligence modules' },
+    { name: 'ModelSpark', desc: 'Dual-model ensemble engine (Qwen2.5 + LLaMA)' },
+    { name: 'QwenLocalLLM', desc: 'Local Qwen2.5-Coder inference engine' },
+    { name: 'LocalLLMBridge', desc: 'Brain ↔ LLM connector with smart routing' },
+    { name: 'SemanticEngine', desc: 'Semantic understanding and NLU processing' },
+    { name: 'IntentEngine', desc: 'Intent classification and slot filling' },
+    { name: 'ReasoningEngine', desc: 'Multi-step logical reasoning' },
+    { name: 'MetaCognition', desc: 'Self-awareness and confidence calibration' },
+    { name: 'ContextManager', desc: 'Multi-turn conversation context tracking' },
+    { name: 'SemanticMemory', desc: 'Knowledge graph with semantic search' },
+    { name: 'PlanningEngine', desc: 'Goal decomposition and task planning' },
+    { name: 'CodeOptimizer', desc: 'Automated code optimization and refactoring' },
+    { name: 'ExploitSearchEngine', desc: 'CVE/CWE/exploit database search with CVSS scoring' },
+    { name: 'BufferOverflowDebugger', desc: 'Stack/heap overflow analysis with ROP chain generation' },
+    { name: 'PythonBlackHat', desc: 'Security research — 16 attack domains, 298 knowledge entries' },
+    { name: 'VulnerabilityScanner', desc: 'Automated vulnerability detection and assessment' },
+    { name: 'ThreatModeler', desc: 'STRIDE/DREAD threat modeling framework' },
+    { name: 'NetworkForensics', desc: 'Packet analysis and network investigation tools' },
+    { name: 'CyberThreatIntelligence', desc: 'Threat intelligence feeds and IOC tracking' },
+    { name: 'CreativeEngine', desc: 'Creative writing and story generation' },
+    { name: 'EmotionEngine', desc: 'Sentiment and emotion analysis' },
+    { name: 'KnowledgeGraphEngine', desc: 'Knowledge graph construction and querying' },
+    { name: 'DecisionEngine', desc: 'Multi-criteria decision analysis' },
+    { name: 'CollaborationEngine', desc: 'Multi-agent collaboration framework' },
+    { name: 'DocumentAnalyzer', desc: 'Document parsing, summarization, and extraction' },
+    { name: 'CodeAgent', desc: 'Autonomous code generation agent' },
+    { name: 'TradingEngine', desc: 'Financial analysis and trading strategy generation' },
+    { name: 'AdvancedSearchEngine', desc: 'Multi-strategy search (fuzzy, semantic, graph)' },
+    { name: 'BayesianNetwork', desc: 'Probabilistic reasoning and inference' },
+    { name: 'TemporalReasoner', desc: 'Time-series analysis and temporal logic' },
+    { name: 'ConceptMapper', desc: 'Concept mapping and ontology building' },
+    { name: 'PatternRecognizer', desc: 'Pattern detection across code and data' },
+    { name: 'SelfReflectionEngine', desc: 'Self-evaluation and improvement' },
+    { name: 'DebateEngine', desc: 'Multi-perspective argument analysis' },
+    { name: 'ScientificReasoner', desc: 'Hypothesis testing and scientific method' },
+    { name: 'EthicalReasoner', desc: 'Ethical analysis and moral reasoning' },
+    { name: 'KurdishLanguageUtils', desc: 'Kurdish language processing (Sorani/Kurmanji)' },
+    { name: 'ImageAnalyzer', desc: 'Image metadata extraction and analysis' },
+    { name: 'PdfExpert', desc: 'PDF parsing and document intelligence' },
+    { name: 'TaskOrchestrator', desc: 'Task scheduling and workflow orchestration' },
+  ]
+
+  const moduleItems = modules.map(m =>
+    `<div class="module-item"><h4>${m.name}</h4><p>${m.desc}</p></div>`
+  ).join('')
+
+  return `${htmlHead('AI Modules — AI Dashboard')}
+${sidebarHtml('modules')}
+<div class="main">
+  <div class="topbar"><h2>📊 AI Modules</h2><span style="color:var(--text2)">${modules.length} modules</span></div>
+  <div class="content">
+    <p style="color:var(--text2);margin-bottom:16px">All modules run 100% offline. No external APIs required.</p>
+    <div class="module-list">${moduleItems}</div>
+  </div>
+</div>
+</body></html>`
+}
+
+/** Settings page */
+export function renderSettingsPage(config: DashboardConfig): string {
+  return `${htmlHead('Settings — AI Dashboard')}
+${sidebarHtml('settings')}
+<div class="main">
+  <div class="topbar"><h2>⚙️ Settings</h2></div>
+  <div class="content">
+    <form id="settings-form" onsubmit="saveSettings(event)">
+      <div class="form-group">
+        <label>Default Model</label>
+        <select name="defaultModel" id="settings-model">
+          ${DASHBOARD_MODELS.map(m => `<option value="${m.id}" ${m.id === config.defaultModel ? 'selected' : ''}>${m.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ollama Host</label>
+        <input type="text" name="ollamaHost" value="${config.ollamaHost}">
+      </div>
+      <div class="form-group">
+        <label>Ollama Port</label>
+        <input type="number" name="ollamaPort" value="${config.ollamaPort}">
+      </div>
+      <div class="form-group">
+        <label>Default Temperature</label>
+        <input type="number" name="defaultTemperature" value="${config.defaultTemperature}" min="0" max="2" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>Max Tokens</label>
+        <input type="number" name="defaultMaxTokens" value="${config.defaultMaxTokens}" min="100" max="8192">
+      </div>
+      <div class="form-group">
+        <label>Dashboard Port</label>
+        <input type="number" name="port" value="${config.port}" min="1024" max="65535">
+      </div>
+      <button type="submit" class="btn">💾 Save Settings</button>
+      <span id="save-status" style="margin-left:12px;color:var(--green);display:none">✓ Saved</span>
+    </form>
+  </div>
+</div>
+<script>
+async function saveSettings(e) {
+  e.preventDefault();
+  const form = new FormData(e.target);
+  const data = Object.fromEntries(form);
+  try {
+    const res = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (res.ok) {
+      const el = document.getElementById('save-status');
+      el.style.display = 'inline';
+      setTimeout(() => el.style.display = 'none', 2000);
+    }
+  } catch (err) {
+    alert('Failed to save settings');
+  }
+}
+</script>
+</body></html>`
+}
+
+/** 404 page */
+function render404Page(): string {
+  return `${htmlHead('404 — AI Dashboard')}
+${sidebarHtml('')}
+<div class="main">
+  <div class="topbar"><h2>404 — Not Found</h2></div>
+  <div class="content" style="text-align:center;padding-top:100px">
+    <div style="font-size:5rem">🔍</div>
+    <h2 style="margin:16px 0">Page Not Found</h2>
+    <p style="color:var(--text2)">The page you're looking for doesn't exist.</p>
+    <a href="/" class="btn" style="display:inline-block;margin-top:20px">← Back to Dashboard</a>
+  </div>
+</div>
+</body></html>`
+}
+
+// ─── Dashboard Server ────────────────────────────────────────────────────────
+
+export class DashboardServer {
+  private config: DashboardConfig
+  private server: http.Server | null = null
+  private sessions: ChatSession[] = []
+  private models: DashboardModelInfo[] = [...DASHBOARD_MODELS]
+
+  constructor(config?: Partial<DashboardConfig>) {
+    this.config = { ...DEFAULT_CONFIG, ...config }
+  }
+
+  /** Get the server configuration */
+  getConfig(): DashboardConfig {
+    return { ...this.config }
+  }
+
+  /** Get all chat sessions */
+  getSessions(): ChatSession[] {
+    return [...this.sessions]
+  }
+
+  /** Get model list with current status */
+  getModels(): DashboardModelInfo[] {
+    return [...this.models]
+  }
+
+  /** Update model statuses from Ollama */
+  async refreshModelStatus(): Promise<void> {
+    const ollamaAvailable = await checkOllama(this.config.ollamaHost, this.config.ollamaPort)
+    if (!ollamaAvailable) {
+      this.models = this.models.map(m => ({ ...m, status: 'unavailable' as const }))
+      return
+    }
+    const ollamaModels = await listOllamaModels(this.config.ollamaHost, this.config.ollamaPort)
+    this.models = this.models.map(m => {
+      const isAvailable = ollamaModels.some(om =>
+        om === m.id || om.startsWith(m.id.split(':')[0] ?? '')
+      )
+      return { ...m, status: isAvailable ? 'available' as const : 'unavailable' as const }
+    })
+  }
+
+  /** Handle incoming HTTP requests */
+  async handleRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+    const url = req.url ?? '/'
+    const pathname = url.split('?')[0] ?? '/'
+    const method = req.method ?? 'GET'
+
+    // CORS preflight
+    if (method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      })
+      res.end()
+      return
+    }
+
+    try {
+      // API routes
+      if (pathname === '/api/chat' && method === 'POST') {
+        const body = await readBody(req)
+        await this.handleChatApi(res, body)
+        return
+      }
+
+      if (pathname === '/api/models' && method === 'GET') {
+        await this.refreshModelStatus()
+        sendJson(res, { models: this.models })
+        return
+      }
+
+      if (pathname === '/api/stats' && method === 'GET') {
+        const stats = getSystemStats(this.sessions)
+        stats.ollamaAvailable = await checkOllama(this.config.ollamaHost, this.config.ollamaPort)
+        sendJson(res, stats)
+        return
+      }
+
+      if (pathname === '/api/sessions' && method === 'GET') {
+        sendJson(res, { sessions: this.sessions })
+        return
+      }
+
+      if (pathname === '/api/settings' && method === 'POST') {
+        const body = await readBody(req)
+        this.handleSettingsApi(res, body)
+        return
+      }
+
+      if (pathname === '/api/settings' && method === 'GET') {
+        sendJson(res, this.config)
+        return
+      }
+
+      // Backward-compatible API endpoints (from main branch dashboard)
+      if (pathname === '/api/status' && method === 'GET') {
+        const mem = process.memoryUsage()
+        const ollamaRunning = await checkOllama(this.config.ollamaHost, this.config.ollamaPort)
+        sendJson(res, {
+          ok: true,
+          nodeVersion: process.version,
+          platform: process.platform,
+          arch: process.arch,
+          uptime: Math.floor(process.uptime()),
+          memoryMB: Math.round(mem.rss / 1024 / 1024),
+          heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024),
+          heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024),
+          ollamaRunning,
+          pid: process.pid,
+          cwd: process.cwd(),
+        })
+        return
+      }
+
+      if (pathname === '/api/modules' && method === 'GET') {
+        const moduleNames = [
+          'LocalBrain', 'ModelSpark', 'QwenLocalLLM', 'LocalLLMBridge',
+          'SemanticEngine', 'IntentEngine', 'ReasoningEngine', 'MetaCognition',
+          'ContextManager', 'SemanticMemory', 'PlanningEngine', 'CodeOptimizer',
+          'ExploitSearchEngine', 'BufferOverflowDebugger', 'PythonBlackHat',
+          'VulnerabilityScanner', 'ThreatModeler', 'NetworkForensics',
+          'CyberThreatIntelligence', 'CreativeEngine', 'EmotionEngine',
+          'KnowledgeGraphEngine', 'DecisionEngine', 'CollaborationEngine',
+          'DocumentAnalyzer', 'CodeAgent', 'TradingEngine', 'AdvancedSearchEngine',
+          'BayesianNetwork', 'TemporalReasoner', 'ConceptMapper', 'PatternRecognizer',
+          'SelfReflectionEngine', 'DebateEngine', 'ScientificReasoner', 'EthicalReasoner',
+          'KurdishLanguageUtils', 'ImageAnalyzer', 'PdfExpert', 'TaskOrchestrator',
+        ]
+        sendJson(res, { ok: true, modules: moduleNames })
+        return
+      }
+
+      if (pathname === '/api/config' && method === 'GET') {
+        sendJson(res, {
+          ok: true,
+          config: {
+            ollamaUrl: `http://${this.config.ollamaHost}:${this.config.ollamaPort}`,
+            llamaCppUrl: `http://${this.config.llamaCppHost}:${this.config.llamaCppPort}`,
+            defaultModel: this.config.defaultModel,
+            dashboardPort: this.config.port,
+            version: '2.3.0',
+          },
+        })
+        return
+      }
+
+      // Page routes
+      if (pathname === '/' && method === 'GET') {
+        await this.refreshModelStatus()
+        const stats = getSystemStats(this.sessions)
+        stats.ollamaAvailable = await checkOllama(this.config.ollamaHost, this.config.ollamaPort)
+        sendHtml(res, renderDashboardPage(stats, this.models))
+        return
+      }
+
+      if (pathname === '/chat' && method === 'GET') {
+        const query = parseQuery(url)
+        const selectedModel = query.model ?? this.config.defaultModel
+        sendHtml(res, renderChatPage(this.models, selectedModel))
+        return
+      }
+
+      if (pathname === '/models' && method === 'GET') {
+        await this.refreshModelStatus()
+        sendHtml(res, renderModelsPage(this.models))
+        return
+      }
+
+      if (pathname === '/modules' && method === 'GET') {
+        sendHtml(res, renderModulesPage())
+        return
+      }
+
+      if (pathname === '/settings' && method === 'GET') {
+        sendHtml(res, renderSettingsPage(this.config))
+        return
+      }
+
+      // 404
+      sendHtml(res, render404Page(), 404)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Internal server error'
+      sendJson(res, { error: message }, 500)
+    }
+  }
+
+  /** Handle chat API */
+  private async handleChatApi(res: http.ServerResponse, body: string): Promise<void> {
+    let parsed: { model?: string; messages?: Array<{ role: string; content: string }>; temperature?: number; maxTokens?: number }
+    try {
+      parsed = JSON.parse(body)
+    } catch {
+      sendJson(res, { error: 'Invalid JSON body' }, 400)
+      return
+    }
+
+    const model = parsed.model ?? this.config.defaultModel
+    const messages = parsed.messages ?? []
+    const temperature = parsed.temperature ?? this.config.defaultTemperature
+    const maxTokens = parsed.maxTokens ?? this.config.defaultMaxTokens
+
+    if (messages.length === 0) {
+      sendJson(res, { error: 'No messages provided' }, 400)
+      return
+    }
+
+    try {
+      const result = await chatWithOllama(
+        this.config.ollamaHost,
+        this.config.ollamaPort,
+        model,
+        messages,
+        { temperature, maxTokens },
+      )
+
+      // Store in session
+      const session: ChatSession = {
+        id: generateId(),
+        title: (messages[0]?.content ?? 'Chat').slice(0, 50),
+        model,
+        messages: messages.map(m => ({
+          id: generateId(),
+          role: m.role as 'user' | 'assistant' | 'system',
+          content: m.content,
+          model,
+          timestamp: Date.now(),
+        })),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      }
+
+      // Add assistant response
+      session.messages.push({
+        id: generateId(),
+        role: 'assistant',
+        content: result.text,
+        model,
+        timestamp: Date.now(),
+        tokensUsed: result.tokensUsed,
+        durationMs: result.durationMs,
+      })
+
+      this.sessions.push(session)
+      if (this.sessions.length > this.config.maxChatHistory) {
+        this.sessions.shift()
+      }
+
+      sendJson(res, {
+        text: result.text,
+        model,
+        tokensUsed: result.tokensUsed,
+        durationMs: result.durationMs,
+      })
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Chat request failed'
+      sendJson(res, { error: `Failed to chat with model "${model}": ${msg}. Make sure Ollama is running (ollama serve) and the model is pulled (ollama pull ${model}).` }, 503)
+    }
+  }
+
+  /** Handle settings API */
+  private handleSettingsApi(res: http.ServerResponse, body: string): void {
+    try {
+      const settings = JSON.parse(body)
+      if (settings.defaultModel) this.config.defaultModel = settings.defaultModel
+      if (settings.ollamaHost) this.config.ollamaHost = settings.ollamaHost
+      if (settings.ollamaPort) this.config.ollamaPort = parseInt(settings.ollamaPort, 10)
+      if (settings.defaultTemperature) this.config.defaultTemperature = parseFloat(settings.defaultTemperature)
+      if (settings.defaultMaxTokens) this.config.defaultMaxTokens = parseInt(settings.defaultMaxTokens, 10)
+      if (settings.port) this.config.port = parseInt(settings.port, 10)
+      sendJson(res, { ok: true, config: this.config })
+    } catch {
+      sendJson(res, { error: 'Invalid settings JSON' }, 400)
+    }
+  }
+
+  /** Start the dashboard server */
+  start(): Promise<http.Server> {
+    return new Promise((resolve, reject) => {
+      this.server = http.createServer((req, res) => {
+        this.handleRequest(req, res).catch(err => {
+          console.error('Dashboard error:', err)
+          sendJson(res, { error: 'Internal server error' }, 500)
+        })
+      })
+
+      this.server.on('error', reject)
+      this.server.listen(this.config.port, this.config.host, () => {
+        console.log(`\n🖥️  AI Dashboard running at http://localhost:${this.config.port}`)
+        console.log(`   💬 Chat:     http://localhost:${this.config.port}/chat`)
+        console.log(`   🤖 Models:   http://localhost:${this.config.port}/models`)
+        console.log(`   📊 Modules:  http://localhost:${this.config.port}/modules`)
+        console.log(`   ⚙️  Settings: http://localhost:${this.config.port}/settings`)
+        console.log(`\n   Ollama: ${this.config.ollamaHost}:${this.config.ollamaPort}`)
+        console.log(`   100% Local — No external APIs\n`)
+        resolve(this.server!)
+      })
+    })
+  }
+
+  /** Stop the dashboard server */
+  stop(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.server) {
+        resolve()
+        return
+      }
+      this.server.close(err => {
+        if (err) reject(err)
+        else {
+          this.server = null
+          resolve()
+        }
+      })
+    })
+  }
+
+  /** Check if server is running */
+  isRunning(): boolean {
+    return this.server !== null && this.server.listening
+  }
+}
+
+// ─── CLI Entry Point ─────────────────────────────────────────────────────────
+
+/** Backward-compatible startDashboard function (used by main branch tests) */
+export function startDashboard(port?: number): http.Server {
+  const dashboard = new DashboardServer({ port: port ?? DEFAULT_CONFIG.port })
+  const server = http.createServer((req, res) => {
+    dashboard.handleRequest(req, res).catch(err => {
+      console.error('Dashboard error:', err)
+      sendJson(res, { error: 'Internal server error' }, 500)
+    })
+  })
+  server.listen(port ?? DEFAULT_CONFIG.port, DEFAULT_CONFIG.host)
   return server
 }
 
-// ── CLI entry ─────────────────────────────────────────────────────────────────
-if (require.main === module) {
-  startDashboard()
-}
-
-// ── Dashboard HTML (self-contained SPA) ───────────────────────────────────────
-function getDashboardHTML(): string {
-  return `<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Dashboard</title>
-  <style>
-    :root {
-      --bg-primary: #0a0e17;
-      --bg-secondary: #111827;
-      --bg-card: #1a2332;
-      --bg-card-hover: #1f2b3d;
-      --bg-input: #0d1321;
-      --border-color: #2a3a50;
-      --border-active: #3b82f6;
-      --text-primary: #e2e8f0;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --accent-blue: #3b82f6;
-      --accent-purple: #8b5cf6;
-      --accent-green: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-red: #ef4444;
-      --accent-cyan: #06b6d4;
-      --gradient-primary: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      --gradient-green: linear-gradient(135deg, #10b981, #06b6d4);
-      --gradient-amber: linear-gradient(135deg, #f59e0b, #ef4444);
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-      --shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    a { color: var(--accent-blue); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* ── Layout ── */
-    .app { display: flex; min-height: 100vh; }
-    .sidebar {
-      width: 260px;
-      background: var(--bg-secondary);
-      border-right: 1px solid var(--border-color);
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      z-index: 100;
-      transition: transform 0.3s;
-    }
-    .main {
-      flex: 1;
-      margin-left: 260px;
-      padding: 32px;
-      min-height: 100vh;
-    }
-
-    /* ── Logo ── */
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 8px 24px;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 24px;
-    }
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--gradient-primary);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 4px 15px rgba(59,130,246,0.3);
-    }
-    .logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-    .logo-version {
-      font-size: 11px;
-      color: var(--text-muted);
-      background: var(--bg-card);
-      padding: 2px 8px;
-      border-radius: 20px;
-      margin-left: auto;
-    }
-
-    /* ── Nav ── */
-    .nav { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all 0.15s;
-      color: var(--text-secondary);
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .nav-item:hover { background: var(--bg-card); color: var(--text-primary); }
-    .nav-item.active {
-      background: rgba(59,130,246,0.12);
-      color: var(--accent-blue);
-      font-weight: 600;
-    }
-    .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-    .nav-badge {
-      margin-left: auto;
-      background: var(--accent-blue);
-      color: white;
-      font-size: 11px;
-      padding: 1px 7px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    /* ── Sidebar footer ── */
-    .sidebar-footer {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid var(--border-color);
-    }
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 8px;
-    }
-    .status-dot.online { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
-    .status-dot.offline { background: var(--accent-red); box-shadow: 0 0 6px var(--accent-red); }
-    .status-text { font-size: 13px; color: var(--text-secondary); }
-
-    /* ── Page Header ── */
-    .page-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 32px;
-    }
-    .page-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-    .page-subtitle { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
-    .header-actions { display: flex; gap: 12px; }
-
-    /* ── Cards ── */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      transition: all 0.2s;
-    }
-    .card:hover { border-color: var(--border-active); box-shadow: var(--shadow-md); }
-    .card-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-    /* ── Grid ── */
-    .grid { display: grid; gap: 20px; }
-    .grid-4 { grid-template-columns: repeat(4, 1fr); }
-    .grid-3 { grid-template-columns: repeat(3, 1fr); }
-    .grid-2 { grid-template-columns: repeat(2, 1fr); }
-
-    /* ── Stat cards ── */
-    .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      transition: all 0.2s;
-    }
-    .stat-card:hover { border-color: var(--border-active); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .stat-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-    .stat-icon.blue { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
-    .stat-icon.green { background: rgba(16,185,129,0.15); color: var(--accent-green); }
-    .stat-icon.purple { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
-    .stat-icon.amber { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
-    .stat-icon.cyan { background: rgba(6,182,212,0.15); color: var(--accent-cyan); }
-    .stat-icon.red { background: rgba(239,68,68,0.15); color: var(--accent-red); }
-    .stat-value { font-size: 28px; font-weight: 700; line-height: 1.2; }
-    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
-    .stat-change {
-      font-size: 12px;
-      margin-top: 6px;
-      padding: 2px 8px;
-      border-radius: 20px;
-      display: inline-block;
-      font-weight: 600;
-    }
-    .stat-change.up { background: rgba(16,185,129,0.1); color: var(--accent-green); }
-    .stat-change.neutral { background: rgba(100,116,139,0.1); color: var(--text-muted); }
-
-    /* ── Model cards ── */
-    .model-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-    .model-card:hover { border-color: var(--accent-purple); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .model-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .model-name { font-size: 16px; font-weight: 600; }
-    .model-badge {
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    .badge-ready { background: rgba(16,185,129,0.15); color: var(--accent-green); }
-    .badge-download { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
-    .badge-active { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
-    .model-meta { display: flex; gap: 16px; margin-top: 12px; }
-    .model-meta-item { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-
-    /* ── Table ── */
-    .table-container { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); }
-    td { padding: 14px 16px; border-bottom: 1px solid rgba(42,58,80,0.5); font-size: 14px; }
-    tr:hover td { background: rgba(59,130,246,0.04); }
-
-    /* ── Buttons ── */
-    .btn {
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s;
-    }
-    .btn-primary { background: var(--gradient-primary); color: white; }
-    .btn-primary:hover { opacity: 0.9; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
-    .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); }
-    .btn-secondary:hover { border-color: var(--border-active); }
-    .btn-danger { background: rgba(239,68,68,0.15); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.3); }
-    .btn-sm { padding: 6px 14px; font-size: 13px; }
-
-    /* ── Chat ── */
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - 140px);
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .chat-message {
-      max-width: 80%;
-      padding: 14px 18px;
-      border-radius: 16px;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .chat-message.user {
-      align-self: flex-end;
-      background: var(--gradient-primary);
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
-    .chat-message.assistant {
-      align-self: flex-start;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-bottom-left-radius: 4px;
-    }
-    .chat-message pre {
-      background: var(--bg-primary);
-      padding: 12px;
-      border-radius: 8px;
-      overflow-x: auto;
-      margin: 8px 0;
-      font-size: 13px;
-    }
-    .chat-input-area {
-      padding: 16px 24px;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      gap: 12px;
-      background: var(--bg-secondary);
-    }
-    .chat-input {
-      flex: 1;
-      background: var(--bg-input);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: var(--text-primary);
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .chat-input:focus { border-color: var(--accent-blue); }
-    .chat-input::placeholder { color: var(--text-muted); }
-
-    /* ── Progress bars ── */
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      background: var(--bg-input);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.5s;
-    }
-    .progress-fill.blue { background: var(--gradient-primary); }
-    .progress-fill.green { background: var(--gradient-green); }
-
-    /* ── Tags ── */
-    .tag {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-right: 4px;
-    }
-    .tag-blue { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
-    .tag-green { background: rgba(16,185,129,0.15); color: var(--accent-green); }
-    .tag-purple { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
-    .tag-amber { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-    /* ── Responsive ── */
-    @media (max-width: 1200px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 768px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); }
-      .main { margin-left: 0; padding: 16px; }
-      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
-    }
-
-    /* ── Animations ── */
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    .fade-in { animation: fadeIn 0.3s ease-out; }
-    .pulse { animation: pulse 2s infinite; }
-
-    /* ── Empty state ── */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-secondary);
-    }
-    .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
-    .empty-state-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
-
-    /* ── Spinner ── */
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid var(--border-color);
-      border-top-color: var(--accent-blue);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 20px auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Section divider ── */
-    .section { margin-bottom: 32px; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .section-title { font-size: 18px; font-weight: 600; }
-
-    /* ── Module list ── */
-    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
-    .module-item {
-      padding: 10px 14px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      transition: all 0.15s;
-    }
-    .module-item:hover { border-color: var(--accent-purple); background: var(--bg-card-hover); }
-  </style>
-</head>
-<body>
-  <div class="app" id="app">
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-      <div class="logo">
-        <div class="logo-icon">🤖</div>
-        <span class="logo-text">AI</span>
-        <span class="logo-version" id="version">v2.3.0</span>
-      </div>
-
-      <ul class="nav" id="nav">
-        <li class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
-          <span class="nav-icon">📊</span> Dashboard
-        </li>
-        <li class="nav-item" data-page="models" onclick="navigate('models')">
-          <span class="nav-icon">🧠</span> Models
-          <span class="nav-badge" id="model-count">0</span>
-        </li>
-        <li class="nav-item" data-page="modules" onclick="navigate('modules')">
-          <span class="nav-icon">📦</span> Modules
-          <span class="nav-badge" id="module-count">0</span>
-        </li>
-        <li class="nav-item" data-page="chat" onclick="navigate('chat')">
-          <span class="nav-icon">💬</span> Chat
-        </li>
-        <li class="nav-item" data-page="settings" onclick="navigate('settings')">
-          <span class="nav-icon">⚙️</span> Settings
-        </li>
-      </ul>
-
-      <div class="sidebar-footer">
-        <div style="display:flex;align-items:center;padding:8px 12px">
-          <span class="status-dot" id="status-dot"></span>
-          <span class="status-text" id="status-text">Checking…</span>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Main content -->
-    <main class="main" id="content">
-      <!-- Rendered by JS -->
-    </main>
-  </div>
-
-  <script>
-    // ── State ──
-    let state = {
-      page: 'dashboard',
-      status: null,
-      models: [],
-      modules: [],
-      config: null,
-      chatMessages: [
-        { role: 'assistant', content: 'Hello! I am your local AI assistant. All processing happens on your machine — no cloud APIs needed. How can I help you today?' }
-      ],
-    };
-
-    // ── API ──
-    async function fetchJSON(url) {
-      try {
-        const r = await fetch(url);
-        return await r.json();
-      } catch (e) {
-        return { ok: false, error: e.message };
-      }
-    }
-
-    async function refreshData() {
-      const [statusRes, modelsRes, modulesRes, configRes] = await Promise.all([
-        fetchJSON('/api/status'),
-        fetchJSON('/api/models'),
-        fetchJSON('/api/modules'),
-        fetchJSON('/api/config'),
-      ]);
-      state.status = statusRes;
-      state.models = modelsRes.models || [];
-      state.modules = modulesRes.modules || [];
-      state.config = configRes.config || {};
-      document.getElementById('model-count').textContent = state.models.length;
-      document.getElementById('module-count').textContent = state.modules.length;
-
-      const dot = document.getElementById('status-dot');
-      const txt = document.getElementById('status-text');
-      if (statusRes.ollamaRunning) {
-        dot.className = 'status-dot online';
-        txt.textContent = 'Ollama Online';
-      } else {
-        dot.className = 'status-dot offline';
-        txt.textContent = 'Ollama Offline';
-      }
-      render();
-    }
-
-    // ── Navigation ──
-    function navigate(page) {
-      state.page = page;
-      document.querySelectorAll('.nav-item').forEach(el => {
-        el.classList.toggle('active', el.dataset.page === page);
-      });
-      render();
-    }
-
-    // ── Render ──
-    function render() {
-      const el = document.getElementById('content');
-      switch (state.page) {
-        case 'dashboard': el.innerHTML = renderDashboard(); break;
-        case 'models': el.innerHTML = renderModels(); break;
-        case 'modules': el.innerHTML = renderModules(); break;
-        case 'chat': el.innerHTML = renderChat(); setupChat(); break;
-        case 'settings': el.innerHTML = renderSettings(); break;
-      }
-    }
-
-    // ── Dashboard Page ──
-    function renderDashboard() {
-      const s = state.status || {};
-      const modelCount = state.models.length;
-      const moduleCount = state.modules.length;
-      const memPercent = s.heapTotalMB ? Math.round((s.heapUsedMB / s.heapTotalMB) * 100) : 0;
-
-      return \`
-        <div class="fade-in">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Dashboard</h1>
-              <p class="page-subtitle">System overview and performance metrics</p>
-            </div>
-            <div class="header-actions">
-              <button class="btn btn-secondary btn-sm" onclick="refreshData()">🔄 Refresh</button>
-            </div>
-          </div>
-
-          <div class="grid grid-4" style="margin-bottom:24px">
-            <div class="stat-card">
-              <div class="stat-icon blue">🧠</div>
-              <div>
-                <div class="stat-value">\${modelCount}</div>
-                <div class="stat-label">Local Models</div>
-                <span class="stat-change \${modelCount > 0 ? 'up' : 'neutral'}">\${modelCount > 0 ? '✓ Ready' : '⬇ Install models'}</span>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon purple">📦</div>
-              <div>
-                <div class="stat-value">\${moduleCount}</div>
-                <div class="stat-label">AI Modules</div>
-                <span class="stat-change up">All loaded</span>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon green">💾</div>
-              <div>
-                <div class="stat-value">\${s.memoryMB || 0} MB</div>
-                <div class="stat-label">Memory Usage</div>
-                <span class="stat-change neutral">RSS</span>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon amber">⏱️</div>
-              <div>
-                <div class="stat-value">\${formatUptime(s.uptime || 0)}</div>
-                <div class="stat-label">Uptime</div>
-                <span class="stat-change neutral">PID \${s.pid || '—'}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid grid-2">
-            <div class="card">
-              <div class="card-title">System Information</div>
-              <table>
-                <tr><td style="color:var(--text-secondary)">Platform</td><td>\${s.platform || '—'} / \${s.arch || '—'}</td></tr>
-                <tr><td style="color:var(--text-secondary)">Node.js</td><td>\${s.nodeVersion || '—'}</td></tr>
-                <tr><td style="color:var(--text-secondary)">Heap Used</td><td>\${s.heapUsedMB || 0} / \${s.heapTotalMB || 0} MB (\${memPercent}%)</td></tr>
-                <tr><td style="color:var(--text-secondary)">Ollama</td><td>\${s.ollamaRunning ? '<span style="color:var(--accent-green)">● Running</span>' : '<span style="color:var(--accent-red)">● Not running</span>'}</td></tr>
-                <tr><td style="color:var(--text-secondary)">Working Dir</td><td style="font-family:monospace;font-size:12px">\${s.cwd || '—'}</td></tr>
-              </table>
-            </div>
-            <div class="card">
-              <div class="card-title">Memory Usage</div>
-              <div style="padding:16px 0">
-                <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-                  <span style="font-size:13px;color:var(--text-secondary)">Heap Used</span>
-                  <span style="font-size:13px;font-weight:600">\${memPercent}%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill blue" style="width:\${memPercent}%"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-top:20px;margin-bottom:8px">
-                  <span style="font-size:13px;color:var(--text-secondary)">RSS Memory</span>
-                  <span style="font-size:13px;font-weight:600">\${s.memoryMB || 0} MB</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill green" style="width:\${Math.min(100, (s.memoryMB || 0) / 10)}%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          \${state.models.length > 0 ? \`
-          <div class="section" style="margin-top:24px">
-            <div class="section-header">
-              <h2 class="section-title">Installed Models</h2>
-              <button class="btn btn-secondary btn-sm" onclick="navigate('models')">View All →</button>
-            </div>
-            <div class="grid grid-3">
-              \${state.models.slice(0, 3).map(m => renderModelMiniCard(m)).join('')}
-            </div>
-          </div>
-          \` : \`
-          <div class="card" style="margin-top:24px;text-align:center;padding:40px">
-            <div style="font-size:40px;margin-bottom:12px">🚀</div>
-            <h3 style="margin-bottom:8px">Get Started with Local AI</h3>
-            <p style="color:var(--text-secondary);margin-bottom:16px">Install Ollama and pull a model to begin using AI locally.</p>
-            <code style="background:var(--bg-input);padding:8px 16px;border-radius:8px;font-size:13px;display:inline-block">ollama pull qwen2.5-coder:7b</code>
-          </div>
-          \`}
-        </div>
-      \`;
-    }
-
-    function renderModelMiniCard(m) {
-      const size = m.size ? formatSize(m.size) : '—';
-      return \`
-        <div class="model-card" onclick="navigate('models')">
-          <div class="model-card-header">
-            <span class="model-name">\${m.name || m.model || '—'}</span>
-            <span class="model-badge badge-ready">Ready</span>
-          </div>
-          <div class="model-meta">
-            <span class="model-meta-item">💾 \${size}</span>
-            \${m.details?.parameter_size ? \`<span class="model-meta-item">🔢 \${m.details.parameter_size}</span>\` : ''}
-            \${m.details?.quantization_level ? \`<span class="model-meta-item">📐 \${m.details.quantization_level}</span>\` : ''}
-          </div>
-        </div>
-      \`;
-    }
-
-    // ── Models Page ──
-    function renderModels() {
-      return \`
-        <div class="fade-in">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Models</h1>
-              <p class="page-subtitle">Manage your local AI models — all running offline</p>
-            </div>
-            <div class="header-actions">
-              <button class="btn btn-secondary btn-sm" onclick="refreshData()">🔄 Refresh</button>
-            </div>
-          </div>
-
-          <div class="card" style="margin-bottom:24px;padding:16px 20px">
-            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:13px;color:var(--text-secondary)">Ollama:</span>
-                \${state.status?.ollamaRunning ?
-                  '<span class="tag tag-green">● Online</span>' :
-                  '<span class="tag tag-amber">● Offline</span>'}
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:13px;color:var(--text-secondary)">Total Models:</span>
-                <strong>\${state.models.length}</strong>
-              </div>
-              <div style="margin-left:auto;font-size:12px;color:var(--text-muted)">
-                Models are served via Ollama (localhost:11434)
-              </div>
-            </div>
-          </div>
-
-          \${state.models.length > 0 ? \`
-            <div class="grid grid-3">
-              \${state.models.map(m => {
-                const size = m.size ? formatSize(m.size) : '—';
-                const modified = m.modified_at ? new Date(m.modified_at).toLocaleDateString() : '—';
-                return \`
-                  <div class="model-card">
-                    <div class="model-card-header">
-                      <span class="model-name">\${m.name || m.model || '—'}</span>
-                      <span class="model-badge badge-ready">Ready</span>
-                    </div>
-                    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">\${m.details?.family || 'Local Model'}</p>
-                    <div class="model-meta">
-                      <span class="model-meta-item">💾 \${size}</span>
-                      \${m.details?.parameter_size ? \`<span class="model-meta-item">🔢 \${m.details.parameter_size}</span>\` : ''}
-                      \${m.details?.quantization_level ? \`<span class="model-meta-item">📐 \${m.details.quantization_level}</span>\` : ''}
-                      <span class="model-meta-item">📅 \${modified}</span>
-                    </div>
-                  </div>
-                \`;
-              }).join('')}
-            </div>
-          \` : \`
-            <div class="empty-state">
-              <div class="empty-state-icon">🧠</div>
-              <div class="empty-state-title">No Models Installed</div>
-              <p style="margin-bottom:20px">Install Ollama and pull models to get started.</p>
-              <div style="display:flex;flex-direction:column;gap:8px;max-width:400px;margin:0 auto;text-align:left">
-                <code style="background:var(--bg-input);padding:10px 14px;border-radius:8px;font-size:13px;display:block">curl -fsSL https://ollama.com/install.sh | sh</code>
-                <code style="background:var(--bg-input);padding:10px 14px;border-radius:8px;font-size:13px;display:block">ollama pull qwen2.5-coder:7b</code>
-                <code style="background:var(--bg-input);padding:10px 14px;border-radius:8px;font-size:13px;display:block">ollama pull llama3.1:8b</code>
-                <code style="background:var(--bg-input);padding:10px 14px;border-radius:8px;font-size:13px;display:block">ollama pull mistral:7b</code>
-              </div>
-            </div>
-          \`}
-
-          <div class="section" style="margin-top:32px">
-            <div class="section-header">
-              <h2 class="section-title">Recommended Models</h2>
-            </div>
-            <div class="table-container card" style="padding:0;overflow:hidden">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Model</th>
-                    <th>Size</th>
-                    <th>Type</th>
-                    <th>Best For</th>
-                    <th>Install</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>qwen2.5-coder:7b</strong></td>
-                    <td>4.7 GB</td>
-                    <td><span class="tag tag-blue">Code</span></td>
-                    <td>Code generation, analysis, debugging</td>
-                    <td><code style="font-size:12px;background:var(--bg-input);padding:4px 8px;border-radius:4px">ollama pull qwen2.5-coder:7b</code></td>
-                  </tr>
-                  <tr>
-                    <td><strong>llama3.1:8b</strong></td>
-                    <td>4.9 GB</td>
-                    <td><span class="tag tag-purple">General</span></td>
-                    <td>General tasks, reasoning, chat</td>
-                    <td><code style="font-size:12px;background:var(--bg-input);padding:4px 8px;border-radius:4px">ollama pull llama3.1:8b</code></td>
-                  </tr>
-                  <tr>
-                    <td><strong>mistral:7b</strong></td>
-                    <td>4.1 GB</td>
-                    <td><span class="tag tag-green">General</span></td>
-                    <td>Fast inference, good balance</td>
-                    <td><code style="font-size:12px;background:var(--bg-input);padding:4px 8px;border-radius:4px">ollama pull mistral:7b</code></td>
-                  </tr>
-                  <tr>
-                    <td><strong>deepseek-coder:6.7b</strong></td>
-                    <td>3.8 GB</td>
-                    <td><span class="tag tag-blue">Code</span></td>
-                    <td>Code completion, fill-in-middle</td>
-                    <td><code style="font-size:12px;background:var(--bg-input);padding:4px 8px;border-radius:4px">ollama pull deepseek-coder:6.7b</code></td>
-                  </tr>
-                  <tr>
-                    <td><strong>codellama:7b</strong></td>
-                    <td>3.8 GB</td>
-                    <td><span class="tag tag-blue">Code</span></td>
-                    <td>Code generation, Meta's model</td>
-                    <td><code style="font-size:12px;background:var(--bg-input);padding:4px 8px;border-radius:4px">ollama pull codellama:7b</code></td>
-                  </tr>
-                  <tr>
-                    <td><strong>phi3:mini</strong></td>
-                    <td>2.3 GB</td>
-                    <td><span class="tag tag-amber">Compact</span></td>
-                    <td>Lightweight, low memory usage</td>
-                    <td><code style="font-size:12px;background:var(--bg-input);padding:4px 8px;border-radius:4px">ollama pull phi3:mini</code></td>
-                  </tr>
-                  <tr>
-                    <td><strong>gemma2:9b</strong></td>
-                    <td>5.4 GB</td>
-                    <td><span class="tag tag-purple">General</span></td>
-                    <td>Google's model, reasoning</td>
-                    <td><code style="font-size:12px;background:var(--bg-input);padding:4px 8px;border-radius:4px">ollama pull gemma2:9b</code></td>
-                  </tr>
-                  <tr>
-                    <td><strong>starcoder2:7b</strong></td>
-                    <td>4.0 GB</td>
-                    <td><span class="tag tag-blue">Code</span></td>
-                    <td>Multi-language code completion</td>
-                    <td><code style="font-size:12px;background:var(--bg-input);padding:4px 8px;border-radius:4px">ollama pull starcoder2:7b</code></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      \`;
-    }
-
-    // ── Modules Page ──
-    function renderModules() {
-      return \`
-        <div class="fade-in">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">AI Modules</h1>
-              <p class="page-subtitle">\${state.modules.length} modules loaded — all running locally</p>
-            </div>
-            <div class="header-actions">
-              <button class="btn btn-secondary btn-sm" onclick="refreshData()">🔄 Refresh</button>
-            </div>
-          </div>
-
-          <div class="card" style="margin-bottom:24px">
-            <div class="card-title">Module Categories</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <span class="tag tag-blue">Core AI</span>
-              <span class="tag tag-purple">Code Analysis</span>
-              <span class="tag tag-green">Security</span>
-              <span class="tag tag-amber">Planning</span>
-              <span class="tag tag-blue">Search</span>
-              <span class="tag tag-purple">Memory</span>
-              <span class="tag tag-green">Debugging</span>
-              <span class="tag tag-amber">Knowledge</span>
-            </div>
-          </div>
-
-          \${state.modules.length > 0 ? \`
-            <div class="module-grid">
-              \${state.modules.map(m => {
-                const name = m.replace('.ts', '');
-                const icon = getModuleIcon(name);
-                return \`<div class="module-item">\${icon} \${name}</div>\`;
-              }).join('')}
-            </div>
-          \` : \`
-            <div class="empty-state">
-              <div class="empty-state-icon">📦</div>
-              <div class="empty-state-title">No Modules Found</div>
-              <p>Chat modules should be in src/chat/</p>
-            </div>
-          \`}
-        </div>
-      \`;
-    }
-
-    // ── Chat Page ──
-    function renderChat() {
-      return \`
-        <div class="fade-in" style="height:calc(100vh - 64px)">
-          <div class="page-header" style="margin-bottom:16px">
-            <div>
-              <h1 class="page-title">Chat</h1>
-              <p class="page-subtitle">Talk to your local AI — all processing stays on your machine</p>
-            </div>
-            <div class="header-actions">
-              <button class="btn btn-secondary btn-sm" onclick="clearChat()">🗑️ Clear</button>
-            </div>
-          </div>
-
-          <div class="chat-container">
-            <div class="chat-messages" id="chat-messages">
-              \${state.chatMessages.map(msg => \`
-                <div class="chat-message \${msg.role}">
-                  \${escapeHtml(msg.content)}
-                </div>
-              \`).join('')}
-            </div>
-            <div class="chat-input-area">
-              <input
-                type="text"
-                class="chat-input"
-                id="chat-input"
-                placeholder="Type a message…"
-                onkeydown="if(event.key==='Enter')sendMessage()"
-              />
-              <button class="btn btn-primary" onclick="sendMessage()">Send ➤</button>
-            </div>
-          </div>
-        </div>
-      \`;
-    }
-
-    function setupChat() {
-      const el = document.getElementById('chat-messages');
-      if (el) el.scrollTop = el.scrollHeight;
-      const input = document.getElementById('chat-input');
-      if (input) input.focus();
-    }
-
-    async function sendMessage() {
-      const input = document.getElementById('chat-input');
-      if (!input || !input.value.trim()) return;
-      const text = input.value.trim();
-      input.value = '';
-
-      state.chatMessages.push({ role: 'user', content: text });
-      render();
-
-      // Try to send to Ollama for a real response
-      try {
-        const ollamaUrl = state.config?.ollamaUrl || 'http://localhost:11434';
-        const model = state.config?.defaultModel || 'qwen2.5-coder:7b';
-        const response = await fetch(ollamaUrl + '/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model, prompt: text, stream: false }),
-        });
-        if (response.ok) {
-          const data = await response.json();
-          state.chatMessages.push({ role: 'assistant', content: data.response || 'No response.' });
-        } else {
-          state.chatMessages.push({ role: 'assistant', content: 'I received your message but could not generate a response. Make sure Ollama is running with a model loaded.' });
-        }
-      } catch {
-        state.chatMessages.push({ role: 'assistant', content: 'Unable to connect to Ollama. Please make sure it is running (ollama serve) and a model is installed.' });
-      }
-      render();
-    }
-
-    function clearChat() {
-      state.chatMessages = [
-        { role: 'assistant', content: 'Chat cleared. How can I help you?' }
-      ];
-      render();
-    }
-
-    // ── Settings Page ──
-    function renderSettings() {
-      const c = state.config || {};
-      return \`
-        <div class="fade-in">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Settings</h1>
-              <p class="page-subtitle">Configure your local AI environment</p>
-            </div>
-          </div>
-
-          <div class="grid grid-2">
-            <div class="card">
-              <div class="card-title">Backend Configuration</div>
-              <table>
-                <tr><td style="color:var(--text-secondary)">Ollama URL</td><td><code>\${c.ollamaUrl || '—'}</code></td></tr>
-                <tr><td style="color:var(--text-secondary)">llama.cpp URL</td><td><code>\${c.llamaCppUrl || '—'}</code></td></tr>
-                <tr><td style="color:var(--text-secondary)">Default Model</td><td><code>\${c.defaultModel || '—'}</code></td></tr>
-                <tr><td style="color:var(--text-secondary)">Dashboard Port</td><td><code>\${c.dashboardPort || '—'}</code></td></tr>
-                <tr><td style="color:var(--text-secondary)">Version</td><td><code>\${c.version || '—'}</code></td></tr>
-              </table>
-            </div>
-            <div class="card">
-              <div class="card-title">Quick Commands</div>
-              <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
-                <code style="background:var(--bg-input);padding:10px 14px;border-radius:8px;font-size:13px;display:block">ollama serve</code>
-                <code style="background:var(--bg-input);padding:10px 14px;border-radius:8px;font-size:13px;display:block">ollama pull qwen2.5-coder:7b</code>
-                <code style="background:var(--bg-input);padding:10px 14px;border-radius:8px;font-size:13px;display:block">ollama list</code>
-                <code style="background:var(--bg-input);padding:10px 14px;border-radius:8px;font-size:13px;display:block">npm run dashboard</code>
-              </div>
-            </div>
-          </div>
-
-          <div class="card" style="margin-top:24px">
-            <div class="card-title">About</div>
-            <p style="color:var(--text-secondary);line-height:1.8;font-size:14px">
-              This AI system runs <strong>entirely locally</strong> on your machine. No cloud APIs, no external services,
-              no API keys needed. All models are served through <a href="https://ollama.com" target="_blank">Ollama</a>
-              or <a href="https://github.com/ggerganov/llama.cpp" target="_blank">llama.cpp</a>.<br><br>
-              Supported local models include Qwen 2.5 Coder, LLaMA 3.x, Mistral, DeepSeek Coder, CodeLlama,
-              Phi-3, Gemma 2, StarCoder 2, and many more through Ollama's model library.
-            </p>
-          </div>
-        </div>
-      \`;
-    }
-
-    // ── Helpers ──
-    function formatUptime(seconds) {
-      if (seconds < 60) return seconds + 's';
-      if (seconds < 3600) return Math.floor(seconds/60) + 'm ' + (seconds%60) + 's';
-      const h = Math.floor(seconds/3600);
-      const m = Math.floor((seconds%3600)/60);
-      return h + 'h ' + m + 'm';
-    }
-
-    function formatSize(bytes) {
-      if (bytes > 1e9) return (bytes/1e9).toFixed(1) + ' GB';
-      if (bytes > 1e6) return (bytes/1e6).toFixed(1) + ' MB';
-      return (bytes/1e3).toFixed(1) + ' KB';
-    }
-
-    function getModuleIcon(name) {
-      const n = name.toLowerCase();
-      if (n.includes('brain') || n.includes('spark')) return '🧠';
-      if (n.includes('exploit') || n.includes('security') || n.includes('blackhat')) return '🔐';
-      if (n.includes('search') || n.includes('query')) return '🔍';
-      if (n.includes('memory') || n.includes('semantic')) return '💾';
-      if (n.includes('plan') || n.includes('orchestrat')) return '📋';
-      if (n.includes('debug') || n.includes('overflow')) return '🐛';
-      if (n.includes('code') || n.includes('analysis')) return '💻';
-      if (n.includes('llm') || n.includes('qwen') || n.includes('model')) return '🤖';
-      if (n.includes('visual') || n.includes('data')) return '📊';
-      if (n.includes('conversation') || n.includes('dialogue')) return '💬';
-      if (n.includes('knowledge') || n.includes('bounty')) return '📚';
-      return '📦';
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    // ── Boot ──
-    refreshData();
-    setInterval(refreshData, 15000);
-  </script>
-</body>
-</html>`;
+if (process.argv[1]?.endsWith('server.ts') || process.argv[1]?.endsWith('server.js')) {
+  const dashboard = new DashboardServer()
+  dashboard.start().catch(err => {
+    console.error('Failed to start dashboard:', err)
+    process.exit(1)
+  })
 }
