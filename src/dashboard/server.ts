@@ -112,6 +112,9 @@ export type RouteHandler = (
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
+/** Maximum characters to include when previewing file content in chat context */
+const MAX_FILE_PREVIEW_LENGTH = 5000
+
 const DEFAULT_CONFIG: DashboardConfig = {
   port: parseInt(process.env.AI_DASHBOARD_PORT ?? '3210', 10),
   host: '0.0.0.0',
@@ -787,7 +790,7 @@ ${sidebarHtml('chat')}
         <p style="font-size:0.8rem;margin-top:8px;color:var(--text2)">Upload files 📎 and images 🖼️ for analysis. All processing runs 100% locally.</p>
       </div>
     </div>
-    <div id="attachment-bar" style="display:none;padding:8px 20px;background:var(--bg3);border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px"></div>
+    <div id="attachment-bar" style="display:none;padding:8px 20px;background:var(--bg3);border-top:1px solid var(--border);flex-wrap:wrap;gap:8px"></div>
     <div class="chat-input-area">
       <input type="file" id="file-input" style="display:none" multiple onchange="handleFileSelect(event)">
       <input type="file" id="image-input" style="display:none" accept="image/*" onchange="handleImageSelect(event)">
@@ -898,9 +901,10 @@ function updateAttachmentBar() {
     const isImage = a.type.startsWith('image/');
     const icon = isImage ? '🖼️' : '📄';
     const sizeStr = a.size > 1024*1024 ? (a.size/(1024*1024)).toFixed(1)+'MB' : a.size > 1024 ? (a.size/1024).toFixed(1)+'KB' : a.size+'B';
+    const safeId = a.id.replace(/[^a-zA-Z0-9_-]/g, '');
     return '<span style="background:var(--accent);padding:4px 10px;border-radius:16px;font-size:0.8rem;display:flex;align-items:center;gap:6px">' +
       icon + ' ' + escapeHtml(a.name) + ' <span style="color:var(--text2)">(' + sizeStr + ')</span>' +
-      '<span style="cursor:pointer;color:var(--red);font-weight:bold" onclick="removeAttachment(\\'' + a.id + '\\')">&times;</span></span>';
+      '<span style="cursor:pointer;color:var(--red);font-weight:bold" data-att-id="' + safeId + '" onclick="removeAttachment(this.dataset.attId)">&times;</span></span>';
   }).join('');
 }
 
@@ -1465,7 +1469,7 @@ export class DashboardServer {
               }
             } else {
               // Text/document content
-              const preview = att.content.length > 5000 ? att.content.substring(0, 5000) + '...(truncated)' : att.content
+              const preview = att.content.length > MAX_FILE_PREVIEW_LENGTH ? att.content.substring(0, MAX_FILE_PREVIEW_LENGTH) + '...(truncated)' : att.content
               fileContextParts.push(`[File: ${att.name}]\n${preview}`)
             }
           }
